@@ -53,7 +53,8 @@ export const PresetsComponent: React.FC = () => {
     >
       {presets.map((preset) => {
         const isActive =
-          !!selectedDate && preset.targetDate.toDateString() === selectedDate.toDateString();
+          !!selectedDate &&
+          preset.targetDate.toDateString() === selectedDate.toDateString();
         return (
           <button
             key={preset.id}
@@ -66,9 +67,11 @@ export const PresetsComponent: React.FC = () => {
             ]
               .filter(Boolean)
               .join(" ")}
-            onClick={() => onChangeDate(getPresetDate(preset, date, startDate, endDate))}
+            onClick={() =>
+              onChangeDate(getPresetDate(preset, date, startDate, endDate))
+            }
           >
-            {getRelativeLabel(locale, preset.amount, preset.unit)}{" "} {date.toDateString()}
+            {getRelativeLabel(locale, preset.amount, preset.unit)}
           </button>
         );
       })}
