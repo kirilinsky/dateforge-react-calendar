@@ -151,6 +151,7 @@ export const KitchenSink = () => {
   const [mode, setMode] = useState<SelectionMode>("single");
   const [dates, setDates] = useState<Date[]>([]);
   const [date, setDate] = useState<Date>(new Date());
+  const [startMonth, setStartMonth] = useState<Date>(new Date());
   const [activeTheme, setActiveTheme] = useState<CalendarTheme>("mint");
   const [activeLocale, setActiveLocale] = useState("en");
   const [containerWidth, setContainerWidth] = useState(580);
@@ -165,6 +166,8 @@ export const KitchenSink = () => {
 
   const [startDate, setStartDate] = useState<Date>(() => getOffsetDay(-391));
   const [endDate, setEndDate] = useState<Date>(() => getOffsetDay(411));
+  const [rangeMinDays, setRangeMinDays] = useState<number | undefined>(undefined);
+  const [rangeMaxDays, setRangeMaxDays] = useState<number | undefined>(undefined);
   const toISODate = (d: Date) => d.toISOString().split("T")[0];
   const parseDate = (s: string) => new Date(s + "T00:00:00");
 
@@ -336,6 +339,7 @@ export const KitchenSink = () => {
           <div style={{ width: `${containerWidth}px` }}>
             <Calendar
               date={isRange ? undefined : multiselect ? dates : date}
+              startMonth={startMonth}
               multiselect={multiselect}
               range={isRange || undefined}
               onChangeDate={handleChangeDate}
@@ -345,6 +349,8 @@ export const KitchenSink = () => {
               endDate={endDate}
               startOfWeek={startOfWeek}
               disabled={getDisabledValue()}
+              rangeMinDays={isRange ? rangeMinDays : undefined}
+              rangeMaxDays={isRange ? rangeMaxDays : undefined}
               {...config}
             />
           </div>
@@ -389,6 +395,18 @@ export const KitchenSink = () => {
           </select>
 
           <p className="panel-label" style={{ marginTop: 12 }}>
+            Start month
+          </p>
+          <div className="panel-date">
+            <label>select start month</label>
+            <input
+              type="date"
+              value={startMonth.getMonth()}
+              onChange={(e) => setStartMonth(parseDate(e.target.value))}
+            />
+          </div>
+
+          <p className="panel-label" style={{ marginTop: 12 }}>
             Start of week
           </p>
           <div className="panel-weekdays">
@@ -422,6 +440,38 @@ export const KitchenSink = () => {
               onChange={(e) => setEndDate(parseDate(e.target.value))}
             />
           </div>
+
+          {isRange && (
+            <>
+              <p className="panel-label" style={{ marginTop: 12 }}>
+                Range limits
+              </p>
+              <div className="panel-date">
+                <label>Min days</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={rangeMinDays ?? ""}
+                  placeholder="—"
+                  onChange={(e) =>
+                    setRangeMinDays(e.target.value ? Number(e.target.value) : undefined)
+                  }
+                />
+              </div>
+              <div className="panel-date">
+                <label>Max days</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={rangeMaxDays ?? ""}
+                  placeholder="—"
+                  onChange={(e) =>
+                    setRangeMaxDays(e.target.value ? Number(e.target.value) : undefined)
+                  }
+                />
+              </div>
+            </>
+          )}
 
           <p className="panel-label" style={{ marginTop: 12 }}>
             Disabled

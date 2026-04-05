@@ -42,6 +42,8 @@ export const CalendarProvider: React.FC<
   multiselect,
   range,
   startMonth,
+  rangeMinDays,
+  rangeMaxDays,
   containerWidth = 0,
   ...props
 }) => {
@@ -82,6 +84,10 @@ export const CalendarProvider: React.FC<
   const rangeEndRef = useRef(rangeEnd);
   rangeEndRef.current = rangeEnd;
 
+  useEffect(() => {
+    if (startMonth) setInternalDate(toValidDate(startMonth));
+  }, [startMonth]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const [showTimePopup, setShowTimePopup] = useState(false);
   const [showMonthPopup, setShowMonthPopup] = useState(false);
   const [showYearPopup, setShowYearPopup] = useState(false);
@@ -118,7 +124,13 @@ export const CalendarProvider: React.FC<
   const handleChangeDate = useCallback(
     (d: Date | null) => {
       if (range) {
-        if (!d) return;
+        if (!d) {
+          setRangeStart(null);
+          setRangeEnd(null);
+          setHoverDate(null);
+          onChangeDate?.(null);
+          return;
+        }
         const prevStart = rangeStartRef.current;
         const prevEnd = rangeEndRef.current;
 
@@ -140,6 +152,9 @@ export const CalendarProvider: React.FC<
         }
 
         const [s, e] = d < prevStart ? [d, prevStart] : [prevStart, d];
+        const diffDays = Math.round((e.getTime() - s.getTime()) / 86400000) + 1;
+        if (rangeMinDays !== undefined && diffDays < rangeMinDays) return;
+        if (rangeMaxDays !== undefined && diffDays > rangeMaxDays) return;
         setRangeStart(s);
         setRangeEnd(e);
         setInternalDate(s);

@@ -24,6 +24,19 @@
   background: var(--c-t);
 }
 
+.clearBtn {
+  margin-left: auto;
+  padding: 0.35em 0.6em !important;
+  font-size: 0.9em !important;
+  min-height: 2.1em;
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+.clearBtn:hover {
+  opacity: 1;
+}
+
 .rangeSep {
   font-size: 0.8em;
   color: var(--c-s);

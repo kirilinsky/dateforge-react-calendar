@@ -44,6 +44,8 @@ export interface CalendarProps {
   disabled?: DisabledRule;
   twoMonthsLayout?: boolean;
   monthsColumn?: boolean;
+  rangeMinDays?: number;
+  rangeMaxDays?: number;
 }
 
 export interface CalendarContextValue extends CalendarProps {

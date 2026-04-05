@@ -359,6 +359,8 @@ export interface RangeOptions {
   rangeStart?: Date | null;
   rangeEnd?: Date | null;
   hoverDate?: Date | null;
+  rangeMinDays?: number;
+  rangeMaxDays?: number;
 }
 
 export const getCalendarData = (
@@ -382,6 +384,8 @@ export const getCalendarData = (
   const rS = rangeOpts?.rangeStart;
   const rE = rangeOpts?.rangeEnd;
   const hD = rangeOpts?.hoverDate;
+  const rangeMinDays = rangeOpts?.rangeMinDays;
+  const rangeMaxDays = rangeOpts?.rangeMaxDays;
 
   const rStartT = rS
     ? new Date(rS.getFullYear(), rS.getMonth(), rS.getDate()).getTime()
@@ -446,11 +450,20 @@ export const getCalendarData = (
         pMaxT !== null &&
         t + DAY_MS <= pMaxT;
 
+      const isDisabled = checkIsDateDisabled(fullDate, startDate, endDate, disabled);
+      let isRangeLimitDisabled = false;
+      if (!isDisabled && rStartT !== null && rEndT === null && t !== rStartT) {
+        const diffDays = Math.round(Math.abs(t - rStartT) / DAY_MS) + 1;
+        if (rangeMinDays !== undefined && diffDays < rangeMinDays) isRangeLimitDisabled = true;
+        if (rangeMaxDays !== undefined && diffDays > rangeMaxDays) isRangeLimitDisabled = true;
+      }
+
       return {
         day: fullDate.getDate(),
         fullDate,
         isCurrentMonth: fullDate.getMonth() === currentMonth,
-        isDisabled: checkIsDateDisabled(fullDate, startDate, endDate, disabled),
+        isDisabled: isDisabled || isRangeLimitDisabled,
+        isRangeLimitDisabled,
         isSelected,
         connectLeft,
         connectRight,

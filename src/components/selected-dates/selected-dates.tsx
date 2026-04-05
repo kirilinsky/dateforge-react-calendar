@@ -19,7 +19,7 @@ const getRangeSep = (fmt: Intl.DateTimeFormat, start: Date, end: Date): string =
 };
 
 export const SelectedDatesComponent: React.FC = () => {
-  const { selectedDates, date, navigateTo, locale, range, rangeStart, rangeEnd } =
+  const { selectedDates, date, navigateTo, locale, range, rangeStart, rangeEnd, onChangeDate } =
     useCalendarContext();
 
   const fmt = new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", year: "numeric" });
@@ -37,6 +37,16 @@ export const SelectedDatesComponent: React.FC = () => {
       .filter(Boolean)
       .join(" ");
 
+  const clearBtn = (
+    <button
+      type="button"
+      className={`${styles.clearBtn} ${shared.interactive} ${shared.hoverable}`}
+      onClick={() => onChangeDate(null)}
+    >
+      ×
+    </button>
+  );
+
   if (range) {
     if (!rangeStart) return null;
 
@@ -53,6 +63,7 @@ export const SelectedDatesComponent: React.FC = () => {
             {fmt.format(rangeEnd)}
           </button>
         )}
+        {clearBtn}
       </div>
     );
   }
@@ -81,6 +92,7 @@ export const SelectedDatesComponent: React.FC = () => {
           </button>
         );
       })}
+      {clearBtn}
     </div>
   );
 };
