@@ -52,8 +52,8 @@
 .presetItem {
   height: auto !important;
   min-height: 2.1em;
-  padding: 0.45em 0.6em !important;
-  font-size: 0.78em !important;
+  padding: 0.45em !important;
+  font-size: 0.85em !important;
   line-height: 1.3;
   text-align: center;
   white-space: normal;

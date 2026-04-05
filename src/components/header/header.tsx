@@ -22,9 +22,10 @@ export const HeaderComponent: React.FC = () => {
     date,
     time,
     locale,
-    setView,
     hour12,
     setShowTimePopup,
+    setShowMonthPopup,
+    setShowYearPopup,
     shortMonths,
     disabled,
     twoMonthsLayout,
@@ -85,7 +86,7 @@ export const HeaderComponent: React.FC = () => {
         <button
           disabled={monthFixed}
           className={styles.monthButton}
-          onClick={() => setView("month")}
+          onClick={() => setShowMonthPopup(true)}
         >
           <Down /> {currentMonthName}
         </button>
@@ -99,7 +100,7 @@ export const HeaderComponent: React.FC = () => {
             </button>
           )}
           <button
-            onClick={() => setView(monthFixed ? "calendar" : "month")}
+            onClick={() => !monthFixed && setShowMonthPopup(true)}
             className={`${styles.currentYear} ${monthFixed ? styles.staticButton : ""}`}
           >
             {currentMonthName}
@@ -120,7 +121,7 @@ export const HeaderComponent: React.FC = () => {
             </button>
           )}
           <button
-            onClick={() => setView(monthFixed ? "calendar" : "month")}
+            onClick={() => !monthFixed && setShowMonthPopup(true)}
             className={`${styles.currentYear} ${monthFixed ? styles.staticButton : ""}`}
           >
             {currentMonthName} {cur}
@@ -146,7 +147,7 @@ export const HeaderComponent: React.FC = () => {
             </button>
           )}
           <button
-            onClick={() => setView(yearFixed ? "calendar" : "year")}
+            onClick={() => !yearFixed && setShowYearPopup(true)}
             className={`${styles.currentYear} ${yearFixed ? styles.staticButton : ""}`}
           >
             {cur}
@@ -160,7 +161,7 @@ export const HeaderComponent: React.FC = () => {
       )}
 
       {compactYears && (
-        <button className={styles.monthButton} onClick={() => setView("year")}>
+        <button className={styles.monthButton} onClick={() => setShowYearPopup(true)}>
           {cur} <Down />
         </button>
       )}

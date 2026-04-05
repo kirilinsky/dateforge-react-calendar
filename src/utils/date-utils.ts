@@ -138,10 +138,20 @@ export const getPresetDate = (
   }
   preset.calc(d);
   if (startDate && d.getTime() < startDate.getTime()) {
-    d.setHours(startDate.getHours(), startDate.getMinutes(), startDate.getSeconds(), 0);
+    d.setHours(
+      startDate.getHours(),
+      startDate.getMinutes(),
+      startDate.getSeconds(),
+      0,
+    );
   }
   if (endDate && d.getTime() > endDate.getTime()) {
-    d.setHours(endDate.getHours(), endDate.getMinutes(), endDate.getSeconds(), 0);
+    d.setHours(
+      endDate.getHours(),
+      endDate.getMinutes(),
+      endDate.getSeconds(),
+      0,
+    );
   }
   return d;
 };
@@ -202,24 +212,6 @@ export const getMonthListData = (
           (maxT !== null && new Date(year, i, 1).getTime() > maxT)
         : false,
   }));
-};
-
-export const getYearListData = (
-  centerYear: number,
-  startDate?: Date | null,
-  endDate?: Date | null,
-  rangeLen = 25,
-) => {
-  const half = Math.floor(rangeLen / 2);
-  const minY = getYearSafe(startDate);
-  const maxY = getYearSafe(endDate);
-  return Array.from({ length: rangeLen }, (_, i) => {
-    const y = centerYear - half + i;
-    return {
-      value: y,
-      disabled: (minY !== null && y < minY) || (maxY !== null && y > maxY),
-    };
-  });
 };
 
 const navBoundsFromDisabled = (

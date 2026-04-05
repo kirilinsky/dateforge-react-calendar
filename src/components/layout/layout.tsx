@@ -4,9 +4,9 @@ import { MonthsComponent } from "../months/months";
 import { PresetsComponent } from "../presets/presets";
 import { SelectedDatesComponent } from "../selected-dates/selected-dates";
 import { useCalendarContext } from "../provider/provider";
-import { SelectorComponent } from "../selector/selector";
 import { TimeComponent } from "../time/time";
 import { TimePopup } from "../time-popup/time-popup";
+import { MonthPopup, YearPopup } from "../month-year-track/month-year-track";
 import { getTwoMonthsNarrowThreshold } from "@/helpers/get-grid-layout";
 import styles from "./layout.module.css";
 import "../../themes.css";
@@ -16,7 +16,6 @@ export const CalendarLayout: React.FC<{
   brutalism: boolean;
 }> = ({ containerStyle, brutalism }) => {
   const {
-    view,
     presets,
     years,
     months,
@@ -29,24 +28,36 @@ export const CalendarLayout: React.FC<{
     dark,
     showTimePopup,
     setShowTimePopup,
+    showMonthPopup,
+    setShowMonthPopup,
+    showYearPopup,
+    setShowYearPopup,
     date,
     onChangeDate,
+    navigateTo,
     hour12,
     gestures,
+    locale,
+    shortMonths,
+    startDate,
+    endDate,
     selectedDates,
     showSelectedDates,
     twoMonthsLayout,
     monthsColumn,
     containerWidth,
-    locale,
-    shortMonths,
   } = useCalendarContext();
 
   const nextMonthDate = twoMonthsLayout
     ? new Date(date.getFullYear(), date.getMonth() + 1, 1)
     : null;
 
-  const twoMonthsStacked = !!twoMonthsLayout && (!!monthsColumn || (containerWidth > 0 && containerWidth < getTwoMonthsNarrowThreshold({ monthsGrid, timeGrid })));
+  const twoMonthsStacked =
+    !!twoMonthsLayout &&
+    (!!monthsColumn ||
+      (containerWidth > 0 &&
+        containerWidth <
+          getTwoMonthsNarrowThreshold({ monthsGrid, timeGrid })));
 
   const nextMonthLabel = nextMonthDate
     ? new Intl.DateTimeFormat(locale, {
@@ -70,7 +81,6 @@ export const CalendarLayout: React.FC<{
         .join(" ")}
       style={containerStyle}
     >
-      {view !== "calendar" && <SelectorComponent type={view} />}
       {showTimePopup && (
         <TimePopup
           date={date}
@@ -83,6 +93,34 @@ export const CalendarLayout: React.FC<{
           onClose={() => setShowTimePopup(false)}
         />
       )}
+      {showMonthPopup && (
+        <MonthPopup
+          date={date}
+          locale={locale}
+          startDate={startDate}
+          endDate={endDate}
+          shortMonths={shortMonths}
+          gestures={gestures}
+          onConfirm={(newDate) => {
+            navigateTo(newDate);
+            setShowMonthPopup(false);
+          }}
+          onClose={() => setShowMonthPopup(false)}
+        />
+      )}
+      {showYearPopup && (
+        <YearPopup
+          date={date}
+          startDate={startDate}
+          endDate={endDate}
+          gestures={gestures}
+          onConfirm={(newDate) => {
+            navigateTo(newDate);
+            setShowYearPopup(false);
+          }}
+          onClose={() => setShowYearPopup(false)}
+        />
+      )}
       {presets && <PresetsComponent />}
       {(years || compactMonths || compactYears || time || months) && (
         <HeaderComponent />
@@ -93,7 +131,13 @@ export const CalendarLayout: React.FC<{
           {nextMonthLabel}
         </div>
       )}
-      {nextMonthDate && <DaysComponent dateOverride={nextMonthDate} gridArea="D2" hideOtherMonths />}
+      {nextMonthDate && (
+        <DaysComponent
+          dateOverride={nextMonthDate}
+          gridArea="D2"
+          hideOtherMonths
+        />
+      )}
       {monthsGrid && <MonthsComponent />}
       {timeGrid && <TimeComponent />}
       {hasSelectedDates && <SelectedDatesComponent />}

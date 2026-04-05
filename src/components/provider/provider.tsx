@@ -8,11 +8,7 @@ import React, {
   useEffect,
   useRef,
 } from "react";
-import {
-  CalendarContextValue,
-  CalendarProps,
-  CalendarView,
-} from "@/types/calendar";
+import { CalendarContextValue, CalendarProps } from "@/types/calendar";
 import { DARK_THEMES } from "@/types/themes";
 
 const CalendarContext = createContext<CalendarContextValue | undefined>(
@@ -50,9 +46,10 @@ export const CalendarProvider: React.FC<
   ...props
 }) => {
   const externalDates = Array.isArray(externalDate) ? externalDate : undefined;
-  const externalSingle = Array.isArray(externalDate) ? externalDate[0] : externalDate;
+  const externalSingle = Array.isArray(externalDate)
+    ? externalDate[0]
+    : externalDate;
 
-  const [view, setView] = useState<CalendarView>("calendar");
   const [internalDate, setInternalDate] = useState<Date>(() => {
     if (externalSingle) return toValidDate(externalSingle);
     if (startMonth) return toValidDate(startMonth);
@@ -65,7 +62,7 @@ export const CalendarProvider: React.FC<
     return [];
   });
 
-   const [rangeStart, setRangeStart] = useState<Date | null>(() => {
+  const [rangeStart, setRangeStart] = useState<Date | null>(() => {
     if (!range) return null;
     if (externalDates?.[0]) return toValidDate(externalDates[0]);
     if (externalSingle) return toValidDate(externalSingle);
@@ -78,7 +75,7 @@ export const CalendarProvider: React.FC<
   });
   const [hoverDate, setHoverDate] = useState<Date | null>(null);
 
-   const selectedDatesRef = useRef(selectedDates);
+  const selectedDatesRef = useRef(selectedDates);
   selectedDatesRef.current = selectedDates;
   const rangeStartRef = useRef(rangeStart);
   rangeStartRef.current = rangeStart;
@@ -86,6 +83,8 @@ export const CalendarProvider: React.FC<
   rangeEndRef.current = rangeEnd;
 
   const [showTimePopup, setShowTimePopup] = useState(false);
+  const [showMonthPopup, setShowMonthPopup] = useState(false);
+  const [showYearPopup, setShowYearPopup] = useState(false);
 
   useEffect(() => {
     if (range) {
@@ -124,7 +123,7 @@ export const CalendarProvider: React.FC<
         const prevEnd = rangeEndRef.current;
 
         if (!prevStart || (prevStart && prevEnd)) {
-           setRangeStart(d);
+          setRangeStart(d);
           setRangeEnd(null);
           setInternalDate(d);
           setHoverDate(null);
@@ -132,8 +131,8 @@ export const CalendarProvider: React.FC<
           return;
         }
 
-         if (isSameDay(d, prevStart)) {
-           setRangeStart(null);
+        if (isSameDay(d, prevStart)) {
+          setRangeStart(null);
           setRangeEnd(null);
           setHoverDate(null);
           onChangeDate?.(null);
@@ -200,7 +199,7 @@ export const CalendarProvider: React.FC<
 
   const selectedDate = range ? rangeStart : (selectedDates[0] ?? null);
 
-   const contextSelectedDates = range
+  const contextSelectedDates = range
     ? ([rangeStart, rangeEnd].filter(Boolean) as Date[])
     : selectedDates;
 
@@ -210,8 +209,6 @@ export const CalendarProvider: React.FC<
         ...props,
         multiselect,
         range,
-        view,
-        setView,
         dark: isDark,
         date: internalDate,
         selectedDate,
@@ -223,11 +220,33 @@ export const CalendarProvider: React.FC<
         navigateTo,
         showTimePopup,
         setShowTimePopup,
+        showMonthPopup,
+        setShowMonthPopup,
+        showYearPopup,
+        setShowYearPopup,
         onChangeDate: handleChangeDate,
         onChangeTime: handleChangeTime,
         containerWidth,
       }) as CalendarContextValue,
-     [props, multiselect, range, view, isDark, internalDate, selectedDate, contextSelectedDates, rangeStart, rangeEnd, hoverDate, handleChangeDate, handleChangeTime, navigateTo, showTimePopup, containerWidth],
+    [
+      props,
+      multiselect,
+      range,
+      isDark,
+      internalDate,
+      selectedDate,
+      contextSelectedDates,
+      rangeStart,
+      rangeEnd,
+      hoverDate,
+      handleChangeDate,
+      handleChangeTime,
+      navigateTo,
+      showTimePopup,
+      showMonthPopup,
+      showYearPopup,
+      containerWidth,
+    ],
   );
 
   return (

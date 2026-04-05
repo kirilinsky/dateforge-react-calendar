@@ -104,9 +104,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding:   0.5em;
+  padding: 0.5em;
   min-height: 3em;
-  font-size: .9em;
+  font-size: 0.9em;
   font-weight: 800;
   border-top: 1px solid var(--c-s);
   border-bottom: 1px solid var(--c-s);
@@ -137,8 +137,6 @@
   --time-border-top: 1px solid var(--c-s);
 }
 
-/* Two months wide: each day grid gets ~half the container width,
-   so font-size must scale relative to half the container */
 .twoMonthsWide {
   max-width: 1200px;
   font-size: clamp(11px, 1.4cqw, 18px);

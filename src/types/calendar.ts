@@ -46,8 +46,6 @@ export interface CalendarProps {
   monthsColumn?: boolean;
 }
 
-export type CalendarView = "calendar" | "month" | "year";
-
 export interface CalendarContextValue extends CalendarProps {
   date: Date;
   containerWidth: number;
@@ -69,8 +67,10 @@ export interface CalendarContextValue extends CalendarProps {
   hoverDate: Date | null;
   setHoverDate: (d: Date | null) => void;
   dark: boolean;
-  view: CalendarView;
-  setView: (view: CalendarView) => void;
   showTimePopup: boolean;
   setShowTimePopup: (v: boolean) => void;
+  showMonthPopup: boolean;
+  setShowMonthPopup: (v: boolean) => void;
+  showYearPopup: boolean;
+  setShowYearPopup: (v: boolean) => void;
 }

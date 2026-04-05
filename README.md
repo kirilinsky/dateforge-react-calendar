@@ -14,24 +14,24 @@
 
 </div>
 
-# ⚡️ React Calendar & Date/Time Picker
+# React Calendar & Date/Time Picker
 
-📅 Ultra-lightweight Date & Time picker for React — zero dependencies, fluid adaptive layout.
+Ultra-lightweight Date & Time picker for React — zero dependencies, fluid adaptive layout, 20 themes.
 
 <div align="center">
   <table style="border: none; border-collapse: collapse;">
     <tr style="border: none;">
-      <td align="center" style="border: none; padding: 3px;">
-        <p><b>Paper Theme (light theme by default)</b></p>
-        <img src="https://i.ibb.co/NnrpfTsx/image.png" alt="Light" height="330" />
+      <td align="center" style="border: none; padding: 4px;">
+        <p><b>Paper (light)</b></p>
+        <img src="https://i.ibb.co/NnrpfTsx/image.png" alt="Paper theme" height="300" />
       </td>
-      <td align="center" style="border: none; padding: 3px;">
-        <p><b>Carbon Theme with gradient</b></p>
-        <img src="https://iili.io/BHP0U0u.md.png" alt="Dark" height="330" />
+      <td align="center" style="border: none; padding: 4px;">
+        <p><b>Carbon + gradient</b></p>
+        <img src="https://iili.io/BHP0U0u.md.png" alt="Carbon theme" height="300" />
       </td>
-      <td align="center" style="border: none; padding: 3px;">
-        <p><b>Industrial Theme with brutalism mode</b></p>
-        <img src="https://i.ibb.co/d4JBjwy0/image.png" alt="Brutalism" height="330" />
+      <td align="center" style="border: none; padding: 4px;">
+        <p><b>Industrial + brutalism</b></p>
+        <img src="https://i.ibb.co/d4JBjwy0/image.png" alt="Brutalism mode" height="300" />
       </td>
     </tr>
   </table>
@@ -43,52 +43,30 @@
   </a>
 </div>
 
-### ✨ Key Features
+---
 
-- ⚡ **Zero Dependencies** — No `moment`, `dayjs`, or `date-fns`. Pure React.
-- 📦 **~7kb gzipped** — Styles included, no CSS imports required.
-- 🌎 **400+ Locales** — Powered by native `Intl` API. No dictionaries, no extra bytes.
-- 🎨 **20 Themes** — `Midnight`, `Crimson`, `Industrial`, `Forest`, `Latte` and more.
-- 📐 **Fluid Layout** — One grid that adapts to any container width. Smart font scaling.
-- 🛠️ **Fully Modular** — Toggle time, years, presets, month grid, week numbers independently.
-- 🎛️ **Deeply Customizable** — Start of week, weekend highlights, gradients, brutalism mode.
-- 🕒 **12 Smart Presets** — "Today", "Next week", "In 2 weeks", "Next month" and more.
-- 👆 **Gesture Support** — Swipe left/right to change months, swipe hour & minute tracks.
-- ✅ **Multi-select** — Pick 2, 3, or unlimited dates. Selected dates panel with navigation.
-- 📅 **Date Range** — Select a start and end date with live hover preview and range highlight.
+## Features
 
-<div align="center">
-  <table>
-    <tr>
-      <td align="center">
-        <p><b>Time, presets, months grid, wide screen</b></p>
-        <img src="https://iili.io/BHv44zG.png" alt="presets" height="230" />
-      </td>
-      <td align="center">
-        <p><b>Fully modular, compact selectors</b></p>
-        <img src="https://i.ibb.co/cXRLTJNh/image.png" alt="modules" height="230" />
-      </td>
-    </tr>
-    <tr>
-      <td align="center">
-          <p><b>Time, presets and months grid on ultra narrow mobile screen</b></p>
-          <img src="https://i.ibb.co/Kc7PRJRH/image.png" alt="modules" height="600" />
-      </td>
-      <td align="center">
-          <p><b>And medium mobile screen</b></p>
-          <img src="https://i.ibb.co/q3wJCvHW/image.png" alt="modules" height="600" />
-      </td>
-    </tr>
-  </table>
-</div>
+- ⚡ **Zero dependencies** — no moment, dayjs, or date-fns
+- 📦 **~7kb gzipped** — styles included
+- 🌎 **400+ locales** — native `Intl` API, no extra bytes
+- 🎨 **20 themes** — dark & light, with optional gradient overlay
+- 📐 **Fluid layout** — adapts to any container width, smart font scaling
+- 🛠️ **Modular** — toggle time, presets, month grid, week numbers, two-months view
+- 📅 **Range & multi-select** — live hover preview, range highlight, chips panel
+- 👆 **Gesture support** — swipe to change months, swipe time tracks
 
-## 🔨 How to install:
+---
+
+## Install
 
 ```bash
 npm i react-calendar-datetime
 ```
 
-## 📆 How to use:
+---
+
+## Usage
 
 ### Single date
 
@@ -97,7 +75,6 @@ import { Calendar } from "react-calendar-datetime";
 
 const App = () => {
   const [date, setDate] = useState(new Date());
-
   return (
     <Calendar
       date={date}
@@ -107,33 +84,15 @@ const App = () => {
 };
 ```
 
-### Multi-select
-
-```tsx
-const App = () => {
-  const [dates, setDates] = useState<Date[]>([]);
-
-  return (
-    <Calendar
-      date={dates}
-      multiselect={3}         // max 3 dates; true = unlimited
-      showSelectedDates       // chip panel below calendar
-      onChangeDate={(d) => { if (Array.isArray(d)) setDates(d); }}
-    />
-  );
-};
-```
-
-### Date Range
+### Date range
 
 ```tsx
 const App = () => {
   const [range, setRange] = useState<Date[]>([]);
-
   return (
     <Calendar
       range
-      showSelectedDates       // shows "Apr 1, 2025 – May 15, 2025"
+      showSelectedDates
       date={range}
       onChangeDate={(d) => {
         if (!d) setRange([]);
@@ -145,7 +104,43 @@ const App = () => {
 };
 ```
 
-First click sets the start date. Hover shows a live preview of the range. Second click confirms the end date. Clicking the start date again resets. `onChangeDate` fires with `[start, end]` when the range is complete, and `null` when reset.
+First click sets start, hover shows live preview, second click confirms end. Clicking start again resets. `onChangeDate` fires `[start, end]` on completion, `null` on reset.
+
+<!-- SCREENSHOT: Range picker, ~420px wide, theme: paper, months=true, time=false, presets=false, range selected spanning 2 weeks with blue fill, showSelectedDates showing "Apr 1 – Apr 14, 2026" chip below -->
+
+### Multi-select
+
+```tsx
+const App = () => {
+  const [dates, setDates] = useState<Date[]>([]);
+  return (
+    <Calendar
+      date={dates}
+      multiselect={3}        // or true for unlimited
+      showSelectedDates
+      onChangeDate={(d) => { if (Array.isArray(d)) setDates(d); }}
+    />
+  );
+};
+```
+
+<!-- SCREENSHOT: Multi-select, ~380px wide, theme: mint, multiselect=3, 3 dates selected shown as connected pills, showSelectedDates panel visible below -->
+
+### Two-months layout
+
+```tsx
+<Calendar
+  twoMonthsLayout
+  months
+  time={false}
+  presets={false}
+/>
+```
+
+Shows current and next month side by side. Switches to stacked single-column below ~540px.
+
+<!-- SCREENSHOT: Two-months layout WIDE — ~680px, theme: paper, twoMonthsLayout=true, months=true, time=false, header shows "April 2026  May 2026" with arrows, two day grids side by side, one date selected -->
+<!-- SCREENSHOT: Two-months layout STACKED — ~400px, same props, single-column with "May 2026" label between the two grids -->
 
 ---
 
@@ -153,143 +148,148 @@ First click sets the start date. Hover shows a live preview of the range. Second
 
 ### Data & callbacks
 
-| Property           | Type                                    | Default   | Description                                                                                   |
-| :----------------- | :-------------------------------------- | :-------- | :-------------------------------------------------------------------------------------------- |
-| **date**           | `Date \| Date[]`                        | —         | Selected date (single), array of dates (multi), or `[start, end]` pair (range)                |
-| **onChangeDate**   | `(d: Date \| Date[] \| null) => void`   | —         | Fired on selection. Returns `Date`, `Date[]`, or `null` depending on mode                     |
-| **startDate**      | `Date`                                  | —         | Minimum navigable/selectable date                                                             |
-| **endDate**        | `Date`                                  | —         | Maximum navigable/selectable date                                                             |
-| **startMonth**     | `Date`                                  | —         | Initial month to display (does not set selected date)                                         |
-| **locale**         | `string`                                | `'en'`    | Any valid BCP 47 locale tag, see [Localization](#-localization)                               |
-| **theme**          | `string`                                | `'paper'` | Theme name, see [Themes](#-themes)                                                            |
-| **width**          | `string \| number`                      | `'100%'`  | Any CSS width value (e.g. `'400px'`)                                                          |
-| **startOfWeek**    | `0–6`                                   | `1`       | Week start day: `0` = Sunday, `1` = Monday, etc.                                              |
-| **disabled**       | `DisabledRule`                          | —         | Disable specific dates. See [Disabled Dates](#-disabled-dates)                                |
+| Prop | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `date` | `Date \| Date[]` | — | Selected date, array of dates (multi), or `[start, end]` (range) |
+| `onChangeDate` | `(d: Date \| Date[] \| null) => void` | — | Fires on selection |
+| `startDate` | `Date` | — | Minimum selectable/navigable date |
+| `endDate` | `Date` | — | Maximum selectable/navigable date |
+| `startMonth` | `Date` | — | Initial month to display (does not select a date) |
+| `locale` | `string` | `'en'` | BCP 47 locale tag |
+| `theme` | `CalendarTheme` | `'paper'` | See [Themes](#themes) |
+| `width` | `string \| number` | `'100%'` | Any CSS width value |
+| `startOfWeek` | `0–6` | `1` | Week start: `0` = Sun, `1` = Mon … |
+| `disabled` | `DisabledRule` | — | See [Disabled Dates](#disabled-dates) |
 
 ### Selection modes
 
-| Property              | Type                | Default | Description                                                                                          |
-| :-------------------- | :------------------ | :------ | :--------------------------------------------------------------------------------------------------- |
-| **multiselect**       | `number \| boolean` | —       | Enable multi-select. Pass a number to cap selections (e.g. `2`, `3`), `true` for unlimited          |
-| **range**             | `boolean`           | `false` | Enable range mode. Click to set start, click again to set end. Hover shows live preview              |
-| **showSelectedDates** | `boolean`           | `false` | Panel below calendar showing selected dates. In range mode shows "from [start] to [end]" with locale-native separator |
+| Prop | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `multiselect` | `number \| boolean` | — | Multi-select mode. Number caps selections, `true` = unlimited |
+| `range` | `boolean` | `false` | Range mode with live hover preview |
+| `showSelectedDates` | `boolean` | `false` | Panel showing selected dates / range below calendar |
 
-### Features & toggles
+### Layout modules
 
-| Property              | Type      | Default | Description                                                         |
-| :-------------------- | :-------- | :------ | :------------------------------------------------------------------ |
-| **time**              | `boolean` | `true`  | Enable time picker in header                                        |
-| **timeGrid**          | `boolean` | `false` | Enable full-size time selector panel                                |
-| **presets**           | `boolean` | `false` | Enable quick-select presets (today, tomorrow, etc.). Disabled dates are automatically excluded |
-| **years**             | `boolean` | `false` | Enable year selector in header                                      |
-| **months**            | `boolean` | `true`  | Enable month navigation arrows in header                            |
-| **monthsGrid**        | `boolean` | `false` | Enable full-size month-grid selector panel                          |
-| **compactMonths**     | `boolean` | `false` | Compact month dropdown button in header                             |
-| **compactYears**      | `boolean` | `true`  | Compact year dropdown button in header                              |
-| **gradient**          | `boolean` | `false` | Gradient background tinted by active theme                          |
-| **brutalism**         | `boolean` | `false` | Brutalism aesthetic mode                                            |
-| **gestures**          | `boolean` | `true`  | Swipe left/right on days to change month; swipe hour & minute tracks |
-| **hour12**            | `boolean` | `false` | 12-hour (AM/PM) format for the time picker                          |
-| **highlightWeekends** | `boolean` | `true`  | Highlight Saturday and Sunday                                       |
-| **showWeekNumber**    | `boolean` | `false` | Show ISO week numbers alongside each row                            |
-| **hideLimited**       | `boolean` | `false` | Hide dates outside `startDate`/`endDate` range instead of dimming  |
-| **hideDisabled**      | `boolean` | `false` | Hide disabled dates entirely instead of showing them struck through |
-| **hideWeekdays**      | `boolean` | `false` | Hide the weekday header row                                         |
-| **shortMonths**       | `boolean` | `false` | Use abbreviated month names (Jan, Feb…)                             |
+| Prop | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `twoMonthsLayout` | `boolean` | `false` | Show current + next month side by side. Stacks on narrow screens |
+| `time` | `boolean` | `true` | Time button in header (opens time popup) |
+| `timeGrid` | `boolean` | `false` | Full-size time picker panel alongside the calendar |
+| `months` | `boolean` | `true` | Month navigation arrows in header |
+| `years` | `boolean` | `false` | Year navigation arrows in header |
+| `monthsGrid` | `boolean` | `false` | Full-size month-grid panel alongside the calendar |
+| `compactMonths` | `boolean` | `false` | Compact month dropdown button in header |
+| `compactYears` | `boolean` | `true` | Compact year dropdown button in header |
+| `monthsColumn` | `boolean` | `false` | Stack months grid and time grid vertically |
+| `presets` | `boolean` | `false` | Quick-select presets (Today, Tomorrow, Next week…) |
+| `showWeekNumber` | `boolean` | `false` | ISO week numbers alongside each row |
+
+<!-- SCREENSHOT: Modules — wide layout ~780px, theme: midnight, monthsGrid=true, timeGrid=true, presets=true, months=true, compactYears=true — showing full grid with presets row at bottom, month panel on left, time panel on right -->
+
+### Appearance
+
+| Prop | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `gradient` | `boolean` | `false` | Subtle radial gradient tinted by active theme |
+| `brutalism` | `boolean` | `false` | Brutalism aesthetic — monospace font, hard borders, no radius |
+| `hour12` | `boolean` | `false` | 12-hour AM/PM format for time picker |
+| `highlightWeekends` | `boolean` | `true` | Highlight Saturday and Sunday |
+| `shortMonths` | `boolean` | `false` | Abbreviated month names (Jan, Feb…) |
+
+### Visibility
+
+| Prop | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `hideLimited` | `boolean` | `false` | Hide dates outside `startDate`/`endDate` instead of dimming |
+| `hideDisabled` | `boolean` | `false` | Hide disabled dates entirely instead of striking through |
+| `hideWeekdays` | `boolean` | `false` | Hide the weekday header row (Mon Tue Wed…) |
+
+### Input
+
+| Prop | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `gestures` | `boolean` | `true` | Swipe left/right on days to change month; swipe time tracks |
 
 ---
 
-### 🚫 Disabled Dates
-
-The `disabled` prop accepts several forms. Dates matching any rule are unclickable, excluded from presets, and block month/year navigation when using `before`/`after`.
+## Disabled Dates
 
 ```tsx
-// Disable all dates
+// All dates
 <Calendar disabled={true} />
 
-// Disable a single date
+// Single date
 <Calendar disabled={new Date("2025-12-25")} />
 
-// Disable an array of dates
+// Array of dates
 <Calendar disabled={[new Date("2025-01-01"), new Date("2025-12-31")]} />
 
-// Disable a date range
+// Date range
 <Calendar disabled={{ from: new Date("2025-06-01"), to: new Date("2025-06-30") }} />
 
-// Disable specific weekdays (0=Sun, 6=Sat)
+// Specific weekdays (0=Sun … 6=Sat)
 <Calendar disabled={{ dayOfWeek: [0, 6] }} />
 
-// Disable before/after a date (also locks header navigation)
-<Calendar disabled={{ before: new Date("2025-03-01") }} />
-<Calendar disabled={{ after: new Date("2025-12-31") }} />
+// Before / after (also locks header navigation)
 <Calendar disabled={{ before: new Date("2025-03-01"), after: new Date("2025-12-31") }} />
 ```
 
-> `hideDisabled={true}` removes disabled days from the grid entirely. `hideLimited={true}` does the same for dates outside `startDate`/`endDate`.
+`hideDisabled` removes disabled days from the grid. `hideLimited` does the same for dates outside `startDate`/`endDate`.
 
 ---
 
-## 🎨 Themes
+## Themes
 
-20 built-in themes. Use the `theme` prop to switch.
+20 built-in themes via the `theme` prop. Swatches show **background · accent** colors.
 
-<img src="https://i.ibb.co/PZMb2k02/theme.png" alt="Theme" />
+<!-- SCREENSHOT: Theme grid — composite image or single wide strip showing all 20 themes as small calendar thumbnails, ~100px each, 5 per row or similar layout -->
 
-| 🌑 Dark Themes | ☀️ Light Themes |
+<img src="https://i.ibb.co/PZMb2k02/theme.png" alt="Themes" />
+
+| 🌑 Dark | ☀️ Light |
 | :--- | :--- |
-| <img src="https://placehold.co/15x15/1a1a1c/1a1a1c.png" valign="middle"/> **`carbon`** | <img src="https://placehold.co/15x15/ffffff/ffffff.png" valign="middle"/> **`paper`** |
-| <img src="https://placehold.co/15x15/0d0909/0d0909.png" valign="middle"/> **`crimson`** | <img src="https://placehold.co/15x15/f5f3f7/f5f3f7.png" valign="middle"/> **`amethyst`** |
-| <img src="https://placehold.co/15x15/07070b/07070b.png" valign="middle"/> **`cyber`** | <img src="https://placehold.co/15x15/f8f9fc/f8f9fc.png" valign="middle"/> **`mint`** |
-| <img src="https://placehold.co/15x15/1a1e2b/1a1e2b.png" valign="middle"/> **`midnight`** | <img src="https://placehold.co/15x15/fef0f4/fef0f4.png" valign="middle"/> **`rosa`** |
-| <img src="https://placehold.co/15x15/010401/010401.png" valign="middle"/> **`phosphor`** | <img src="https://placehold.co/15x15/e2e5e9/e2e5e9.png" valign="middle"/> **`snow`** |
-| <img src="https://placehold.co/15x15/1f1c18/1f1c18.png" valign="middle"/> **`sandstone`** | <img src="https://placehold.co/15x15/fffbe8/fffbe8.png" valign="middle"/> **`solar`** |
-| <img src="https://placehold.co/15x15/1c1111/1c1111.png" valign="middle"/> **`dracula`** | <img src="https://placehold.co/15x15/f2e8e0/f2e8e0.png" valign="middle"/> **`comfy`** |
-| <img src="https://placehold.co/15x15/14252e/14252e.png" valign="middle"/> **`temporal`** | <img src="https://placehold.co/15x15/f7f8f9/f7f8f9.png" valign="middle"/> **`neon`** |
-| <img src="https://placehold.co/15x15/111111/111111.png" valign="middle"/> **`industrial`** | <img src="https://placehold.co/15x15/f7f8f9/f7f8f9.png" valign="middle"/> **`graphite`** |
-| <img src="https://placehold.co/15x15/0f2016/0f2016.png" valign="middle"/> **`forest`** | <img src="https://placehold.co/15x15/faf8f4/faf8f4.png" valign="middle"/> **`latte`** |
+| <img src="https://placehold.co/13x13/1a1a1c/1a1a1c.png" valign="middle"/> <img src="https://placehold.co/13x13/ffffff/ffffff.png" valign="middle"/> **`carbon`** | <img src="https://placehold.co/13x13/ffffff/ffffff.png" valign="middle"/> <img src="https://placehold.co/13x13/1a1a1c/1a1a1c.png" valign="middle"/> **`paper`** |
+| <img src="https://placehold.co/13x13/0d0909/0d0909.png" valign="middle"/> <img src="https://placehold.co/13x13/f92f2f/f92f2f.png" valign="middle"/> **`crimson`** | <img src="https://placehold.co/13x13/f5f3f7/f5f3f7.png" valign="middle"/> <img src="https://placehold.co/13x13/681c9e/681c9e.png" valign="middle"/> **`amethyst`** |
+| <img src="https://placehold.co/13x13/07070b/07070b.png" valign="middle"/> <img src="https://placehold.co/13x13/00f3ff/00f3ff.png" valign="middle"/> **`cyber`** | <img src="https://placehold.co/13x13/f8f9fc/f8f9fc.png" valign="middle"/> <img src="https://placehold.co/13x13/60d276/60d276.png" valign="middle"/> **`mint`** |
+| <img src="https://placehold.co/13x13/1a1e2b/1a1e2b.png" valign="middle"/> <img src="https://placehold.co/13x13/3559e0/3559e0.png" valign="middle"/> **`midnight`** | <img src="https://placehold.co/13x13/fef0f4/fef0f4.png" valign="middle"/> <img src="https://placehold.co/13x13/d64c7f/d64c7f.png" valign="middle"/> **`rosa`** |
+| <img src="https://placehold.co/13x13/010401/010401.png" valign="middle"/> <img src="https://placehold.co/13x13/76ff03/76ff03.png" valign="middle"/> **`phosphor`** | <img src="https://placehold.co/13x13/e2e5e9/e2e5e9.png" valign="middle"/> <img src="https://placehold.co/13x13/3a60d6/3a60d6.png" valign="middle"/> **`snow`** |
+| <img src="https://placehold.co/13x13/1f1c18/1f1c18.png" valign="middle"/> <img src="https://placehold.co/13x13/e3ae5c/e3ae5c.png" valign="middle"/> **`sandstone`** | <img src="https://placehold.co/13x13/fffbe8/fffbe8.png" valign="middle"/> <img src="https://placehold.co/13x13/e67e22/e67e22.png" valign="middle"/> **`solar`** |
+| <img src="https://placehold.co/13x13/1c1111/1c1111.png" valign="middle"/> <img src="https://placehold.co/13x13/ff5e5e/ff5e5e.png" valign="middle"/> **`dracula`** | <img src="https://placehold.co/13x13/f2e8e0/f2e8e0.png" valign="middle"/> <img src="https://placehold.co/13x13/c04e2f/c04e2f.png" valign="middle"/> **`comfy`** |
+| <img src="https://placehold.co/13x13/14252e/14252e.png" valign="middle"/> <img src="https://placehold.co/13x13/27d1f4/27d1f4.png" valign="middle"/> **`temporal`** | <img src="https://placehold.co/13x13/f7f8f9/f7f8f9.png" valign="middle"/> <img src="https://placehold.co/13x13/80ec27/80ec27.png" valign="middle"/> **`neon`** |
+| <img src="https://placehold.co/13x13/111111/111111.png" valign="middle"/> <img src="https://placehold.co/13x13/e85d00/e85d00.png" valign="middle"/> **`industrial`** | <img src="https://placehold.co/13x13/f7f8f9/f7f8f9.png" valign="middle"/> <img src="https://placehold.co/13x13/f1a01d/f1a01d.png" valign="middle"/> **`graphite`** |
+| <img src="https://placehold.co/13x13/0f2016/0f2016.png" valign="middle"/> <img src="https://placehold.co/13x13/4ade80/4ade80.png" valign="middle"/> **`forest`** | <img src="https://placehold.co/13x13/faf8f4/faf8f4.png" valign="middle"/> <img src="https://placehold.co/13x13/6f3d18/6f3d18.png" valign="middle"/> **`latte`** |
 
-> 💡 Enable `gradient` for an extra depth effect tailored to the active theme.
+> `gradient` adds a radial tint tuned to each theme's accent color.
 
 <a href="https://calendar-demo-pi.vercel.app/?step=3" target="_blank">
-  <img src="https://img.shields.io/badge/Themes%20Playground-Try%20it%20Out-60d276?style=for-the-badge&logo=paint-format&logoColor=white" alt="Play with themes" />
+  <img src="https://img.shields.io/badge/Themes%20Playground-Try%20it%20Out-60d276?style=for-the-badge&logo=paint-format&logoColor=white" alt="Themes playground" />
 </a>
 
 ---
 
-### 🌍 Localization
+## Localization
 
-No dictionaries, no extra bytes — powered by the native **Intl API** with support for **400+ BCP 47 locales**.
+Powered by the native **Intl API** — 400+ BCP 47 locales, zero extra bytes.
 
 ```tsx
-<Calendar locale="en" />     // Default
-<Calendar locale="zh-CN" />  // Chinese
-<Calendar locale="ar-SA" />  // Arabic
+<Calendar locale="de" />     // Deutsch
+<Calendar locale="zh-CN" />  // 中文
+<Calendar locale="ar-SA" />  // العربية
+<Calendar locale="ja" />     // 日本語
 ```
 
-Pass any valid locale tag and the calendar automatically formats days, months, date labels, and range separators to local standards.
-
-![Locales](https://img.shields.io/badge/400+_Locales-Supported-60d276?style=flat-square&logo=globe&logoColor=white)
+Days, months, date labels, and range separators all follow local standards automatically.
 
 ---
 
-## ✅ Patch notes:
+## Changelog
 
-### 🚀 Version 5.0.0
+[**CHANGELOG.md**](https://github.com/kirilinsky/react-calendar-datetime/blob/main/CHANGELOG.md)
 
-- **📅 Date Range** — New `range` prop for start → end selection with animated hover preview, range fill using theme's `--c-r` color, and locale-native separator in the selected-dates panel.
-- **✅ Multi-select** — Pick multiple dates via `multiselect` prop (`2`, `3`, or `true` for unlimited). Unified `date` prop accepts both `Date` and `Date[]`.
-- **📋 Selected dates panel** — `showSelectedDates` renders chips below the calendar. In range mode shows "from [date] to [date]" with a locale-native separator via `Intl.DateTimeFormat.formatRangeToParts`.
-- **🙈 hideDisabled** — New `hideDisabled` prop removes disabled dates from the grid entirely instead of showing them struck through.
-- **🚦 Smart navigation** — Month/year arrows and swipe gestures now respect `disabled: { before, after }` rules and won't navigate into blocked months.
-- **🎛️ Preset filtering** — Presets that land on a disabled date are automatically hidden.
-- **🎨 20 Themes** — Added `latte` and `forest`.
-- **🔗 Range highlight** — Adjacent selected dates connect into a continuous pill. Cross-month selected dates shown at reduced opacity.
- 
-[**Full Version History in CHANGELOG.md**](https://github.com/kirilinsky/react-calendar-datetime/blob/main/CHANGELOG.md)
+## Roadmap
 
-## 🗺️ Roadmap
-
-- [ ] **Holiday Calendar** — Prop to mark specific dates as holidays with optional labels.
-- [ ] **Custom Presets** — Ability to pass custom quick-select buttons.
-- [ ] **Custom Themes** — API for creating and applying fully custom color schemes.
-- [ ] **RTL Support** — Full support for right-to-left interfaces.
+- [ ] Custom presets via prop
+- [ ] Custom theme API
+- [ ] Holiday markers with labels
+- [ ] RTL support

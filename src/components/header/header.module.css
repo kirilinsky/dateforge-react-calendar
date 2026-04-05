@@ -42,7 +42,7 @@
   margin: 0 0.3em;
   height: 2.3em;
   white-space: nowrap;
-
+  flex-grow: 1;
   &:active {
     transform: scale(0.96);
   }
