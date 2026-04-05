@@ -12,6 +12,7 @@ export const PresetsComponent: React.FC = () => {
   const {
     monthsGrid,
     date,
+    selectedDate,
     startDate,
     endDate,
     years,
@@ -52,7 +53,7 @@ export const PresetsComponent: React.FC = () => {
     >
       {presets.map((preset) => {
         const isActive =
-          preset.targetDate.toDateString() === date.toDateString();
+          !!selectedDate && preset.targetDate.toDateString() === selectedDate.toDateString();
         return (
           <button
             key={preset.id}
@@ -67,7 +68,7 @@ export const PresetsComponent: React.FC = () => {
               .join(" ")}
             onClick={() => onChangeDate(getPresetDate(preset, date, startDate, endDate))}
           >
-            {getRelativeLabel(locale, preset.amount, preset.unit)}{" "}
+            {getRelativeLabel(locale, preset.amount, preset.unit)}{" "} {date.toDateString()}
           </button>
         );
       })}
