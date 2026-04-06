@@ -84,6 +84,32 @@
   box-shadow: none !important;
 }
 
+.homeButton {
+  composes: interactive from "../../global/global.module.css";
+  composes: hoverable from "../../global/global.module.css";
+  width: 2.2em;
+  height: 2.3em;
+  flex-shrink: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  & svg {
+    width: 1.1em;
+    height: 1.1em;
+  }
+}
+.flexWrapper{
+  display: flex;
+  align-items: center;
+}
+
+.homeButtonDisabled {
+  opacity: 0.25;
+  cursor: default;
+  pointer-events: none;
+}
+
 .timeButton {
   composes: interactive from "../../global/global.module.css";
   background: var(--c-h) !important;

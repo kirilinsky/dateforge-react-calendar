@@ -54,6 +54,8 @@ export interface CalendarProps {
   disabled?: DisabledRule | DisabledRule[];
   twoMonthsLayout?: boolean;
   monthsColumn?: boolean;
+  showHomeButton?: boolean;
+  showClearButton?: boolean;
 }
 
 export interface CalendarContextValue extends Omit<CalendarProps, "onChange" | "onDatesChange" | "onRangeChange" | "mode" | "max"> {

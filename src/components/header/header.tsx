@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import styles from "./header.module.css";
-import { Down } from "@/Icons";
+import { Clear, Down, Home } from "@/Icons";
 import { useCalendarContext } from "../provider/provider";
 import {
   addDate,
@@ -33,9 +33,23 @@ export const HeaderComponent: React.FC = () => {
     monthsGrid,
     timeGrid,
     containerWidth,
+    showHomeButton,
+    showClearButton,
+    selectedDates,
+    onChangeDate,
   } = useCalendarContext();
 
-  const twoMonthsStacked = !!twoMonthsLayout && (!!monthsColumn || (containerWidth > 0 && containerWidth < getTwoMonthsNarrowThreshold({ monthsGrid, timeGrid })));
+  const twoMonthsStacked =
+    !!twoMonthsLayout &&
+    (!!monthsColumn ||
+      (containerWidth > 0 &&
+        containerWidth <
+          getTwoMonthsNarrowThreshold({ monthsGrid, timeGrid })));
+
+  const today = new Date();
+  const isCurrentMonth =
+    date.getFullYear() === today.getFullYear() &&
+    date.getMonth() === today.getMonth();
 
   const cur = date.getFullYear();
   const curTime = getTimeString(date, hour12);
@@ -55,13 +69,17 @@ export const HeaderComponent: React.FC = () => {
   );
 
   const monthFormat = shortMonths ? "short" : "long";
-  const currentMonthName = new Intl.DateTimeFormat(locale, { month: monthFormat }).format(date);
+  const currentMonthName = new Intl.DateTimeFormat(locale, {
+    month: monthFormat,
+  }).format(date);
 
   const nextMonthDate = useMemo(
     () => new Date(date.getFullYear(), date.getMonth() + 1, 1),
     [date],
   );
-  const nextMonthName = new Intl.DateTimeFormat(locale, { month: monthFormat }).format(nextMonthDate);
+  const nextMonthName = new Intl.DateTimeFormat(locale, {
+    month: monthFormat,
+  }).format(nextMonthDate);
   const nextMonthYear = nextMonthDate.getFullYear();
 
   const ch = (v: number) =>
@@ -70,7 +88,12 @@ export const HeaderComponent: React.FC = () => {
     navigateTo(addDate(date, v, "month", startDate, endDate));
   return (
     <div
-      className={[styles.headerContainer, twoMonthsLayout && styles.twoMonthsHeader].filter(Boolean).join(" ")}
+      className={[
+        styles.headerContainer,
+        twoMonthsLayout && styles.twoMonthsHeader,
+      ]
+        .filter(Boolean)
+        .join(" ")}
       style={{ gridArea: "HH" }}
     >
       {time && (
@@ -89,6 +112,7 @@ export const HeaderComponent: React.FC = () => {
           onClick={() => setShowMonthPopup(true)}
         >
           <Down /> {currentMonthName}
+          {twoMonthsLayout ? ` — ${nextMonthName}` : ""}
         </button>
       )}
 
@@ -126,9 +150,7 @@ export const HeaderComponent: React.FC = () => {
           >
             {currentMonthName} {cur}
           </button>
-          <button
-            className={`${styles.currentYear} ${styles.staticButton}`}
-          >
+          <button className={`${styles.currentYear} ${styles.staticButton}`}>
             {nextMonthName} {nextMonthYear}
           </button>
           {canGoNextMonth && (
@@ -161,10 +183,35 @@ export const HeaderComponent: React.FC = () => {
       )}
 
       {compactYears && (
-        <button className={styles.monthButton} onClick={() => setShowYearPopup(true)}>
+        <button
+          className={styles.monthButton}
+          onClick={() => setShowYearPopup(true)}
+        >
           {cur} <Down />
         </button>
       )}
+      <div className={styles.flexWrapper}>
+        {showHomeButton && (
+          <button
+            className={`${styles.homeButton} ${isCurrentMonth ? styles.homeButtonDisabled : ""}`}
+            disabled={isCurrentMonth}
+            onClick={() =>
+              navigateTo(new Date(today.getFullYear(), today.getMonth(), 1))
+            }
+          >
+            <Home />
+          </button>
+        )}
+        {showClearButton && (
+          <button
+            className={`${styles.homeButton} ${selectedDates.length === 0 ? styles.homeButtonDisabled : ""}`}
+            disabled={selectedDates.length === 0}
+            onClick={() => onChangeDate(null)}
+          >
+            <Clear />
+          </button>
+        )}
+      </div>
     </div>
   );
 };

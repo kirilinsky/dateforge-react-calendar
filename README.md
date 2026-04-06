@@ -169,6 +169,8 @@ Clicking a selected date deselects it. When `max` is reached further clicks are 
 | `monthsColumn`    | `boolean` | `false` | Stack months vertically for two-months layout                    |
 | `presets`         | `boolean` | `false` | Quick-select presets (Today, Tomorrow, Next week…)               |
 | `showWeekNumber`  | `boolean` | `false` | ISO week numbers alongside each row                              |
+| `showHomeButton`  | `boolean` | `false` | Home button in header — active when viewing any month other than the current one; click navigates back without selecting a date |
+| `showClearButton` | `boolean` | `false` | Clear button in header — active when any date is selected; click clears the entire selection (single, multi, or range)         |
 
 <img src="https://i.ibb.co/6cQcpgnt/image.png" alt="modular" width="460" />
 
