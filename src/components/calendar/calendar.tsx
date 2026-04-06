@@ -7,7 +7,7 @@ import { CalendarLayout } from "../layout/layout";
 export const Calendar: React.FC<CalendarProps> = ({
   width = "100%",
   theme = "paper",
-  presets = true,
+  presets = false,
   compactMonths = false,
   compactYears = true,
   years = false,
@@ -21,8 +21,8 @@ export const Calendar: React.FC<CalendarProps> = ({
   brutalism = false,
   gradient = false,
   highlightWeekends = true,
-  multiselect,
-  range,
+  mode,
+  max,
   showSelectedDates = false,
   twoMonthsLayout = false,
   monthsColumn = false,
@@ -105,8 +105,8 @@ export const Calendar: React.FC<CalendarProps> = ({
       highlightWeekends={highlightWeekends}
       theme={theme}
       width={width}
-      multiselect={multiselect}
-      range={range}
+      mode={mode}
+      max={max}
       showSelectedDates={showSelectedDates}
       twoMonthsLayout={twoMonthsLayout}
       monthsColumn={monthsColumn}

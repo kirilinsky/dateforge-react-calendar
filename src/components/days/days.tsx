@@ -201,7 +201,6 @@ export const DaysComponent: React.FC<{
       <WeekDays />
       <div role="row" style={{ display: "contents", gridArea: "DD" }}>
         {weeksData.map((week, wIndex) => {
-          if (week.days.every(isDayHidden)) return null;
           return (
             <React.Fragment key={wIndex}>
               {showWeekNumber && (

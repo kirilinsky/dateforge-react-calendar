@@ -32,27 +32,40 @@ const isSameDay = (a: Date, b: Date) =>
   a.getMonth() === b.getMonth() &&
   a.getDate() === b.getDate();
 
+const isDateRange = (v: unknown): v is import("@/types/calendar").DateRange =>
+  v !== null &&
+  typeof v === "object" &&
+  !Array.isArray(v) &&
+  !(v instanceof Date) &&
+  "from" in (v as object);
+
 export const CalendarProvider: React.FC<
   CalendarProps & { children: ReactNode; containerWidth?: number }
 > = ({
   children,
   theme,
-  date: externalDate,
-  onChangeDate,
-  multiselect,
-  range,
+  value: externalValue,
+  mode = "single",
+  max,
+  onChange,
+  onDatesChange,
+  onRangeChange,
   startMonth,
   rangeMinDays,
   rangeMaxDays,
   containerWidth = 0,
   ...props
 }) => {
-  const externalDates = Array.isArray(externalDate) ? externalDate : undefined;
-  const externalSingle = Array.isArray(externalDate)
-    ? externalDate[0]
-    : externalDate;
+  const range = mode === "range";
+  const multiselect: number | boolean | undefined =
+    mode === "multiple" ? (max ?? true) : undefined;
+  const externalRangeObj = isDateRange(externalValue) ? externalValue : undefined;
+  const externalDates = Array.isArray(externalValue) ? externalValue : undefined;
+  const externalSingle = externalValue instanceof Date ? externalValue :
+    (!externalRangeObj ? externalDates?.[0] : undefined);
 
   const [internalDate, setInternalDate] = useState<Date>(() => {
+    if (externalRangeObj?.from) return toValidDate(externalRangeObj.from);
     if (externalSingle) return toValidDate(externalSingle);
     if (startMonth) return toValidDate(startMonth);
     return new Date();
@@ -66,12 +79,14 @@ export const CalendarProvider: React.FC<
 
   const [rangeStart, setRangeStart] = useState<Date | null>(() => {
     if (!range) return null;
+    if (externalRangeObj?.from) return toValidDate(externalRangeObj.from);
     if (externalDates?.[0]) return toValidDate(externalDates[0]);
     if (externalSingle) return toValidDate(externalSingle);
     return null;
   });
   const [rangeEnd, setRangeEnd] = useState<Date | null>(() => {
     if (!range) return null;
+    if (externalRangeObj?.to) return toValidDate(externalRangeObj.to);
     if (externalDates?.[1]) return toValidDate(externalDates[1]);
     return null;
   });
@@ -94,7 +109,11 @@ export const CalendarProvider: React.FC<
 
   useEffect(() => {
     if (range) {
-      if (externalDates?.length) {
+      if (externalRangeObj) {
+        setRangeStart(externalRangeObj.from ? toValidDate(externalRangeObj.from) : null);
+        setRangeEnd(externalRangeObj.to ? toValidDate(externalRangeObj.to) : null);
+        if (externalRangeObj.from) setInternalDate(toValidDate(externalRangeObj.from));
+      } else if (externalDates?.length) {
         setRangeStart(toValidDate(externalDates[0]));
         setRangeEnd(externalDates[1] ? toValidDate(externalDates[1]) : null);
         if (externalDates[0]) setInternalDate(toValidDate(externalDates[0]));
@@ -110,7 +129,7 @@ export const CalendarProvider: React.FC<
       setInternalDate(parsed);
       setSelectedDates(externalSingle ? [parsed] : []);
     }
-  }, [externalDate]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [externalValue]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const isDark = useMemo(() => {
     if (!theme) {
@@ -128,7 +147,7 @@ export const CalendarProvider: React.FC<
           setRangeStart(null);
           setRangeEnd(null);
           setHoverDate(null);
-          onChangeDate?.(null);
+          onRangeChange?.({ from: null, to: null });
           return;
         }
         const prevStart = rangeStartRef.current;
@@ -139,7 +158,7 @@ export const CalendarProvider: React.FC<
           setRangeEnd(null);
           setInternalDate(d);
           setHoverDate(null);
-          onChangeDate?.(null);
+          onRangeChange?.({ from: d, to: null });
           return;
         }
 
@@ -147,7 +166,7 @@ export const CalendarProvider: React.FC<
           setRangeStart(null);
           setRangeEnd(null);
           setHoverDate(null);
-          onChangeDate?.(null);
+          onRangeChange?.({ from: null, to: null });
           return;
         }
 
@@ -159,7 +178,7 @@ export const CalendarProvider: React.FC<
         setRangeEnd(e);
         setInternalDate(s);
         setHoverDate(null);
-        onChangeDate?.([s, e]);
+        onRangeChange?.({ from: s, to: e });
         return;
       }
 
@@ -179,13 +198,13 @@ export const CalendarProvider: React.FC<
 
         setSelectedDates(next);
         setInternalDate(d);
-        onChangeDate?.(next);
+        onDatesChange?.(next);
       } else {
         if (d) {
           const prev = selectedDatesRef.current[0];
           if (prev && isSameDay(prev, d)) {
             setSelectedDates([]);
-            onChangeDate?.(null);
+            onChange?.(null);
             return;
           }
           setInternalDate(d);
@@ -193,19 +212,19 @@ export const CalendarProvider: React.FC<
         } else {
           setSelectedDates([]);
         }
-        onChangeDate?.(d);
+        onChange?.(d);
       }
     },
-    [multiselect, range, onChangeDate],
+    [multiselect, range, onChange, onDatesChange, onRangeChange],
   );
 
   const handleChangeTime = useCallback(
     (d: Date) => {
       setInternalDate(d);
       setSelectedDates((prev) => (prev.length > 0 ? [d] : prev));
-      onChangeDate?.(d);
+      onChange?.(d);
     },
-    [onChangeDate],
+    [onChange],
   );
 
   const navigateTo = useCallback((d: Date) => {

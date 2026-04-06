@@ -5,19 +5,29 @@ export type StartOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 export type DisabledRule =
   | boolean
   | Date
-  | Date[]
   | { from: Date; to: Date }
   | { dayOfWeek: number[] }
   | { before?: Date; after?: Date };
 
+export type DateRange = {
+  from: Date | null;
+  to: Date | null;
+};
+
+export type CalendarMode = "single" | "multiple" | "range";
+
 export interface CalendarProps {
-  date?: Date | Date[];
+  value?: Date | Date[] | DateRange;
+  mode?: CalendarMode;
+  max?: number;
   startDate?: Date;
   endDate?: Date;
   startMonth?: Date;
-  onChangeDate?: (date: Date | Date[] | null) => void;
-  multiselect?: number | boolean;
-  range?: boolean;
+  onChange?: (date: Date | null) => void;
+  onDatesChange?: (dates: Date[]) => void;
+  onRangeChange?: (range: DateRange) => void;
+  rangeMinDays?: number;
+  rangeMaxDays?: number;
   showSelectedDates?: boolean;
   locale?: string;
   theme?: CalendarTheme;
@@ -41,14 +51,14 @@ export interface CalendarProps {
   hideDisabled?: boolean;
   hideWeekdays?: boolean;
   shortMonths?: boolean;
-  disabled?: DisabledRule;
+  disabled?: DisabledRule | DisabledRule[];
   twoMonthsLayout?: boolean;
   monthsColumn?: boolean;
-  rangeMinDays?: number;
-  rangeMaxDays?: number;
 }
 
-export interface CalendarContextValue extends CalendarProps {
+export interface CalendarContextValue extends Omit<CalendarProps, "onChange" | "onDatesChange" | "onRangeChange" | "mode" | "max"> {
+  range: boolean;
+  multiselect: number | boolean | undefined;
   date: Date;
   containerWidth: number;
   locale: string;
@@ -59,7 +69,7 @@ export interface CalendarContextValue extends CalendarProps {
   months: boolean;
   monthsGrid: boolean;
   compactMonths: boolean;
-  onChangeDate: (date: Date | Date[] | null) => void;
+  onChangeDate: (date: Date | null) => void;
   onChangeTime: (date: Date) => void;
   navigateTo: (date: Date) => void;
   selectedDate: Date | null;
@@ -69,6 +79,8 @@ export interface CalendarContextValue extends CalendarProps {
   hoverDate: Date | null;
   setHoverDate: (d: Date | null) => void;
   dark: boolean;
+  view: CalendarView;
+  setView: (view: CalendarView) => void;
   showTimePopup: boolean;
   setShowTimePopup: (v: boolean) => void;
   showMonthPopup: boolean;
@@ -76,3 +88,5 @@ export interface CalendarContextValue extends CalendarProps {
   showYearPopup: boolean;
   setShowYearPopup: (v: boolean) => void;
 }
+
+export type CalendarView = "calendar" | "month" | "year";

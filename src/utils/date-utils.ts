@@ -170,7 +170,6 @@ export const getRelativeLabel = (
 const checkDisabledRule = (d: Date, rule: DisabledRule): boolean => {
   if (typeof rule === "boolean") return rule;
   if (rule instanceof Date) return isSameDay(d, rule);
-  if (Array.isArray(rule)) return rule.some((r) => isSameDay(d, r));
   if ("dayOfWeek" in rule) return rule.dayOfWeek.includes(d.getDay());
   if ("from" in rule) return d >= rule.from && d <= rule.to;
   return (
@@ -183,10 +182,12 @@ export const checkIsDateDisabled = (
   viewDate: Date,
   startDate?: Date | null,
   endDate?: Date | null,
-  disabled?: DisabledRule,
+  disabled?: DisabledRule | DisabledRule[],
 ): boolean => {
-  if (disabled !== undefined && checkDisabledRule(viewDate, disabled))
-    return true;
+  if (disabled !== undefined) {
+    const rules = Array.isArray(disabled) ? disabled : [disabled];
+    if (rules.some((rule) => checkDisabledRule(viewDate, rule))) return true;
+  }
   if (!startDate && !endDate) return false;
   const t = viewDate.getTime();
   const minT = getLimit(startDate);
@@ -215,20 +216,18 @@ export const getMonthListData = (
 };
 
 const navBoundsFromDisabled = (
-  disabled?: DisabledRule,
+  disabled?: DisabledRule | DisabledRule[],
 ): { min?: Date; max?: Date } => {
-  if (
-    !disabled ||
-    typeof disabled !== "object" ||
-    Array.isArray(disabled) ||
-    disabled instanceof Date
-  )
-    return {};
-  if ("from" in disabled || "dayOfWeek" in disabled) return {};
-  return {
-    min: "before" in disabled ? disabled.before : undefined,
-    max: "after" in disabled ? disabled.after : undefined,
-  };
+  const rules = disabled === undefined ? [] : Array.isArray(disabled) ? disabled : [disabled];
+  let min: Date | undefined;
+  let max: Date | undefined;
+  for (const rule of rules) {
+    if (!rule || typeof rule !== "object" || rule instanceof Date) continue;
+    if ("from" in rule || "dayOfWeek" in rule) continue;
+    if ("before" in rule && rule.before && (!min || rule.before > min)) min = rule.before;
+    if ("after" in rule && rule.after && (!max || rule.after < max)) max = rule.after;
+  }
+  return { min, max };
 };
 
 export const checkYearNavigation = (
@@ -236,7 +235,7 @@ export const checkYearNavigation = (
   startDate?: Date | null,
   endDate?: Date | null,
   currentDate?: Date | null,
-  disabled?: DisabledRule,
+  disabled?: DisabledRule | DisabledRule[],
 ) => {
   const { min: dMin, max: dMax } = navBoundsFromDisabled(disabled);
 
@@ -307,7 +306,7 @@ export const getFilteredPresets = (
   showMonths: boolean,
   startDate?: Date | null,
   endDate?: Date | null,
-  disabled?: DisabledRule,
+  disabled?: DisabledRule | DisabledRule[],
 ): (PresetItem & { targetDate: Date })[] => {
   const excluded = [
     ...(!showMonths ? ["month", "week"] : []),
@@ -327,7 +326,7 @@ export const getNextMonthFromSwipe = (
   startDate?: Date,
   endDate?: Date,
   threshold = 50,
-  disabled?: DisabledRule,
+  disabled?: DisabledRule | DisabledRule[],
 ): Date | null => {
   if (Math.abs(deltaX) < threshold) return null;
   const dir = deltaX > 0 ? 1 : -1;
@@ -370,7 +369,7 @@ export const getCalendarData = (
   selectedDates: Date[],
   startDate?: Date | null,
   endDate?: Date | null,
-  disabled?: DisabledRule,
+  disabled?: DisabledRule | DisabledRule[],
   rangeOpts?: RangeOptions,
 ) => {
   const DAY_MS = 86400000;

@@ -1,16 +1,21 @@
 ## Changelog
 
-### 🚀 Version 5.0.0
+### 🚀 Version 5.0.0 — Breaking
 
-- **✅ Multi-select** — Pick multiple dates via `multiselect` prop (`2`, `3`, `4` etc, or `true` for unlimited). Unified `date` prop now accepts both `Date` and `Date[]`.
-- **📋 Selected dates panel** — New `showSelectedDates` prop renders a chip list below the calendar. Works in both single and multi mode. Clicking a chip navigates to that month without changing selection.
-- **🔗 Range highlight** — Adjacent selected dates are visually connected into a continuous pill using `box-shadow` bridging, with correct border-radius on endpoints.
-- **🗓️ Cross-month selection** — Selected dates from adjacent months are now highlighted in the current month view at reduced opacity (0.9).
-- **🗑️ API cleanup** — Removed separate `dates` prop; `date` now accepts `Date | Date[]`. Removed `onChangeDates`; `onChangeDate` returns `Date | Date[] | null` depending on mode.
+- **🔄 New API** — `value` replaces `date`; selection mode is now controlled by `mode: 'single' | 'multiple' | 'range'`. Separate callbacks: `onChange` (single), `onDatesChange` (multiple), `onRangeChange` (range).
+- **📅 Range mode** — First click sets `from`, hover shows live preview, second click sets `to`. `onRangeChange` fires on each click with `{ from, to }` where `to` is `null` until end is picked.
+- **🔢 Range limits** — `rangeMinDays` / `rangeMaxDays` props block selections outside the allowed span.
+- **📋 Selected dates panel** — `showSelectedDates` renders chips below the calendar for all modes.
+- **🗓️ Two-months layout** — `twoMonthsLayout` shows current and next month side by side; stacks below ~540px.
+- **🪟 Month/year popups** — Month and year selectors migrated from inline dropdowns to popups.
+- **👆 Gestures on by default** — `gestures` prop now defaults to `true`.
+- **✅ Multi-select** — `mode="multiple"` with optional `max` cap (replaces old `multiselect` prop).
+- **🗑️ Removed** — `date`, `onChangeDate`, `onChangeDates`, `multiselect` props removed.
+- **🚫 Disabled rule** — `disableWeekends` removed in favor of `disabled={{ dayOfWeek: [0, 6] }}`.
 
 ---
 
-### 🚀 Version 4.0.0 — Breaking
+### 🚀 Version 4.0.0
 
 - **📐 Fluid adaptive grid** — Replaced static + "jelly" (cqw) dual modes with a single fluid layout that fits any container width. Smart font auto-sizing, ideal cell proportions, zero breakpoints.
 - **🎨 Theme overhaul** — Reworked colors across all 18 themes for better contrast and readability.
@@ -20,7 +25,6 @@
 - **👆 Gesture scrolling** — Swipe-to-scroll for hour & minute tracks (opt-in via `gestures` prop).
 - **🚫 Date unselect** — Tap a selected date again to clear it.
 - **🔲 Updated shadows** — Refined shadow tokens across all components.
-- **🚫 Removed** — `minDate` / `maxDate` replaced by `startDate` / `endDate`. `disableWeekends` removed in favor of `disabled={{ dayOfWeek: [0, 6] }}`.
 
 ---
 

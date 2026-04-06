@@ -68,12 +68,10 @@ export const Default = () => {
     <StoryWrapper title="Default" subtitle={formatSubtitle(date)}>
       <div className="calendar-fixed-container">
         <Calendar
-          date={date}
-          onChangeDate={(d: Date | Date[] | null) => {
-            if (d instanceof Date) setDate(d);
-          }}
+          value={date}
           theme="industrial"
           brutalism
+          onChange={(d: Date | null) => { if (d) setDate(d); }}
         />
       </div>
     </StoryWrapper>
@@ -86,10 +84,8 @@ export const TwoMonthsLayout = () => {
     <StoryWrapper title="Two Months Layout" subtitle={formatSubtitle(date)}>
       <div style={{ width: 640 }}>
         <Calendar
-          date={date}
-          onChangeDate={(d: Date | Date[] | null) => {
-            if (d instanceof Date) setDate(d);
-          }}
+          value={date}
+          onChange={(d: Date | null) => { if (d) setDate(d); }}
           twoMonthsLayout
           months
           time={false}
@@ -102,39 +98,25 @@ export const TwoMonthsLayout = () => {
 };
 
 export const RangePicker = () => {
-  const [range, setRange] = useState<[Date, Date] | [Date] | []>([]);
-
-  const handleChange = (d: Date | Date[] | null) => {
-    if (!d) {
-      setRange([]);
-      return;
-    }
-    if (Array.isArray(d) && d.length === 2) setRange([d[0], d[1]]);
-    else if (d instanceof Date) setRange([d]);
-  };
+  const [range, setRange] = useState<{ from: Date | null; to: Date | null }>({ from: null, to: null });
 
   const fmt = (d: Date) =>
-    new Intl.DateTimeFormat("en", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-    }).format(d);
+    new Intl.DateTimeFormat("en", { day: "2-digit", month: "long", year: "numeric" }).format(d);
 
-  const subtitle =
-    range.length === 2
-      ? `${fmt(range[0])} → ${fmt(range[1])}`
-      : range.length === 1
-        ? `${fmt(range[0])} → pick end…`
-        : "Pick start date";
+  const subtitle = range.from && range.to
+    ? `${fmt(range.from)} → ${fmt(range.to)}`
+    : range.from
+      ? `${fmt(range.from)} → pick end…`
+      : "Pick start date";
 
   return (
     <StoryWrapper title="Range Picker" subtitle={subtitle}>
       <div className="calendar-fixed-container">
         <Calendar
-          range
+          mode="range"
           showSelectedDates
-          date={range.length ? range : undefined}
-          onChangeDate={handleChange}
+          value={range}
+          onRangeChange={setRange}
           theme="paper"
           months
           time={false}
@@ -145,10 +127,12 @@ export const RangePicker = () => {
   );
 };
 
-type SelectionMode = "single" | "range" | 2 | 3 | true;
+import { CalendarMode } from "../types/calendar";
 
 export const KitchenSink = () => {
-  const [mode, setMode] = useState<SelectionMode>("single");
+  const [mode, setMode] = useState<CalendarMode>("single");
+  const [max, setMax] = useState<number | undefined>(undefined);
+  const [range, setRange] = useState({ from: null as Date | null, to: null as Date | null });
   const [dates, setDates] = useState<Date[]>([]);
   const [date, setDate] = useState<Date>(new Date());
   const [startMonth, setStartMonth] = useState<Date>(new Date());
@@ -199,7 +183,7 @@ export const KitchenSink = () => {
       prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d],
     );
 
-  const getDisabledValue = (): DisabledRule | undefined => {
+  const getDisabledValue = (): DisabledRule | DisabledRule[] | undefined => {
     switch (disabledMode) {
       case "all":
         return true;
@@ -254,31 +238,22 @@ export const KitchenSink = () => {
   const toggle = (key: keyof typeof config) =>
     setConfig((prev) => ({ ...prev, [key]: !prev[key] }));
 
-  const isRange = mode === "range";
-  const multiselect = mode !== "single" && mode !== "range" ? mode : undefined;
-
-  const handleChangeDate = (d: Date | Date[] | null) => {
-    if (isRange) {
-      return;
-    }
-    if (multiselect) {
-      setDates(Array.isArray(d) ? d : d ? [d] : []);
-    } else {
-      if (d instanceof Date) setDate(d);
-    }
-  };
-
-  const modeOptions: { label: string; value: SelectionMode }[] = [
-    { label: "Single", value: "single" },
-    { label: "Range", value: "range" },
-    { label: "2 dates", value: 2 },
-    { label: "3 dates", value: 3 },
-    { label: "Unlimited", value: true },
+  type ModeOption = { label: string; mode: CalendarMode; max?: number };
+  const modeOptions: ModeOption[] = [
+    { label: "Single", mode: "single" },
+    { label: "Range", mode: "range" },
+    { label: "2 dates", mode: "multiple", max: 2 },
+    { label: "3 dates", mode: "multiple", max: 3 },
+    { label: "Unlimited", mode: "multiple" },
   ];
 
-  const subtitle = isRange
-    ? "Range mode"
-    : multiselect
+  const subtitle = mode === "range"
+    ? range.from && range.to
+      ? `${formatSubtitle(range.from, activeLocale)} → ${formatSubtitle(range.to, activeLocale)}`
+      : range.from
+        ? `${formatSubtitle(range.from, activeLocale)} → pick end…`
+        : "Pick start date"
+    : mode === "multiple"
       ? dates.length
         ? dates.map((d) => formatSubtitle(d, activeLocale)).join(" · ")
         : "No dates selected"
@@ -308,12 +283,14 @@ export const KitchenSink = () => {
           <p className="panel-label">Mode</p>
           {modeOptions.map((opt) => (
             <button
-              key={String(opt.value)}
+              key={opt.label}
               onClick={() => {
-                setMode(opt.value);
+                setMode(opt.mode);
+                setMax(opt.max);
                 setDates([]);
+                setRange({ from: null, to: null });
               }}
-              className={`panel-button ${mode === opt.value ? "active" : ""}`}
+              className={`panel-button ${mode === opt.mode && max === opt.max ? "active" : ""}`}
             >
               <span className="panel-button-key">{opt.label}</span>
             </button>
@@ -338,19 +315,21 @@ export const KitchenSink = () => {
         <div className="kitchen-center">
           <div style={{ width: `${containerWidth}px` }}>
             <Calendar
-              date={isRange ? undefined : multiselect ? dates : date}
+              mode={mode}
+              max={max}
+              value={mode === "range" ? range : mode === "multiple" ? dates : date}
               startMonth={startMonth}
-              multiselect={multiselect}
-              range={isRange || undefined}
-              onChangeDate={handleChangeDate}
+              onChange={(d: Date | null) => { if (d) setDate(d); }}
+              onDatesChange={setDates}
+              onRangeChange={setRange}
               theme={activeTheme}
               locale={activeLocale}
               startDate={startDate}
               endDate={endDate}
               startOfWeek={startOfWeek}
               disabled={getDisabledValue()}
-              rangeMinDays={isRange ? rangeMinDays : undefined}
-              rangeMaxDays={isRange ? rangeMaxDays : undefined}
+              rangeMinDays={mode === "range" ? rangeMinDays : undefined}
+              rangeMaxDays={mode === "range" ? rangeMaxDays : undefined}
               {...config}
             />
           </div>
@@ -441,7 +420,7 @@ export const KitchenSink = () => {
             />
           </div>
 
-          {isRange && (
+          {mode === "range" && (
             <>
               <p className="panel-label" style={{ marginTop: 12 }}>
                 Range limits
