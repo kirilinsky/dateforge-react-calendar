@@ -10,6 +10,7 @@ import React, {
 } from "react";
 import { CalendarContextValue, CalendarProps } from "@/types/calendar";
 import { DARK_THEMES } from "@/types/themes";
+import { isSameDay } from "@/utils/date-utils";
 
 const CalendarContext = createContext<CalendarContextValue | undefined>(
   undefined,
@@ -26,11 +27,6 @@ const toValidDate = (d?: Date) => {
   const parsed = d ? new Date(d) : new Date();
   return isNaN(parsed.getTime()) ? new Date() : parsed;
 };
-
-const isSameDay = (a: Date, b: Date) =>
-  a.getFullYear() === b.getFullYear() &&
-  a.getMonth() === b.getMonth() &&
-  a.getDate() === b.getDate();
 
 const isDateRange = (v: unknown): v is import("@/types/calendar").DateRange =>
   v !== null &&
@@ -59,10 +55,18 @@ export const CalendarProvider: React.FC<
   const range = mode === "range";
   const multiselect: number | boolean | undefined =
     mode === "multiple" ? (max ?? true) : undefined;
-  const externalRangeObj = isDateRange(externalValue) ? externalValue : undefined;
-  const externalDates = Array.isArray(externalValue) ? externalValue : undefined;
-  const externalSingle = externalValue instanceof Date ? externalValue :
-    (!externalRangeObj ? externalDates?.[0] : undefined);
+  const externalRangeObj = isDateRange(externalValue)
+    ? externalValue
+    : undefined;
+  const externalDates = Array.isArray(externalValue)
+    ? externalValue
+    : undefined;
+  const externalSingle =
+    externalValue instanceof Date
+      ? externalValue
+      : !externalRangeObj
+        ? externalDates?.[0]
+        : undefined;
 
   const [internalDate, setInternalDate] = useState<Date>(() => {
     if (externalRangeObj?.from) return toValidDate(externalRangeObj.from);
@@ -110,9 +114,14 @@ export const CalendarProvider: React.FC<
   useEffect(() => {
     if (range) {
       if (externalRangeObj) {
-        setRangeStart(externalRangeObj.from ? toValidDate(externalRangeObj.from) : null);
-        setRangeEnd(externalRangeObj.to ? toValidDate(externalRangeObj.to) : null);
-        if (externalRangeObj.from) setInternalDate(toValidDate(externalRangeObj.from));
+        setRangeStart(
+          externalRangeObj.from ? toValidDate(externalRangeObj.from) : null,
+        );
+        setRangeEnd(
+          externalRangeObj.to ? toValidDate(externalRangeObj.to) : null,
+        );
+        if (externalRangeObj.from)
+          setInternalDate(toValidDate(externalRangeObj.from));
       } else if (externalDates?.length) {
         setRangeStart(toValidDate(externalDates[0]));
         setRangeEnd(externalDates[1] ? toValidDate(externalDates[1]) : null);

@@ -196,7 +196,17 @@ export const HeaderComponent: React.FC = () => {
             className={`${styles.homeButton} ${isCurrentMonth ? styles.homeButtonDisabled : ""}`}
             disabled={isCurrentMonth}
             onClick={() =>
-              navigateTo(new Date(today.getFullYear(), today.getMonth(), 1))
+              navigateTo(
+                new Date(
+                  today.getFullYear(),
+                  today.getMonth(),
+                  1,
+                  date.getHours(),
+                  date.getMinutes(),
+                  date.getSeconds(),
+                  date.getMilliseconds(),
+                ),
+              )
             }
           >
             <Home />

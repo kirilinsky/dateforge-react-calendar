@@ -26,7 +26,7 @@ const getLimit = (d?: Date | null, isMax?: boolean) =>
 
 const getYearSafe = (d?: Date | null) => d?.getFullYear() ?? null;
 
-const isSameDay = (a: Date, b: Date) =>
+export const isSameDay = (a: Date, b: Date) =>
   a.getFullYear() === b.getFullYear() &&
   a.getMonth() === b.getMonth() &&
   a.getDate() === b.getDate();
@@ -218,14 +218,21 @@ export const getMonthListData = (
 const navBoundsFromDisabled = (
   disabled?: DisabledRule | DisabledRule[],
 ): { min?: Date; max?: Date } => {
-  const rules = disabled === undefined ? [] : Array.isArray(disabled) ? disabled : [disabled];
+  const rules =
+    disabled === undefined
+      ? []
+      : Array.isArray(disabled)
+        ? disabled
+        : [disabled];
   let min: Date | undefined;
   let max: Date | undefined;
   for (const rule of rules) {
     if (!rule || typeof rule !== "object" || rule instanceof Date) continue;
     if ("from" in rule || "dayOfWeek" in rule) continue;
-    if ("before" in rule && rule.before && (!min || rule.before > min)) min = rule.before;
-    if ("after" in rule && rule.after && (!max || rule.after < max)) max = rule.after;
+    if ("before" in rule && rule.before && (!min || rule.before > min))
+      min = rule.before;
+    if ("after" in rule && rule.after && (!max || rule.after < max))
+      max = rule.after;
   }
   return { min, max };
 };
@@ -449,12 +456,19 @@ export const getCalendarData = (
         pMaxT !== null &&
         t + DAY_MS <= pMaxT;
 
-      const isDisabled = checkIsDateDisabled(fullDate, startDate, endDate, disabled);
+      const isDisabled = checkIsDateDisabled(
+        fullDate,
+        startDate,
+        endDate,
+        disabled,
+      );
       let isRangeLimitDisabled = false;
       if (!isDisabled && rStartT !== null && rEndT === null && t !== rStartT) {
         const diffDays = Math.round(Math.abs(t - rStartT) / DAY_MS) + 1;
-        if (rangeMinDays !== undefined && diffDays < rangeMinDays) isRangeLimitDisabled = true;
-        if (rangeMaxDays !== undefined && diffDays > rangeMaxDays) isRangeLimitDisabled = true;
+        if (rangeMinDays !== undefined && diffDays < rangeMinDays)
+          isRangeLimitDisabled = true;
+        if (rangeMaxDays !== undefined && diffDays > rangeMaxDays)
+          isRangeLimitDisabled = true;
       }
 
       return {

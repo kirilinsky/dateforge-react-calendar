@@ -36,10 +36,13 @@ Ultra-lightweight Date & Time picker for React — zero dependencies, fluid adap
     </tr>
   </table>
 
-  <br />
-
+  <br /> 
   <a href="https://calendar-demo-pi.vercel.app/" target="_blank">
     <img src="https://img.shields.io/badge/Live%20Demo-Try%20it%20Out-60d276?style=for-the-badge&logo=rocket&logoColor=white" alt="Live Demo" />
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://calendar-demo-pi.vercel.app/doc" target="_blank">
+    <img src="https://img.shields.io/badge/Documentation-View%20Docs-3559e0?style=for-the-badge&logo=read-the-docs&logoColor=white" alt="Documentation" />
   </a>
 </div>
 
@@ -48,13 +51,14 @@ Ultra-lightweight Date & Time picker for React — zero dependencies, fluid adap
 ## Features
 
 - ⚡ **Zero dependencies** — no moment, dayjs, or date-fns
-- 📦 **~9kb gzipped** — styles included
+- 📦 **~10kb gzipped** — styles included
 - 🌎 **200+ locales** — native `Intl` API, no extra bytes
 - 🎨 **20 themes** — dark & light, with optional gradient overlay
 - 📐 **Fluid layout** — adapts to any container width, smart font scaling
 - 🛠️ **Modular** — toggle time, presets, month grid, week numbers, two-months view
 - 📅 **Range & multi-select** — live hover preview, range highlight, chips panel
 - 👆 **Gesture support** — swipe to change months, swipe time tracks
+- 🗓️ **Two-months layout** — side-by-side months, auto-stacks on narrow containers
 
 ---
 
@@ -156,21 +160,21 @@ Clicking a selected date deselects it. When `max` is reached further clicks are 
 
 ### Layout modules
 
-| Prop              | Type      | Default | Description                                                      |
-| :---------------- | :-------- | :------ | :--------------------------------------------------------------- |
-| `twoMonthsLayout` | `boolean` | `false` | Show current + next month side by side. Stacks on narrow screens |
-| `time`            | `boolean` | `true`  | Time button in header (opens time popup)                         |
-| `timeGrid`        | `boolean` | `false` | Full-size time picker panel alongside the calendar               |
-| `months`          | `boolean` | `true`  | Month navigation arrows in header                                |
-| `years`           | `boolean` | `false` | Year navigation arrows in header                                 |
-| `monthsGrid`      | `boolean` | `false` | Full-size month-grid panel alongside the calendar                |
-| `compactMonths`   | `boolean` | `false` | Compact month dropdown button in header                          |
-| `compactYears`    | `boolean` | `true`  | Compact year dropdown button in header                           |
-| `monthsColumn`    | `boolean` | `false` | Stack months vertically for two-months layout                    |
-| `presets`         | `boolean` | `false` | Quick-select presets (Today, Tomorrow, Next week…)               |
-| `showWeekNumber`  | `boolean` | `false` | ISO week numbers alongside each row                              |
+| Prop              | Type      | Default | Description                                                                                                                     |
+| :---------------- | :-------- | :------ | :------------------------------------------------------------------------------------------------------------------------------ |
+| `twoMonthsLayout` | `boolean` | `false` | Show current + next month side by side. Stacks on narrow screens                                                                |
+| `time`            | `boolean` | `true`  | Time button in header (opens time popup)                                                                                        |
+| `timeGrid`        | `boolean` | `false` | Full-size time picker panel alongside the calendar                                                                              |
+| `months`          | `boolean` | `true`  | Month navigation arrows in header                                                                                               |
+| `years`           | `boolean` | `false` | Year navigation arrows in header                                                                                                |
+| `monthsGrid`      | `boolean` | `false` | Full-size month-grid panel alongside the calendar                                                                               |
+| `compactMonths`   | `boolean` | `false` | Compact month dropdown button in header                                                                                         |
+| `compactYears`    | `boolean` | `true`  | Compact year dropdown button in header                                                                                          |
+| `monthsColumn`    | `boolean` | `false` | Stack months vertically for two-months layout                                                                                   |
+| `presets`         | `boolean` | `false` | Quick-select presets (Today, Tomorrow, Next week…)                                                                              |
+| `showWeekNumber`  | `boolean` | `false` | ISO week numbers alongside each row                                                                                             |
 | `showHomeButton`  | `boolean` | `false` | Home button in header — active when viewing any month other than the current one; click navigates back without selecting a date |
-| `showClearButton` | `boolean` | `false` | Clear button in header — active when any date is selected; click clears the entire selection (single, multi, or range)         |
+| `showClearButton` | `boolean` | `false` | Clear button in header — active when any date is selected; click clears the entire selection (single, multi, or range)          |
 
 <img src="https://i.ibb.co/6cQcpgnt/image.png" alt="modular" width="460" />
 
@@ -267,7 +271,9 @@ Days, months, date labels, and range separators all follow local standards autom
 
 ## Roadmap
 
+- [ ] Full accessibility — keyboard navigation, ARIA roles (`grid`, `gridcell`, `dialog`), screen reader announcements, focus management in popups
 - [ ] Custom presets via prop
 - [ ] Custom theme API
 - [ ] Holiday markers with labels
+- [ ] Week Selection mode
 - [ ] RTL support

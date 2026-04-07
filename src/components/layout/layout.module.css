@@ -58,13 +58,13 @@
 .calendarContainer.gradient {
   background:
     radial-gradient(
-      ellipse 72% 65% at 6% 6%,
-      color-mix(in srgb, var(--c-b) 76%, var(--c-h)) 0%,
+      ellipse 50% 45% at 5% 5%,
+      color-mix(in srgb, var(--c-b) 88%, var(--c-h)) 0%,
       transparent 100%
     ),
     radial-gradient(
-      ellipse 58% 52% at 94% 94%,
-      color-mix(in srgb, var(--c-b) 80%, var(--c-h)) 0%,
+      ellipse 40% 38% at 95% 95%,
+      color-mix(in srgb, var(--c-b) 90%, var(--c-h)) 0%,
       transparent 100%
     ),
     var(--c-b) !important;
@@ -73,13 +73,13 @@
 .calendarContainer.gradient.dark {
   background:
     radial-gradient(
-      ellipse 68% 58% at 4% 4%,
-      color-mix(in srgb, var(--c-b) 58%, var(--c-h)) 0%,
+      ellipse 48% 42% at 4% 4%,
+      color-mix(in srgb, var(--c-b) 74%, var(--c-h)) 0%,
       transparent 100%
     ),
     radial-gradient(
-      ellipse 52% 48% at 96% 96%,
-      color-mix(in srgb, var(--c-b) 66%, var(--c-h)) 0%,
+      ellipse 38% 35% at 96% 96%,
+      color-mix(in srgb, var(--c-b) 78%, var(--c-h)) 0%,
       transparent 100%
     ),
     var(--c-b) !important;

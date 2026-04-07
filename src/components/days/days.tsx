@@ -34,6 +34,7 @@ export const DaysComponent: React.FC<{
     setHoverDate,
     rangeMinDays,
     rangeMaxDays,
+    twoMonthsLayout,
   } = useCalendarContext();
 
   const startT = startDate
@@ -120,6 +121,8 @@ export const DaysComponent: React.FC<{
     rangeStart,
     rangeEnd,
     hoverDate,
+    rangeMinDays,
+    rangeMaxDays,
   ]);
 
   const handleSetDay = useCallback(
@@ -204,9 +207,13 @@ export const DaysComponent: React.FC<{
           const isLastRow = wIndex === weeksData.length - 1;
           if (
             isLastRow &&
-            (hideLimited || hideDisabled) &&
+            (hideLimited || hideDisabled || twoMonthsLayout) &&
             week.days.every((d) =>
-              isDayHidden({ fullDate: d.fullDate, isDisabled: d.isDisabled, isCurrentMonth: d.isCurrentMonth }),
+              isDayHidden({
+                fullDate: d.fullDate,
+                isDisabled: d.isDisabled,
+                isCurrentMonth: d.isCurrentMonth,
+              }),
             )
           ) {
             return null;

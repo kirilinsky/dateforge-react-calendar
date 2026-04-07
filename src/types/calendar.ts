@@ -58,7 +58,10 @@ export interface CalendarProps {
   showClearButton?: boolean;
 }
 
-export interface CalendarContextValue extends Omit<CalendarProps, "onChange" | "onDatesChange" | "onRangeChange" | "mode" | "max"> {
+export interface CalendarContextValue extends Omit<
+  CalendarProps,
+  "onChange" | "onDatesChange" | "onRangeChange" | "mode" | "max"
+> {
   range: boolean;
   multiselect: number | boolean | undefined;
   date: Date;
@@ -81,8 +84,6 @@ export interface CalendarContextValue extends Omit<CalendarProps, "onChange" | "
   hoverDate: Date | null;
   setHoverDate: (d: Date | null) => void;
   dark: boolean;
-  view: CalendarView;
-  setView: (view: CalendarView) => void;
   showTimePopup: boolean;
   setShowTimePopup: (v: boolean) => void;
   showMonthPopup: boolean;
@@ -90,5 +91,3 @@ export interface CalendarContextValue extends Omit<CalendarProps, "onChange" | "
   showYearPopup: boolean;
   setShowYearPopup: (v: boolean) => void;
 }
-
-export type CalendarView = "calendar" | "month" | "year";

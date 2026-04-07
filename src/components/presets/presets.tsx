@@ -5,6 +5,7 @@ import {
   getFilteredPresets,
   getPresetDate,
   getRelativeLabel,
+  isSameDay,
 } from "@/utils/date-utils";
 import shared from "@/global/global.module.css";
 
@@ -53,8 +54,7 @@ export const PresetsComponent: React.FC = () => {
     >
       {presets.map((preset) => {
         const isActive =
-          !!selectedDate &&
-          preset.targetDate.toDateString() === selectedDate.toDateString();
+          !!selectedDate && isSameDay(preset.targetDate, selectedDate);
         return (
           <button
             key={preset.id}
