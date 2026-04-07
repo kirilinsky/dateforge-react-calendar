@@ -4,3 +4,5 @@ const I = (d: string) => (
   </svg>
 );
 export const Down = () => I("M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z");
+export const Home = () => I("M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z");
+export const Clear = () => I("M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z");

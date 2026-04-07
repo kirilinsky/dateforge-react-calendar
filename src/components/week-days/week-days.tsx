@@ -4,13 +4,15 @@ import { useCalendarContext } from "../provider/provider";
 import styles from "./weekdays.module.css";
 
 const WeekDays = () => {
-  const { locale, highlightWeekends, dark, startOfWeek, showWeekNumber } =
+  const { locale, highlightWeekends, dark, startOfWeek, showWeekNumber, hideWeekdays } =
     useCalendarContext();
 
   const wDays = useMemo(
     () => getWeekdaysNames(locale, startOfWeek),
     [locale, startOfWeek],
   );
+
+  if (hideWeekdays) return null;
 
   return (
     <div role="row" style={{ display: "contents" }}>

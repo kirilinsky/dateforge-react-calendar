@@ -29,4 +29,6 @@
   padding-bottom: 1em !important;
   font-size: 0.8em !important;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

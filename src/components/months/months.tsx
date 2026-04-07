@@ -5,19 +5,18 @@ import { getMonthListData, setMonth } from "@/utils/date-utils";
 import shared from "@/global/global.module.css";
 
 export const MonthsComponent: React.FC = () => {
-  const { onChangeDate, locale, date, minDate, maxDate, disableWeekends } =
+  const { navigateTo, locale, date, startDate, endDate, shortMonths } =
     useCalendarContext();
 
   const currentMonth = date.getMonth();
   const currentYear = date.getFullYear();
 
   const mNames = useMemo(
-    () => getMonthListData(locale, currentYear, minDate, maxDate, true),
-    [locale, currentYear, minDate, maxDate],
+    () => getMonthListData(locale, currentYear, startDate, endDate, shortMonths ?? true),
+    [locale, currentYear, startDate, endDate, shortMonths],
   );
 
-  const handleClick = (i: number) =>
-    onChangeDate(setMonth(date, i, disableWeekends));
+  const handleClick = (i: number) => navigateTo(setMonth(date, i));
 
   return (
     <div className={styles.monthsContainer} style={{ gridArea: "MM" }}>

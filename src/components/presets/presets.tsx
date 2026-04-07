@@ -5,6 +5,7 @@ import {
   getFilteredPresets,
   getPresetDate,
   getRelativeLabel,
+  isSameDay,
 } from "@/utils/date-utils";
 import shared from "@/global/global.module.css";
 
@@ -12,24 +13,37 @@ export const PresetsComponent: React.FC = () => {
   const {
     monthsGrid,
     date,
-    minDate,
-    maxDate,
+    selectedDate,
+    startDate,
+    endDate,
     years,
     onChangeDate,
     locale,
     compactMonths,
     compactYears,
+    months,
+    disabled,
   } = useCalendarContext();
 
   const presets = useMemo(
     () =>
       getFilteredPresets(
         years || !!compactYears,
-        monthsGrid || !!compactMonths,
-        minDate,
-        maxDate,
+        monthsGrid || !!compactMonths || !!months,
+        startDate,
+        endDate,
+        disabled,
       ),
-    [years, monthsGrid, minDate, maxDate, compactYears, compactMonths],
+    [
+      years,
+      months,
+      monthsGrid,
+      startDate,
+      endDate,
+      compactYears,
+      compactMonths,
+      disabled,
+    ],
   );
 
   return (
@@ -40,7 +54,7 @@ export const PresetsComponent: React.FC = () => {
     >
       {presets.map((preset) => {
         const isActive =
-          preset.targetDate.toDateString() === date.toDateString();
+          !!selectedDate && isSameDay(preset.targetDate, selectedDate);
         return (
           <button
             key={preset.id}
@@ -53,9 +67,11 @@ export const PresetsComponent: React.FC = () => {
             ]
               .filter(Boolean)
               .join(" ")}
-            onClick={() => onChangeDate(getPresetDate(preset))}
+            onClick={() =>
+              onChangeDate(getPresetDate(preset, date, startDate, endDate))
+            }
           >
-            {getRelativeLabel(locale, preset.amount, preset.unit)}{" "}
+            {getRelativeLabel(locale, preset.amount, preset.unit)}
           </button>
         );
       })}

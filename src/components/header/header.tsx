@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import styles from "./header.module.css";
-import { Down } from "@/Icons";
+import { Clear, Down, Home } from "@/Icons";
 import { useCalendarContext } from "../provider/provider";
 import {
   addDate,
@@ -8,52 +8,94 @@ import {
   getTimeString,
   isYearFixed,
 } from "@/utils/date-utils";
+import { getTwoMonthsNarrowThreshold } from "@/helpers/get-grid-layout";
 
 export const HeaderComponent: React.FC = () => {
   const {
-    onChangeDate,
+    navigateTo,
     compactMonths,
     compactYears,
-    minDate,
-    maxDate,
+    startDate,
+    endDate,
     years,
     months,
     date,
     time,
     locale,
-    setView,
     hour12,
-    disableWeekends,
     setShowTimePopup,
+    setShowMonthPopup,
+    setShowYearPopup,
+    shortMonths,
+    disabled,
+    twoMonthsLayout,
+    monthsColumn,
+    monthsGrid,
+    timeGrid,
+    containerWidth,
+    showHomeButton,
+    showClearButton,
+    selectedDates,
+    onChangeDate,
   } = useCalendarContext();
+
+  const twoMonthsStacked =
+    !!twoMonthsLayout &&
+    (!!monthsColumn ||
+      (containerWidth > 0 &&
+        containerWidth <
+          getTwoMonthsNarrowThreshold({ monthsGrid, timeGrid })));
+
+  const today = new Date();
+  const isCurrentMonth =
+    date.getFullYear() === today.getFullYear() &&
+    date.getMonth() === today.getMonth();
 
   const cur = date.getFullYear();
   const curTime = getTimeString(date, hour12);
 
   const yearFixed = useMemo(
-    () => isYearFixed(cur, minDate, maxDate),
-    [cur, minDate, maxDate],
+    () => isYearFixed(cur, startDate, endDate),
+    [cur, startDate, endDate],
   );
   const monthFixed = useMemo(
-    () => isYearFixed(cur, minDate, maxDate, date.getMonth()),
-    [minDate, maxDate, date],
+    () => isYearFixed(cur, startDate, endDate, date.getMonth()),
+    [startDate, endDate, date],
   );
 
   const { canGoPrev, canGoNext, canGoPrevMonth, canGoNextMonth } = useMemo(
-    () => checkYearNavigation(cur, minDate, maxDate, date),
-    [cur, date, minDate, maxDate],
+    () => checkYearNavigation(cur, startDate, endDate, date, disabled),
+    [cur, date, startDate, endDate, disabled],
   );
 
+  const monthFormat = shortMonths ? "short" : "long";
   const currentMonthName = new Intl.DateTimeFormat(locale, {
-    month: "long",
+    month: monthFormat,
   }).format(date);
 
+  const nextMonthDate = useMemo(
+    () => new Date(date.getFullYear(), date.getMonth() + 1, 1),
+    [date],
+  );
+  const nextMonthName = new Intl.DateTimeFormat(locale, {
+    month: monthFormat,
+  }).format(nextMonthDate);
+  const nextMonthYear = nextMonthDate.getFullYear();
+
   const ch = (v: number) =>
-    onChangeDate(addDate(date, v, "year", disableWeekends, minDate, maxDate));
+    navigateTo(addDate(date, v, "year", startDate, endDate));
   const cm = (v: number) =>
-    onChangeDate(addDate(date, v, "month", disableWeekends, minDate, maxDate));
+    navigateTo(addDate(date, v, "month", startDate, endDate));
   return (
-    <div className={styles.headerContainer} style={{ gridArea: "HH" }}>
+    <div
+      className={[
+        styles.headerContainer,
+        twoMonthsLayout && styles.twoMonthsHeader,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      style={{ gridArea: "HH" }}
+    >
       {time && (
         <button
           className={styles.timeButton}
@@ -67,13 +109,14 @@ export const HeaderComponent: React.FC = () => {
         <button
           disabled={monthFixed}
           className={styles.monthButton}
-          onClick={() => setView("month")}
+          onClick={() => setShowMonthPopup(true)}
         >
           <Down /> {currentMonthName}
+          {twoMonthsLayout ? ` — ${nextMonthName}` : ""}
         </button>
       )}
 
-      {months && (
+      {months && (!twoMonthsLayout || twoMonthsStacked) && (
         <div className={styles.yearsSelector}>
           {canGoPrevMonth && (
             <button className={styles.arrow} onClick={() => cm(-1)}>
@@ -81,10 +124,34 @@ export const HeaderComponent: React.FC = () => {
             </button>
           )}
           <button
-            onClick={() => setView(monthFixed ? "calendar" : "month")}
+            onClick={() => !monthFixed && setShowMonthPopup(true)}
             className={`${styles.currentYear} ${monthFixed ? styles.staticButton : ""}`}
           >
             {currentMonthName}
+          </button>
+          {canGoNextMonth && (
+            <button className={styles.arrow} onClick={() => cm(1)}>
+              ›
+            </button>
+          )}
+        </div>
+      )}
+
+      {months && twoMonthsLayout && !twoMonthsStacked && (
+        <div className={`${styles.yearsSelector} ${styles.twoMonthsSelector}`}>
+          {canGoPrevMonth && (
+            <button className={styles.arrow} onClick={() => cm(-1)}>
+              ‹
+            </button>
+          )}
+          <button
+            onClick={() => !monthFixed && setShowMonthPopup(true)}
+            className={`${styles.currentYear} ${monthFixed ? styles.staticButton : ""}`}
+          >
+            {currentMonthName} {cur}
+          </button>
+          <button className={`${styles.currentYear} ${styles.staticButton}`}>
+            {nextMonthName} {nextMonthYear}
           </button>
           {canGoNextMonth && (
             <button className={styles.arrow} onClick={() => cm(1)}>
@@ -102,7 +169,7 @@ export const HeaderComponent: React.FC = () => {
             </button>
           )}
           <button
-            onClick={() => setView(yearFixed ? "calendar" : "year")}
+            onClick={() => !yearFixed && setShowYearPopup(true)}
             className={`${styles.currentYear} ${yearFixed ? styles.staticButton : ""}`}
           >
             {cur}
@@ -116,10 +183,45 @@ export const HeaderComponent: React.FC = () => {
       )}
 
       {compactYears && (
-        <button className={styles.monthButton} onClick={() => setView("year")}>
+        <button
+          className={styles.monthButton}
+          onClick={() => setShowYearPopup(true)}
+        >
           {cur} <Down />
         </button>
       )}
+      <div className={styles.flexWrapper}>
+        {showHomeButton && (
+          <button
+            className={`${styles.homeButton} ${isCurrentMonth ? styles.homeButtonDisabled : ""}`}
+            disabled={isCurrentMonth}
+            onClick={() =>
+              navigateTo(
+                new Date(
+                  today.getFullYear(),
+                  today.getMonth(),
+                  1,
+                  date.getHours(),
+                  date.getMinutes(),
+                  date.getSeconds(),
+                  date.getMilliseconds(),
+                ),
+              )
+            }
+          >
+            <Home />
+          </button>
+        )}
+        {showClearButton && (
+          <button
+            className={`${styles.homeButton} ${selectedDates.length === 0 ? styles.homeButtonDisabled : ""}`}
+            disabled={selectedDates.length === 0}
+            onClick={() => onChangeDate(null)}
+          >
+            <Clear />
+          </button>
+        )}
+      </div>
     </div>
   );
 };

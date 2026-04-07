@@ -17,11 +17,15 @@ export const Calendar: React.FC<CalendarProps> = ({
   hour12 = false,
   monthsGrid = false,
   locale = "en",
-  disableWeekends = false,
   startOfWeek = 1,
   brutalism = false,
   gradient = false,
   highlightWeekends = true,
+  mode,
+  max,
+  showSelectedDates = false,
+  twoMonthsLayout = false,
+  monthsColumn = false,
   ...restProps
 }) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -57,6 +61,9 @@ export const Calendar: React.FC<CalendarProps> = ({
             time,
             months,
             monthsGrid,
+            selectedDates: showSelectedDates,
+            twoMonthsLayout,
+            monthsColumn,
           },
           containerWidth,
         ),
@@ -71,12 +78,14 @@ export const Calendar: React.FC<CalendarProps> = ({
       timeGrid,
       months,
       monthsGrid,
-
+      showSelectedDates,
+      twoMonthsLayout,
+      monthsColumn,
       containerWidth,
     ],
   );
 
-  const layoutMode = getLayoutMode(containerWidth, { monthsGrid, timeGrid });
+  const layoutMode = getLayoutMode(containerWidth, { monthsGrid, timeGrid, twoMonthsLayout, monthsColumn });
 
   return (
     <CalendarProvider
@@ -90,13 +99,18 @@ export const Calendar: React.FC<CalendarProps> = ({
       timeGrid={timeGrid}
       months={months}
       monthsGrid={monthsGrid}
-      disableWeekends={disableWeekends}
       startOfWeek={startOfWeek}
       brutalism={brutalism}
       gradient={gradient}
       highlightWeekends={highlightWeekends}
       theme={theme}
       width={width}
+      mode={mode}
+      max={max}
+      showSelectedDates={showSelectedDates}
+      twoMonthsLayout={twoMonthsLayout}
+      monthsColumn={monthsColumn}
+      containerWidth={containerWidth}
       {...restProps}
     >
       <div

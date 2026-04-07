@@ -48,3 +48,7 @@
     opacity: 0.8;
   }
 }
+
+.selectedOtherItem {
+  opacity: 0.9;
+}

@@ -1,3 +1,33 @@
+## Changelog
+
+### 🚀 Version 5.0.0 — Breaking
+
+- **🔄 New API** — `value` replaces `date`; selection mode is now controlled by `mode: 'single' | 'multiple' | 'range'`. Separate callbacks: `onChange` (single), `onDatesChange` (multiple), `onRangeChange` (range).
+- **📅 Range mode** — First click sets `from`, hover shows live preview, second click sets `to`. `onRangeChange` fires on each click with `{ from, to }` where `to` is `null` until end is picked.
+- **🔢 Range limits** — `rangeMinDays` / `rangeMaxDays` props block selections outside the allowed span.
+- **📋 Selected dates panel** — `showSelectedDates` renders chips below the calendar for all modes.
+- **🗓️ Two-months layout** — `twoMonthsLayout` shows current and next month side by side; stacks below ~540px.
+- **🪟 Month/year popups** — Month and year selectors migrated from inline dropdowns to popups.
+- **👆 Gestures on by default** — `gestures` prop now defaults to `true`.
+- **✅ Multi-select** — `mode="multiple"` with optional `max` cap (replaces old `multiselect` prop).
+- **🗑️ Removed** — `date`, `onChangeDate`, `onChangeDates`, `multiselect` props removed.
+- **🚫 Disabled rule** — `disableWeekends` removed in favor of `disabled={{ dayOfWeek: [0, 6] }}`.
+
+---
+
+### 🚀 Version 4.0.0
+
+- **📐 Fluid adaptive grid** — Replaced static + "jelly" (cqw) dual modes with a single fluid layout that fits any container width. Smart font auto-sizing, ideal cell proportions, zero breakpoints.
+- **🎨 Theme overhaul** — Reworked colors across all 18 themes for better contrast and readability.
+- **🌈 Gradient mode redesign** — Completely rebuilt gradient backgrounds for a cleaner, more polished look.
+- **🏗️ Brutalism mode redesign** — Now a proper industrial aesthetic — sharp edges, raw surfaces, heavy type.
+- **🕒 4 new presets** — Next week, next month, in 2 weeks, next year.
+- **👆 Gesture scrolling** — Swipe-to-scroll for hour & minute tracks (opt-in via `gestures` prop).
+- **🚫 Date unselect** — Tap a selected date again to clear it.
+- **🔲 Updated shadows** — Refined shadow tokens across all components.
+
+---
+
 ## Patch notes (old versions)
 
 - **v3.2.1:** Compact inline time popup, 12/24h support via `hour12` prop, time grid redesign.
