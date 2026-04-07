@@ -250,6 +250,8 @@ export const CalendarProvider: React.FC<
     () =>
       ({
         ...props,
+        rangeMinDays,
+        rangeMaxDays,
         multiselect,
         range,
         dark: isDark,
@@ -274,6 +276,8 @@ export const CalendarProvider: React.FC<
     [
       props,
       multiselect,
+      rangeMinDays,
+      rangeMaxDays,
       range,
       isDark,
       internalDate,

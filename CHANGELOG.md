@@ -1,6 +1,9 @@
 ## Changelog
 
-### 🚀 Version 5.0.0 — Breaking
+### 🚀 Version 5.0.1 (LTS)
+- **Bug fixes.**
+
+### Version 5.0.0 — Breaking
 
 - **🔄 New API** — `value` replaces `date`; selection mode is now controlled by `mode: 'single' | 'multiple' | 'range'`. Separate callbacks: `onChange` (single), `onDatesChange` (multiple), `onRangeChange` (range).
 - **📅 Range mode** — First click sets `from`, hover shows live preview, second click sets `to`. `onRangeChange` fires on each click with `{ from, to }` where `to` is `null` until end is picked.
@@ -15,7 +18,7 @@
 
 ---
 
-### 🚀 Version 4.0.0
+### Version 4.0.0
 
 - **📐 Fluid adaptive grid** — Replaced static + "jelly" (cqw) dual modes with a single fluid layout that fits any container width. Smart font auto-sizing, ideal cell proportions, zero breakpoints.
 - **🎨 Theme overhaul** — Reworked colors across all 18 themes for better contrast and readability.
