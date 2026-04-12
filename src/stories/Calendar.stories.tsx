@@ -32,6 +32,7 @@ const THEME_LABELS: Record<CalendarTheme, string> = {
   cyber: "Cyber",
   comfy: "Comfy",
   temporal: "Temporal",
+  nebula: "Nebula",
   neon: "Neon",
   rosa: "Rosa",
   amethyst: "Amethyst",
@@ -71,7 +72,9 @@ export const Default = () => {
           value={date}
           theme="industrial"
           brutalism
-          onChange={(d: Date | null) => { if (d) setDate(d); }}
+          onChange={(d: Date | null) => {
+            if (d) setDate(d);
+          }}
         />
       </div>
     </StoryWrapper>
@@ -85,7 +88,9 @@ export const TwoMonthsLayout = () => {
       <div style={{ width: 640 }}>
         <Calendar
           value={date}
-          onChange={(d: Date | null) => { if (d) setDate(d); }}
+          onChange={(d: Date | null) => {
+            if (d) setDate(d);
+          }}
           twoMonthsLayout
           months
           time={false}
@@ -98,16 +103,24 @@ export const TwoMonthsLayout = () => {
 };
 
 export const RangePicker = () => {
-  const [range, setRange] = useState<{ from: Date | null; to: Date | null }>({ from: null, to: null });
+  const [range, setRange] = useState<{ from: Date | null; to: Date | null }>({
+    from: null,
+    to: null,
+  });
 
   const fmt = (d: Date) =>
-    new Intl.DateTimeFormat("en", { day: "2-digit", month: "long", year: "numeric" }).format(d);
+    new Intl.DateTimeFormat("en", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    }).format(d);
 
-  const subtitle = range.from && range.to
-    ? `${fmt(range.from)} → ${fmt(range.to)}`
-    : range.from
-      ? `${fmt(range.from)} → pick end…`
-      : "Pick start date";
+  const subtitle =
+    range.from && range.to
+      ? `${fmt(range.from)} → ${fmt(range.to)}`
+      : range.from
+        ? `${fmt(range.from)} → pick end…`
+        : "Pick start date";
 
   return (
     <StoryWrapper title="Range Picker" subtitle={subtitle}>
@@ -132,7 +145,10 @@ import { CalendarMode } from "../types/calendar";
 export const KitchenSink = () => {
   const [mode, setMode] = useState<CalendarMode>("single");
   const [max, setMax] = useState<number | undefined>(undefined);
-  const [range, setRange] = useState({ from: null as Date | null, to: null as Date | null });
+  const [range, setRange] = useState({
+    from: null as Date | null,
+    to: null as Date | null,
+  });
   const [dates, setDates] = useState<Date[]>([]);
   const [date, setDate] = useState<Date>(new Date());
   const [startMonth, setStartMonth] = useState<Date>(new Date());
@@ -150,8 +166,12 @@ export const KitchenSink = () => {
 
   const [startDate, setStartDate] = useState<Date>(() => getOffsetDay(-391));
   const [endDate, setEndDate] = useState<Date>(() => getOffsetDay(411));
-  const [rangeMinDays, setRangeMinDays] = useState<number | undefined>(undefined);
-  const [rangeMaxDays, setRangeMaxDays] = useState<number | undefined>(undefined);
+  const [rangeMinDays, setRangeMinDays] = useState<number | undefined>(
+    undefined,
+  );
+  const [rangeMaxDays, setRangeMaxDays] = useState<number | undefined>(
+    undefined,
+  );
   const toISODate = (d: Date) => d.toISOString().split("T")[0];
   const parseDate = (s: string) => new Date(s + "T00:00:00");
 
@@ -233,6 +253,9 @@ export const KitchenSink = () => {
     showSelectedDates: false,
     twoMonthsLayout: false,
     monthsColumn: false,
+    showHomeButton: false,
+    showClearButton: false,
+    showThemeToggle: false,
   });
 
   const toggle = (key: keyof typeof config) =>
@@ -247,17 +270,18 @@ export const KitchenSink = () => {
     { label: "Unlimited", mode: "multiple" },
   ];
 
-  const subtitle = mode === "range"
-    ? range.from && range.to
-      ? `${formatSubtitle(range.from, activeLocale)} → ${formatSubtitle(range.to, activeLocale)}`
-      : range.from
-        ? `${formatSubtitle(range.from, activeLocale)} → pick end…`
-        : "Pick start date"
-    : mode === "multiple"
-      ? dates.length
-        ? dates.map((d) => formatSubtitle(d, activeLocale)).join(" · ")
-        : "No dates selected"
-      : formatSubtitle(date, activeLocale, config.time);
+  const subtitle =
+    mode === "range"
+      ? range.from && range.to
+        ? `${formatSubtitle(range.from, activeLocale)} → ${formatSubtitle(range.to, activeLocale)}`
+        : range.from
+          ? `${formatSubtitle(range.from, activeLocale)} → pick end…`
+          : "Pick start date"
+      : mode === "multiple"
+        ? dates.length
+          ? dates.map((d) => formatSubtitle(d, activeLocale)).join(" · ")
+          : "No dates selected"
+        : formatSubtitle(date, activeLocale, config.time);
 
   const isLight = (LIGHT_THEMES as readonly string[]).includes(activeTheme);
 
@@ -317,9 +341,13 @@ export const KitchenSink = () => {
             <Calendar
               mode={mode}
               max={max}
-              value={mode === "range" ? range : mode === "multiple" ? dates : date}
+              value={
+                mode === "range" ? range : mode === "multiple" ? dates : date
+              }
               startMonth={startMonth}
-              onChange={(d: Date | null) => { if (d) setDate(d); }}
+              onChange={(d: Date | null) => {
+                if (d) setDate(d);
+              }}
               onDatesChange={setDates}
               onRangeChange={setRange}
               theme={activeTheme}
@@ -433,7 +461,9 @@ export const KitchenSink = () => {
                   value={rangeMinDays ?? ""}
                   placeholder="—"
                   onChange={(e) =>
-                    setRangeMinDays(e.target.value ? Number(e.target.value) : undefined)
+                    setRangeMinDays(
+                      e.target.value ? Number(e.target.value) : undefined,
+                    )
                   }
                 />
               </div>
@@ -445,7 +475,9 @@ export const KitchenSink = () => {
                   value={rangeMaxDays ?? ""}
                   placeholder="—"
                   onChange={(e) =>
-                    setRangeMaxDays(e.target.value ? Number(e.target.value) : undefined)
+                    setRangeMaxDays(
+                      e.target.value ? Number(e.target.value) : undefined,
+                    )
                   }
                 />
               </div>

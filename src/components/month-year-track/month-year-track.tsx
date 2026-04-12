@@ -15,6 +15,7 @@ function SelectDrum({
   isDisabled,
   onStep,
   onJump,
+  label,
 }: {
   val: number;
   gestures?: boolean;
@@ -23,6 +24,7 @@ function SelectDrum({
   isDisabled: (v: number) => boolean;
   onStep: (dir: 1 | -1) => void;
   onJump: (target: number) => void;
+  label: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const stepRef = useRef(onStep);
@@ -85,7 +87,11 @@ function SelectDrum({
     <div
       ref={ref}
       className={styles.drum}
+      role="spinbutton"
       tabIndex={0}
+      aria-label={label}
+      aria-valuenow={val}
+      aria-valuetext={getLabel(val)}
       onKeyDown={(e) => {
         if (e.key === "ArrowUp") { e.preventDefault(); onStep(-1); }
         if (e.key === "ArrowDown") { e.preventDefault(); onStep(1); }
@@ -103,6 +109,7 @@ function SelectDrum({
             key={o}
             className={`${styles.item} ${isActive ? styles.active : ""} ${disabled ? styles.disabled : ""}`}
             style={!isActive ? { opacity: disabled ? opacity * 0.4 : opacity } : undefined}
+            aria-hidden={!isActive}
             onClick={isActive || disabled ? undefined : () => onJump(dispVal)}
           >
             {getLabel(dispVal)}
@@ -158,6 +165,7 @@ function MonthTrack({
         isDisabled={isDisabled}
         onStep={step}
         onJump={onChange}
+        label="Month"
       />
     </div>
   );
@@ -198,6 +206,7 @@ function YearTrack({
         isDisabled={isDisabled}
         onStep={step}
         onJump={onChange}
+        label="Year"
       />
     </div>
   );

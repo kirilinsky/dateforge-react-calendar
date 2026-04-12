@@ -56,6 +56,7 @@ export interface CalendarProps {
   monthsColumn?: boolean;
   showHomeButton?: boolean;
   showClearButton?: boolean;
+  showThemeToggle?: boolean;
 }
 
 export interface CalendarContextValue extends Omit<
@@ -84,6 +85,7 @@ export interface CalendarContextValue extends Omit<
   hoverDate: Date | null;
   setHoverDate: (d: Date | null) => void;
   dark: boolean;
+  toggleTheme: () => void;
   showTimePopup: boolean;
   setShowTimePopup: (v: boolean) => void;
   showMonthPopup: boolean;

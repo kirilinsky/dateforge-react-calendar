@@ -13,12 +13,14 @@ export default defineConfig({
   dts: true,
   treeshake: true,
   target: "es2022",
-  external: [
-    "react",
-    "react-dom",
-    "react/jsx-runtime",
-    ...Object.keys(pkg.peerDependencies || {}),
-  ],
+  deps: {
+    neverBundle: [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      ...Object.keys(pkg.peerDependencies || {}),
+    ],
+  },
   css: {
     inject: true,
     minify: true,

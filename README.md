@@ -6,7 +6,7 @@
 &nbsp;&nbsp;
 ![dependencies](https://img.shields.io/badge/dependencies-0-brightgreen?style=flat-square)
 &nbsp;&nbsp;
-![themes](https://img.shields.io/badge/themes-20-orange?style=flat-square)
+![themes](https://img.shields.io/badge/themes-21-orange?style=flat-square)
 &nbsp;&nbsp;
 [![bundle size](https://img.shields.io/bundlephobia/minzip/react-calendar-datetime?style=flat-square)](https://bundlephobia.com/package/react-calendar-datetime)
 &nbsp;&nbsp;
@@ -16,7 +16,7 @@
 
 # React Calendar & Date/Time Picker
 
-Ultra-lightweight Date & Time picker for React — zero dependencies, fluid adaptive layout, 20 themes.
+Ultra-lightweight Date & Time picker for React — zero dependencies, fluid adaptive layout, 21 themes.
 
 <div align="center">
   <table style="border: none; border-collapse: collapse;">
@@ -53,7 +53,7 @@ Ultra-lightweight Date & Time picker for React — zero dependencies, fluid adap
 - ⚡ **Zero dependencies** — no moment, dayjs, or date-fns
 - 📦 **~10kb gzipped** — styles included
 - 🌎 **200+ locales** — native `Intl` API, no extra bytes
-- 🎨 **20 themes** — dark & light, with optional gradient overlay
+- 🎨 **21 themes** — dark & light, with optional gradient overlay and one-prop dark/light toggle
 - 📐 **Fluid layout** — adapts to any container width, smart font scaling
 - 🛠️ **Modular** — toggle time, presets, month grid, week numbers, two-months view
 - 📅 **Range & multi-select** — live hover preview, range highlight, chips panel
@@ -173,8 +173,9 @@ Clicking a selected date deselects it. When `max` is reached further clicks are 
 | `monthsColumn`    | `boolean` | `false` | Stack months vertically for two-months layout                                                                                   |
 | `presets`         | `boolean` | `false` | Quick-select presets (Today, Tomorrow, Next week…)                                                                              |
 | `showWeekNumber`  | `boolean` | `false` | ISO week numbers alongside each row                                                                                             |
-| `showHomeButton`  | `boolean` | `false` | Home button in header — active when viewing any month other than the current one; click navigates back without selecting a date |
-| `showClearButton` | `boolean` | `false` | Clear button in header — active when any date is selected; click clears the entire selection (single, multi, or range)          |
+| `showHomeButton`   | `boolean` | `false` | Home button in header — active when viewing any month other than the current one; click navigates back without selecting a date |
+| `showClearButton`  | `boolean` | `false` | Clear button in header — active when any date is selected; click clears the entire selection (single, multi, or range)          |
+| `showThemeToggle`  | `boolean` | `false` | Toggle button in header that switches between `paper` (light) and `carbon` (dark) — built-in dark/light mode control            |
 
 <img src="https://i.ibb.co/6cQcpgnt/image.png" alt="modular" width="460" />
 
@@ -216,7 +217,7 @@ Rules can be combined into an array — all matching rules are applied.
 
 ## Themes
 
-20 built-in themes via the `theme` prop. Swatches show **background · accent** colors.
+21 built-in themes via the `theme` prop. Swatches show **background · accent** colors.
 
 <img src="https://i.ibb.co/PZMb2k02/theme.png" alt="Themes" />
 
@@ -232,6 +233,7 @@ Rules can be combined into an array — all matching rules are applied.
 | <img src="https://placehold.co/13x13/14252e/14252e.png" valign="middle"/> <img src="https://placehold.co/13x13/27d1f4/27d1f4.png" valign="middle"/> **`temporal`**   | <img src="https://placehold.co/13x13/f7f8f9/f7f8f9.png" valign="middle"/> <img src="https://placehold.co/13x13/80ec27/80ec27.png" valign="middle"/> **`neon`**     |
 | <img src="https://placehold.co/13x13/111111/111111.png" valign="middle"/> <img src="https://placehold.co/13x13/e85d00/e85d00.png" valign="middle"/> **`industrial`** | <img src="https://placehold.co/13x13/f7f8f9/f7f8f9.png" valign="middle"/> <img src="https://placehold.co/13x13/f1a01d/f1a01d.png" valign="middle"/> **`graphite`** |
 | <img src="https://placehold.co/13x13/0f2016/0f2016.png" valign="middle"/> <img src="https://placehold.co/13x13/4ade80/4ade80.png" valign="middle"/> **`forest`**     | <img src="https://placehold.co/13x13/faf8f4/faf8f4.png" valign="middle"/> <img src="https://placehold.co/13x13/6f3d18/6f3d18.png" valign="middle"/> **`latte`**    |
+| <img src="https://placehold.co/13x13/0b0a16/0b0a16.png" valign="middle"/> <img src="https://placehold.co/13x13/b388ff/b388ff.png" valign="middle"/> **`nebula`**     | |
 
 Each theme exposes CSS custom properties you can override:
 
@@ -259,6 +261,7 @@ Powered by the native **Intl API** — 200+ BCP 47 locales, zero extra bytes.
 <Calendar locale="zh-CN" />  // 中文
 <Calendar locale="ar-SA" />  // العربية
 <Calendar locale="ja" />     // 日本語
+<Calendar locale="ru" />     // Русский
 ```
 
 Days, months, date labels, and range separators all follow local standards automatically.

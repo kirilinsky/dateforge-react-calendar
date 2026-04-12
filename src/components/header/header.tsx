@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import styles from "./header.module.css";
-import { Clear, Down, Home } from "@/Icons";
+import { Clear, Down, Home, ThemeToggle } from "@/Icons";
 import { useCalendarContext } from "../provider/provider";
 import {
   addDate,
@@ -35,6 +35,8 @@ export const HeaderComponent: React.FC = () => {
     containerWidth,
     showHomeButton,
     showClearButton,
+    showThemeToggle,
+    toggleTheme,
     selectedDates,
     onChangeDate,
   } = useCalendarContext();
@@ -191,6 +193,11 @@ export const HeaderComponent: React.FC = () => {
         </button>
       )}
       <div className={styles.flexWrapper}>
+        {showThemeToggle && (
+          <button className={styles.homeButton} onClick={toggleTheme}>
+            <ThemeToggle />
+          </button>
+        )}
         {showHomeButton && (
           <button
             className={`${styles.homeButton} ${isCurrentMonth ? styles.homeButtonDisabled : ""}`}

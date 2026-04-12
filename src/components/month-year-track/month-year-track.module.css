@@ -5,6 +5,8 @@
   flex: 1;
   min-height: 8em;
   overflow: hidden;
+  padding: 5px;
+  box-sizing: border-box;
 }
 
 .drum {
@@ -17,6 +19,13 @@
   overflow: hidden;
   cursor: pointer;
   outline: none;
+  border-radius: 1em;
+  transition: box-shadow 0.15s; 
+}
+
+.drum:focus-visible {
+  outline: 2px solid var(--c-h);
+  outline-offset: 2px;
 }
 
 .highlight {

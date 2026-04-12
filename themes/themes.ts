@@ -46,4 +46,5 @@ export const THEMES_DATA: Record<string, string[]> = {
   temporal:  ["#122127","#14252e","#27d1f4","#242f52","#f1f5f9","#6366f1","#27d1f42e","#3a4870","#f472b6","#fb923c"],
   latte:     [W,  "#faf8f4","#6f3d18","#f2eddf",  "#1a1208","#d8c8a8", "#6f3d1826",  "#9e8f78", "#c07a38", "#4a90d9"],
   forest:    ["#0c1a10","#0f2016","#4ade80","#162b1e","#e2f5e8","#255038","#4ade8028","#1d3c2a","#86efac","#fb923c"],
+  nebula:    ["#090812","#0b0a16","#b388ff","#18103a","#ede7f6","#3d2f70","#b388ff28","#3a2d60","#ff8a65","#29b6f6"],
 };

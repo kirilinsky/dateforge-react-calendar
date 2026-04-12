@@ -18,11 +18,13 @@ const Drum = ({
   max,
   gestures,
   onMove,
+  label,
 }: {
   val: number;
   max: number;
   gestures?: boolean;
   onMove: (delta: number) => void;
+  label: string;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const moveRef = useRef(onMove);
@@ -89,7 +91,13 @@ const Drum = ({
     <div
       ref={ref}
       className={styles.drum}
+      role="spinbutton"
       tabIndex={0}
+      aria-label={label}
+      aria-valuenow={val}
+      aria-valuemin={0}
+      aria-valuemax={max - 1}
+      aria-valuetext={padTime(val)}
       onKeyDown={(e) => {
         if (e.key === "ArrowUp") {
           e.preventDefault();
@@ -98,6 +106,14 @@ const Drum = ({
         if (e.key === "ArrowDown") {
           e.preventDefault();
           onMove(1);
+        }
+        if (e.key === "Home") {
+          e.preventDefault();
+          onMove(-val);
+        }
+        if (e.key === "End") {
+          e.preventDefault();
+          onMove(max - 1 - val);
         }
       }}
     >
@@ -112,6 +128,7 @@ const Drum = ({
             key={o}
             className={`${styles.item} ${isActive ? styles.active : ""}`}
             style={!isActive ? { opacity } : undefined}
+            aria-hidden={!isActive}
             onClick={isActive ? undefined : () => onMove(o)}
           >
             {padTime(getDrumValue(val, o, max))}
@@ -147,13 +164,14 @@ export const TimeTrack = ({
     emit(hours, getDrumValue(minutes, delta, 60), period);
 
   return (
-    <div className={styles.root}>
+    <div className={styles.root} role="group" aria-label="Time picker">
       {hour12 && (
         <div className={styles.period}>
           {(["AM", "PM"] as const).map((p) => (
             <button
               key={p}
               className={`${styles.periodBtn} ${period === p ? styles.periodActive : ""}`}
+              aria-pressed={period === p}
               onClick={() => emit(hours, minutes, p)}
             >
               {p}
@@ -162,9 +180,9 @@ export const TimeTrack = ({
         </div>
       )}
       <div className={styles.drums}>
-        <Drum val={hours} max={hourMax} gestures={gestures} onMove={moveHours} />
-        <span className={styles.colon}>:</span>
-        <Drum val={minutes} max={60} gestures={gestures} onMove={moveMinutes} />
+        <Drum val={hours} max={hourMax} gestures={gestures} onMove={moveHours} label="Hours" />
+        <span className={styles.colon} aria-hidden>:</span>
+        <Drum val={minutes} max={60} gestures={gestures} onMove={moveMinutes} label="Minutes" />
       </div>
     </div>
   );

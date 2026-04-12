@@ -36,9 +36,10 @@ const isDateRange = (v: unknown): v is import("@/types/calendar").DateRange =>
   "from" in (v as object);
 
 export const CalendarProvider: React.FC<
-  CalendarProps & { children: ReactNode; containerWidth?: number }
+  CalendarProps & { children: ReactNode; containerWidth?: number; toggleTheme?: () => void }
 > = ({
   children,
+  toggleTheme,
   theme,
   value: externalValue,
   mode = "single",
@@ -255,6 +256,7 @@ export const CalendarProvider: React.FC<
         multiselect,
         range,
         dark: isDark,
+        toggleTheme: toggleTheme ?? (() => {}),
         date: internalDate,
         selectedDate,
         selectedDates: contextSelectedDates,

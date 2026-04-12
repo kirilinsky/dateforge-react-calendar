@@ -21,6 +21,7 @@ export const DARK_THEMES = [
   "temporal",
   "crimson",
   "forest",
+  "nebula",
 ] as const;
 
 export type CalendarTheme =

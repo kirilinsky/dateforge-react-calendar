@@ -6,7 +6,7 @@ import { CalendarLayout } from "../layout/layout";
 
 export const Calendar: React.FC<CalendarProps> = ({
   width = "100%",
-  theme = "paper",
+  theme: themeProp = "paper",
   presets = false,
   compactMonths = false,
   compactYears = true,
@@ -85,6 +85,18 @@ export const Calendar: React.FC<CalendarProps> = ({
     ],
   );
 
+  const [isToggled, setIsToggled] = useState(false);
+
+  useEffect(() => {
+    setIsToggled(false);
+  }, [themeProp]);
+
+  const activeTheme = isToggled
+    ? themeProp === "paper" ? "carbon" : "paper"
+    : themeProp;
+
+  const toggleTheme = () => setIsToggled((v) => !v);
+
   const layoutMode = getLayoutMode(containerWidth, { monthsGrid, timeGrid, twoMonthsLayout, monthsColumn });
 
   return (
@@ -103,7 +115,7 @@ export const Calendar: React.FC<CalendarProps> = ({
       brutalism={brutalism}
       gradient={gradient}
       highlightWeekends={highlightWeekends}
-      theme={theme}
+      theme={activeTheme}
       width={width}
       mode={mode}
       max={max}
@@ -111,11 +123,12 @@ export const Calendar: React.FC<CalendarProps> = ({
       twoMonthsLayout={twoMonthsLayout}
       monthsColumn={monthsColumn}
       containerWidth={containerWidth}
+      toggleTheme={toggleTheme}
       {...restProps}
     >
       <div
         ref={wrapperRef}
-        data-theme={theme}
+        data-theme={activeTheme}
         data-layout={layoutMode}
         style={{ containerType: "inline-size", width }}
       >
