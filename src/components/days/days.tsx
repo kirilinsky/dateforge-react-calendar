@@ -295,7 +295,14 @@ export const DaysComponent: React.FC<{
                           : null;
 
                   const isToday =
-                    !!highlightToday && isSameDay(fullDate, today);
+                    !!highlightToday &&
+                    isSameDay(fullDate, today) &&
+                    !isRangeStart &&
+                    !isRangeEnd &&
+                    !isInRange &&
+                    !isPreviewStart &&
+                    !isPreviewEnd &&
+                    !isPreviewMid;
                   const isOtherMonth = !isCurrentMonth;
                   const isHighlighted =
                     isSelected ||

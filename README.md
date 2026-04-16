@@ -16,21 +16,21 @@
 
 # React Calendar & Date/Time Picker
 
-Ultra-lightweight Date & Time picker for React — zero dependencies, fluid adaptive layout, 21 themes.
+Lightweight Date & Time picker for React — range, multiple. Zero dependencies, fluid adaptive layout, 21 themes.
 
 <div align="center">
   <table style="border: none; border-collapse: collapse;">
     <tr style="border: none;">
       <td align="center" style="border: none; padding: 4px;">
-        <p><b>Paper (light theme)</b></p>
+        <p><b>Paper - default light theme</b></p>
         <img src="https://i.ibb.co/1fRLgr4j/image.png" alt="Paper theme" height="300" />
       </td>
       <td align="center" style="border: none; padding: 4px;">
-        <p><b>Carbon + gradient</b></p>
+        <p><b>Carbon theme with optional gradient</b></p>
         <img src="https://i.ibb.co/zH7XjwDC/image.png" alt="Carbon theme" height="300" />
       </td>
       <td align="center" style="border: none; padding: 4px;">
-        <p><b>Industrial + brutalism</b></p>
+        <p><b>Industrial theme with optional brutalism</b></p>
         <img src="https://i.ibb.co/k6sQG8jR/image.png" alt="Brutalism mode" height="300" />
       </td>
     </tr>
@@ -173,9 +173,9 @@ Clicking a selected date deselects it. When `max` is reached further clicks are 
 | `monthsColumn`    | `boolean` | `false` | Stack months vertically for two-months layout                                                                                   |
 | `presets`         | `boolean` | `false` | Quick-select presets (Today, Tomorrow, Next week…)                                                                              |
 | `showWeekNumber`  | `boolean` | `false` | ISO week numbers alongside each row                                                                                             |
-| `showHomeButton`   | `boolean` | `false` | Home button in header — active when viewing any month other than the current one; click navigates back without selecting a date |
-| `showClearButton`  | `boolean` | `false` | Clear button in header — active when any date is selected; click clears the entire selection (single, multi, or range)          |
-| `showThemeToggle`  | `boolean` | `false` | Toggle button in header that switches between `paper` (light) and `carbon` (dark) — built-in dark/light mode control            |
+| `showHomeButton`  | `boolean` | `false` | Home button in header — active when viewing any month other than the current one; click navigates back without selecting a date |
+| `showClearButton` | `boolean` | `false` | Clear button in header — active when any date is selected; click clears the entire selection (single, multi, or range)          |
+| `showThemeToggle` | `boolean` | `false` | Toggle button in header that switches between `paper` (light) and `carbon` (dark) — built-in dark/light mode control            |
 
 <img src="https://i.ibb.co/6cQcpgnt/image.png" alt="modular" width="460" />
 
@@ -187,7 +187,7 @@ Clicking a selected date deselects it. When `max` is reached further clicks are 
 | `brutalism`         | `boolean` | `false` | Brutalism aesthetic — monospace font, hard borders, no radius |
 | `hour12`            | `boolean` | `false` | 12-hour AM/PM format for time picker                          |
 | `highlightWeekends` | `boolean` | `true`  | Highlight Saturday and Sunday weekday                         |
-| `highlightToday`    | `boolean` | `true` | Show outline on today's date cell              |
+| `highlightToday`    | `boolean` | `true`  | Show outline on today's date cell                             |
 | `shortMonths`       | `boolean` | `false` | Abbreviated month names (Jan, Feb…)                           |
 
 ### Visibility
@@ -234,7 +234,7 @@ Rules can be combined into an array — all matching rules are applied.
 | <img src="https://placehold.co/13x13/14252e/14252e.png" valign="middle"/> <img src="https://placehold.co/13x13/27d1f4/27d1f4.png" valign="middle"/> **`temporal`**   | <img src="https://placehold.co/13x13/f7f8f9/f7f8f9.png" valign="middle"/> <img src="https://placehold.co/13x13/80ec27/80ec27.png" valign="middle"/> **`neon`**     |
 | <img src="https://placehold.co/13x13/111111/111111.png" valign="middle"/> <img src="https://placehold.co/13x13/e85d00/e85d00.png" valign="middle"/> **`industrial`** | <img src="https://placehold.co/13x13/f7f8f9/f7f8f9.png" valign="middle"/> <img src="https://placehold.co/13x13/f1a01d/f1a01d.png" valign="middle"/> **`graphite`** |
 | <img src="https://placehold.co/13x13/0f2016/0f2016.png" valign="middle"/> <img src="https://placehold.co/13x13/4ade80/4ade80.png" valign="middle"/> **`forest`**     | <img src="https://placehold.co/13x13/faf8f4/faf8f4.png" valign="middle"/> <img src="https://placehold.co/13x13/6f3d18/6f3d18.png" valign="middle"/> **`latte`**    |
-| <img src="https://placehold.co/13x13/0b0a16/0b0a16.png" valign="middle"/> <img src="https://placehold.co/13x13/b388ff/b388ff.png" valign="middle"/> **`nebula`**     | |
+| <img src="https://placehold.co/13x13/0b0a16/0b0a16.png" valign="middle"/> <img src="https://placehold.co/13x13/b388ff/b388ff.png" valign="middle"/> **`nebula`**     |                                                                                                                                                                    |
 
 Each theme exposes CSS custom properties you can override:
 
