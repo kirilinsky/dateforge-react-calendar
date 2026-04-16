@@ -1,9 +1,10 @@
 ## Changelog
 
-### 🚀 Version 5.2.1 (LTS)
+### 🚀 Version 5.2.2 (LTS)
 
 - **✅ Code optimization**
 - **📅 `highlightToday` prop** — When `true`, today's date cell gets outline.
+- **🪲 Bug fixes**
 
 ### 🚀 Version 5.1.3
 

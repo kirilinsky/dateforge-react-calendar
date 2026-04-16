@@ -97,10 +97,16 @@ export const TimePopup = ({
   gestures,
 }: TimePopupProps) => {
   const [current, setCurrent] = useState(date);
+  const currentRef = useRef(current);
+
+  const handleChange = (newDate: Date) => {
+    currentRef.current = newDate;
+    setCurrent(newDate);
+  };
 
   return (
-    <Popup onConfirm={() => onConfirm(current)} onClose={onClose}>
-      <TimeTrack date={current} hour12={hour12} gestures={gestures} onChange={setCurrent} />
+    <Popup onConfirm={() => onConfirm(currentRef.current)} onClose={onClose}>
+      <TimeTrack date={current} hour12={hour12} gestures={gestures} onChange={handleChange} />
     </Popup>
   );
 };

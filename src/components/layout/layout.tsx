@@ -33,7 +33,7 @@ export const CalendarLayout: React.FC<{
     showYearPopup,
     setShowYearPopup,
     date,
-    onChangeDate,
+    onChangeTime,
     navigateTo,
     hour12,
     gestures,
@@ -87,7 +87,7 @@ export const CalendarLayout: React.FC<{
           hour12={hour12}
           gestures={gestures}
           onConfirm={(newDate) => {
-            onChangeDate(newDate);
+            onChangeTime(newDate);
             setShowTimePopup(false);
           }}
           onClose={() => setShowTimePopup(false)}
