@@ -1,10 +1,15 @@
 ## Changelog
 
-### 🚀 Version 5.1.3 (LTS)
+### 🚀 Version 5.2.0 (LTS)
+
+- **✅ Code optimization**
+- **📅 `highlightToday` prop** — When `true`, today's date cell gets outline.
+
+### 🚀 Version 5.1.3
 
 - **🌗 Theme toggle button** — New `showThemeToggle` prop adds header button that switches between `paper` (light) and `carbon` (dark) mode toggle.
 - **🌌 Nebula theme** — New dark theme with deep indigo backdrop and bright violet accent.
-- **✅ A11y improvements**
+- **❤️ A11y improvements**
 
 ### 🚀 Version 5.0.1
 

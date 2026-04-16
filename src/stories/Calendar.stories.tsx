@@ -256,6 +256,7 @@ export const KitchenSink = () => {
     showHomeButton: false,
     showClearButton: false,
     showThemeToggle: false,
+    highlightToday: true,
   });
 
   const toggle = (key: keyof typeof config) =>

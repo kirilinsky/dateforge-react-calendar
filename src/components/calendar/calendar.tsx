@@ -26,6 +26,7 @@ export const Calendar: React.FC<CalendarProps> = ({
   showSelectedDates = false,
   twoMonthsLayout = false,
   monthsColumn = false,
+  highlightToday = true,
   ...restProps
 }) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -122,6 +123,7 @@ export const Calendar: React.FC<CalendarProps> = ({
       showSelectedDates={showSelectedDates}
       twoMonthsLayout={twoMonthsLayout}
       monthsColumn={monthsColumn}
+      highlightToday={highlightToday}
       containerWidth={containerWidth}
       toggleTheme={toggleTheme}
       {...restProps}

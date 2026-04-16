@@ -1,7 +1,7 @@
 .headerContainer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   flex-wrap: wrap;
   gap: 0.4em;
   font-size: 1.1em;
@@ -99,9 +99,10 @@
     height: 1.1em;
   }
 }
-.flexWrapper{
+.flexWrapper {
   display: flex;
   align-items: center;
+  margin-left: auto;
 }
 
 .homeButtonDisabled {

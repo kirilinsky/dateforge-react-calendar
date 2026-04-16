@@ -187,6 +187,7 @@ Clicking a selected date deselects it. When `max` is reached further clicks are 
 | `brutalism`         | `boolean` | `false` | Brutalism aesthetic — monospace font, hard borders, no radius |
 | `hour12`            | `boolean` | `false` | 12-hour AM/PM format for time picker                          |
 | `highlightWeekends` | `boolean` | `true`  | Highlight Saturday and Sunday weekday                         |
+| `highlightToday`    | `boolean` | `true` | Show outline on today's date cell              |
 | `shortMonths`       | `boolean` | `false` | Abbreviated month names (Jan, Feb…)                           |
 
 ### Visibility

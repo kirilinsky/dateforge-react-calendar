@@ -57,6 +57,7 @@ export interface CalendarProps {
   showHomeButton?: boolean;
   showClearButton?: boolean;
   showThemeToggle?: boolean;
+  highlightToday?: boolean;
 }
 
 export interface CalendarContextValue extends Omit<

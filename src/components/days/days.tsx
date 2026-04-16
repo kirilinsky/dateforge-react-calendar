@@ -5,6 +5,7 @@ import {
   getFirstDayOffset,
   getNextMonthFromSwipe,
   getCalendarData,
+  isSameDay,
 } from "@/utils/date-utils";
 import shared from "@/global/global.module.css";
 import WeekDays from "../week-days/week-days";
@@ -35,7 +36,10 @@ export const DaysComponent: React.FC<{
     rangeMinDays,
     rangeMaxDays,
     twoMonthsLayout,
+    highlightToday,
   } = useCalendarContext();
+
+  const today = useMemo(() => new Date(), []);
 
   const startT = startDate
     ? new Date(
@@ -290,6 +294,8 @@ export const DaysComponent: React.FC<{
                           ? styles.rPreviewBridgeLeft
                           : null;
 
+                  const isToday =
+                    !!highlightToday && isSameDay(fullDate, today);
                   const isOtherMonth = !isCurrentMonth;
                   const isHighlighted =
                     isSelected ||
@@ -329,6 +335,7 @@ export const DaysComponent: React.FC<{
                         range && isInRange && styles.rIn,
                         previewClass,
                         previewBridgeClass,
+                        isToday && styles.todayItem,
                         isOtherMonth &&
                           (isHighlighted
                             ? shared.selectedOtherItem

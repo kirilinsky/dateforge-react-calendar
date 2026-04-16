@@ -93,19 +93,23 @@ export const getWeekdaysNames = (
   locale: string,
   startOfWeek: StartOfWeek,
 ): string[] => {
-  const key = `${locale}W`;
+  const key = `${locale}W${startOfWeek}`;
   if (!i18nCache[key]) {
-    const fmt = new Intl.DateTimeFormat(locale, { weekday: "short" }).format;
-    const base = new Date(2024, 0, 1);
-    i18nCache[key] = Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(base);
-      d.setDate(base.getDate() + i);
-      return fmt(d);
-    });
+    const baseKey = `${locale}W`;
+    if (!i18nCache[baseKey]) {
+      const fmt = new Intl.DateTimeFormat(locale, { weekday: "short" }).format;
+      const base = new Date(2024, 0, 1);
+      i18nCache[baseKey] = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(base);
+        d.setDate(base.getDate() + i);
+        return fmt(d);
+      });
+    }
+    const days = i18nCache[baseKey];
+    const shift = startOfWeek === 0 ? 6 : startOfWeek - 1;
+    i18nCache[key] = shift === 0 ? days : [...days.slice(shift), ...days.slice(0, shift)];
   }
-  const days = i18nCache[key];
-  const shift = startOfWeek === 0 ? 6 : startOfWeek - 1;
-  return shift === 0 ? days : [...days.slice(shift), ...days.slice(0, shift)];
+  return i18nCache[key];
 };
 
 export const padTime = (n: number) => n.toString().padStart(2, "0");

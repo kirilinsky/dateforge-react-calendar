@@ -6,6 +6,8 @@
   grid-template-rows: auto repeat(6, auto);
   gap: 0.15em;
   --day-gap: 0.15em;
+  --rng-bg: var(--rng-bg);
+  --rng-prev: var(--rng-prev);
   padding: 0.9em;
   height: auto;
   box-sizing: border-box;
@@ -25,6 +27,12 @@
   color: var(--c-s);
   font-weight: 600;
   padding: 0.5em 0.25em !important;
+}
+
+.todayItem {
+  outline: 1px solid color-mix(in srgb, var(--c-h) 50%, transparent);
+  outline-offset: -1px;
+  --hover-outline: 1px solid color-mix(in srgb, var(--c-h) 50%, transparent);
 }
 
 .dayItemEmpty {
@@ -74,52 +82,52 @@
 
 .rBridgeRight {
   box-shadow: calc(var(--day-gap) / 2) 0 0 0
-    color-mix(in srgb, var(--c-r) 28%, var(--c-b)) !important;
+    var(--rng-bg) !important;
 }
 .rBridgeLeft {
   box-shadow: calc(-1 * var(--day-gap) / 2) 0 0 0
-    color-mix(in srgb, var(--c-r) 28%, var(--c-b)) !important;
+    var(--rng-bg) !important;
 }
 .rBridgeBoth {
   box-shadow:
     calc(var(--day-gap) / 2) 0 0 0
-      color-mix(in srgb, var(--c-r) 28%, var(--c-b)),
+      var(--rng-bg),
     calc(-1 * var(--day-gap) / 2) 0 0 0
-      color-mix(in srgb, var(--c-r) 28%, var(--c-b)) !important;
+      var(--rng-bg) !important;
 }
 
 .rIn {
-  background: color-mix(in srgb, var(--c-r) 28%, var(--c-b)) !important;
+  background: var(--rng-bg) !important;
   color: var(--c-c) !important;
   border-radius: 0 !important;
 }
 
 .rPreviewStart {
-  background: color-mix(in srgb, var(--c-r) 16%, transparent) !important;
+  background: var(--rng-prev) !important;
   border-radius: 0.5em 0 0 0.5em !important;
 }
 .rPreviewEnd {
-  background: color-mix(in srgb, var(--c-r) 16%, transparent) !important;
+  background: var(--rng-prev) !important;
   border-radius: 0 0.5em 0.5em 0 !important;
 }
 .rPreview {
-  background: color-mix(in srgb, var(--c-r) 16%, transparent) !important;
+  background: var(--rng-prev) !important;
   border-radius: 0 !important;
 }
 .rPreviewBridgeRight {
   box-shadow: calc(var(--day-gap) / 2) 0 0 0
-    color-mix(in srgb, var(--c-r) 16%, transparent) !important;
+    var(--rng-prev) !important;
 }
 .rPreviewBridgeLeft {
   box-shadow: calc(-1 * var(--day-gap) / 2) 0 0 0
-    color-mix(in srgb, var(--c-r) 16%, transparent) !important;
+    var(--rng-prev) !important;
 }
 .rPreviewBridgeBoth {
   box-shadow:
     calc(var(--day-gap) / 2) 0 0 0
-      color-mix(in srgb, var(--c-r) 16%, transparent),
+      var(--rng-prev),
     calc(-1 * var(--day-gap) / 2) 0 0 0
-      color-mix(in srgb, var(--c-r) 16%, transparent) !important;
+      var(--rng-prev) !important;
 }
 
 @keyframes slideInRight {
