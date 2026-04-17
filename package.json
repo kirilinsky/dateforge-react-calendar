@@ -1,6 +1,6 @@
 {
   "name": "react-calendar-datetime",
-  "version": "5.2.2",
+  "version": "5.3.0",
   "description": "Zero-dependency React date & time picker, range & multi-select, themes, gestures, fluid adaptive layout.",
   "type": "module",
   "types": "./dist/index.d.ts",
