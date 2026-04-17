@@ -10,15 +10,13 @@
   border-top: var(--months-border-top, none);
   background: var(--c-b);
   z-index: 2;
-  transition: all 0.25s linear;
+  transition: all var(--cal-transition) linear;
   &:hover {
     box-shadow: 0.1em 0 0.5em var(--c-x);
   }
 }
 
 .item {
-  composes: interactive from "../../global/global.module.css";
-  composes: hoverable from "../../global/global.module.css";
   justify-self: center;
   align-self: center;
   width: 95%;

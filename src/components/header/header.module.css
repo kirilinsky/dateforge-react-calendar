@@ -10,9 +10,9 @@
   height: auto;
   z-index: 3;
   background: var(--c-a);
-  border-bottom: 1px solid var(--c-s);
+  border-bottom: var(--cal-border) solid var(--c-s);
   box-sizing: border-box;
-  transition: all 0.25s linear;
+  transition: all var(--cal-transition) linear;
   overflow: hidden;
   &:hover {
     box-shadow: 0 0.1em 0.1em var(--c-x);
@@ -32,8 +32,6 @@
 }
 
 .currentYear {
-  composes: interactive from "../../global/global.module.css";
-  composes: hoverable from "../../global/global.module.css";
   font-size: 1.05em;
   font-weight: 800;
   line-height: 1;
@@ -49,8 +47,6 @@
 }
 
 .arrow {
-  composes: interactive from "../../global/global.module.css";
-  composes: hoverable from "../../global/global.module.css";
   width: 2.2em;
   min-width: 1.4em;
   height: 2.3em;
@@ -59,7 +55,6 @@
 }
 
 .monthButton {
-  composes: interactive from "../../global/global.module.css";
   flex: 0 0 auto;
   min-width: 0;
   padding: 0 1em;
@@ -85,8 +80,6 @@
 }
 
 .homeButton {
-  composes: interactive from "../../global/global.module.css";
-  composes: hoverable from "../../global/global.module.css";
   width: 2.2em;
   height: 2.3em;
   flex-shrink: 0;
@@ -112,7 +105,6 @@
 }
 
 .timeButton {
-  composes: interactive from "../../global/global.module.css";
   background: var(--c-h) !important;
   color: var(--c-a) !important;
   padding: 0 1em;

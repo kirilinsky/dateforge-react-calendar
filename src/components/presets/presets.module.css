@@ -3,12 +3,12 @@
   grid-template-columns: repeat(auto-fill, minmax(8em, 1fr));
   align-items: stretch;
   gap: 0.35em;
-  padding: 0.5em;
-  border-top: 1px solid var(--c-s);
+  padding: var(--cal-spacing);
+  border-top: var(--cal-border) solid var(--c-s);
   background: var(--c-a);
   height: auto;
   z-index: 3;
-  transition: all 0.25s linear;
+  transition: all var(--cal-transition) linear;
   &:hover {
     box-shadow: 0 -0.1em 0.1em var(--c-x);
   }

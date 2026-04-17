@@ -272,3 +272,42 @@
 --c-r: #29b6f6;
 }
 
+[data-theme="aurora"] {
+--c-a: #07091a;
+--c-b: #0b0e24;
+--c-h: #3de0a0;
+--c-t: #131838;
+--c-c: #e0f9f0;
+--c-s: #2a1f5a;
+--c-x: #3de0a028;
+--c-d: #2d3560;
+--c-we: #ff5fa2;
+--c-r: #00d4f5;
+}
+
+[data-theme="slate"] {
+--c-a: #ffffff;
+--c-b: #f1f5f9;
+--c-h: #475569;
+--c-t: #e2e8f0;
+--c-c: #0f172a;
+--c-s: #cbd5e1;
+--c-x: #47556920;
+--c-d: #94a3b8;
+--c-we: #e53935;
+--c-r: #0ea5e9;
+}
+
+[data-theme="scarlet"] {
+--c-a: #ffffff;
+--c-b: #fff5f5;
+--c-h: #d92121;
+--c-t: #ffe4e4;
+--c-c: #1c0808;
+--c-s: #f4b4b4;
+--c-x: #d9212124;
+--c-d: #c89898;
+--c-we: #ff6b6b;
+--c-r: #ff9800;
+}
+

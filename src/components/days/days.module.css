@@ -30,9 +30,9 @@
 }
 
 .todayItem {
-  outline: 1px solid color-mix(in srgb, var(--c-h) 50%, transparent);
+  outline: var(--cal-border, 1px) solid color-mix(in srgb, var(--c-h) 50%, transparent);
   outline-offset: -1px;
-  --hover-outline: 1px solid color-mix(in srgb, var(--c-h) 50%, transparent);
+  --hover-outline: var(--cal-border, 1px) solid color-mix(in srgb, var(--c-h) 50%, transparent);
 }
 
 .dayItemEmpty {
@@ -41,8 +41,6 @@
 }
 
 .dayItem {
-  composes: interactive from "../../global/global.module.css";
-  composes: hoverable from "../../global/global.module.css";
   width: 100%;
   height: auto !important;
   aspect-ratio: 1 / 0.85;
@@ -57,12 +55,12 @@
 }
 
 .rangeStart {
-  border-radius: 0.5em 0 0 0.5em !important;
+  border-radius: var(--cal-radius, 0.5em) 0 0 var(--cal-radius, 0.5em) !important;
   box-shadow: calc(var(--day-gap) / 2) 0 0 0 var(--c-h) !important;
 }
 
 .rangeEnd {
-  border-radius: 0 0.5em 0.5em 0 !important;
+  border-radius: 0 var(--cal-radius, 0.5em) var(--cal-radius, 0.5em) 0 !important;
   box-shadow: calc(-1 * var(--day-gap) / 2) 0 0 0 var(--c-h) !important;
 }
 
@@ -74,10 +72,10 @@
 }
 
 .rStart {
-  border-radius: 0.5em 0 0 0.5em !important;
+  border-radius: var(--cal-radius, 0.5em) 0 0 var(--cal-radius, 0.5em) !important;
 }
 .rEnd {
-  border-radius: 0 0.5em 0.5em 0 !important;
+  border-radius: 0 var(--cal-radius, 0.5em) var(--cal-radius, 0.5em) 0 !important;
 }
 
 .rBridgeRight {
@@ -104,11 +102,11 @@
 
 .rPreviewStart {
   background: var(--rng-prev) !important;
-  border-radius: 0.5em 0 0 0.5em !important;
+  border-radius: var(--cal-radius, 0.5em) 0 0 var(--cal-radius, 0.5em) !important;
 }
 .rPreviewEnd {
   background: var(--rng-prev) !important;
-  border-radius: 0 0.5em 0.5em 0 !important;
+  border-radius: 0 var(--cal-radius, 0.5em) var(--cal-radius, 0.5em) 0 !important;
 }
 .rPreview {
   background: var(--rng-prev) !important;

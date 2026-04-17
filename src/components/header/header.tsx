@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import styles from "./header.module.css";
+import shared from "@/global/global.module.css";
 import { Clear, Down, Home, ThemeToggle } from "@/Icons";
 import { useCalendarContext } from "../provider/provider";
 import {
@@ -100,7 +101,7 @@ export const HeaderComponent: React.FC = () => {
     >
       {time && (
         <button
-          className={styles.timeButton}
+          className={`${styles.timeButton} ${shared.interactive}`}
           onClick={() => setShowTimePopup(true)}
         >
           {curTime}
@@ -110,7 +111,7 @@ export const HeaderComponent: React.FC = () => {
       {compactMonths && (
         <button
           disabled={monthFixed}
-          className={styles.monthButton}
+          className={`${styles.monthButton} ${shared.interactive}`}
           onClick={() => setShowMonthPopup(true)}
         >
           <Down /> {currentMonthName}
@@ -121,18 +122,18 @@ export const HeaderComponent: React.FC = () => {
       {months && (!twoMonthsLayout || twoMonthsStacked) && (
         <div className={styles.yearsSelector}>
           {canGoPrevMonth && (
-            <button className={styles.arrow} onClick={() => cm(-1)}>
+            <button className={`${styles.arrow} ${shared.interactive} ${shared.hoverable}`} onClick={() => cm(-1)}>
               ‹
             </button>
           )}
           <button
             onClick={() => !monthFixed && setShowMonthPopup(true)}
-            className={`${styles.currentYear} ${monthFixed ? styles.staticButton : ""}`}
+            className={`${styles.currentYear} ${shared.interactive} ${shared.hoverable} ${monthFixed ? styles.staticButton : ""}`}
           >
             {currentMonthName}
           </button>
           {canGoNextMonth && (
-            <button className={styles.arrow} onClick={() => cm(1)}>
+            <button className={`${styles.arrow} ${shared.interactive} ${shared.hoverable}`} onClick={() => cm(1)}>
               ›
             </button>
           )}
@@ -142,21 +143,21 @@ export const HeaderComponent: React.FC = () => {
       {months && twoMonthsLayout && !twoMonthsStacked && (
         <div className={`${styles.yearsSelector} ${styles.twoMonthsSelector}`}>
           {canGoPrevMonth && (
-            <button className={styles.arrow} onClick={() => cm(-1)}>
+            <button className={`${styles.arrow} ${shared.interactive} ${shared.hoverable}`} onClick={() => cm(-1)}>
               ‹
             </button>
           )}
           <button
             onClick={() => !monthFixed && setShowMonthPopup(true)}
-            className={`${styles.currentYear} ${monthFixed ? styles.staticButton : ""}`}
+            className={`${styles.currentYear} ${shared.interactive} ${shared.hoverable} ${monthFixed ? styles.staticButton : ""}`}
           >
             {currentMonthName} {cur}
           </button>
-          <button className={`${styles.currentYear} ${styles.staticButton}`}>
+          <button className={`${styles.currentYear} ${shared.interactive} ${shared.hoverable} ${styles.staticButton}`}>
             {nextMonthName} {nextMonthYear}
           </button>
           {canGoNextMonth && (
-            <button className={styles.arrow} onClick={() => cm(1)}>
+            <button className={`${styles.arrow} ${shared.interactive} ${shared.hoverable}`} onClick={() => cm(1)}>
               ›
             </button>
           )}
@@ -166,18 +167,18 @@ export const HeaderComponent: React.FC = () => {
       {years && (
         <div className={styles.yearsSelector}>
           {canGoPrev && (
-            <button className={styles.arrow} onClick={() => ch(-1)}>
+            <button className={`${styles.arrow} ${shared.interactive} ${shared.hoverable}`} onClick={() => ch(-1)}>
               ‹
             </button>
           )}
           <button
             onClick={() => !yearFixed && setShowYearPopup(true)}
-            className={`${styles.currentYear} ${yearFixed ? styles.staticButton : ""}`}
+            className={`${styles.currentYear} ${shared.interactive} ${shared.hoverable} ${yearFixed ? styles.staticButton : ""}`}
           >
             {cur}
           </button>
           {canGoNext && (
-            <button className={styles.arrow} onClick={() => ch(1)}>
+            <button className={`${styles.arrow} ${shared.interactive} ${shared.hoverable}`} onClick={() => ch(1)}>
               ›
             </button>
           )}
@@ -186,7 +187,7 @@ export const HeaderComponent: React.FC = () => {
 
       {compactYears && (
         <button
-          className={styles.monthButton}
+          className={`${styles.monthButton} ${shared.interactive}`}
           onClick={() => setShowYearPopup(true)}
         >
           {cur} <Down />
@@ -194,13 +195,13 @@ export const HeaderComponent: React.FC = () => {
       )}
       <div className={styles.flexWrapper}>
         {showThemeToggle && (
-          <button className={styles.homeButton} onClick={toggleTheme}>
+          <button className={`${styles.homeButton} ${shared.interactive} ${shared.hoverable}`} onClick={toggleTheme}>
             <ThemeToggle />
           </button>
         )}
         {showHomeButton && (
           <button
-            className={`${styles.homeButton} ${isCurrentMonth ? styles.homeButtonDisabled : ""}`}
+            className={`${styles.homeButton} ${shared.interactive} ${shared.hoverable} ${isCurrentMonth ? styles.homeButtonDisabled : ""}`}
             disabled={isCurrentMonth}
             onClick={() =>
               navigateTo(
@@ -221,7 +222,7 @@ export const HeaderComponent: React.FC = () => {
         )}
         {showClearButton && (
           <button
-            className={`${styles.homeButton} ${selectedDates.length === 0 ? styles.homeButtonDisabled : ""}`}
+            className={`${styles.homeButton} ${shared.interactive} ${shared.hoverable} ${selectedDates.length === 0 ? styles.homeButtonDisabled : ""}`}
             disabled={selectedDates.length === 0}
             onClick={() => onChangeDate(null)}
           >

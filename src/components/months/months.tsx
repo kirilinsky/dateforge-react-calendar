@@ -25,7 +25,7 @@ export const MonthsComponent: React.FC = () => {
           key={i}
           type="button"
           disabled={n.disabled}
-          className={[styles.item, i === currentMonth ? shared.activeItem : ""]
+          className={[styles.item, shared.interactive, shared.hoverable, i === currentMonth ? shared.activeItem : ""]
             .filter(Boolean)
             .join(" ")}
           onClick={() => handleClick(i)}

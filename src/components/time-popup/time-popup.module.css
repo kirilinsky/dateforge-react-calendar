@@ -6,14 +6,14 @@
   border-radius: inherit;
   display: flex;
   align-items: flex-start;
-  padding: 0.5em;
+  padding: var(--cal-spacing, 0.6em);
   box-sizing: border-box;
 }
 
 .popup {
   position: relative;
   background: var(--c-b);
-  border-radius: 1em;
+  border-radius: calc(var(--cal-radius, 0.5em) * 2);
   padding: 0.8em;
   width: 55%;
   max-width: 13.8em;
@@ -23,7 +23,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.6em;
-  border: 1px solid var(--c-s);
+  border: var(--cal-border, 1px) solid var(--c-s);
   box-shadow: 0 0.4em 2em var(--c-x);
   user-select: none;
   box-sizing: border-box;
@@ -33,13 +33,13 @@
   background: var(--c-h);
   color: var(--c-a);
   border: none;
-  border-radius: 99px;
+  border-radius: calc(var(--cal-radius, 0.5em) * 99);
   padding: 0.6em;
   width: 100%;
   font-size: 1em;
   font-weight: 700;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: opacity var(--cal-transition, 0.2s);
   box-shadow: 0 0.2em 0.6em var(--c-x);
   flex-shrink: 0;
 }

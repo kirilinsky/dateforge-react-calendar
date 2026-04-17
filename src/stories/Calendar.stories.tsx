@@ -21,7 +21,9 @@ const LOCALES_LIST = [
 
 const THEME_LABELS: Record<CalendarTheme, string> = {
   paper: "Paper",
+  slate: "Slate",
   carbon: "Carbon",
+  scarlet: "Scarlet",
   mint: "Mint",
   midnight: "Midnight",
   industrial: "Industrial",
@@ -41,6 +43,7 @@ const THEME_LABELS: Record<CalendarTheme, string> = {
   solar: "Solar",
   latte: "Latte",
   forest: "Forest",
+  aurora: "Aurora",
 };
 
 export default { title: "Calendar" };

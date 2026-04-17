@@ -9,11 +9,11 @@
   border: none;
   background: transparent;
   color: var(--c-c);
-  transition: all 0.2s ease;
+  transition: all var(--cal-transition, 0.2s) ease;
   cursor: pointer;
   user-select: none;
   height: 2.1em;
-  border-radius: 0.5em;
+  border-radius: var(--cal-radius, 0.5em);
 }
 
 .hoverable:hover:not([disabled]) {

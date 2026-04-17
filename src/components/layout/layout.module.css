@@ -1,4 +1,10 @@
 .calendarContainer {
+  --cal-radius: 0.5em;
+  --cal-font: system-ui, -apple-system, sans-serif;
+  --cal-transition: 0.2s;
+  --cal-border: 1px;
+  --cal-spacing: 0.6em;
+
   container-type: inline-size;
   display: grid;
   position: relative;
@@ -8,51 +14,42 @@
   font-size: clamp(11px, 2.7cqw, 18px);
   background: var(--c-b);
   color: var(--c-c);
-  font-family:
-    system-ui,
-    -apple-system,
-    sans-serif;
+  font-family: var(--cal-font);
   user-select: none;
-  border-radius: 0.8em;
-  border: 1px solid var(--c-s);
+  border-radius: calc(var(--cal-radius) * 1.6);
+  border: var(--cal-border) solid var(--c-s);
   box-shadow: 0 0.2em 0.8em var(--c-x);
   overflow: hidden;
 }
+
 .calendarContainer.brutalism {
-  border-radius: 0 !important;
-  font-family: "Courier New", Courier, monospace !important;
-  border: 2px solid var(--c-c) !important;
-  box-shadow: 2px 2px 0 var(--c-c) !important;
+  --cal-radius: 0;
+  --cal-font: "Courier New", Courier, monospace;
+  --cal-border: 2px;
+  --cal-transition: 0s;
+
+  box-shadow: 2px 2px 0 var(--c-c);
 
   --hover-bg: var(--c-h);
   --hover-color: var(--c-a);
   --hover-shadow: none;
-  --hover-outline: 2px solid var(--c-c);
-
+  --hover-outline: var(--cal-border) solid var(--c-c);
   --active-shadow: 3px 3px 0 var(--c-c);
-
-  --months-border-right: 2px solid var(--c-c);
-  --months-border-top: 2px solid var(--c-c);
-  --time-border-left: 2px solid var(--c-c);
-  --time-border-top: 2px solid var(--c-c);
-}
-
-.calendarContainer.brutalism * {
-  border-radius: 0 !important;
-  transition: none !important;
+  --months-border-right: var(--cal-border) solid var(--c-c);
+  --months-border-top: var(--cal-border) solid var(--c-c);
+  --time-border-left: var(--cal-border) solid var(--c-c);
+  --time-border-top: var(--cal-border) solid var(--c-c);
 }
 
 .calendarContainer.brutalism button {
   font-weight: 700 !important;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  font-family: inherit;
 }
 
 .calendarContainer.brutalism > div[style*="HH"],
 .calendarContainer.brutalism > div[style*="PP"] {
   border-color: var(--c-c) !important;
-  border-width: 2px !important;
 }
 
 .calendarContainer.gradient {
@@ -108,20 +105,20 @@
   min-height: 3em;
   font-size: 0.9em;
   font-weight: 800;
-  border-top: 1px solid var(--c-s);
-  border-bottom: 1px solid var(--c-s);
+  border-top: var(--cal-border) solid var(--c-s);
+  border-bottom: var(--cal-border) solid var(--c-s);
   background: var(--c-a);
   color: var(--c-c);
 }
 
 :global([data-layout="stacked"]) {
   --months-border-right: none;
-  --months-border-bottom: 1px solid var(--c-s);
-  --months-border-top: 1px solid var(--c-s);
+  --months-border-bottom: var(--cal-border) solid var(--c-s);
+  --months-border-top: var(--cal-border) solid var(--c-s);
   --months-cols: repeat(4, minmax(0, 1fr));
   --months-rows: repeat(3, 1fr);
   --time-border-left: none;
-  --time-border-top: 1px solid var(--c-s);
+  --time-border-top: var(--cal-border) solid var(--c-s);
   --time-min-height: 8em;
   --time-root-max-width: 16em;
   --time-root-margin: 0 auto;
@@ -130,11 +127,11 @@
 }
 
 :global([data-layout="medium"]) {
-  --months-border-top: 1px solid var(--c-s);
+  --months-border-top: var(--cal-border) solid var(--c-s);
   --months-border-bottom: none;
   --time-border-left: none;
   --time-item-font: 1em;
-  --time-border-top: 1px solid var(--c-s);
+  --time-border-top: var(--cal-border) solid var(--c-s);
 }
 
 .twoMonthsWide {

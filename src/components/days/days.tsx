@@ -323,6 +323,8 @@ export const DaysComponent: React.FC<{
                       aria-selected={isSelected}
                       className={[
                         styles.dayItem,
+                        shared.interactive,
+                        shared.hoverable,
                         !range && isSelected && shared.activeItem,
                         !range &&
                           connectLeft &&

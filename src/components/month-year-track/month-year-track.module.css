@@ -19,8 +19,8 @@
   overflow: hidden;
   cursor: pointer;
   outline: none;
-  border-radius: 1em;
-  transition: box-shadow 0.15s;
+  border-radius: calc(var(--cal-radius, 0.5em) * 2);
+  transition: box-shadow calc(var(--cal-transition, 0.2s) * 0.75);
 }
 
 .drum:focus-visible {
@@ -36,7 +36,7 @@
   height: calc(100% / 7);
   transform: translateY(-50%);
   background: var(--c-h);
-  border-radius: 0.5em;
+  border-radius: var(--cal-radius, 0.5em);
   box-shadow: 0 0.2em 0.6em var(--c-x);
   pointer-events: none;
   z-index: 0;
