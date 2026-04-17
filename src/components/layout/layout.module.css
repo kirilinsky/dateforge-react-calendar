@@ -1,140 +1,175 @@
-.calendarContainer {
-  --cal-radius: 0.5em;
-  --cal-font: system-ui, -apple-system, sans-serif;
-  --cal-transition: 0.2s;
-  --cal-border: 1px;
-  --cal-spacing: 0.6em;
+@layer base, themes;
 
-  container-type: inline-size;
-  display: grid;
-  position: relative;
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 864px;
-  font-size: clamp(11px, 2.7cqw, 18px);
-  background: var(--c-b);
-  color: var(--c-c);
-  font-family: var(--cal-font);
-  user-select: none;
-  border-radius: calc(var(--cal-radius) * 1.6);
-  border: var(--cal-border) solid var(--c-s);
-  box-shadow: 0 0.2em 0.8em var(--c-x);
-  overflow: hidden;
+@layer themes {
+  :global([data-theme="light"]) {
+    --c-a: #ffffff;
+    --c-b: #ffffff;
+    --c-h: #1a1a1c;
+    --c-t: #f4f4f4;
+    --c-c: #1a1a1c;
+    --c-s: #e8e8e8;
+    --c-x: #1a1a1c14;
+    --c-d: #a0a0a2;
+    --c-we: #e53935;
+    --c-r: #4a90d9;
+  }
+
+  :global([data-theme="dark"]) {
+    --c-a: #1a1a1c;
+    --c-b: #1a1a1c;
+    --c-h: #ffffff;
+    --c-t: #2d2d2d;
+    --c-c: #f0f0f0;
+    --c-s: #333333;
+    --c-x: #ffffff16;
+    --c-d: #555558;
+    --c-we: #e53935;
+    --c-r: #4a90d9;
+  }
 }
 
-.calendarContainer.brutalism {
-  --cal-radius: 0;
-  --cal-font: "Courier New", Courier, monospace;
-  --cal-border: 2px;
-  --cal-transition: 0s;
+@layer base {
+  .calendarContainer {
+    --cal-radius: 0.5em;
+    --cal-font: system-ui, -apple-system, sans-serif;
+    --cal-transition: 0.2s;
+    --cal-border: 1px;
+    --cal-spacing: 0.6em;
 
-  box-shadow: 2px 2px 0 var(--c-c);
+    container-type: inline-size;
+    display: grid;
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 864px;
+    font-size: clamp(11px, 2.7cqw, 18px);
+    background: var(--c-b);
+    color: var(--c-c);
+    font-family: var(--cal-font);
+    user-select: none;
+    border-radius: calc(var(--cal-radius) * 1.6);
+    border: var(--cal-border) solid var(--c-s);
+    box-shadow: 0 0.2em 0.8em var(--c-x);
+    overflow: hidden;
+  }
 
-  --hover-bg: var(--c-h);
-  --hover-color: var(--c-a);
-  --hover-shadow: none;
-  --hover-outline: var(--cal-border) solid var(--c-c);
-  --active-shadow: 3px 3px 0 var(--c-c);
-  --months-border-right: var(--cal-border) solid var(--c-c);
-  --months-border-top: var(--cal-border) solid var(--c-c);
-  --time-border-left: var(--cal-border) solid var(--c-c);
-  --time-border-top: var(--cal-border) solid var(--c-c);
-}
+  .calendarContainer.brutalism {
+    --cal-radius: 0;
+    --cal-font: "Courier New", Courier, monospace;
+    --cal-border: 2px;
+    --cal-transition: 0s;
 
-.calendarContainer.brutalism button {
-  font-weight: 700 !important;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
+    box-shadow: 2px 2px 0 var(--c-c);
 
-.calendarContainer.brutalism > div[style*="HH"],
-.calendarContainer.brutalism > div[style*="PP"] {
-  border-color: var(--c-c) !important;
-}
+    --hover-bg: var(--c-h);
+    --hover-color: var(--c-a);
+    --hover-shadow: none;
+    --hover-outline: var(--cal-border) solid var(--c-c);
+    --active-shadow: 3px 3px 0 var(--c-c);
+    --months-border-right: var(--cal-border) solid var(--c-c);
+    --months-border-top: var(--cal-border) solid var(--c-c);
+    --time-border-left: var(--cal-border) solid var(--c-c);
+    --time-border-top: var(--cal-border) solid var(--c-c);
+  }
 
-.calendarContainer.gradient {
-  background:
-    radial-gradient(
-      ellipse 50% 45% at 5% 5%,
-      color-mix(in srgb, var(--c-b) 88%, var(--c-h)) 0%,
-      transparent 100%
-    ),
-    radial-gradient(
-      ellipse 40% 38% at 95% 95%,
-      color-mix(in srgb, var(--c-b) 90%, var(--c-h)) 0%,
-      transparent 100%
-    ),
-    var(--c-b) !important;
-}
+  .calendarContainer.brutalism button {
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
 
-.calendarContainer.gradient.dark {
-  background:
-    radial-gradient(
-      ellipse 48% 42% at 4% 4%,
-      color-mix(in srgb, var(--c-b) 74%, var(--c-h)) 0%,
-      transparent 100%
-    ),
-    radial-gradient(
-      ellipse 38% 35% at 96% 96%,
-      color-mix(in srgb, var(--c-b) 78%, var(--c-h)) 0%,
-      transparent 100%
-    ),
-    var(--c-b) !important;
-}
+  .calendarContainer.brutalism > div[style*="HH"],
+  .calendarContainer.brutalism > div[style*="PP"] {
+    border-color: var(--c-c) !important;
+  }
 
-.calendarContainer * {
-  box-sizing: border-box;
-}
+  .calendarContainer.gradient {
+    background:
+      radial-gradient(
+        ellipse 50% 45% at 5% 5%,
+        color-mix(in srgb, var(--c-b) 88%, var(--c-h)) 0%,
+        transparent 100%
+      ),
+      radial-gradient(
+        ellipse 40% 38% at 95% 95%,
+        color-mix(in srgb, var(--c-b) 90%, var(--c-h)) 0%,
+        transparent 100%
+      ),
+      var(--c-b) !important;
+  }
 
-.calendarContainer > div {
-  width: 100%;
-  height: 100%;
-  background: inherit;
-}
-.calendarContainer.gradient > div {
-  background: unset !important;
-}
-.calendarContainer.gradient > div[data-state="open"] {
-  background: var(--c-b) !important;
-}
-.secondMonthLabel {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5em;
-  min-height: 3em;
-  font-size: 0.9em;
-  font-weight: 800;
-  border-top: var(--cal-border) solid var(--c-s);
-  border-bottom: var(--cal-border) solid var(--c-s);
-  background: var(--c-a);
-  color: var(--c-c);
-}
+  .calendarContainer.gradient.dark {
+    background:
+      radial-gradient(
+        ellipse 48% 42% at 4% 4%,
+        color-mix(in srgb, var(--c-b) 74%, var(--c-h)) 0%,
+        transparent 100%
+      ),
+      radial-gradient(
+        ellipse 38% 35% at 96% 96%,
+        color-mix(in srgb, var(--c-b) 78%, var(--c-h)) 0%,
+        transparent 100%
+      ),
+      var(--c-b) !important;
+  }
 
-:global([data-layout="stacked"]) {
-  --months-border-right: none;
-  --months-border-bottom: var(--cal-border) solid var(--c-s);
-  --months-border-top: var(--cal-border) solid var(--c-s);
-  --months-cols: repeat(4, minmax(0, 1fr));
-  --months-rows: repeat(3, 1fr);
-  --time-border-left: none;
-  --time-border-top: var(--cal-border) solid var(--c-s);
-  --time-min-height: 8em;
-  --time-root-max-width: 16em;
-  --time-root-margin: 0 auto;
-  --time-item-font: 1.35em;
-  --time-align: center;
-}
+  .calendarContainer * {
+    box-sizing: border-box;
+  }
 
-:global([data-layout="medium"]) {
-  --months-border-top: var(--cal-border) solid var(--c-s);
-  --months-border-bottom: none;
-  --time-border-left: none;
-  --time-item-font: 1em;
-  --time-border-top: var(--cal-border) solid var(--c-s);
-}
+  .calendarContainer > div {
+    width: 100%;
+    height: 100%;
+    background: inherit;
+  }
 
-.twoMonthsWide {
-  max-width: 1200px;
-  font-size: clamp(11px, 1.4cqw, 18px);
+  .calendarContainer.gradient > div {
+    background: unset !important;
+  }
+
+  .calendarContainer.gradient > div[data-state="open"] {
+    background: var(--c-b) !important;
+  }
+
+  .secondMonthLabel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5em;
+    min-height: 3em;
+    font-size: 0.9em;
+    font-weight: 800;
+    border-top: var(--cal-border) solid var(--c-s);
+    border-bottom: var(--cal-border) solid var(--c-s);
+    background: var(--c-a);
+    color: var(--c-c);
+  }
+
+  :global([data-layout="stacked"]) {
+    --months-border-right: none;
+    --months-border-bottom: var(--cal-border) solid var(--c-s);
+    --months-border-top: var(--cal-border) solid var(--c-s);
+    --months-cols: repeat(4, minmax(0, 1fr));
+    --months-rows: repeat(3, 1fr);
+    --time-border-left: none;
+    --time-border-top: var(--cal-border) solid var(--c-s);
+    --time-min-height: 8em;
+    --time-root-max-width: 16em;
+    --time-root-margin: 0 auto;
+    --time-item-font: 1.35em;
+    --time-align: center;
+  }
+
+  :global([data-layout="medium"]) {
+    --months-border-top: var(--cal-border) solid var(--c-s);
+    --months-border-bottom: none;
+    --time-border-left: none;
+    --time-item-font: 1em;
+    --time-border-top: var(--cal-border) solid var(--c-s);
+  }
+
+  .twoMonthsWide {
+    max-width: 1200px;
+    font-size: clamp(11px, 1.4cqw, 18px);
+  }
 }

@@ -1,5 +1,13 @@
+import type { ThemeTokens } from "../../themes/themes";
+export type { ThemeTokens };
+
+export type CustomTheme = {
+  readonly __type: "custom";
+  readonly base: "light" | "dark";
+  readonly vars: Record<string, string>;
+};
+
 export const LIGHT_THEMES = [
-  "paper",
   "mint",
   "comfy",
   "neon",
@@ -12,9 +20,9 @@ export const LIGHT_THEMES = [
   "slate",
   "scarlet",
 ] as const;
+
 export const DARK_THEMES = [
   "industrial",
-  "carbon",
   "midnight",
   "sandstone",
   "phosphor",
@@ -27,6 +35,11 @@ export const DARK_THEMES = [
   "aurora",
 ] as const;
 
-export type CalendarTheme =
+export type BuiltInTheme = "auto" | "light" | "dark";
+
+ export type CalendarTheme =
+  | BuiltInTheme
   | (typeof LIGHT_THEMES)[number]
-  | (typeof DARK_THEMES)[number];
+  | (typeof DARK_THEMES)[number]
+  | CustomTheme
+  | (string & {});

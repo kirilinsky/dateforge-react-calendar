@@ -12,6 +12,15 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs",
       "default": "./dist/index.mjs"
+    },
+    "./themes": {
+      "default": "./dist/themes/index.css"
+    },
+    "./themes/*": {
+      "default": "./dist/themes/*.css"
+    },
+    "./style.css": {
+      "default": "./dist/style.css"
     }
   },
   "repository": {
@@ -28,7 +37,7 @@
   "scripts": {
     "start": "ladle serve",
     "dev": "tsdown --watch",
-    "build": "npx tsx scripts/generate-theme.ts && tsdown --dts",
+    "build": "tsdown --dts && npx tsx scripts/generate-theme.ts",
     "clean": "rm -rf dist"
   },
   "peerDependencies": {
@@ -38,7 +47,7 @@
   "devDependencies": {
     "@ladle/react": "^5.1.1",
     "@tsdown/css": "^0.21.4",
-    "@types/node": "^25.5.0",
+    "@types/node": "^25.6.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "react": "^19",
@@ -76,7 +85,9 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "sideEffects": false,
+  "sideEffects": [
+    "**/*.css"
+  ],
   "author": "Kirilinsky (https://github.com/kirilinsky)",
   "license": "MIT"
 }

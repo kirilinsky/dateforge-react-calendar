@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Calendar } from "../components/calendar/calendar";
+import { createTheme } from "../utils/create-theme";
 import "./calendar.css";
-import { CalendarTheme, DARK_THEMES, LIGHT_THEMES } from "../types/themes";
-import { DisabledRule, StartOfWeek } from "../types/calendar";
+import "../themes.gen.css";
+import { DARK_THEMES, LIGHT_THEMES } from "../types/themes";
+import { CalendarMode, DisabledRule, StartOfWeek } from "../types/calendar";
 
 const LOCALES_LIST = [
   { locale: "en", label: "English" },
@@ -19,30 +21,31 @@ const LOCALES_LIST = [
   { locale: "sr", label: "Srpski" },
 ] as const;
 
-const THEME_LABELS: Record<CalendarTheme, string> = {
-  paper: "Paper",
-  slate: "Slate",
-  carbon: "Carbon",
-  scarlet: "Scarlet",
+const THEME_LABELS: Record<string, string> = {
+  auto: "Auto (system)",
+  light: "Light",
+  dark: "Dark",
   mint: "Mint",
-  midnight: "Midnight",
-  industrial: "Industrial",
+  comfy: "Comfy",
+  neon: "Neon",
+  rosa: "Rosa",
+  snow: "Snow",
+  solar: "Solar",
   graphite: "Graphite",
+  amethyst: "Amethyst",
+  latte: "Latte",
+  slate: "Slate",
+  scarlet: "Scarlet",
+  industrial: "Industrial",
+  midnight: "Midnight",
   sandstone: "Sandstone",
   phosphor: "Phosphor",
   dracula: "Dracula",
   cyber: "Cyber",
-  comfy: "Comfy",
   temporal: "Temporal",
-  nebula: "Nebula",
-  neon: "Neon",
-  rosa: "Rosa",
-  amethyst: "Amethyst",
   crimson: "Crimson",
-  snow: "Snow",
-  solar: "Solar",
-  latte: "Latte",
   forest: "Forest",
+  nebula: "Nebula",
   aurora: "Aurora",
 };
 
@@ -98,7 +101,7 @@ export const TwoMonthsLayout = () => {
           months
           time={false}
           presets={false}
-          theme="paper"
+          theme="light"
         />
       </div>
     </StoryWrapper>
@@ -133,7 +136,7 @@ export const RangePicker = () => {
           showSelectedDates
           value={range}
           onRangeChange={setRange}
-          theme="paper"
+          theme="light"
           months
           time={false}
           presets={false}
@@ -143,7 +146,39 @@ export const RangePicker = () => {
   );
 };
 
-import { CalendarMode } from "../types/calendar";
+export const CustomThemeDemo = () => {
+  const [date, setDate] = useState<Date>(new Date());
+
+  const oceanTheme = createTheme(
+    {
+      accent: "#ffffff",
+      backdrop: "#0a1628",
+      highlight: "#0ea5e9",
+      tone: "#0f2044",
+      text: "#e0f2fe",
+      stroke: "#1e3a5f",
+      shadow: "#0ea5e940",
+      disabled: "#1e3a5f",
+      weekend: "#f83875",
+      range: "#06b6d4",
+    },
+    "dark",
+  );
+
+  return (
+    <StoryWrapper title="createTheme — Ocean" subtitle={formatSubtitle(date)} light={false}>
+      <div className="calendar-fixed-container">
+        <Calendar
+          value={date}
+          theme={oceanTheme}
+          onChange={(d: Date | null) => {
+            if (d) setDate(d);
+          }}
+        />
+      </div>
+    </StoryWrapper>
+  );
+};
 
 export const KitchenSink = () => {
   const [mode, setMode] = useState<CalendarMode>("single");
@@ -155,7 +190,7 @@ export const KitchenSink = () => {
   const [dates, setDates] = useState<Date[]>([]);
   const [date, setDate] = useState<Date>(new Date());
   const [startMonth, setStartMonth] = useState<Date>(new Date());
-  const [activeTheme, setActiveTheme] = useState<CalendarTheme>("mint");
+  const [activeTheme, setActiveTheme] = useState("mint");
   const [activeLocale, setActiveLocale] = useState("en");
   const [containerWidth, setContainerWidth] = useState(580);
   const [startOfWeek, setStartOfWeek] = useState<StartOfWeek>(1);
@@ -169,32 +204,19 @@ export const KitchenSink = () => {
 
   const [startDate, setStartDate] = useState<Date>(() => getOffsetDay(-391));
   const [endDate, setEndDate] = useState<Date>(() => getOffsetDay(411));
-  const [rangeMinDays, setRangeMinDays] = useState<number | undefined>(
-    undefined,
-  );
-  const [rangeMaxDays, setRangeMaxDays] = useState<number | undefined>(
-    undefined,
-  );
+  const [rangeMinDays, setRangeMinDays] = useState<number | undefined>(undefined);
+  const [rangeMaxDays, setRangeMaxDays] = useState<number | undefined>(undefined);
   const toISODate = (d: Date) => d.toISOString().split("T")[0];
   const parseDate = (s: string) => new Date(s + "T00:00:00");
 
   type DisabledMode =
-    | "none"
-    | "all"
-    | "date"
-    | "dates"
-    | "range"
-    | "weekdays"
-    | "before"
-    | "after"
-    | "outside";
+    | "none" | "all" | "date" | "dates" | "range"
+    | "weekdays" | "before" | "after" | "outside";
   const WEEKDAY_LABELS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
   const [disabledMode, setDisabledMode] = useState<DisabledMode>("none");
   const [disabledDate, setDisabledDate] = useState(toISODate(new Date()));
-  const [disabledDates, setDisabledDates] = useState<string[]>([
-    toISODate(new Date()),
-  ]);
+  const [disabledDates, setDisabledDates] = useState<string[]>([toISODate(new Date())]);
   const [disabledFrom, setDisabledFrom] = useState(toISODate(getOffsetDay(-3)));
   const [disabledTo, setDisabledTo] = useState(toISODate(getOffsetDay(3)));
   const [disabledBefore, setDisabledBefore] = useState(toISODate(new Date()));
@@ -208,29 +230,15 @@ export const KitchenSink = () => {
 
   const getDisabledValue = (): DisabledRule | DisabledRule[] | undefined => {
     switch (disabledMode) {
-      case "all":
-        return true;
-      case "date":
-        return parseDate(disabledDate);
-      case "dates":
-        return disabledDates.map(parseDate);
-      case "range":
-        return { from: parseDate(disabledFrom), to: parseDate(disabledTo) };
-      case "weekdays":
-        return disabledWeekdays.length
-          ? { dayOfWeek: disabledWeekdays }
-          : undefined;
-      case "before":
-        return { before: parseDate(disabledBefore) };
-      case "after":
-        return { after: parseDate(disabledAfter) };
-      case "outside":
-        return {
-          before: parseDate(disabledBefore),
-          after: parseDate(disabledAfter),
-        };
-      default:
-        return undefined;
+      case "all": return true;
+      case "date": return parseDate(disabledDate);
+      case "dates": return disabledDates.map(parseDate);
+      case "range": return { from: parseDate(disabledFrom), to: parseDate(disabledTo) };
+      case "weekdays": return disabledWeekdays.length ? { dayOfWeek: disabledWeekdays } : undefined;
+      case "before": return { before: parseDate(disabledBefore) };
+      case "after": return { after: parseDate(disabledAfter) };
+      case "outside": return { before: parseDate(disabledBefore), after: parseDate(disabledAfter) };
+      default: return undefined;
     }
   };
 
@@ -260,6 +268,8 @@ export const KitchenSink = () => {
     showClearButton: false,
     showThemeToggle: false,
     highlightToday: true,
+    allowCleanSelected: true,
+    allowNavigateSelected: true,
   });
 
   const toggle = (key: keyof typeof config) =>
@@ -287,7 +297,10 @@ export const KitchenSink = () => {
           : "No dates selected"
         : formatSubtitle(date, activeLocale, config.time);
 
-  const isLight = (LIGHT_THEMES as readonly string[]).includes(activeTheme);
+  const isLight =
+    activeTheme === "light" ||
+    activeTheme === "auto" ||
+    (LIGHT_THEMES as readonly string[]).includes(activeTheme);
 
   return (
     <StoryWrapper
@@ -372,8 +385,13 @@ export const KitchenSink = () => {
           <select
             className="panel-select"
             value={activeTheme}
-            onChange={(e) => setActiveTheme(e.target.value as CalendarTheme)}
+            onChange={(e) => setActiveTheme(e.target.value)}
           >
+            <optgroup label="Built-in">
+              <option value="auto">{THEME_LABELS.auto}</option>
+              <option value="light">{THEME_LABELS.light}</option>
+              <option value="dark">{THEME_LABELS.dark}</option>
+            </optgroup>
             <optgroup label="Dark">
               {DARK_THEMES.map((t) => (
                 <option key={t} value={t}>

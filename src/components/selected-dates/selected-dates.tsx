@@ -19,7 +19,7 @@ const getRangeSep = (fmt: Intl.DateTimeFormat, start: Date, end: Date): string =
 };
 
 export const SelectedDatesComponent: React.FC = () => {
-  const { selectedDates, date, navigateTo, locale, range, rangeStart, rangeEnd, onChangeDate } =
+  const { selectedDates, date, navigateTo, locale, range, rangeStart, rangeEnd, onChangeDate, allowCleanSelected = true, allowNavigateSelected = true } =
     useCalendarContext();
 
   const fmt = new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", year: "numeric" });
@@ -42,6 +42,9 @@ export const SelectedDatesComponent: React.FC = () => {
       type="button"
       className={`${styles.clearBtn} ${shared.interactive} ${shared.hoverable}`}
       onClick={() => onChangeDate(null)}
+      style={allowCleanSelected ? undefined : { visibility: "hidden", pointerEvents: "none" }}
+      tabIndex={allowCleanSelected ? undefined : -1}
+      aria-hidden={!allowCleanSelected}
     >
       ×
     </button>
@@ -54,12 +57,12 @@ export const SelectedDatesComponent: React.FC = () => {
 
     return (
       <div className={styles.container} style={{ gridArea: "SD" }}>
-        <button type="button" onClick={() => navigateTo(rangeStart)} className={chipClass(rangeStart)}>
+        <button type="button" onClick={() => allowNavigateSelected && navigateTo(rangeStart)} className={chipClass(rangeStart)}>
           {fmt.format(rangeStart)}
         </button>
         <span className={styles.rangeSep}>{rangeEnd ? sep : "…"}</span>
         {rangeEnd && (
-          <button type="button" onClick={() => navigateTo(rangeEnd)} className={chipClass(rangeEnd)}>
+          <button type="button" onClick={() => allowNavigateSelected && navigateTo(rangeEnd)} className={chipClass(rangeEnd)}>
             {fmt.format(rangeEnd)}
           </button>
         )}
@@ -71,14 +74,14 @@ export const SelectedDatesComponent: React.FC = () => {
   if (!selectedDates.length) return null;
 
   return (
-    <div className={styles.container} style={{ gridArea: "SD" }}>
+    <div className={styles.selectedContainer} style={{ gridArea: "SD" }}>
       {selectedDates.map((d, i) => {
         const isActive = isCurrentMonth(d) && d.getDate() === date.getDate();
         return (
           <button
             key={i}
             type="button"
-            onClick={() => navigateTo(d)}
+            onClick={() => allowNavigateSelected && navigateTo(d)}
             className={[
               styles.chip,
               shared.interactive,

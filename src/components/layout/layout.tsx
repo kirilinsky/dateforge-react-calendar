@@ -9,7 +9,6 @@ import { TimePopup } from "../time-popup/time-popup";
 import { MonthPopup, YearPopup } from "../month-year-track/month-year-track";
 import { getTwoMonthsNarrowThreshold } from "@/helpers/get-grid-layout";
 import styles from "./layout.module.css";
-import "../../themes.css";
 
 export const CalendarLayout: React.FC<{
   containerStyle: React.CSSProperties;

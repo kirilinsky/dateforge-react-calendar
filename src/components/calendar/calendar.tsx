@@ -1,12 +1,16 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { CalendarProps } from "@/types/calendar";
+import { DARK_THEMES, CustomTheme } from "@/types/themes";
 import { CalendarProvider } from "@/components/provider/provider";
 import { getGridLayout, getLayoutMode } from "@/helpers/get-grid-layout";
 import { CalendarLayout } from "../layout/layout";
 
+const isCustomTheme = (t: unknown): t is CustomTheme =>
+  typeof t === "object" && t !== null && (t as CustomTheme).__type === "custom";
+
 export const Calendar: React.FC<CalendarProps> = ({
   width = "100%",
-  theme: themeProp = "paper",
+  theme: themeProp,
   presets = false,
   compactMonths = false,
   compactYears = true,
@@ -51,7 +55,6 @@ export const Calendar: React.FC<CalendarProps> = ({
     () =>
       ({
         width,
-
         ...getGridLayout(
           {
             presets,
@@ -88,17 +91,40 @@ export const Calendar: React.FC<CalendarProps> = ({
 
   const [isToggled, setIsToggled] = useState(false);
 
+  const systemTheme = useState<"light" | "dark">(() =>
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light",
+  )[0];
+
+  const customTheme = isCustomTheme(themeProp) ? themeProp : undefined;
+  const themeKey = customTheme
+    ? customTheme.base
+    : (themeProp as string | undefined);
+
+  const baseTheme = !themeKey || themeKey === "auto" ? systemTheme : themeKey;
+
   useEffect(() => {
     setIsToggled(false);
   }, [themeProp]);
 
-  const activeTheme = isToggled
-    ? themeProp === "paper" ? "carbon" : "paper"
-    : themeProp;
+  const isBaseDark =
+    baseTheme === "dark" ||
+    (DARK_THEMES as readonly string[]).includes(baseTheme);
+
+  const activeTheme = isToggled ? (isBaseDark ? "light" : "dark") : baseTheme;
 
   const toggleTheme = () => setIsToggled((v) => !v);
 
-  const layoutMode = getLayoutMode(containerWidth, { monthsGrid, timeGrid, twoMonthsLayout, monthsColumn });
+  const layoutMode = getLayoutMode(containerWidth, {
+    monthsGrid,
+    timeGrid,
+    twoMonthsLayout,
+    monthsColumn,
+  });
+
+  const customVars = customTheme?.vars as React.CSSProperties | undefined;
 
   return (
     <CalendarProvider
@@ -116,7 +142,7 @@ export const Calendar: React.FC<CalendarProps> = ({
       brutalism={brutalism}
       gradient={gradient}
       highlightWeekends={highlightWeekends}
-      theme={activeTheme}
+      theme={themeProp}
       width={width}
       mode={mode}
       max={max}
@@ -132,7 +158,7 @@ export const Calendar: React.FC<CalendarProps> = ({
         ref={wrapperRef}
         data-theme={activeTheme}
         data-layout={layoutMode}
-        style={{ containerType: "inline-size", width }}
+        style={{ containerType: "inline-size", width, ...customVars }}
       >
         <CalendarLayout containerStyle={containerStyle} brutalism={brutalism} />
       </div>

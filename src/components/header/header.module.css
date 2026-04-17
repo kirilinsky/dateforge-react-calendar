@@ -8,8 +8,7 @@
   padding: 0.45em 0.7em;
   min-height: 3.2em;
   height: auto;
-  z-index: 3;
-  background: var(--c-a);
+  z-index: 3; 
   border-bottom: var(--cal-border) solid var(--c-s);
   box-sizing: border-box;
   transition: all var(--cal-transition) linear;

@@ -46,6 +46,7 @@ export const addDate = (
   endDate?: Date | null,
 ) =>
   mutate(date, (d) => {
+    const h = d.getHours(), m = d.getMinutes(), s = d.getSeconds(), ms = d.getMilliseconds();
     if (unit === "month") {
       const targetMonth = d.getMonth() + v;
       const max = daysInMonth(d.getFullYear(), targetMonth);
@@ -54,8 +55,14 @@ export const addDate = (
     } else {
       d.setFullYear(d.getFullYear() + v);
     }
-    if (endDate && d > endDate) d.setTime(endDate.getTime());
-    if (startDate && d < startDate) d.setTime(startDate.getTime());
+    if (endDate && d > endDate) {
+      d.setTime(endDate.getTime());
+      d.setHours(h, m, s, ms);
+    }
+    if (startDate && d < startDate) {
+      d.setTime(startDate.getTime());
+      d.setHours(h, m, s, ms);
+    }
   });
 
 export const setYear = (date: Date, v: number) =>

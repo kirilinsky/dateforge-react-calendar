@@ -142,11 +142,9 @@ export const CalendarProvider: React.FC<
   }, [externalValue]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const isDark = useMemo(() => {
-    if (!theme) {
-      return typeof window !== "undefined"
-        ? window.matchMedia("(prefers-color-scheme: dark)").matches
-        : false;
-    }
+    if (!theme) return false;
+    if (typeof theme === "object") return theme.base === "dark";
+    if (theme === "dark") return true;
     return (DARK_THEMES as readonly string[]).includes(theme);
   }, [theme]);
 

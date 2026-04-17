@@ -4,8 +4,7 @@
   align-items: stretch;
   gap: 0.35em;
   padding: var(--cal-spacing);
-  border-top: var(--cal-border) solid var(--c-s);
-  background: var(--c-a);
+  border-top: var(--cal-border) solid var(--c-s); 
   height: auto;
   z-index: 3;
   transition: all var(--cal-transition) linear;

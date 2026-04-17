@@ -1,10 +1,9 @@
-.container {
+.selectedContainer {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35em;
   padding: var(--cal-spacing);
-  border-top: var(--cal-border) solid var(--c-s);
-  background: var(--c-a);
+  border-top: var(--cal-border) solid var(--c-s); 
   z-index: 3;
   transition: box-shadow 0.25s linear;
   &:hover {

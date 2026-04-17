@@ -1,0 +1,25 @@
+/* generated — do not edit, run: npm run build */
+@layer themes{
+[data-theme="industrial"]{--c-a:#ffffff;--c-b:#111111;--c-h:#e85d00;--c-t:#1c1c1c;--c-c:#d4d4d4;--c-s:#2a2a2a;--c-x:#e85d0030;--c-d:#505050;--c-we:#ff7043;--c-r:#f1c40f}
+[data-theme="graphite"]{--c-a:#ffffff;--c-b:#f7f8f9;--c-h:#f1a01d;--c-t:#eeeff1;--c-c:#1a1a1a;--c-s:#e2e4e8;--c-x:#f1a01d1e;--c-d:#9aa0aa;--c-we:#e53935;--c-r:#4a90d9}
+[data-theme="crimson"]{--c-a:#161111;--c-b:#0d0909;--c-h:#f92f2f;--c-t:#3a1616;--c-c:#ffffff;--c-s:#2b1a1a;--c-x:#f92f2f2c;--c-d:#5a3535;--c-we:#ff6b6b;--c-r:#ff9800}
+[data-theme="amethyst"]{--c-a:#ffffff;--c-b:#f5f3f7;--c-h:#681c9e;--c-t:#ebdff4;--c-c:#2b2533;--c-s:#ddd5e6;--c-x:#681c9e22;--c-d:#b0a0be;--c-we:#e53935;--c-r:#2196f3}
+[data-theme="cyber"]{--c-a:#0d0d15;--c-b:#07070b;--c-h:#00f3ff;--c-t:#301649;--c-c:#ffffff;--c-s:#303050;--c-x:#00f3ff2c;--c-d:#282840;--c-we:#e040fb;--c-r:#ff6d00}
+[data-theme="phosphor"]{--c-a:#020602;--c-b:#010401;--c-h:#76ff03;--c-t:#1a1f1a;--c-c:#00e676;--c-s:#1a4428;--c-x:#76ff0328;--c-d:#1a4020;--c-we:#ff6d00;--c-r:#00bcd4}
+[data-theme="midnight"]{--c-a:#141721;--c-b:#1a1e2b;--c-h:#3559e0;--c-t:#212638;--c-c:#ffffff;--c-s:#444b68;--c-x:#3559e02c;--c-d:#3a4060;--c-we:#e53935;--c-r:#00bcd4}
+[data-theme="sandstone"]{--c-a:#1c1a17;--c-b:#1f1c18;--c-h:#e3ae5c;--c-t:#2f2b24;--c-c:#fdfbf7;--c-s:#5d5448;--c-x:#e3ae5c24;--c-d:#504840;--c-we:#e53935;--c-r:#8bc34a}
+[data-theme="mint"]{--c-a:#ffffff;--c-b:#f8f9fc;--c-h:#60d276;--c-t:#eaedf4;--c-c:#171827;--c-s:#b8c0d1;--c-x:#60d27620;--c-d:#8898aa;--c-we:#e53935;--c-r:#7c4dff}
+[data-theme="rosa"]{--c-a:#ffffff;--c-b:#fef0f4;--c-h:#d64c7f;--c-t:#fce4ed;--c-c:#2a1520;--c-s:#f0b8cc;--c-x:#d64c7f28;--c-d:#c09aaa;--c-we:#ff6b95;--c-r:#8e44ad}
+[data-theme="snow"]{--c-a:#ffffff;--c-b:#e2e5e9;--c-h:#3a60d6;--c-t:#eceff4;--c-c:#212630;--c-s:#acb9cb;--c-x:#3a60d624;--c-d:#8898a8;--c-we:#e53935;--c-r:#26c6da}
+[data-theme="solar"]{--c-a:#ffffff;--c-b:#fffbe8;--c-h:#e67e22;--c-t:#fff3c4;--c-c:#1e1a08;--c-s:#d4aa5a;--c-x:#e67e2224;--c-d:#b09060;--c-we:#f59e0b;--c-r:#27ae60}
+[data-theme="dracula"]{--c-a:#1a0f0f;--c-b:#1c1111;--c-h:#ff5e5e;--c-t:#341d1d;--c-c:#ffffff;--c-s:#614040;--c-x:#ff5e5e2c;--c-d:#583535;--c-we:#ff6b6b;--c-r:#ffd740}
+[data-theme="comfy"]{--c-a:#ffffff;--c-b:#f2e8e0;--c-h:#c04e2f;--c-t:#fdddd0;--c-c:#6e4531;--c-s:#d4b0a0;--c-x:#c04e2f28;--c-d:#b08878;--c-we:#d96040;--c-r:#558b2f}
+[data-theme="neon"]{--c-a:#fcfcf5;--c-b:#f7f8f9;--c-h:#80ec27;--c-t:#e9f3eb;--c-c:#1f2937;--c-s:#bed3c3;--c-x:#80ec2722;--c-d:#8a9a88;--c-we:#e53935;--c-r:#ff6b35}
+[data-theme="temporal"]{--c-a:#122127;--c-b:#14252e;--c-h:#27d1f4;--c-t:#242f52;--c-c:#f1f5f9;--c-s:#6366f1;--c-x:#27d1f42e;--c-d:#3a4870;--c-we:#f472b6;--c-r:#fb923c}
+[data-theme="latte"]{--c-a:#ffffff;--c-b:#faf8f4;--c-h:#6f3d18;--c-t:#f2eddf;--c-c:#1a1208;--c-s:#d8c8a8;--c-x:#6f3d1826;--c-d:#9e8f78;--c-we:#c07a38;--c-r:#4a90d9}
+[data-theme="forest"]{--c-a:#0c1a10;--c-b:#0f2016;--c-h:#4ade80;--c-t:#162b1e;--c-c:#e2f5e8;--c-s:#255038;--c-x:#4ade8028;--c-d:#1d3c2a;--c-we:#86efac;--c-r:#fb923c}
+[data-theme="nebula"]{--c-a:#090812;--c-b:#0b0a16;--c-h:#b388ff;--c-t:#18103a;--c-c:#ede7f6;--c-s:#3d2f70;--c-x:#b388ff28;--c-d:#3a2d60;--c-we:#ff8a65;--c-r:#29b6f6}
+[data-theme="aurora"]{--c-a:#07091a;--c-b:#0b0e24;--c-h:#3de0a0;--c-t:#131838;--c-c:#e0f9f0;--c-s:#2a1f5a;--c-x:#3de0a028;--c-d:#2d3560;--c-we:#ff5fa2;--c-r:#00d4f5}
+[data-theme="slate"]{--c-a:#ffffff;--c-b:#f1f5f9;--c-h:#475569;--c-t:#e2e8f0;--c-c:#0f172a;--c-s:#cbd5e1;--c-x:#47556920;--c-d:#94a3b8;--c-we:#e53935;--c-r:#0ea5e9}
+[data-theme="scarlet"]{--c-a:#ffffff;--c-b:#fff5f5;--c-h:#d92121;--c-t:#ffe4e4;--c-c:#1c0808;--c-s:#f4b4b4;--c-x:#d9212124;--c-d:#c89898;--c-we:#ff6b6b;--c-r:#ff9800}
+}
