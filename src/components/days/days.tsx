@@ -41,24 +41,32 @@ export const DaysComponent: React.FC<{
 
   const today = useMemo(() => new Date(), []);
 
-  const startT = startDate
-    ? new Date(
-        startDate.getFullYear(),
-        startDate.getMonth(),
-        startDate.getDate(),
-      ).getTime()
-    : null;
-  const endT = endDate
-    ? new Date(
-        endDate.getFullYear(),
-        endDate.getMonth(),
-        endDate.getDate(),
-        23,
-        59,
-        59,
-        999,
-      ).getTime()
-    : null;
+  const startT = useMemo(
+    () =>
+      startDate
+        ? new Date(
+            startDate.getFullYear(),
+            startDate.getMonth(),
+            startDate.getDate(),
+          ).getTime()
+        : null,
+    [startDate],
+  );
+  const endT = useMemo(
+    () =>
+      endDate
+        ? new Date(
+            endDate.getFullYear(),
+            endDate.getMonth(),
+            endDate.getDate(),
+            23,
+            59,
+            59,
+            999,
+          ).getTime()
+        : null,
+    [endDate],
+  );
 
   const [direction, setDirection] = useState<"left" | "right" | "none">("none");
   const [prevDate, setPrevDate] = useState(date);
@@ -173,21 +181,20 @@ export const DaysComponent: React.FC<{
 
   const animationKey = `${currentMonth}-${currentYear}`;
 
-  const isDayHidden = (d: {
-    fullDate: Date;
-    isDisabled: boolean;
-    isCurrentMonth: boolean;
-  }) => {
-    const t = d.fullDate.getTime();
-    if (
-      hideLimited &&
-      ((startT !== null && t < startT) || (endT !== null && t > endT))
-    )
-      return true;
-    if (hideDisabled && d.isDisabled) return true;
-    if (hideOtherMonths && !d.isCurrentMonth) return true;
-    return false;
-  };
+  const isDayHidden = useCallback(
+    (d: { fullDate: Date; isDisabled: boolean; isCurrentMonth: boolean }) => {
+      const t = d.fullDate.getTime();
+      if (
+        hideLimited &&
+        ((startT !== null && t < startT) || (endT !== null && t > endT))
+      )
+        return true;
+      if (hideDisabled && d.isDisabled) return true;
+      if (hideOtherMonths && !d.isCurrentMonth) return true;
+      return false;
+    },
+    [hideLimited, hideDisabled, hideOtherMonths, startT, endT],
+  );
 
   return (
     <div

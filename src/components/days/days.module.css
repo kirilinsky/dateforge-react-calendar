@@ -8,7 +8,7 @@
   --day-gap: 0.15em;
   --rng-bg: color-mix(in srgb, var(--c-r) 28%, var(--c-b));
   --rng-prev: color-mix(in srgb, var(--c-r) 16%, transparent);
-  padding: 0.9em;
+  padding: 0.85em;
   height: auto;
   box-sizing: border-box;
   overflow: hidden;

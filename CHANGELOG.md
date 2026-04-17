@@ -9,7 +9,7 @@
 - **🚫 `allowNavigateSelected` prop** — When `false`, clicking a date chip in the selected-dates panel no longer navigates the calendar view. Defaults to `true`.
 - **🪲 Bug fixes**  
 
-### 🚀 Version 5.2.2 (LTS)
+### 🚀 Version 5.2.2
 
 - **✅ Code optimization**
 - **📅 `highlightToday` prop** — When `true`, today's date cell gets outline.
