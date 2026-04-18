@@ -84,7 +84,7 @@ export const Calendar: React.FC<CalendarProps> = ({
       compactYears,
       compactMonths,
       manualSelect,
-      years,
+      showYearPicker,
       time,
       timeGrid,
       months,
@@ -141,7 +141,7 @@ export const Calendar: React.FC<CalendarProps> = ({
       presets={presets}
       compactMonths={compactMonths}
       compactYears={compactYears}
-      years={years}
+      showYearPicker={showYearPicker}
       time={time}
       hour12={hour12}
       timeGrid={timeGrid}

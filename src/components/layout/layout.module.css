@@ -1,4 +1,4 @@
-@layer base, themes;
+@layer base, themes, appearances;
 
 @layer themes {
   :global([data-theme="light"]) {
@@ -56,78 +56,7 @@
     overflow: hidden;
   }
 
-  .calendarContainer:global([data-appearance="neo"]) {
-    --cal-radius: 0.4em;
-    --cal-border: 2px;
-    --cal-spacing: 0.6em;
-    --cal-shadow-sm: none;
-    --cal-shadow-md: none;
-    --cal-shadow-lg: 4px 4px 0 var(--c-h);
-    --hover-bg: var(--c-h);
-    --hover-color: var(--c-a);
-    --hover-shadow: none;
-    --hover-outline: none;
-    --active-shadow: 2px 2px 0 var(--c-s);
-  }
-
-  .calendarContainer:global([data-appearance="neo"]) button {
-    font-weight: 700;
-  }
-
-  .calendarContainer:global([data-appearance="soft"]) {
-    --cal-radius: 0.75em;
-    --cal-border: 1px;
-    --cal-spacing: 0.7em;
-    --cal-shadow-sm: 0 0.15em 0.5em var(--c-x);
-    --cal-shadow-md: 0 0.25em 0.8em var(--c-x);
-    --cal-shadow-lg: 0 0.3em 1.2em var(--c-x);
-  }
-
-  .calendarContainer:global([data-appearance="compact"]) {
-    --cal-radius: 0.3em;
-    --cal-border: 1px;
-    --cal-spacing: 0.35em;
-    --cal-shadow-sm: 0 0.05em 0.15em var(--c-x);
-    --cal-shadow-md: 0 0.1em 0.3em var(--c-x);
-    --cal-shadow-lg: 0 0.1em 0.4em var(--c-x);
-  }
-
-  .calendarContainer:global([data-appearance="square"]) {
-    --cal-radius: 0;
-    --cal-border: 1px;
-    --cal-spacing: 0.5em;
-  }
-
-  .calendarContainer:global([data-appearance="brutalist"]) {
-    --cal-radius: 0;
-    --cal-border: 2px;
-    --cal-shadow-sm: none;
-    --cal-shadow-md: none;
-    --cal-shadow-lg: 2px 2px 0 var(--c-c);
-    --hover-shadow: none;
-    --hover-bg: var(--c-h);
-    --hover-color: var(--c-a);
-    --hover-outline: var(--cal-border) solid var(--c-c);
-    --active-shadow: 3px 3px 0 var(--c-c);
-    --months-border-right: var(--cal-border) solid var(--c-c);
-    --months-border-top: var(--cal-border) solid var(--c-c);
-    --time-border-left: var(--cal-border) solid var(--c-c);
-    --time-border-top: var(--cal-border) solid var(--c-c);
-    font-family: "Courier New", Courier, monospace;
-  }
-
-  .calendarContainer:global([data-appearance="brutalist"]) button {
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .calendarContainer:global([data-appearance="brutalist"]) > div[style*="HH"],
-  .calendarContainer:global([data-appearance="brutalist"]) > div[style*="PP"] {
-    border-color: var(--c-c) !important;
-  }
-
-  .calendarContainer.gradient {
+.calendarContainer.gradient {
     background:
       radial-gradient(
         ellipse 50% 45% at 5% 5%,

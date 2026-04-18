@@ -1,0 +1,10 @@
+@layer appearances {
+  [data-appearance="compact"] {
+    --cal-radius: 0.3em;
+    --cal-border: 1px;
+    --cal-spacing: 0.35em;
+    --cal-shadow-sm: 0 0.05em 0.15em var(--c-x);
+    --cal-shadow-md: 0 0.1em 0.3em var(--c-x);
+    --cal-shadow-lg: 0 0.1em 0.4em var(--c-x);
+  }
+}

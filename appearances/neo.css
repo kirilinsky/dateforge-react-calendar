@@ -1,0 +1,19 @@
+@layer appearances {
+  [data-appearance="neo"] {
+    --cal-radius: 0.2em;
+    --cal-border: 2px;
+    --cal-spacing: 0.55em;
+    --cal-shadow-sm: none;
+    --cal-shadow-md: none;
+    --cal-shadow-lg: 3px 3px 0 var(--c-s);
+    --hover-bg: var(--c-t);
+    --hover-color: inherit;
+    --hover-shadow: none;
+    --hover-outline: 2px solid var(--c-h);
+    --active-shadow: 2px 2px 0 var(--c-s);
+  }
+
+  [data-appearance="neo"] button {
+    font-weight: 600;
+  }
+}

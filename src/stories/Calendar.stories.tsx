@@ -1,9 +1,10 @@
+/// <reference path="../../global.d.ts" />
 import { useState } from "react";
 import { Calendar } from "../components/calendar/calendar";
 import { createTheme } from "../utils/create-theme";
-import { createAppearance } from "../utils/create-appearance";
 import "./calendar.css";
 import "../themes.gen.css";
+import "../appearances.gen.css";
 import { DARK_THEMES, LIGHT_THEMES } from "../types/themes";
 import { CalendarMode, DisabledRule, StartOfWeek } from "../types/calendar";
 
@@ -79,66 +80,6 @@ export const Default = () => {
           value={date}
           theme="industrial"
           appearance="brutalist"
-          onChange={(d: Date | null) => {
-            if (d) setDate(d);
-          }}
-        />
-      </div>
-    </StoryWrapper>
-  );
-};
-
-export const AppearanceDemo = () => {
-  const [date, setDate] = useState<Date>(new Date());
-  const [appearance, setAppearance] = useState<string>("default");
-
-  const customPill = createAppearance({ radius: "99em", spacing: "0.5em" });
-
-  const appearances = [
-    "default",
-    "soft",
-    "compact",
-    "square",
-    "neo",
-    "brutalist",
-    "custom",
-  ];
-
-  return (
-    <StoryWrapper title="Appearance" subtitle={formatSubtitle(date)}>
-      <div
-        style={{
-          display: "flex",
-          gap: "0.5em",
-          marginBottom: "1em",
-          flexWrap: "wrap",
-        }}
-      >
-        {appearances.map((a) => (
-          <button
-            key={a}
-            onClick={() => setAppearance(a)}
-            style={{
-              padding: "0.3em 0.8em",
-              fontWeight: appearance === a ? 700 : 400,
-              border: "1px solid #ccc",
-              borderRadius: 4,
-              cursor: "pointer",
-              background: appearance === a ? "#1a1a1c" : "#fff",
-              color: appearance === a ? "#fff" : "#1a1a1c",
-            }}
-          >
-            {a}
-          </button>
-        ))}
-      </div>
-      <div className="calendar-fixed-container">
-        <Calendar
-          value={date}
-          theme={appearance === "brutalist" ? "industrial" : "light"}
-          appearance={
-            appearance === "custom" ? customPill : (appearance as any)
-          }
           onChange={(d: Date | null) => {
             if (d) setDate(d);
           }}

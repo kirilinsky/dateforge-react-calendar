@@ -1,0 +1,28 @@
+@layer appearances {
+  [data-appearance="brutalist"] {
+    --cal-radius: 0;
+    --cal-border: 2px;
+    --cal-shadow-sm: none;
+    --cal-shadow-md: none;
+    --cal-shadow-lg: 2px 2px 0 var(--c-s);
+    --hover-bg: var(--c-t);
+    --hover-shadow: none;
+    --hover-outline: var(--cal-border) solid var(--c-c);
+    --active-shadow: 3px 3px 0 var(--c-h);
+    --months-border-right: var(--cal-border) solid var(--c-s);
+    --months-border-top: var(--cal-border) solid var(--c-s);
+    --time-border-left: var(--cal-border) solid var(--c-s);
+    --time-border-top: var(--cal-border) solid var(--c-s);
+    font-family: ui-monospace, "Cascadia Code", Menlo, monospace;
+  }
+
+  [data-appearance="brutalist"] button {
+    font-weight: 700;
+    letter-spacing: 0.03em;
+  }
+
+  [data-appearance="brutalist"] > div[style*="HH"],
+  [data-appearance="brutalist"] > div[style*="PP"] {
+    border-color: var(--c-s);
+  }
+}
