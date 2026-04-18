@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { CalendarProps } from "@/types/calendar";
 import { DARK_THEMES, CustomTheme } from "@/types/themes";
+import { CustomAppearance } from "@/types/appearances";
 import { CalendarProvider } from "@/components/provider/provider";
 import { getGridLayout, getLayoutMode } from "@/helpers/get-grid-layout";
 import { CalendarLayout } from "../layout/layout";
@@ -8,9 +9,13 @@ import { CalendarLayout } from "../layout/layout";
 const isCustomTheme = (t: unknown): t is CustomTheme =>
   typeof t === "object" && t !== null && (t as CustomTheme).__type === "custom";
 
+const isCustomAppearance = (a: unknown): a is CustomAppearance =>
+  typeof a === "object" && a !== null && (a as CustomAppearance).__type === "custom-appearance";
+
 export const Calendar: React.FC<CalendarProps> = ({
   width = "100%",
   theme: themeProp,
+  appearance: appearanceProp,
   presets = false,
   compactMonths = false,
   manualSelect = false,
@@ -23,7 +28,6 @@ export const Calendar: React.FC<CalendarProps> = ({
   monthsGrid = false,
   locale = "en",
   startOfWeek = 1,
-  brutalism = false,
   gradient = false,
   highlightWeekends = true,
   mode,
@@ -117,7 +121,6 @@ export const Calendar: React.FC<CalendarProps> = ({
     (DARK_THEMES as readonly string[]).includes(baseTheme);
 
   const activeTheme = isToggled ? (isBaseDark ? "light" : "dark") : baseTheme;
-
   const toggleTheme = () => setIsToggled((v) => !v);
 
   const layoutMode = getLayoutMode(containerWidth, {
@@ -127,7 +130,10 @@ export const Calendar: React.FC<CalendarProps> = ({
     monthsColumn,
   });
 
-  const customVars = customTheme?.vars as React.CSSProperties | undefined;
+  const customAppearance = isCustomAppearance(appearanceProp) ? appearanceProp : undefined;
+  const appearanceKey = customAppearance ? undefined : (appearanceProp as string | undefined);
+  const customThemeVars = customTheme?.vars as React.CSSProperties | undefined;
+  const customAppearanceVars = customAppearance?.vars as React.CSSProperties | undefined;
 
   return (
     <CalendarProvider
@@ -142,7 +148,7 @@ export const Calendar: React.FC<CalendarProps> = ({
       months={months}
       monthsGrid={monthsGrid}
       startOfWeek={startOfWeek}
-      brutalism={brutalism}
+      appearance={appearanceProp}
       gradient={gradient}
       highlightWeekends={highlightWeekends}
       theme={themeProp}
@@ -162,9 +168,13 @@ export const Calendar: React.FC<CalendarProps> = ({
         ref={wrapperRef}
         data-theme={activeTheme}
         data-layout={layoutMode}
-        style={{ containerType: "inline-size", width, ...customVars }}
+        style={{ containerType: "inline-size", width, ...customThemeVars }}
       >
-        <CalendarLayout containerStyle={containerStyle} brutalism={brutalism} />
+        <CalendarLayout
+          containerStyle={containerStyle}
+          appearanceKey={appearanceKey}
+          customAppearanceVars={customAppearanceVars}
+        />
       </div>
     </CalendarProvider>
   );

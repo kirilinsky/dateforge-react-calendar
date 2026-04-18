@@ -12,6 +12,9 @@
   - **Range** — two inputs (start / end) separated by an em-dash; each can be cleared independently.
   - **Multiple** — an add-new input plus a chip per selected date; only one slot is editable at a time; each chip has an inline clear button.
 - **🗑️ `allowCleanManualSelect` prop** — Controls visibility of the "clear all" button inside the manual-select bar. Defaults to `true`.
+- **🎨 `appearance` prop** — Controls the visual shape of the calendar independently of the color theme. Four built-in presets: `"default"` (0.5em radius, soft shadows), `"compact"` (tighter spacing, smaller radius), `"square"` (no radius, clean edges), `"brutalist"` (2px border, no shadows, monospace font, uppercase labels). Replaces the old boolean `brutalist` prop.
+- **🛠️ `createAppearance()` utility** — Build a fully typed custom appearance object and pass it as the `appearance` prop. Accepts `radius`, `border`, `spacing`, `shadowSm`, `shadowMd`, `shadowLg` tokens.
+- **🌑 Shadow tokens** — Three new CSS variables extracted from component styles: `--cal-shadow-sm` (interactive element hover/focus), `--cal-shadow-md` (internal panels and highlights), `--cal-shadow-lg` (outer calendar container). All are set to `none` in the brutalist appearance.
 - **🪲 Bug fixes** — Month navigation no longer resets the selected time to 00:00 when navigating to a boundary month.
 
 ### 🚀 Version 5.2.2

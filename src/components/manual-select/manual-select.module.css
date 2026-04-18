@@ -1,12 +1,12 @@
 @layer base {
   .inputWrapper:hover {
     border-color: var(--c-s);
-    box-shadow: 0 0.1em 0.3em var(--c-x);
+    box-shadow: var(--cal-shadow-sm, 0 0.1em 0.3em var(--c-x));
   }
 
   .inputWrapper:focus-within {
     border-color: var(--c-h);
-    box-shadow: 0 0.1em 0.4em var(--c-x);
+    box-shadow: var(--cal-shadow-sm, 0 0.1em 0.3em var(--c-x));
   }
 
   .saveBtn:hover:not([disabled]) {
@@ -147,7 +147,7 @@
 
   &:hover {
     border-color: var(--c-s);
-    box-shadow: 0 0.1em 0.3em var(--c-x);
+    box-shadow: var(--cal-shadow-sm, 0 0.1em 0.3em var(--c-x));
   }
 }
 

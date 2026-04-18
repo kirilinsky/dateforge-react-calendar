@@ -13,8 +13,9 @@ import styles from "./layout.module.css";
 
 export const CalendarLayout: React.FC<{
   containerStyle: React.CSSProperties;
-  brutalism: boolean;
-}> = ({ containerStyle, brutalism }) => {
+  appearanceKey?: string;
+  customAppearanceVars?: React.CSSProperties;
+}> = ({ containerStyle, appearanceKey, customAppearanceVars }) => {
   const {
     presets,
     years,
@@ -75,12 +76,12 @@ export const CalendarLayout: React.FC<{
         styles.calendarContainer,
         gradient ? styles.gradient : "",
         dark ? styles.dark : "",
-        brutalism ? styles.brutalism : "",
         twoMonthsLayout && !twoMonthsStacked ? styles.twoMonthsWide : "",
       ]
         .filter(Boolean)
         .join(" ")}
-      style={containerStyle}
+      data-appearance={appearanceKey}
+      style={{ ...containerStyle, ...customAppearanceVars }}
     >
       {showTimePopup && (
         <TimePopup

@@ -181,14 +181,13 @@ Clicking a selected date deselects it. When `max` is reached further clicks are 
 
 ### Appearance
 
-| Prop                | Type      | Default | Description                                                   |
-| :------------------ | :-------- | :------ | :------------------------------------------------------------ |
-| `gradient`          | `boolean` | `false` | Subtle radial gradient tinted by active theme                 |
-| `brutalism`         | `boolean` | `false` | Brutalism aesthetic — monospace font, hard borders, no radius |
-| `hour12`            | `boolean` | `false` | 12-hour AM/PM format for time picker                          |
-| `highlightWeekends` | `boolean` | `true`  | Highlight Saturday and Sunday weekday                         |
-| `highlightToday`    | `boolean` | `true`  | Show outline on today's date cell                             |
-| `shortMonths`       | `boolean` | `false` | Abbreviated month names (Jan, Feb…)                           |
+| Prop                | Type      | Default | Description                                   |
+| :------------------ | :-------- | :------ | :-------------------------------------------- |
+| `gradient`          | `boolean` | `false` | Subtle radial gradient tinted by active theme |
+| `hour12`            | `boolean` | `false` | 12-hour AM/PM format for time picker          |
+| `highlightWeekends` | `boolean` | `true`  | Highlight Saturday and Sunday weekday         |
+| `highlightToday`    | `boolean` | `true`  | Show outline on today's date cell             |
+| `shortMonths`       | `boolean` | `false` | Abbreviated month names (Jan, Feb…)           |
 
 ### Visibility
 
@@ -222,20 +221,20 @@ Rules can be combined into an array — all matching rules are applied.
 
 <img src="https://i.ibb.co/PZMb2k02/theme.png" alt="Themes" />
 
-| 🌑 Dark                                                                                                                                                              | ☀️ Light                                                                                                                                                            |
-| :------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| <img src="https://placehold.co/13x13/1a1a1c/1a1a1c.png" valign="middle"/> <img src="https://placehold.co/13x13/ffffff/ffffff.png" valign="middle"/> **`carbon`**     | <img src="https://placehold.co/13x13/ffffff/ffffff.png" valign="middle"/> <img src="https://placehold.co/13x13/1a1a1c/1a1a1c.png" valign="middle"/> **`paper`**     |
-| <img src="https://placehold.co/13x13/0d0909/0d0909.png" valign="middle"/> <img src="https://placehold.co/13x13/f92f2f/f92f2f.png" valign="middle"/> **`crimson`**    | <img src="https://placehold.co/13x13/fff5f5/fff5f5.png" valign="middle"/> <img src="https://placehold.co/13x13/d92121/d92121.png" valign="middle"/> **`scarlet`**   |
-| <img src="https://placehold.co/13x13/1c1111/1c1111.png" valign="middle"/> <img src="https://placehold.co/13x13/ff5e5e/ff5e5e.png" valign="middle"/> **`dracula`**    | <img src="https://placehold.co/13x13/fef0f4/fef0f4.png" valign="middle"/> <img src="https://placehold.co/13x13/d64c7f/d64c7f.png" valign="middle"/> **`rosa`**      |
-| <img src="https://placehold.co/13x13/111111/111111.png" valign="middle"/> <img src="https://placehold.co/13x13/e85d00/e85d00.png" valign="middle"/> **`industrial`** | <img src="https://placehold.co/13x13/fffbe8/fffbe8.png" valign="middle"/> <img src="https://placehold.co/13x13/e67e22/e67e22.png" valign="middle"/> **`solar`**     |
-| <img src="https://placehold.co/13x13/1f1c18/1f1c18.png" valign="middle"/> <img src="https://placehold.co/13x13/e3ae5c/e3ae5c.png" valign="middle"/> **`sandstone`**  | <img src="https://placehold.co/13x13/f7f8f9/f7f8f9.png" valign="middle"/> <img src="https://placehold.co/13x13/f1a01d/f1a01d.png" valign="middle"/> **`graphite`**  |
-| <img src="https://placehold.co/13x13/010401/010401.png" valign="middle"/> <img src="https://placehold.co/13x13/76ff03/76ff03.png" valign="middle"/> **`phosphor`**   | <img src="https://placehold.co/13x13/f7f8f9/f7f8f9.png" valign="middle"/> <img src="https://placehold.co/13x13/80ec27/80ec27.png" valign="middle"/> **`neon`**      |
-| <img src="https://placehold.co/13x13/0f2016/0f2016.png" valign="middle"/> <img src="https://placehold.co/13x13/4ade80/4ade80.png" valign="middle"/> **`forest`**     | <img src="https://placehold.co/13x13/f8f9fc/f8f9fc.png" valign="middle"/> <img src="https://placehold.co/13x13/60d276/60d276.png" valign="middle"/> **`mint`**      |
-| <img src="https://placehold.co/13x13/0b0a16/0b0a16.png" valign="middle"/> <img src="https://placehold.co/13x13/b388ff/b388ff.png" valign="middle"/> **`nebula`**     | <img src="https://placehold.co/13x13/f5f3f7/f5f3f7.png" valign="middle"/> <img src="https://placehold.co/13x13/681c9e/681c9e.png" valign="middle"/> **`amethyst`**  |
-| <img src="https://placehold.co/13x13/1a1e2b/1a1e2b.png" valign="middle"/> <img src="https://placehold.co/13x13/3559e0/3559e0.png" valign="middle"/> **`midnight`**   | <img src="https://placehold.co/13x13/e2e5e9/e2e5e9.png" valign="middle"/> <img src="https://placehold.co/13x13/3a60d6/3a60d6.png" valign="middle"/> **`snow`**      |
-| <img src="https://placehold.co/13x13/14252e/14252e.png" valign="middle"/> <img src="https://placehold.co/13x13/27d1f4/27d1f4.png" valign="middle"/> **`temporal`**   | <img src="https://placehold.co/13x13/f1f5f9/f1f5f9.png" valign="middle"/> <img src="https://placehold.co/13x13/475569/475569.png" valign="middle"/> **`slate`**     |
-| <img src="https://placehold.co/13x13/07070b/07070b.png" valign="middle"/> <img src="https://placehold.co/13x13/00f3ff/00f3ff.png" valign="middle"/> **`cyber`**      | <img src="https://placehold.co/13x13/faf8f4/faf8f4.png" valign="middle"/> <img src="https://placehold.co/13x13/6f3d18/6f3d18.png" valign="middle"/> **`latte`**     |
-| <img src="https://placehold.co/13x13/0b0e24/0b0e24.png" valign="middle"/> <img src="https://placehold.co/13x13/3de0a0/3de0a0.png" valign="middle"/> **`aurora`**     | <img src="https://placehold.co/13x13/f2e8e0/f2e8e0.png" valign="middle"/> <img src="https://placehold.co/13x13/c04e2f/c04e2f.png" valign="middle"/> **`comfy`**     |
+| 🌑 Dark                                                                                                                                                              | ☀️ Light                                                                                                                                                           |
+| :------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| <img src="https://placehold.co/13x13/1a1a1c/1a1a1c.png" valign="middle"/> <img src="https://placehold.co/13x13/ffffff/ffffff.png" valign="middle"/> **`carbon`**     | <img src="https://placehold.co/13x13/ffffff/ffffff.png" valign="middle"/> <img src="https://placehold.co/13x13/1a1a1c/1a1a1c.png" valign="middle"/> **`paper`**    |
+| <img src="https://placehold.co/13x13/0d0909/0d0909.png" valign="middle"/> <img src="https://placehold.co/13x13/f92f2f/f92f2f.png" valign="middle"/> **`crimson`**    | <img src="https://placehold.co/13x13/fff5f5/fff5f5.png" valign="middle"/> <img src="https://placehold.co/13x13/d92121/d92121.png" valign="middle"/> **`scarlet`**  |
+| <img src="https://placehold.co/13x13/1c1111/1c1111.png" valign="middle"/> <img src="https://placehold.co/13x13/ff5e5e/ff5e5e.png" valign="middle"/> **`dracula`**    | <img src="https://placehold.co/13x13/fef0f4/fef0f4.png" valign="middle"/> <img src="https://placehold.co/13x13/d64c7f/d64c7f.png" valign="middle"/> **`rosa`**     |
+| <img src="https://placehold.co/13x13/111111/111111.png" valign="middle"/> <img src="https://placehold.co/13x13/e85d00/e85d00.png" valign="middle"/> **`industrial`** | <img src="https://placehold.co/13x13/fffbe8/fffbe8.png" valign="middle"/> <img src="https://placehold.co/13x13/e67e22/e67e22.png" valign="middle"/> **`solar`**    |
+| <img src="https://placehold.co/13x13/1f1c18/1f1c18.png" valign="middle"/> <img src="https://placehold.co/13x13/e3ae5c/e3ae5c.png" valign="middle"/> **`sandstone`**  | <img src="https://placehold.co/13x13/f7f8f9/f7f8f9.png" valign="middle"/> <img src="https://placehold.co/13x13/f1a01d/f1a01d.png" valign="middle"/> **`graphite`** |
+| <img src="https://placehold.co/13x13/010401/010401.png" valign="middle"/> <img src="https://placehold.co/13x13/76ff03/76ff03.png" valign="middle"/> **`phosphor`**   | <img src="https://placehold.co/13x13/f7f8f9/f7f8f9.png" valign="middle"/> <img src="https://placehold.co/13x13/80ec27/80ec27.png" valign="middle"/> **`neon`**     |
+| <img src="https://placehold.co/13x13/0f2016/0f2016.png" valign="middle"/> <img src="https://placehold.co/13x13/4ade80/4ade80.png" valign="middle"/> **`forest`**     | <img src="https://placehold.co/13x13/f8f9fc/f8f9fc.png" valign="middle"/> <img src="https://placehold.co/13x13/60d276/60d276.png" valign="middle"/> **`mint`**     |
+| <img src="https://placehold.co/13x13/0b0a16/0b0a16.png" valign="middle"/> <img src="https://placehold.co/13x13/b388ff/b388ff.png" valign="middle"/> **`nebula`**     | <img src="https://placehold.co/13x13/f5f3f7/f5f3f7.png" valign="middle"/> <img src="https://placehold.co/13x13/681c9e/681c9e.png" valign="middle"/> **`amethyst`** |
+| <img src="https://placehold.co/13x13/1a1e2b/1a1e2b.png" valign="middle"/> <img src="https://placehold.co/13x13/3559e0/3559e0.png" valign="middle"/> **`midnight`**   | <img src="https://placehold.co/13x13/e2e5e9/e2e5e9.png" valign="middle"/> <img src="https://placehold.co/13x13/3a60d6/3a60d6.png" valign="middle"/> **`snow`**     |
+| <img src="https://placehold.co/13x13/14252e/14252e.png" valign="middle"/> <img src="https://placehold.co/13x13/27d1f4/27d1f4.png" valign="middle"/> **`temporal`**   | <img src="https://placehold.co/13x13/f1f5f9/f1f5f9.png" valign="middle"/> <img src="https://placehold.co/13x13/475569/475569.png" valign="middle"/> **`slate`**    |
+| <img src="https://placehold.co/13x13/07070b/07070b.png" valign="middle"/> <img src="https://placehold.co/13x13/00f3ff/00f3ff.png" valign="middle"/> **`cyber`**      | <img src="https://placehold.co/13x13/faf8f4/faf8f4.png" valign="middle"/> <img src="https://placehold.co/13x13/6f3d18/6f3d18.png" valign="middle"/> **`latte`**    |
+| <img src="https://placehold.co/13x13/0b0e24/0b0e24.png" valign="middle"/> <img src="https://placehold.co/13x13/3de0a0/3de0a0.png" valign="middle"/> **`aurora`**     | <img src="https://placehold.co/13x13/f2e8e0/f2e8e0.png" valign="middle"/> <img src="https://placehold.co/13x13/c04e2f/c04e2f.png" valign="middle"/> **`comfy`**    |
 
 Each theme exposes CSS custom properties you can override:
 

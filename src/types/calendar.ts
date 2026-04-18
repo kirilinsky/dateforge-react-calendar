@@ -1,4 +1,5 @@
 import { CalendarTheme } from "./themes";
+import { CalendarAppearance } from "./appearances";
 
 export type StartOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -42,7 +43,7 @@ export interface CalendarProps {
   monthsGrid?: boolean;
   compactYears?: boolean;
   compactMonths?: boolean;
-  brutalism?: boolean;
+  appearance?: CalendarAppearance;
   gestures?: boolean;
   gradient?: boolean;
   highlightWeekends?: boolean;

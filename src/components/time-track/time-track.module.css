@@ -71,13 +71,13 @@
 .highlight {
   position: absolute;
   top: 50%;
-  left: 2px;
-  right: 2px;
+  left: 3px;
+  right: 3px;
   height: calc(100% / 7);
   transform: translateY(-50%);
   background: var(--c-h);
   border-radius: var(--cal-radius, 0.5em);
-  box-shadow: 0 0.2em 0.6em var(--c-x);
+  box-shadow: var(--cal-shadow-md, 0 0.2em 0.6em var(--c-x));
   pointer-events: none;
   z-index: 0;
 }
@@ -107,7 +107,7 @@
   font-size: 1em;
   font-weight: 300;
   color: var(--c-c);
-  opacity: 0.3;
+  opacity: 0.4;
   flex-shrink: 0;
   align-self: center;
 }
