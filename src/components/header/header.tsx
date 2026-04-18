@@ -16,9 +16,9 @@ export const HeaderComponent: React.FC = () => {
     navigateTo,
     compactMonths,
     compactYears,
-    startDate,
-    endDate,
-    years,
+    minDate,
+    maxDate,
+    showYearPicker,
     months,
     date,
     time,
@@ -58,17 +58,17 @@ export const HeaderComponent: React.FC = () => {
   const curTime = getTimeString(date, hour12);
 
   const yearFixed = useMemo(
-    () => isYearFixed(cur, startDate, endDate),
-    [cur, startDate, endDate],
+    () => isYearFixed(cur, minDate, maxDate),
+    [cur, minDate, maxDate],
   );
   const monthFixed = useMemo(
-    () => isYearFixed(cur, startDate, endDate, date.getMonth()),
-    [startDate, endDate, date],
+    () => isYearFixed(cur, minDate, maxDate, date.getMonth()),
+    [minDate, maxDate, date],
   );
 
   const { canGoPrev, canGoNext, canGoPrevMonth, canGoNextMonth } = useMemo(
-    () => checkYearNavigation(cur, startDate, endDate, date, disabled),
-    [cur, date, startDate, endDate, disabled],
+    () => checkYearNavigation(cur, minDate, maxDate, date, disabled),
+    [cur, date, minDate, maxDate, disabled],
   );
 
   const monthFormat = shortMonths ? "short" : "long";
@@ -86,9 +86,9 @@ export const HeaderComponent: React.FC = () => {
   const nextMonthYear = nextMonthDate.getFullYear();
 
   const ch = (v: number) =>
-    navigateTo(addDate(date, v, "year", startDate, endDate));
+    navigateTo(addDate(date, v, "year", minDate, maxDate));
   const cm = (v: number) =>
-    navigateTo(addDate(date, v, "month", startDate, endDate));
+    navigateTo(addDate(date, v, "month", minDate, maxDate));
   return (
     <div
       className={[
@@ -164,7 +164,7 @@ export const HeaderComponent: React.FC = () => {
         </div>
       )}
 
-      {years && (
+      {showYearPicker && (
         <div className={styles.yearsSelector}>
           {canGoPrev && (
             <button className={`${styles.arrow} ${shared.interactive} ${shared.hoverable}`} onClick={() => ch(-1)}>

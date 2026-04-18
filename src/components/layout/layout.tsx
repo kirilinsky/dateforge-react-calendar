@@ -18,7 +18,7 @@ export const CalendarLayout: React.FC<{
 }> = ({ containerStyle, appearanceKey, customAppearanceVars }) => {
   const {
     presets,
-    years,
+    showYearPicker,
     months,
     compactMonths,
     compactYears,
@@ -40,8 +40,8 @@ export const CalendarLayout: React.FC<{
     gestures,
     locale,
     shortMonths,
-    startDate,
-    endDate,
+    minDate,
+    maxDate,
     selectedDates,
     showSelectedDates,
     twoMonthsLayout,
@@ -99,8 +99,8 @@ export const CalendarLayout: React.FC<{
         <MonthPopup
           date={date}
           locale={locale}
-          startDate={startDate}
-          endDate={endDate}
+          minDate={minDate}
+          maxDate={maxDate}
           shortMonths={shortMonths}
           gestures={gestures}
           onConfirm={(newDate) => {
@@ -113,8 +113,8 @@ export const CalendarLayout: React.FC<{
       {showYearPopup && (
         <YearPopup
           date={date}
-          startDate={startDate}
-          endDate={endDate}
+          minDate={minDate}
+          maxDate={maxDate}
           gestures={gestures}
           onConfirm={(newDate) => {
             navigateTo(newDate);
@@ -124,7 +124,7 @@ export const CalendarLayout: React.FC<{
         />
       )}
       {presets && <PresetsComponent />}
-      {(years || compactMonths || compactYears || time || months) && (
+      {(showYearPicker || compactMonths || compactYears || time || months) && (
         <HeaderComponent />
       )} 
       {manualSelect && <ManualSelectComponent />}

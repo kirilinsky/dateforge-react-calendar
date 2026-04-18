@@ -289,8 +289,8 @@ export const ManualSelectComponent: React.FC = () => {
     onRangeSet,
     onDatesSet,
     disabled,
-    startDate,
-    endDate,
+    minDate,
+    maxDate,
     date,
     allowCleanManualSelect = true,
   } = useCalendarContext();
@@ -314,7 +314,7 @@ export const ManualSelectComponent: React.FC = () => {
   const [editingKey, setEditingKey] = useState<number | null>(null);
 
   const isAllowed = (d: Date): boolean =>
-    !checkIsDateDisabled(d, startDate, endDate, disabled);
+    !checkIsDateDisabled(d, minDate, maxDate, disabled);
 
   const hasValue = range ? !!rangeStart : !!selectedDates.length;
 

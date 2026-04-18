@@ -139,8 +139,8 @@ Clicking a selected date deselects it. When `max` is reached further clicks are 
 | `onChange`      | `(date: Date \| null) => void`                              | —         | Single mode: fires on select / deselect                                     |
 | `onDatesChange` | `(dates: Date[]) => void`                                   | —         | Multi-select mode: fires with updated selection array                       |
 | `onRangeChange` | `(range: { from: Date \| null; to: Date \| null }) => void` | —         | Range mode: fires on each click; `to` is `null` while end is not yet picked |
-| `startDate`     | `Date`                                                      | —         | Minimum selectable/navigable date                                           |
-| `endDate`       | `Date`                                                      | —         | Maximum selectable/navigable date                                           |
+| `minDate`       | `Date`                                                      | —         | Minimum selectable/navigable date                                           |
+| `maxDate`       | `Date`                                                      | —         | Maximum selectable/navigable date                                           |
 | `startMonth`    | `Date`                                                      | —         | Initial month to display (does not select a date)                           |
 | `locale`        | `string`                                                    | `'en'`    | BCP 47 locale tag                                                           |
 | `theme`         | `CalendarTheme`                                             | `'paper'` | See [Themes](#themes)                                                       |
@@ -166,7 +166,7 @@ Clicking a selected date deselects it. When `max` is reached further clicks are 
 | `time`            | `boolean` | `true`  | Time button in header (opens time popup)                                                                                        |
 | `timeGrid`        | `boolean` | `false` | Full-size time picker panel alongside the calendar                                                                              |
 | `months`          | `boolean` | `true`  | Month navigation arrows in header                                                                                               |
-| `years`           | `boolean` | `false` | Year navigation arrows in header                                                                                                |
+| `showYearPicker`  | `boolean` | `false` | Year navigation arrows in header                                                                                                |
 | `monthsGrid`      | `boolean` | `false` | Full-size month-grid panel alongside the calendar                                                                               |
 | `compactMonths`   | `boolean` | `false` | Compact month dropdown button in header                                                                                         |
 | `compactYears`    | `boolean` | `true`  | Compact year dropdown button in header                                                                                          |
@@ -193,7 +193,7 @@ Clicking a selected date deselects it. When `max` is reached further clicks are 
 
 | Prop           | Type      | Default | Description                                                 |
 | :------------- | :-------- | :------ | :---------------------------------------------------------- |
-| `hideLimited`  | `boolean` | `false` | Hide dates outside `startDate`/`endDate` instead of dimming |
+| `hideLimited`  | `boolean` | `false` | Hide dates outside `minDate`/`maxDate` instead of dimming |
 | `hideDisabled` | `boolean` | `false` | Hide disabled dates entirely instead of striking through    |
 | `hideWeekdays` | `boolean` | `false` | Hide the weekday header row (Mon Tue Wed…)                  |
 
@@ -211,7 +211,7 @@ Rules can be combined into an array — all matching rules are applied.
 
 <img src="https://i.ibb.co/GvWThVQR/Disabled-rules.png" alt="Disabled Dates" />
 
-`hideDisabled` removes disabled days from the grid entirely instead of striking them through. `hideLimited` does the same for date limits: outside `startDate`/`endDate`.
+`hideDisabled` removes disabled days from the grid entirely instead of striking them through. `hideLimited` does the same for date limits: outside `minDate`/`maxDate`.
 
 ---
 

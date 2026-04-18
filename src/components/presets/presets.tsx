@@ -14,9 +14,9 @@ export const PresetsComponent: React.FC = () => {
     monthsGrid,
     date,
     selectedDate,
-    startDate,
-    endDate,
-    years,
+    minDate,
+    maxDate,
+    showYearPicker,
     onChangeDate,
     locale,
     compactMonths,
@@ -28,18 +28,18 @@ export const PresetsComponent: React.FC = () => {
   const presets = useMemo(
     () =>
       getFilteredPresets(
-        years || !!compactYears,
+        showYearPicker || !!compactYears,
         monthsGrid || !!compactMonths || !!months,
-        startDate,
-        endDate,
+        minDate,
+        maxDate,
         disabled,
       ),
     [
-      years,
+      showYearPicker,
       months,
       monthsGrid,
-      startDate,
-      endDate,
+      minDate,
+      maxDate,
       compactYears,
       compactMonths,
       disabled,
@@ -68,7 +68,7 @@ export const PresetsComponent: React.FC = () => {
               .filter(Boolean)
               .join(" ")}
             onClick={() =>
-              onChangeDate(getPresetDate(preset, date, startDate, endDate))
+              onChangeDate(getPresetDate(preset, date, minDate, maxDate))
             }
           >
             {getRelativeLabel(locale, preset.amount, preset.unit)}

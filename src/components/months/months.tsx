@@ -5,15 +5,15 @@ import { getMonthListData, setMonth } from "@/utils/date-utils";
 import shared from "@/global/global.module.css";
 
 export const MonthsComponent: React.FC = () => {
-  const { navigateTo, locale, date, startDate, endDate, shortMonths } =
+  const { navigateTo, locale, date, minDate, maxDate, shortMonths } =
     useCalendarContext();
 
   const currentMonth = date.getMonth();
   const currentYear = date.getFullYear();
 
   const mNames = useMemo(
-    () => getMonthListData(locale, currentYear, startDate, endDate, shortMonths ?? true),
-    [locale, currentYear, startDate, endDate, shortMonths],
+    () => getMonthListData(locale, currentYear, minDate, maxDate, shortMonths ?? true),
+    [locale, currentYear, minDate, maxDate, shortMonths],
   );
 
   const handleClick = (i: number) => navigateTo(setMonth(date, i));

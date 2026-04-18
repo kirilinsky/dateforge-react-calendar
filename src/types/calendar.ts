@@ -21,8 +21,8 @@ export interface CalendarProps {
   value?: Date | Date[] | DateRange;
   mode?: CalendarMode;
   max?: number;
-  startDate?: Date;
-  endDate?: Date;
+  minDate?: Date;
+  maxDate?: Date;
   startMonth?: Date;
   onChange?: (date: Date | null) => void;
   onDatesChange?: (dates: Date[]) => void;
@@ -38,7 +38,7 @@ export interface CalendarProps {
   hour12?: boolean;
   timeGrid?: boolean;
   presets?: boolean;
-  years?: boolean;
+  showYearPicker?: boolean;
   months?: boolean;
   monthsGrid?: boolean;
   compactYears?: boolean;
@@ -77,7 +77,7 @@ export interface CalendarContextValue extends Omit<
   startOfWeek: StartOfWeek;
   time: boolean;
   presets: boolean;
-  years: boolean;
+  showYearPicker: boolean;
   months: boolean;
   monthsGrid: boolean;
   compactMonths: boolean;

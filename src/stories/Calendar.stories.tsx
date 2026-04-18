@@ -328,7 +328,7 @@ export const KitchenSink = () => {
   };
 
   const [config, setConfig] = useState({
-    years: false,
+    showYearPicker: false,
     monthsGrid: false,
     time: true,
     timeGrid: false,
@@ -456,8 +456,8 @@ export const KitchenSink = () => {
               theme={activeTheme}
               appearance={activeAppearance as any}
               locale={activeLocale}
-              startDate={startDate}
-              endDate={endDate}
+              minDate={startDate}
+              maxDate={endDate}
               startOfWeek={startOfWeek}
               disabled={getDisabledValue()}
               rangeMinDays={mode === "range" ? rangeMinDays : undefined}

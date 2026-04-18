@@ -124,8 +124,8 @@ function MonthTrack({
   month,
   year,
   locale,
-  startDate,
-  endDate,
+  minDate,
+  maxDate,
   shortMonths,
   gestures,
   onChange,
@@ -133,13 +133,13 @@ function MonthTrack({
   month: number;
   year: number;
   locale: string;
-  startDate?: Date | null;
-  endDate?: Date | null;
+  minDate?: Date | null;
+  maxDate?: Date | null;
   shortMonths?: boolean;
   gestures?: boolean;
   onChange: (month: number) => void;
 }) {
-  const monthsData = getMonthListData(locale, year, startDate, endDate, shortMonths);
+  const monthsData = getMonthListData(locale, year, minDate, maxDate, shortMonths);
 
   const isDisabled = (m: number) => monthsData[((m % 12) + 12) % 12].disabled;
   const getOffsetVal = (v: number, offset: number) => getDrumValue(v, offset, 12);
@@ -173,19 +173,19 @@ function MonthTrack({
 
 function YearTrack({
   year,
-  startDate,
-  endDate,
+  minDate,
+  maxDate,
   gestures,
   onChange,
 }: {
   year: number;
-  startDate?: Date | null;
-  endDate?: Date | null;
+  minDate?: Date | null;
+  maxDate?: Date | null;
   gestures?: boolean;
   onChange: (year: number) => void;
 }) {
-  const minYear = startDate ? startDate.getFullYear() : -Infinity;
-  const maxYear = endDate ? endDate.getFullYear() : Infinity;
+  const minYear = minDate ? minDate.getFullYear() : -Infinity;
+  const maxYear = maxDate ? maxDate.getFullYear() : Infinity;
 
   const isDisabled = (y: number) => y < minYear || y > maxYear;
   const getOffsetVal = (v: number, offset: number) => v + offset;
@@ -215,8 +215,8 @@ function YearTrack({
 export interface MonthPopupProps {
   date: Date;
   locale: string;
-  startDate?: Date | null;
-  endDate?: Date | null;
+  minDate?: Date | null;
+  maxDate?: Date | null;
   shortMonths?: boolean;
   gestures?: boolean;
   onConfirm: (date: Date) => void;
@@ -226,8 +226,8 @@ export interface MonthPopupProps {
 export const MonthPopup = ({
   date,
   locale,
-  startDate,
-  endDate,
+  minDate,
+  maxDate,
   shortMonths,
   gestures,
   onConfirm,
@@ -240,8 +240,8 @@ export const MonthPopup = ({
         month={month}
         year={date.getFullYear()}
         locale={locale}
-        startDate={startDate}
-        endDate={endDate}
+        minDate={minDate}
+        maxDate={maxDate}
         shortMonths={shortMonths}
         gestures={gestures}
         onChange={setMonth}
@@ -252,8 +252,8 @@ export const MonthPopup = ({
 
 export interface YearPopupProps {
   date: Date;
-  startDate?: Date | null;
-  endDate?: Date | null;
+  minDate?: Date | null;
+  maxDate?: Date | null;
   gestures?: boolean;
   onConfirm: (date: Date) => void;
   onClose: () => void;
@@ -261,8 +261,8 @@ export interface YearPopupProps {
 
 export const YearPopup = ({
   date,
-  startDate,
-  endDate,
+  minDate,
+  maxDate,
   gestures,
   onConfirm,
   onClose,
@@ -272,8 +272,8 @@ export const YearPopup = ({
     <Popup onConfirm={() => onConfirm(applyYear(date, year))} onClose={onClose}>
       <YearTrack
         year={year}
-        startDate={startDate}
-        endDate={endDate}
+        minDate={minDate}
+        maxDate={maxDate}
         gestures={gestures}
         onChange={setYear}
       />

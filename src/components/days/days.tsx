@@ -16,8 +16,8 @@ export const DaysComponent: React.FC<{
   hideOtherMonths?: boolean;
 }> = ({ dateOverride, gridArea = "DD", hideOtherMonths = false }) => {
   const {
-    startDate,
-    endDate,
+    minDate,
+    maxDate,
     date,
     selectedDates,
     onChangeDate,
@@ -43,29 +43,29 @@ export const DaysComponent: React.FC<{
 
   const startT = useMemo(
     () =>
-      startDate
+      minDate
         ? new Date(
-            startDate.getFullYear(),
-            startDate.getMonth(),
-            startDate.getDate(),
+            minDate.getFullYear(),
+            minDate.getMonth(),
+            minDate.getDate(),
           ).getTime()
         : null,
-    [startDate],
+    [minDate],
   );
   const endT = useMemo(
     () =>
-      endDate
+      maxDate
         ? new Date(
-            endDate.getFullYear(),
-            endDate.getMonth(),
-            endDate.getDate(),
+            maxDate.getFullYear(),
+            maxDate.getMonth(),
+            maxDate.getDate(),
             23,
             59,
             59,
             999,
           ).getTime()
         : null,
-    [endDate],
+    [maxDate],
   );
 
   const [direction, setDirection] = useState<"left" | "right" | "none">("none");
@@ -94,8 +94,8 @@ export const DaysComponent: React.FC<{
     const nextDate = getNextMonthFromSwipe(
       deltaX,
       date,
-      startDate,
-      endDate,
+      minDate,
+      maxDate,
       50,
       disabled,
     );
@@ -114,8 +114,8 @@ export const DaysComponent: React.FC<{
       currentMonth,
       offset,
       selectedDates,
-      startDate,
-      endDate,
+      minDate,
+      maxDate,
       disabled,
       range
         ? { rangeStart, rangeEnd, hoverDate, rangeMinDays, rangeMaxDays }
@@ -126,8 +126,8 @@ export const DaysComponent: React.FC<{
     currentMonth,
     offset,
     selectedDates,
-    startDate,
-    endDate,
+    minDate,
+    maxDate,
     disabled,
     range,
     rangeStart,
@@ -147,16 +147,16 @@ export const DaysComponent: React.FC<{
         date.getSeconds(),
         date.getMilliseconds(),
       );
-      if (startDate && next.getTime() < startDate.getTime()) {
-        next.setHours(startDate.getHours(), startDate.getMinutes(), 0, 0);
+      if (minDate && next.getTime() < minDate.getTime()) {
+        next.setHours(minDate.getHours(), minDate.getMinutes(), 0, 0);
       }
-      if (endDate && next.getTime() > endDate.getTime()) {
-        next.setHours(endDate.getHours(), endDate.getMinutes(), 0, 0);
+      if (maxDate && next.getTime() > maxDate.getTime()) {
+        next.setHours(maxDate.getHours(), maxDate.getMinutes(), 0, 0);
       }
       onChangeDate(next);
       if (dateOverride) navigateTo(date);
     },
-    [onChangeDate, navigateTo, date, startDate, endDate, dateOverride],
+    [onChangeDate, navigateTo, date, minDate, maxDate, dateOverride],
   );
 
   const isPickingRange = range && rangeStart && !rangeEnd;

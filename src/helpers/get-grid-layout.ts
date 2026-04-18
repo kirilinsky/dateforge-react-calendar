@@ -5,7 +5,7 @@ type GridLayoutProps = {
   timeGrid?: boolean;
   presets?: boolean;
   monthsGrid?: boolean;
-  years?: boolean;
+  showYearPicker?: boolean;
   months?: boolean;
   compactYears?: boolean;
   compactMonths?: boolean;
@@ -58,7 +58,7 @@ export const getGridLayout = (
   containerWidth = 0,
 ): CSSProperties => {
   const hasHeader = !!(
-    p.years ||
+    p.showYearPicker ||
     p.compactMonths ||
     p.compactYears ||
     p.months ||
