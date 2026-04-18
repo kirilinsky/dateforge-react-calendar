@@ -3,14 +3,21 @@ import styles from "./selected-dates.module.css";
 import shared from "@/global/global.module.css";
 import { useCalendarContext } from "../provider/provider";
 
-const getRangeSep = (fmt: Intl.DateTimeFormat, start: Date, end: Date): string => {
+const getRangeSep = (
+  fmt: Intl.DateTimeFormat,
+  start: Date,
+  end: Date,
+): string => {
   try {
     const parts = fmt.formatRangeToParts(start, end);
     const sources = parts.map((p) => (p as any).source as string);
     const afterStart = sources.lastIndexOf("startRange") + 1;
     const beforeEnd = sources.indexOf("endRange");
     if (afterStart > 0 && beforeEnd > afterStart) {
-      return parts.slice(afterStart, beforeEnd).map((p) => p.value).join("");
+      return parts
+        .slice(afterStart, beforeEnd)
+        .map((p) => p.value)
+        .join("");
     }
     return " – ";
   } catch {
@@ -19,10 +26,24 @@ const getRangeSep = (fmt: Intl.DateTimeFormat, start: Date, end: Date): string =
 };
 
 export const SelectedDatesComponent: React.FC = () => {
-  const { selectedDates, date, navigateTo, locale, range, rangeStart, rangeEnd, onChangeDate, allowCleanSelected = true, allowNavigateSelected = true } =
-    useCalendarContext();
+  const {
+    selectedDates,
+    date,
+    navigateTo,
+    locale,
+    range,
+    rangeStart,
+    rangeEnd,
+    onChangeDate,
+    allowCleanSelected = true,
+    allowNavigateSelected = true,
+  } = useCalendarContext();
 
-  const fmt = new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", year: "numeric" });
+  const fmt = new Intl.DateTimeFormat(locale, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 
   const isCurrentMonth = (d: Date) =>
     d.getFullYear() === date.getFullYear() && d.getMonth() === date.getMonth();
@@ -32,7 +53,7 @@ export const SelectedDatesComponent: React.FC = () => {
       styles.chip,
       shared.interactive,
       shared.hoverable,
-      isCurrentMonth(d) ? shared.activeItem : styles.inactiveChip,
+      isCurrentMonth(d) && allowNavigateSelected ? shared.activeItem : styles.inactiveChip,
     ]
       .filter(Boolean)
       .join(" ");
@@ -42,7 +63,11 @@ export const SelectedDatesComponent: React.FC = () => {
       type="button"
       className={`${styles.clearBtn} ${shared.interactive} ${shared.hoverable}`}
       onClick={() => onChangeDate(null)}
-      style={allowCleanSelected ? undefined : { visibility: "hidden", pointerEvents: "none" }}
+      style={
+        allowCleanSelected
+          ? undefined
+          : { visibility: "hidden", pointerEvents: "none" }
+      }
       tabIndex={allowCleanSelected ? undefined : -1}
       aria-hidden={!allowCleanSelected}
     >
@@ -57,12 +82,20 @@ export const SelectedDatesComponent: React.FC = () => {
 
     return (
       <div className={styles.selectedContainer} style={{ gridArea: "SD" }}>
-        <button type="button" onClick={() => allowNavigateSelected && navigateTo(rangeStart)} className={chipClass(rangeStart)}>
+        <button
+          type="button"
+          onClick={() => allowNavigateSelected && navigateTo(rangeStart)}
+          className={chipClass(rangeStart)}
+        >
           {fmt.format(rangeStart)}
         </button>
         <span className={styles.rangeSep}>{rangeEnd ? sep : "…"}</span>
         {rangeEnd && (
-          <button type="button" onClick={() => allowNavigateSelected && navigateTo(rangeEnd)} className={chipClass(rangeEnd)}>
+          <button
+            type="button"
+            onClick={() => allowNavigateSelected && navigateTo(rangeEnd)}
+            className={chipClass(rangeEnd)}
+          >
             {fmt.format(rangeEnd)}
           </button>
         )}
