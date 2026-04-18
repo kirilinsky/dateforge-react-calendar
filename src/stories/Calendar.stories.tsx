@@ -12,11 +12,6 @@ const LOCALES_LIST = [
   { locale: "en", label: "English" },
   { locale: "de", label: "Deutsch" },
   { locale: "fr", label: "Français" },
-  { locale: "es", label: "Español" },
-  { locale: "it", label: "Italiano" },
-  { locale: "pt", label: "Português" },
-  { locale: "ua", label: "Українська" },
-  { locale: "pl", label: "Polski" },
   { locale: "ru", label: "Русский" },
   { locale: "zh-CN", label: "中文" },
   { locale: "ja", label: "日本語" },
@@ -49,6 +44,10 @@ const THEME_LABELS: Record<string, string> = {
   forest: "Forest",
   nebula: "Nebula",
   aurora: "Aurora",
+  espresso: "Espresso",
+  ember: "Ember",
+  prism: "Prism",
+  meadow: "Meadow",
 };
 
 export default { title: "Calendar" };

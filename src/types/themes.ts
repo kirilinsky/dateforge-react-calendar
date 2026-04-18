@@ -19,6 +19,8 @@ export const LIGHT_THEMES = [
   "latte",
   "slate",
   "scarlet",
+  "prism",
+  "meadow",
 ] as const;
 
 export const DARK_THEMES = [
@@ -33,6 +35,8 @@ export const DARK_THEMES = [
   "forest",
   "nebula",
   "aurora",
+  "espresso",
+  "ember",
 ] as const;
 
 export type BuiltInTheme = "auto" | "light" | "dark";

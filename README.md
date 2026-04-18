@@ -6,8 +6,6 @@
 &nbsp;&nbsp;
 ![dependencies](https://img.shields.io/badge/dependencies-0-brightgreen?style=flat-square)
 &nbsp;&nbsp;
-![themes](https://img.shields.io/badge/themes-24-orange?style=flat-square)
-&nbsp;&nbsp;
 [![bundle size](https://img.shields.io/bundlephobia/minzip/react-calendar-datetime?style=flat-square)](https://bundlephobia.com/package/react-calendar-datetime)
 &nbsp;&nbsp;
 [![license](https://img.shields.io/npm/l/react-calendar-datetime.svg?style=flat-square)](https://github.com/kirilinsky/react-calendar-datetime/blob/main/LICENSE)
@@ -16,7 +14,7 @@
 
 # React Calendar & Date/Time Picker
 
-Lightweight Date & Time picker for React — range, multiple. Zero dependencies, fluid adaptive layout, 21 themes.
+Lightweight Date & Time picker for React — range, multiple. Zero dependencies, fluid adaptive layout.
 
 <div align="center">
   <table style="border: none; border-collapse: collapse;">
@@ -51,9 +49,9 @@ Lightweight Date & Time picker for React — range, multiple. Zero dependencies,
 ## Features
 
 - ⚡ **Zero dependencies** — no moment, dayjs, or date-fns
-- 📦 **~10kb gzipped** — styles included
+- 📦 **~12kb gzipped** — styles included
 - 🌎 **200+ locales** — native `Intl` API, no extra bytes
-- 🎨 **24 themes** — dark & light, with optional gradient overlay and one-prop dark/light toggle
+- 🎨 **26 themes** — dark & light, with optional gradient overlay and one-prop dark/light toggle
 - 📐 **Fluid layout** — adapts to any container width, smart font scaling
 - 🛠️ **Modular** — toggle time, presets, month grid, week numbers, two-months view
 - 📅 **Range & multi-select** — live hover preview, range highlight, chips panel
@@ -211,7 +209,7 @@ Rules can be combined into an array — all matching rules are applied.
 
 ## Themes
 
-24 built-in themes via the `theme` prop. Swatches show **background · accent** colors.
+26 built-in themes via the `theme` prop. Swatches show **background · accent** colors.
 
 <img src="https://i.ibb.co/PZMb2k02/theme.png" alt="Themes" />
 
@@ -227,17 +225,10 @@ Rules can be combined into an array — all matching rules are applied.
 | <img src="https://placehold.co/13x13/0b0a16/0b0a16.png" valign="middle"/> <img src="https://placehold.co/13x13/b388ff/b388ff.png" valign="middle"/> **`nebula`**     | <img src="https://placehold.co/13x13/f5f3f7/f5f3f7.png" valign="middle"/> <img src="https://placehold.co/13x13/681c9e/681c9e.png" valign="middle"/> **`amethyst`** |
 | <img src="https://placehold.co/13x13/1a1e2b/1a1e2b.png" valign="middle"/> <img src="https://placehold.co/13x13/3559e0/3559e0.png" valign="middle"/> **`midnight`**   | <img src="https://placehold.co/13x13/e2e5e9/e2e5e9.png" valign="middle"/> <img src="https://placehold.co/13x13/3a60d6/3a60d6.png" valign="middle"/> **`snow`**     |
 | <img src="https://placehold.co/13x13/14252e/14252e.png" valign="middle"/> <img src="https://placehold.co/13x13/27d1f4/27d1f4.png" valign="middle"/> **`temporal`**   | <img src="https://placehold.co/13x13/f1f5f9/f1f5f9.png" valign="middle"/> <img src="https://placehold.co/13x13/475569/475569.png" valign="middle"/> **`slate`**    |
-| <img src="https://placehold.co/13x13/07070b/07070b.png" valign="middle"/> <img src="https://placehold.co/13x13/00f3ff/00f3ff.png" valign="middle"/> **`cyber`**      | <img src="https://placehold.co/13x13/faf8f4/faf8f4.png" valign="middle"/> <img src="https://placehold.co/13x13/6f3d18/6f3d18.png" valign="middle"/> **`latte`**    |
-| <img src="https://placehold.co/13x13/0b0e24/0b0e24.png" valign="middle"/> <img src="https://placehold.co/13x13/3de0a0/3de0a0.png" valign="middle"/> **`aurora`**     | <img src="https://placehold.co/13x13/f2e8e0/f2e8e0.png" valign="middle"/> <img src="https://placehold.co/13x13/c04e2f/c04e2f.png" valign="middle"/> **`comfy`**    |
-
-Each theme exposes CSS custom properties you can override:
-
-| Variable | Role               |
-| :------- | :----------------- |
-| `--c-b`  | Background         |
-| `--c-h`  | Accent / highlight |
-| `--c-c`  | Text               |
-| `--c-s`  | Border / separator |
+| <img src="https://placehold.co/13x13/07070b/07070b.png" valign="middle"/> <img src="https://placehold.co/13x13/00f3ff/00f3ff.png" valign="middle"/> **`cyber`**      | <img src="https://placehold.co/13x13/f0f9ff/f0f9ff.png" valign="middle"/> <img src="https://placehold.co/13x13/0ea5e9/0ea5e9.png" valign="middle"/> **`prism`**    |
+| <img src="https://placehold.co/13x13/0b0e24/0b0e24.png" valign="middle"/> <img src="https://placehold.co/13x13/3de0a0/3de0a0.png" valign="middle"/> **`aurora`**     | <img src="https://placehold.co/13x13/f2faf7/f2faf7.png" valign="middle"/> <img src="https://placehold.co/13x13/059669/059669.png" valign="middle"/> **`meadow`**   |
+| <img src="https://placehold.co/13x13/0c0608/0c0608.png" valign="middle"/> <img src="https://placehold.co/13x13/a05878/a05878.png" valign="middle"/> **`espresso`**   | <img src="https://placehold.co/13x13/faf8f4/faf8f4.png" valign="middle"/> <img src="https://placehold.co/13x13/6f3d18/6f3d18.png" valign="middle"/> **`latte`**    |
+| <img src="https://placehold.co/13x13/0e0b04/0e0b04.png" valign="middle"/> <img src="https://placehold.co/13x13/c89020/c89020.png" valign="middle"/> **`ember`**      | <img src="https://placehold.co/13x13/f2e8e0/f2e8e0.png" valign="middle"/> <img src="https://placehold.co/13x13/c04e2f/c04e2f.png" valign="middle"/> **`comfy`**    |
 
 > `gradient` adds a radial tint tuned to each theme's accent color.
 
@@ -271,7 +262,6 @@ Days, months, date labels, and range separators all follow local standards autom
 
 - [ ] Full accessibility — keyboard navigation, ARIA roles (`grid`, `gridcell`, `dialog`), screen reader announcements, focus management in popups
 - [ ] Custom presets via prop
-- [ ] Custom theme API
 - [ ] Holiday markers with labels
 - [ ] Week Selection mode
 - [ ] RTL support
