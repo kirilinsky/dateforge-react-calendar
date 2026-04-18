@@ -21,7 +21,6 @@ export const DaysComponent: React.FC<{
     date,
     selectedDates,
     onChangeDate,
-    gestures,
     disabled,
     navigateTo,
     hideLimited,
@@ -89,7 +88,7 @@ export const DaysComponent: React.FC<{
   }, [date, prevDate]);
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!gestures || touchStartX === null) return;
+    if (touchStartX === null) return;
     const deltaX = touchStartX - e.changedTouches[0].clientX;
     const nextDate = getNextMonthFromSwipe(
       deltaX,
@@ -104,7 +103,6 @@ export const DaysComponent: React.FC<{
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    if (!gestures) return;
     setTouchStartX(e.changedTouches[0].clientX);
   };
 

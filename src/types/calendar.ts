@@ -44,7 +44,6 @@ export interface CalendarProps {
   compactYears?: boolean;
   compactMonths?: boolean;
   appearance?: CalendarAppearance;
-  gestures?: boolean;
   gradient?: boolean;
   highlightWeekends?: boolean;
   showWeekNumber?: boolean;

@@ -87,7 +87,6 @@ interface TimePopupProps {
   onConfirm: (date: Date) => void;
   onClose: () => void;
   hour12?: boolean;
-  gestures?: boolean;
 }
 
 export const TimePopup = ({
@@ -95,7 +94,6 @@ export const TimePopup = ({
   onConfirm,
   onClose,
   hour12 = false,
-  gestures,
 }: TimePopupProps) => {
   const [current, setCurrent] = useState(date);
   const currentRef = useRef(current);
@@ -107,12 +105,7 @@ export const TimePopup = ({
 
   return (
     <Popup onConfirm={() => onConfirm(currentRef.current)} onClose={onClose}>
-      <TimeTrack
-        date={current}
-        hour12={hour12}
-        gestures={gestures}
-        onChange={handleChange}
-      />
+      <TimeTrack date={current} hour12={hour12} onChange={handleChange} />
     </Popup>
   );
 };

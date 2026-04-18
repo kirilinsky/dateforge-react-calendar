@@ -94,7 +94,15 @@ export const AppearanceDemo = () => {
 
   const customPill = createAppearance({ radius: "99em", spacing: "0.5em" });
 
-  const appearances = ["default", "soft", "compact", "square", "neo", "brutalist", "custom"];
+  const appearances = [
+    "default",
+    "soft",
+    "compact",
+    "square",
+    "neo",
+    "brutalist",
+    "custom",
+  ];
 
   return (
     <StoryWrapper title="Appearance" subtitle={formatSubtitle(date)}>
@@ -338,7 +346,6 @@ export const KitchenSink = () => {
     manualSelect: false,
     compactYears: true,
     gradient: false,
-    gestures: false,
     highlightWeekends: true,
     showWeekNumber: false,
     hideLimited: false,
@@ -474,12 +481,18 @@ export const KitchenSink = () => {
             value={activeAppearance}
             onChange={(e) => setActiveAppearance(e.target.value)}
           >
-            {["default", "soft", "compact", "square", "neo", "brutalist"].map((a) => (
-              <option key={a} value={a}>{a}</option>
-            ))}
+            {["default", "soft", "compact", "square", "neo", "brutalist"].map(
+              (a) => (
+                <option key={a} value={a}>
+                  {a}
+                </option>
+              ),
+            )}
           </select>
 
-          <p className="panel-label" style={{ marginTop: 12 }}>Theme</p>
+          <p className="panel-label" style={{ marginTop: 12 }}>
+            Theme
+          </p>
           <select
             className="panel-select"
             value={activeTheme}

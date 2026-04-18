@@ -191,17 +191,11 @@ Clicking a selected date deselects it. When `max` is reached further clicks are 
 
 ### Visibility
 
-| Prop           | Type      | Default | Description                                                 |
-| :------------- | :-------- | :------ | :---------------------------------------------------------- |
+| Prop           | Type      | Default | Description                                               |
+| :------------- | :-------- | :------ | :-------------------------------------------------------- |
 | `hideLimited`  | `boolean` | `false` | Hide dates outside `minDate`/`maxDate` instead of dimming |
-| `hideDisabled` | `boolean` | `false` | Hide disabled dates entirely instead of striking through    |
-| `hideWeekdays` | `boolean` | `false` | Hide the weekday header row (Mon Tue Wed…)                  |
-
-### Input
-
-| Prop       | Type      | Default | Description                                                 |
-| :--------- | :-------- | :------ | :---------------------------------------------------------- |
-| `gestures` | `boolean` | `true`  | Swipe left/right on days to change month; swipe time tracks |
+| `hideDisabled` | `boolean` | `false` | Hide disabled dates entirely instead of striking through  |
+| `hideWeekdays` | `boolean` | `false` | Hide the weekday header row (Mon Tue Wed…)                |
 
 ---
 

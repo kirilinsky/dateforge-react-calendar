@@ -5,7 +5,6 @@ import { getDrumValue, padTime } from "@/utils/date-utils";
 interface TimeTrackProps {
   date: Date;
   hour12?: boolean;
-  gestures?: boolean;
   onChange: (date: Date) => void;
 }
 
@@ -16,13 +15,11 @@ const TOUCH_THRESHOLD = 28;
 const Drum = ({
   val,
   max,
-  gestures,
   onMove,
   label,
 }: {
   val: number;
   max: number;
-  gestures?: boolean;
   onMove: (delta: number) => void;
   label: string;
 }) => {
@@ -53,7 +50,7 @@ const Drum = ({
 
   useEffect(() => {
     const el = ref.current;
-    if (!el || !gestures) return;
+    if (!el) return;
 
     const onTouchStart = (e: TouchEvent) => {
       touchStartY.current = e.touches[0].clientY;
@@ -85,7 +82,7 @@ const Drum = ({
       el.removeEventListener("touchmove", onTouchMove);
       el.removeEventListener("touchend", onTouchEnd);
     };
-  }, [gestures]);
+  }, []);
 
   return (
     <div
@@ -142,7 +139,6 @@ const Drum = ({
 export const TimeTrack = ({
   date,
   hour12 = false,
-  gestures = false,
   onChange,
 }: TimeTrackProps) => {
   const raw = date.getHours();
@@ -180,9 +176,11 @@ export const TimeTrack = ({
         </div>
       )}
       <div className={styles.drums}>
-        <Drum val={hours} max={hourMax} gestures={gestures} onMove={moveHours} label="Hours" />
-        <span className={styles.colon} aria-hidden>:</span>
-        <Drum val={minutes} max={60} gestures={gestures} onMove={moveMinutes} label="Minutes" />
+        <Drum val={hours} max={hourMax} onMove={moveHours} label="Hours" />
+        <span className={styles.colon} aria-hidden>
+          :
+        </span>
+        <Drum val={minutes} max={60} onMove={moveMinutes} label="Minutes" />
       </div>
     </div>
   );

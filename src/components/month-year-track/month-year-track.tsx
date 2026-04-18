@@ -1,6 +1,11 @@
 import { useRef, useEffect, useState } from "react";
 import styles from "./month-year-track.module.css";
-import { getDrumValue, getMonthListData, setMonth as applyMonth, setYear as applyYear } from "@/utils/date-utils";
+import {
+  getDrumValue,
+  getMonthListData,
+  setMonth as applyMonth,
+  setYear as applyYear,
+} from "@/utils/date-utils";
 import { Popup } from "../time-popup/time-popup";
 
 const OFFSETS = Array.from({ length: 7 }, (_, i) => i - 3);
@@ -9,7 +14,6 @@ const TOUCH_THRESHOLD = 28;
 
 function SelectDrum({
   val,
-  gestures,
   getLabel,
   getOffsetVal,
   isDisabled,
@@ -18,7 +22,6 @@ function SelectDrum({
   label,
 }: {
   val: number;
-  gestures?: boolean;
   getLabel: (v: number) => string;
   getOffsetVal: (v: number, offset: number) => number;
   isDisabled: (v: number) => boolean;
@@ -53,7 +56,7 @@ function SelectDrum({
 
   useEffect(() => {
     const el = ref.current;
-    if (!el || !gestures) return;
+    if (!el) return;
     const onTouchStart = (e: TouchEvent) => {
       touchStartY.current = e.touches[0].clientY;
       touchAccum.current = 0;
@@ -81,7 +84,7 @@ function SelectDrum({
       el.removeEventListener("touchmove", onTouchMove);
       el.removeEventListener("touchend", onTouchEnd);
     };
-  }, [gestures]);
+  }, []);
 
   return (
     <div
@@ -93,22 +96,33 @@ function SelectDrum({
       aria-valuenow={val}
       aria-valuetext={getLabel(val)}
       onKeyDown={(e) => {
-        if (e.key === "ArrowUp") { e.preventDefault(); onStep(-1); }
-        if (e.key === "ArrowDown") { e.preventDefault(); onStep(1); }
+        if (e.key === "ArrowUp") {
+          e.preventDefault();
+          onStep(-1);
+        }
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          onStep(1);
+        }
       }}
     >
       <div className={styles.highlight} />
       {OFFSETS.map((o) => {
         const isActive = o === 0;
         const dist = Math.abs(o);
-        const opacity = dist === 0 ? 1 : dist === 1 ? 0.6 : dist === 2 ? 0.35 : 0.15;
+        const opacity =
+          dist === 0 ? 1 : dist === 1 ? 0.6 : dist === 2 ? 0.35 : 0.15;
         const dispVal = getOffsetVal(val, o);
         const disabled = isDisabled(dispVal);
         return (
           <div
             key={o}
             className={`${styles.item} ${isActive ? styles.active : ""} ${disabled ? styles.disabled : ""}`}
-            style={!isActive ? { opacity: disabled ? opacity * 0.4 : opacity } : undefined}
+            style={
+              !isActive
+                ? { opacity: disabled ? opacity * 0.4 : opacity }
+                : undefined
+            }
             aria-hidden={!isActive}
             onClick={isActive || disabled ? undefined : () => onJump(dispVal)}
           >
@@ -127,7 +141,6 @@ function MonthTrack({
   minDate,
   maxDate,
   shortMonths,
-  gestures,
   onChange,
 }: {
   month: number;
@@ -136,13 +149,19 @@ function MonthTrack({
   minDate?: Date | null;
   maxDate?: Date | null;
   shortMonths?: boolean;
-  gestures?: boolean;
   onChange: (month: number) => void;
 }) {
-  const monthsData = getMonthListData(locale, year, minDate, maxDate, shortMonths);
+  const monthsData = getMonthListData(
+    locale,
+    year,
+    minDate,
+    maxDate,
+    shortMonths,
+  );
 
   const isDisabled = (m: number) => monthsData[((m % 12) + 12) % 12].disabled;
-  const getOffsetVal = (v: number, offset: number) => getDrumValue(v, offset, 12);
+  const getOffsetVal = (v: number, offset: number) =>
+    getDrumValue(v, offset, 12);
   const getLabel = (v: number) => monthsData[((v % 12) + 12) % 12].label;
 
   const step = (dir: 1 | -1) => {
@@ -159,7 +178,6 @@ function MonthTrack({
     <div className={styles.root}>
       <SelectDrum
         val={month}
-        gestures={gestures}
         getLabel={getLabel}
         getOffsetVal={getOffsetVal}
         isDisabled={isDisabled}
@@ -175,13 +193,11 @@ function YearTrack({
   year,
   minDate,
   maxDate,
-  gestures,
   onChange,
 }: {
   year: number;
   minDate?: Date | null;
   maxDate?: Date | null;
-  gestures?: boolean;
   onChange: (year: number) => void;
 }) {
   const minYear = minDate ? minDate.getFullYear() : -Infinity;
@@ -200,7 +216,6 @@ function YearTrack({
     <div className={styles.root}>
       <SelectDrum
         val={year}
-        gestures={gestures}
         getLabel={getLabel}
         getOffsetVal={getOffsetVal}
         isDisabled={isDisabled}
@@ -218,7 +233,6 @@ export interface MonthPopupProps {
   minDate?: Date | null;
   maxDate?: Date | null;
   shortMonths?: boolean;
-  gestures?: boolean;
   onConfirm: (date: Date) => void;
   onClose: () => void;
 }
@@ -229,13 +243,15 @@ export const MonthPopup = ({
   minDate,
   maxDate,
   shortMonths,
-  gestures,
   onConfirm,
   onClose,
 }: MonthPopupProps) => {
   const [month, setMonth] = useState(date.getMonth());
   return (
-    <Popup onConfirm={() => onConfirm(applyMonth(date, month))} onClose={onClose}>
+    <Popup
+      onConfirm={() => onConfirm(applyMonth(date, month))}
+      onClose={onClose}
+    >
       <MonthTrack
         month={month}
         year={date.getFullYear()}
@@ -243,7 +259,6 @@ export const MonthPopup = ({
         minDate={minDate}
         maxDate={maxDate}
         shortMonths={shortMonths}
-        gestures={gestures}
         onChange={setMonth}
       />
     </Popup>
@@ -254,7 +269,6 @@ export interface YearPopupProps {
   date: Date;
   minDate?: Date | null;
   maxDate?: Date | null;
-  gestures?: boolean;
   onConfirm: (date: Date) => void;
   onClose: () => void;
 }
@@ -263,7 +277,6 @@ export const YearPopup = ({
   date,
   minDate,
   maxDate,
-  gestures,
   onConfirm,
   onClose,
 }: YearPopupProps) => {
@@ -274,7 +287,6 @@ export const YearPopup = ({
         year={year}
         minDate={minDate}
         maxDate={maxDate}
-        gestures={gestures}
         onChange={setYear}
       />
     </Popup>
