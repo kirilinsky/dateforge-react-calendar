@@ -3,6 +3,7 @@ import { HeaderComponent } from "../header/header";
 import { MonthsComponent } from "../months/months";
 import { PresetsComponent } from "../presets/presets";
 import { SelectedDatesComponent } from "../selected-dates/selected-dates";
+import { ManualSelectComponent } from "../manual-select/manual-select";
 import { useCalendarContext } from "../provider/provider";
 import { TimeComponent } from "../time/time";
 import { TimePopup } from "../time-popup/time-popup";
@@ -45,6 +46,7 @@ export const CalendarLayout: React.FC<{
     twoMonthsLayout,
     monthsColumn,
     containerWidth,
+    manualSelect,
   } = useCalendarContext();
 
   const nextMonthDate = twoMonthsLayout
@@ -123,7 +125,8 @@ export const CalendarLayout: React.FC<{
       {presets && <PresetsComponent />}
       {(years || compactMonths || compactYears || time || months) && (
         <HeaderComponent />
-      )}
+      )} 
+      {manualSelect && <ManualSelectComponent />}
       <DaysComponent hideOtherMonths={!!twoMonthsLayout} />
       {twoMonthsStacked && nextMonthLabel && (
         <div style={{ gridArea: "LB" }} className={styles.secondMonthLabel}>

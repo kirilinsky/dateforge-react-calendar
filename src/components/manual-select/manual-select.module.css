@@ -1,0 +1,188 @@
+@layer base {
+  .inputWrapper:hover {
+    border-color: var(--c-s);
+    box-shadow: 0 0.1em 0.3em var(--c-x);
+  }
+
+  .inputWrapper:focus-within {
+    border-color: var(--c-h);
+    box-shadow: 0 0.1em 0.4em var(--c-x);
+  }
+
+  .saveBtn:hover:not([disabled]) {
+    background: color-mix(in srgb, var(--c-h) 12%, transparent);
+    color: var(--c-h);
+  }
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4em;
+  padding: var(--cal-spacing);
+  border-bottom: var(--cal-border) solid var(--c-s);
+  z-index: 3;
+}
+
+.containerMulti {
+  align-items: flex-start;
+}
+
+.datesArea {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em;
+  flex: 1;
+  min-width: 0;
+}
+
+.inputWrapper {
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 5em;
+  max-width: 12em;
+  height: 2.1em;
+  font-size: 0.85em;
+  background: var(--c-t);
+  border: var(--cal-border) solid transparent;
+  border-radius: var(--cal-radius, 0.5em);
+  transition: all var(--cal-transition, 0.2s) ease;
+  overflow: hidden;
+  animation: msSlotIn var(--cal-transition, 0.2s) ease;
+}
+
+.inputWrapperInvalid {
+  border-color: var(--c-we);
+  box-shadow: 0 0 0 0.15em color-mix(in srgb, var(--c-we) 25%, transparent);
+}
+
+.inputBare {
+  flex: 1;
+  min-width: 10ch;
+  height: 100%;
+  padding: 0 0.4em;
+  font-size: inherit;
+  font-family: inherit;
+  color: var(--c-c);
+  background: transparent;
+  border: none;
+  outline: none;
+  text-align: center;
+
+  &::placeholder {
+    color: var(--c-s);
+    opacity: 0.7;
+  }
+}
+
+.saveBtnMuted {
+  color: var(--c-d);
+
+  &:hover {
+    background: color-mix(in srgb, var(--c-d) 12%, transparent);
+    color: var(--c-c);
+  }
+}
+
+.saveBtnInvalid {
+  color: var(--c-we);
+
+  &:hover {
+    background: color-mix(in srgb, var(--c-we) 12%, transparent);
+  }
+}
+
+.saveBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 0.4em;
+  border: none;
+  border-left: var(--cal-border) solid var(--c-s);
+  background: transparent;
+  color: var(--c-h);
+  cursor: pointer;
+  transition: all var(--cal-transition, 0.2s) ease;
+  flex-shrink: 0;
+
+  & svg {
+    width: 0.9em;
+    height: 0.9em;
+    fill: currentColor;
+  }
+
+  &[disabled] {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}
+
+.saveBtnLeft {
+  border-left: none;
+  border-right: var(--cal-border) solid var(--c-s);
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.1em;
+  padding: 0 2em;
+  font-size: 0.85em;
+  white-space: nowrap;
+  background: var(--c-t);
+  letter-spacing: 0.2px;
+  border: var(--cal-border) solid transparent;
+  border-radius: var(--cal-radius, 0.5em);
+  color: var(--c-c);
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--cal-transition, 0.2s) ease;
+  animation: msSlotIn var(--cal-transition, 0.2s) ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &:hover {
+    border-color: var(--c-s);
+    box-shadow: 0 0.1em 0.3em var(--c-x);
+  }
+}
+
+.clearBtn {
+  margin-left: auto;
+  padding: 0.35em 0.6em;
+  font-size: 0.9em;
+  min-height: 2.1em;
+  opacity: 0.5;
+  flex-shrink: 0;
+
+  &:hover:not([disabled]) {
+    opacity: 1;
+  }
+
+  &[disabled] {
+    opacity: 0.2;
+    cursor: not-allowed;
+  }
+}
+
+.sep {
+  font-size: 0.8em;
+  color: var(--c-s);
+  user-select: none;
+  flex-shrink: 0;
+}
+
+@keyframes msSlotIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

@@ -56,7 +56,7 @@ export const SelectedDatesComponent: React.FC = () => {
     const sep = rangeEnd ? getRangeSep(fmt, rangeStart, rangeEnd) : " – ";
 
     return (
-      <div className={styles.container} style={{ gridArea: "SD" }}>
+      <div className={styles.selectedContainer} style={{ gridArea: "SD" }}>
         <button type="button" onClick={() => allowNavigateSelected && navigateTo(rangeStart)} className={chipClass(rangeStart)}>
           {fmt.format(rangeStart)}
         </button>

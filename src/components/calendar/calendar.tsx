@@ -13,6 +13,7 @@ export const Calendar: React.FC<CalendarProps> = ({
   theme: themeProp,
   presets = false,
   compactMonths = false,
+  manualSelect = false,
   compactYears = true,
   years = false,
   time = true,
@@ -59,6 +60,7 @@ export const Calendar: React.FC<CalendarProps> = ({
           {
             presets,
             compactMonths,
+            manualSelect,
             compactYears,
             years,
             timeGrid,
@@ -77,6 +79,7 @@ export const Calendar: React.FC<CalendarProps> = ({
       presets,
       compactYears,
       compactMonths,
+      manualSelect,
       years,
       time,
       timeGrid,
@@ -147,6 +150,7 @@ export const Calendar: React.FC<CalendarProps> = ({
       mode={mode}
       max={max}
       showSelectedDates={showSelectedDates}
+      manualSelect={manualSelect}
       twoMonthsLayout={twoMonthsLayout}
       monthsColumn={monthsColumn}
       highlightToday={highlightToday}

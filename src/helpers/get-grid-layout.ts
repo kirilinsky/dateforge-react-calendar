@@ -9,6 +9,7 @@ type GridLayoutProps = {
   months?: boolean;
   compactYears?: boolean;
   compactMonths?: boolean;
+  manualSelect?: boolean;
   selectedDates?: boolean;
   twoMonthsLayout?: boolean;
   monthsColumn?: boolean;
@@ -73,6 +74,7 @@ export const getGridLayout = (
     if (isNarrow) {
       const areaRows = [
         hasHeader && '"HH"',
+        p.manualSelect && '"MS"',
         p.monthsGrid && '"MM"',
         '"DD"',
         '"LB"',
@@ -96,6 +98,7 @@ export const getGridLayout = (
     if (!hasMonthPanel && !hasTimePanel) {
       const areas = [
         hasHeader && '"HH HH"',
+        p.manualSelect && '"MS MS"',
         '"DD D2"',
         p.selectedDates && '"SD SD"',
         p.presets && '"PP PP"',
@@ -105,6 +108,7 @@ export const getGridLayout = (
 
       const rows = [
         hasHeader && "auto",
+        p.manualSelect && "auto",
         "auto",
         p.selectedDates && "auto",
         p.presets && "auto",
@@ -137,6 +141,7 @@ export const getGridLayout = (
 
     const areas = [
       hasHeader && `"${buildRow("MM", "HH", "HH", "TT")}"`,
+      p.manualSelect && `"${fullRow("MS")}"`,
       `"${buildRow("MM", "DD", "D2", "TT")}"`,
       p.selectedDates && `"${fullRow("SD")}"`,
       p.presets && `"${fullRow("PP")}"`,
@@ -155,6 +160,7 @@ export const getGridLayout = (
 
     const rows = [
       hasHeader && "auto",
+      p.manualSelect && "auto",
       "auto",
       p.selectedDates && "auto",
       p.presets && "auto",
@@ -175,6 +181,7 @@ export const getGridLayout = (
   if (mode === "stacked") {
     const areaRows = [
       hasHeader && '"HH"',
+      p.manualSelect && '"MS"',
       p.monthsGrid && '"MM"',
       '"DD"',
       p.selectedDates && '"SD"',
@@ -193,6 +200,7 @@ export const getGridLayout = (
   if (mode === "medium") {
     const areaRows = [
       hasHeader && '"HH HH"',
+      p.manualSelect && '"MS MS"',
       '"DD DD"',
       p.selectedDates && '"SD SD"',
       '"MM TT"',
@@ -226,6 +234,7 @@ export const getGridLayout = (
 
   const areas = [
     hasHeader && fullWidth("HH"),
+    p.manualSelect && fullWidth("MS"),
     `"${mainRow}"`,
     p.selectedDates && fullWidth("SD"),
     p.presets && fullWidth("PP"),
@@ -235,6 +244,7 @@ export const getGridLayout = (
 
   const rows = [
     hasHeader && "auto",
+    p.manualSelect && "auto",
     "auto",
     p.selectedDates && "auto",
     p.presets && "auto",

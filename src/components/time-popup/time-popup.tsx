@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import styles from "./time-popup.module.css";
 import { TimeTrack } from "../time-track/time-track";
 import type { ReactNode } from "react";
+import { Check } from "@/Icons";
 
 const FOCUSABLE =
   'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
@@ -74,7 +75,7 @@ export const Popup = ({ children, onConfirm, onClose }: PopupProps) => {
           aria-label="Confirm time"
           onClick={onConfirm}
         >
-          ✓
+          <Check />
         </button>
       </div>
     </div>
@@ -106,7 +107,12 @@ export const TimePopup = ({
 
   return (
     <Popup onConfirm={() => onConfirm(currentRef.current)} onClose={onClose}>
-      <TimeTrack date={current} hour12={hour12} gestures={gestures} onChange={handleChange} />
+      <TimeTrack
+        date={current}
+        hour12={hour12}
+        gestures={gestures}
+        onChange={handleChange}
+      />
     </Popup>
   );
 };

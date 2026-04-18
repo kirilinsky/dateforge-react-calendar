@@ -60,6 +60,8 @@ export interface CalendarProps {
   highlightToday?: boolean;
   allowCleanSelected?: boolean;
   allowNavigateSelected?: boolean;
+  allowCleanManualSelect?: boolean;
+  manualSelect?: boolean;
 }
 
 export interface CalendarContextValue extends Omit<
@@ -79,6 +81,8 @@ export interface CalendarContextValue extends Omit<
   monthsGrid: boolean;
   compactMonths: boolean;
   onChangeDate: (date: Date | null) => void;
+  onRangeSet: (from: Date | null, to: Date | null) => void;
+  onDatesSet: (dates: Date[]) => void;
   onChangeTime: (date: Date) => void;
   navigateTo: (date: Date) => void;
   selectedDate: Date | null;

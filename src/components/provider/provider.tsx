@@ -235,6 +235,24 @@ export const CalendarProvider: React.FC<
     [onChange],
   );
 
+  const handleDatesSet = useCallback(
+    (dates: Date[]) => {
+      setSelectedDates(dates);
+      onDatesChange?.(dates);
+    },
+    [onDatesChange],
+  );
+
+  const handleRangeSet = useCallback(
+    (from: Date | null, to: Date | null) => {
+      setRangeStart(from);
+      setRangeEnd(to);
+      if (from) setInternalDate(from);
+      onRangeChange?.({ from, to });
+    },
+    [onRangeChange],
+  );
+
   const navigateTo = useCallback((d: Date) => {
     setInternalDate(d);
   }, []);
@@ -270,6 +288,8 @@ export const CalendarProvider: React.FC<
         showYearPopup,
         setShowYearPopup,
         onChangeDate: handleChangeDate,
+        onDatesSet: handleDatesSet,
+        onRangeSet: handleRangeSet,
         onChangeTime: handleChangeTime,
         containerWidth,
       }) as CalendarContextValue,
@@ -287,6 +307,8 @@ export const CalendarProvider: React.FC<
       rangeEnd,
       hoverDate,
       handleChangeDate,
+      handleDatesSet,
+      handleRangeSet,
       handleChangeTime,
       navigateTo,
       showTimePopup,

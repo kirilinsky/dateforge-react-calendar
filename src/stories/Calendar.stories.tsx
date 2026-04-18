@@ -166,7 +166,11 @@ export const CustomThemeDemo = () => {
   );
 
   return (
-    <StoryWrapper title="createTheme — Ocean" subtitle={formatSubtitle(date)} light={false}>
+    <StoryWrapper
+      title="createTheme — Ocean"
+      subtitle={formatSubtitle(date)}
+      light={false}
+    >
       <div className="calendar-fixed-container">
         <Calendar
           value={date}
@@ -190,7 +194,7 @@ export const KitchenSink = () => {
   const [dates, setDates] = useState<Date[]>([]);
   const [date, setDate] = useState<Date>(new Date());
   const [startMonth, setStartMonth] = useState<Date>(new Date());
-  const [activeTheme, setActiveTheme] = useState("mint");
+  const [activeTheme, setActiveTheme] = useState("slate");
   const [activeLocale, setActiveLocale] = useState("en");
   const [containerWidth, setContainerWidth] = useState(580);
   const [startOfWeek, setStartOfWeek] = useState<StartOfWeek>(1);
@@ -204,19 +208,32 @@ export const KitchenSink = () => {
 
   const [startDate, setStartDate] = useState<Date>(() => getOffsetDay(-391));
   const [endDate, setEndDate] = useState<Date>(() => getOffsetDay(411));
-  const [rangeMinDays, setRangeMinDays] = useState<number | undefined>(undefined);
-  const [rangeMaxDays, setRangeMaxDays] = useState<number | undefined>(undefined);
+  const [rangeMinDays, setRangeMinDays] = useState<number | undefined>(
+    undefined,
+  );
+  const [rangeMaxDays, setRangeMaxDays] = useState<number | undefined>(
+    undefined,
+  );
   const toISODate = (d: Date) => d.toISOString().split("T")[0];
   const parseDate = (s: string) => new Date(s + "T00:00:00");
 
   type DisabledMode =
-    | "none" | "all" | "date" | "dates" | "range"
-    | "weekdays" | "before" | "after" | "outside";
+    | "none"
+    | "all"
+    | "date"
+    | "dates"
+    | "range"
+    | "weekdays"
+    | "before"
+    | "after"
+    | "outside";
   const WEEKDAY_LABELS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
   const [disabledMode, setDisabledMode] = useState<DisabledMode>("none");
   const [disabledDate, setDisabledDate] = useState(toISODate(new Date()));
-  const [disabledDates, setDisabledDates] = useState<string[]>([toISODate(new Date())]);
+  const [disabledDates, setDisabledDates] = useState<string[]>([
+    toISODate(new Date()),
+  ]);
   const [disabledFrom, setDisabledFrom] = useState(toISODate(getOffsetDay(-3)));
   const [disabledTo, setDisabledTo] = useState(toISODate(getOffsetDay(3)));
   const [disabledBefore, setDisabledBefore] = useState(toISODate(new Date()));
@@ -230,15 +247,29 @@ export const KitchenSink = () => {
 
   const getDisabledValue = (): DisabledRule | DisabledRule[] | undefined => {
     switch (disabledMode) {
-      case "all": return true;
-      case "date": return parseDate(disabledDate);
-      case "dates": return disabledDates.map(parseDate);
-      case "range": return { from: parseDate(disabledFrom), to: parseDate(disabledTo) };
-      case "weekdays": return disabledWeekdays.length ? { dayOfWeek: disabledWeekdays } : undefined;
-      case "before": return { before: parseDate(disabledBefore) };
-      case "after": return { after: parseDate(disabledAfter) };
-      case "outside": return { before: parseDate(disabledBefore), after: parseDate(disabledAfter) };
-      default: return undefined;
+      case "all":
+        return true;
+      case "date":
+        return parseDate(disabledDate);
+      case "dates":
+        return disabledDates.map(parseDate);
+      case "range":
+        return { from: parseDate(disabledFrom), to: parseDate(disabledTo) };
+      case "weekdays":
+        return disabledWeekdays.length
+          ? { dayOfWeek: disabledWeekdays }
+          : undefined;
+      case "before":
+        return { before: parseDate(disabledBefore) };
+      case "after":
+        return { after: parseDate(disabledAfter) };
+      case "outside":
+        return {
+          before: parseDate(disabledBefore),
+          after: parseDate(disabledAfter),
+        };
+      default:
+        return undefined;
     }
   };
 
@@ -250,6 +281,7 @@ export const KitchenSink = () => {
     months: true,
     presets: false,
     compactMonths: false,
+    manualSelect: false,
     compactYears: true,
     gradient: false,
     brutalism: false,
@@ -269,6 +301,7 @@ export const KitchenSink = () => {
     showThemeToggle: false,
     highlightToday: true,
     allowCleanSelected: true,
+    allowCleanManualSelect: true,
     allowNavigateSelected: true,
   });
 

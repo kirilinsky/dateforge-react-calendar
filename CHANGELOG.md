@@ -1,13 +1,18 @@
 ## Changelog
 
-### 🚀 Version 5.3.0
+### 🚀 Version 6.0.0
 
 - **🎨 CSS `@layer` architecture** — All component styles now live inside named `@layer` blocks (`base`, `themes`, etc.), giving consumer apps full specificity control without `!important`.
 - **🖌️ Themes as separate CSS files** — Theme definitions moved out of the main bundle. Each theme ships as its own `dist/themes/<name>.css`; `dist/themes/index.css` bundles all of them. Import only what you need. `src/themes.gen.css` is auto-generated via `npm run build` — do not edit manually.
 - **🧩 `createTheme()` utility** — New `createTheme(tokens, base)` helper lets you build a fully typed custom theme object and pass it directly as the `theme` prop. No CSS required.
 - **🗑️ `allowCleanSelected` prop** — Controls visibility of the clear (×) button in the selected-dates panel. Defaults to `true`. When `false`, the button is hidden but still reserves its layout space so the panel height stays stable.
 - **🚫 `allowNavigateSelected` prop** — When `false`, clicking a date chip in the selected-dates panel no longer navigates the calendar view. Defaults to `true`.
-- **🪲 Bug fixes**  
+- **✍️ `manualSelect` prop** — Enables a manual date entry bar between the header and the day grid. Renders a masked `DD.MM.YYYY` input with Enter-to-save, Escape-to-clear, and keyboard-friendly navigation. Fully respects `startDate`/`endDate`/`disabled` rules — out-of-bounds dates are rejected and highlighted in red. Each mode is supported:
+  - **Single** — one input that toggles between a display chip and an editable field on click.
+  - **Range** — two inputs (start / end) separated by an em-dash; each can be cleared independently.
+  - **Multiple** — an add-new input plus a chip per selected date; only one slot is editable at a time; each chip has an inline clear button.
+- **🗑️ `allowCleanManualSelect` prop** — Controls visibility of the "clear all" button inside the manual-select bar. Defaults to `true`.
+- **🪲 Bug fixes** — Month navigation no longer resets the selected time to 00:00 when navigating to a boundary month.
 
 ### 🚀 Version 5.2.2
 
