@@ -1,5 +1,9 @@
 @layer cal-base {
 
+.headerContainer button {
+  height: 2.3em;
+}
+
 .headerContainer {
   display: flex;
   align-items: center;
@@ -7,8 +11,8 @@
   flex-wrap: wrap;
   gap: 0.4em;
   font-size: 1.1em;
-  padding: 0.45em 0.7em;
-  min-height: 3.2em;
+  padding: var(--header-padding, 0.45em 0.7em);
+  min-height: var(--header-min-height, 3.2em);
   height: auto;
   z-index: 3; 
   border-bottom: var(--cal-border) solid var(--c-s);

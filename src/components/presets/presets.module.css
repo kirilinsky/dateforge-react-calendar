@@ -30,9 +30,9 @@
   padding-top: 1em !important;
   padding-bottom: 1em !important;
   font-size: 0.8em !important;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.3;
   text-align: center;
 }
 

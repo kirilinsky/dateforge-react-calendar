@@ -72,6 +72,7 @@
   [data-appearance="bubble"] {
     --cal-radius: 1.5em;
     --cal-container-radius: 2.2em;
+    --header-min-height: 4em;
     --cal-border: 1px;
     --cal-spacing: 0.7em;
     --cal-shadow-sm: 0 0.15em 0.5em var(--c-x);
