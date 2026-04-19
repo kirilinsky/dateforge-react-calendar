@@ -23,3 +23,5 @@ export const TimeComponent: React.FC = () => {
     </div>
   );
 };
+
+export { TimeComponent as CalendarTimeGrid };

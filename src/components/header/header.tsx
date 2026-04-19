@@ -12,13 +12,12 @@ import {
   getTimeString,
   isYearFixed,
 } from "@/utils/date-utils";
-import { getTwoMonthsNarrowThreshold } from "@/helpers/get-grid-layout";
 
 export const HeaderComponent: React.FC = () => {
   const {
     compactMonths, compactYears, minDate, maxDate, showYearPicker,
-    months, time, locale, hour12, shortMonths, disabled,
-    twoMonthsLayout, monthsColumn, monthsGrid, timeGrid,
+    months, time, locale, hour12, disabled,
+    twoMonthsLayout, monthsColumn,
     showHomeButton, showClearButton, showThemeToggle,
   } = useConfig();
   const { viewDate: date, navigateTo } = useNavigation();
@@ -30,10 +29,7 @@ export const HeaderComponent: React.FC = () => {
 
   const twoMonthsStacked =
     !!twoMonthsLayout &&
-    (!!monthsColumn ||
-      (containerWidth > 0 &&
-        containerWidth <
-          getTwoMonthsNarrowThreshold({ monthsGrid, timeGrid })));
+    (!!monthsColumn || (containerWidth > 0 && containerWidth < 680));
 
   const today = new Date();
   const isCurrentMonth =
@@ -57,7 +53,7 @@ export const HeaderComponent: React.FC = () => {
     [cur, date, minDate, maxDate, disabled],
   );
 
-  const monthFormat = shortMonths ? "short" : "long";
+  const monthFormat = containerWidth > 0 && containerWidth < 260 ? "short" : "long";
   const currentMonthName = new Intl.DateTimeFormat(locale, {
     month: monthFormat,
   }).format(date);

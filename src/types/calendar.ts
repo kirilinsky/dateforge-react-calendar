@@ -1,3 +1,4 @@
+import React from "react";
 import { CalendarTheme } from "./themes";
 import { CalendarAppearance } from "./appearances";
 
@@ -17,30 +18,34 @@ export type DateRange = {
 
 export type CalendarMode = "single" | "multiple" | "range";
 
-export interface CalendarProps {
-  value?: Date | Date[] | DateRange;
-  mode?: CalendarMode;
+export type CalendarValue<M extends CalendarMode> =
+  M extends "range" ? DateRange :
+  M extends "multiple" ? Date[] :
+  Date | null;
+
+export interface CalendarProps<M extends CalendarMode = "single"> {
+  children?: React.ReactNode;
+  value?: CalendarValue<M>;
+  mode?: M;
   max?: number;
   minDate?: Date;
   maxDate?: Date;
   startMonth?: Date;
-  onChange?: (date: Date | null) => void;
+  onChange?: (value: CalendarValue<M>) => void;
+  /** @deprecated use onChange — will be removed in v7 */
   onDatesChange?: (dates: Date[]) => void;
+  /** @deprecated use onChange — will be removed in v7 */
   onRangeChange?: (range: DateRange) => void;
   rangeMinDays?: number;
   rangeMaxDays?: number;
-  showSelectedDates?: boolean;
   locale?: string;
   theme?: CalendarTheme;
   width?: string | number;
   startOfWeek?: StartOfWeek;
   time?: boolean;
   hour12?: boolean;
-  timeGrid?: boolean;
-  presets?: boolean;
   showYearPicker?: boolean;
   months?: boolean;
-  monthsGrid?: boolean;
   compactYears?: boolean;
   compactMonths?: boolean;
   appearance?: CalendarAppearance;
@@ -50,7 +55,6 @@ export interface CalendarProps {
   hideLimited?: boolean;
   hideDisabled?: boolean;
   hideWeekdays?: boolean;
-  shortMonths?: boolean;
   disabled?: DisabledRule | DisabledRule[];
   twoMonthsLayout?: boolean;
   monthsColumn?: boolean;
@@ -58,45 +62,4 @@ export interface CalendarProps {
   showClearButton?: boolean;
   showThemeToggle?: boolean;
   highlightToday?: boolean;
-  allowCleanSelected?: boolean;
-  allowNavigateSelected?: boolean;
-  allowCleanManualSelect?: boolean;
-  manualSelect?: boolean;
-}
-
-export interface CalendarContextValue extends Omit<
-  CalendarProps,
-  "onChange" | "onDatesChange" | "onRangeChange" | "mode" | "max"
-> {
-  range: boolean;
-  multiselect: number | boolean | undefined;
-  date: Date;
-  containerWidth: number;
-  locale: string;
-  startOfWeek: StartOfWeek;
-  time: boolean;
-  presets: boolean;
-  showYearPicker: boolean;
-  months: boolean;
-  monthsGrid: boolean;
-  compactMonths: boolean;
-  onChangeDate: (date: Date | null) => void;
-  onRangeSet: (from: Date | null, to: Date | null) => void;
-  onDatesSet: (dates: Date[]) => void;
-  onChangeTime: (date: Date) => void;
-  navigateTo: (date: Date) => void;
-  selectedDate: Date | null;
-  selectedDates: Date[];
-  rangeStart: Date | null;
-  rangeEnd: Date | null;
-  hoverDate: Date | null;
-  setHoverDate: (d: Date | null) => void;
-  dark: boolean;
-  toggleTheme: () => void;
-  showTimePopup: boolean;
-  setShowTimePopup: (v: boolean) => void;
-  showMonthPopup: boolean;
-  setShowMonthPopup: (v: boolean) => void;
-  showYearPopup: boolean;
-  setShowYearPopup: (v: boolean) => void;
 }

@@ -6,7 +6,7 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import { CalendarProps } from "@/types/calendar";
+import { CalendarMode, CalendarProps, DateRange } from "@/types/calendar";
 import {
   calendarReducer,
   buildInitialState,
@@ -26,7 +26,7 @@ const isDateRange = (v: unknown): v is import("@/types/calendar").DateRange =>
   "from" in (v as object);
 
 export const CalendarProvider: React.FC<
-  CalendarProps & {
+  CalendarProps<CalendarMode> & {
     children: ReactNode;
     containerWidth?: number;
     toggleTheme?: () => void;
@@ -49,17 +49,12 @@ export const CalendarProvider: React.FC<
   locale = "en",
   startOfWeek = 1,
   hour12 = false,
-  shortMonths = true,
   time = true,
-  timeGrid = false,
   months = true,
-  monthsGrid = false,
   compactMonths = false,
   compactYears = true,
   showYearPicker = false,
-  presets = false,
   gradient = false,
-  showSelectedDates = false,
   highlightWeekends = true,
   highlightToday = true,
   showWeekNumber = false,
@@ -68,13 +63,9 @@ export const CalendarProvider: React.FC<
   hideDisabled = false,
   twoMonthsLayout = false,
   monthsColumn = false,
-  manualSelect = false,
   showHomeButton = false,
   showClearButton = false,
   showThemeToggle = false,
-  allowCleanSelected = false,
-  allowNavigateSelected = false,
-  allowCleanManualSelect = false,
   minDate,
   maxDate,
   disabled,
@@ -91,11 +82,12 @@ export const CalendarProvider: React.FC<
   };
 
   const [state, dispatch] = useReducer(calendarReducer, undefined, () =>
-    buildInitialState({ externalValue, startMonth, range }),
+    buildInitialState({ externalValue: externalValue ?? undefined, startMonth, range }),
   );
 
-  const onChangeRef = useRef(onChange);
-  onChangeRef.current = onChange;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const onChangeRef = useRef<((v: any) => void) | undefined>(onChange as any);
+  onChangeRef.current = onChange as any; // eslint-disable-line @typescript-eslint/no-explicit-any
   const onDatesChangeRef = useRef(onDatesChange);
   onDatesChangeRef.current = onDatesChange;
   const onRangeChangeRef = useRef(onRangeChange);
@@ -173,14 +165,14 @@ export const CalendarProvider: React.FC<
       dispatch(action);
 
       if (range) {
-        onRangeChangeRef.current?.({
-          from: next.rangeStart,
-          to: next.rangeEnd,
-        });
+        const rangeVal: DateRange = { from: next.rangeStart, to: next.rangeEnd };
+        onChangeRef.current?.(rangeVal);
+        onRangeChangeRef.current?.(rangeVal);
         return;
       }
       if (multiselect) {
         if (next.selectedDates !== stateRef.current.selectedDates) {
+          onChangeRef.current?.(next.selectedDates);
           onDatesChangeRef.current?.(next.selectedDates);
         }
         return;
@@ -198,12 +190,15 @@ export const CalendarProvider: React.FC<
 
   const handleDatesSet = useCallback((dates: Date[]) => {
     dispatch({ type: "SET_DATES", dates });
+    onChangeRef.current?.(dates);
     onDatesChangeRef.current?.(dates);
   }, []);
 
   const handleRangeSet = useCallback((from: Date | null, to: Date | null) => {
     dispatch({ type: "SET_RANGE", from, to });
-    onRangeChangeRef.current?.({ from, to });
+    const rangeVal: DateRange = { from, to };
+    onChangeRef.current?.(rangeVal);
+    onRangeChangeRef.current?.(rangeVal);
   }, []);
 
   const navigateTo = useCallback((d: Date) => {
@@ -244,7 +239,6 @@ export const CalendarProvider: React.FC<
       locale,
       startOfWeek,
       hour12,
-      shortMonths,
       range,
       multiselect,
       rangeMinDays,
@@ -253,15 +247,11 @@ export const CalendarProvider: React.FC<
       maxDate,
       disabled,
       time,
-      timeGrid,
       months,
-      monthsGrid,
       compactMonths,
       compactYears,
       showYearPicker,
-      presets,
       gradient,
-      showSelectedDates,
       highlightWeekends,
       highlightToday,
       showWeekNumber,
@@ -270,20 +260,15 @@ export const CalendarProvider: React.FC<
       hideDisabled,
       twoMonthsLayout,
       monthsColumn,
-      manualSelect,
       showHomeButton,
       showClearButton,
       showThemeToggle,
-      allowCleanSelected,
-      allowNavigateSelected,
-      allowCleanManualSelect,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       locale,
       startOfWeek,
       hour12,
-      shortMonths,
       range,
       multiselect,
       rangeMinDays,
@@ -292,15 +277,11 @@ export const CalendarProvider: React.FC<
       maxDate,
       disabled,
       time,
-      timeGrid,
       months,
-      monthsGrid,
       compactMonths,
       compactYears,
       showYearPicker,
-      presets,
       gradient,
-      showSelectedDates,
       highlightWeekends,
       highlightToday,
       showWeekNumber,
@@ -309,13 +290,9 @@ export const CalendarProvider: React.FC<
       hideDisabled,
       twoMonthsLayout,
       monthsColumn,
-      manualSelect,
       showHomeButton,
       showClearButton,
       showThemeToggle,
-      allowCleanSelected,
-      allowNavigateSelected,
-      allowCleanManualSelect,
     ],
   );
 

@@ -1,12 +1,18 @@
 /// <reference path="../../global.d.ts" />
 import { useState } from "react";
 import { Calendar } from "../components/calendar/calendar";
+import { CalendarPresets } from "../components/presets/presets";
+import { CalendarMonthGrid } from "../components/months/months";
+import { CalendarTimeGrid } from "../components/time/time";
+import { CalendarSelectedDates } from "../components/selected-dates/selected-dates";
+import { CalendarManualSelect } from "../components/manual-select/manual-select";
+import { CalendarYearsTrack } from "../components/years-track/years-track";
 import { createTheme } from "../utils/create-theme";
 import "./calendar.css";
 import "../themes.gen.css";
 import "../appearances.gen.css";
 import { DARK_THEMES, LIGHT_THEMES } from "../types/themes";
-import { CalendarMode, DisabledRule, StartOfWeek } from "../types/calendar";
+import { CalendarMode, DateRange, DisabledRule, StartOfWeek } from "../types/calendar";
 
 const LOCALES_LIST = [
   { locale: "en", label: "English" },
@@ -79,9 +85,7 @@ export const Default = () => {
           value={date}
           theme="industrial"
           appearance="brutalist"
-          onChange={(d: Date | null) => {
-            if (d) setDate(d);
-          }}
+          onChange={(d) => { if (d) setDate(d); }}
         />
       </div>
     </StoryWrapper>
@@ -95,13 +99,10 @@ export const TwoMonthsLayout = () => {
       <div style={{ width: 640 }}>
         <Calendar
           value={date}
-          onChange={(d: Date | null) => {
-            if (d) setDate(d);
-          }}
+          onChange={(d) => { if (d) setDate(d); }}
           twoMonthsLayout
           months
           time={false}
-          presets={false}
           theme="light"
         />
       </div>
@@ -110,10 +111,7 @@ export const TwoMonthsLayout = () => {
 };
 
 export const RangePicker = () => {
-  const [range, setRange] = useState<{ from: Date | null; to: Date | null }>({
-    from: null,
-    to: null,
-  });
+  const [range, setRange] = useState<DateRange>({ from: null, to: null });
 
   const fmt = (d: Date) =>
     new Intl.DateTimeFormat("en", {
@@ -134,14 +132,14 @@ export const RangePicker = () => {
       <div className="calendar-fixed-container">
         <Calendar
           mode="range"
-          showSelectedDates
           value={range}
-          onRangeChange={setRange}
+          onChange={setRange}
           theme="light"
           months
           time={false}
-          presets={false}
-        />
+        >
+          <CalendarSelectedDates />
+        </Calendar>
       </div>
     </StoryWrapper>
   );
@@ -176,9 +174,7 @@ export const CustomThemeDemo = () => {
         <Calendar
           value={date}
           theme={oceanTheme}
-          onChange={(d: Date | null) => {
-            if (d) setDate(d);
-          }}
+          onChange={(d) => { if (d) setDate(d); }}
         />
       </div>
     </StoryWrapper>
@@ -188,10 +184,7 @@ export const CustomThemeDemo = () => {
 export const KitchenSink = () => {
   const [mode, setMode] = useState<CalendarMode>("single");
   const [max, setMax] = useState<number | undefined>(undefined);
-  const [range, setRange] = useState({
-    from: null as Date | null,
-    to: null as Date | null,
-  });
+  const [range, setRange] = useState<DateRange>({ from: null, to: null });
   const [dates, setDates] = useState<Date[]>([]);
   const [date, setDate] = useState<Date>(new Date());
   const [startMonth, setStartMonth] = useState<Date>(new Date());
@@ -210,32 +203,17 @@ export const KitchenSink = () => {
 
   const [startDate, setStartDate] = useState<Date>(() => getOffsetDay(-391));
   const [endDate, setEndDate] = useState<Date>(() => getOffsetDay(411));
-  const [rangeMinDays, setRangeMinDays] = useState<number | undefined>(
-    undefined,
-  );
-  const [rangeMaxDays, setRangeMaxDays] = useState<number | undefined>(
-    undefined,
-  );
+  const [rangeMinDays, setRangeMinDays] = useState<number | undefined>(undefined);
+  const [rangeMaxDays, setRangeMaxDays] = useState<number | undefined>(undefined);
   const toISODate = (d: Date) => d.toISOString().split("T")[0];
   const parseDate = (s: string) => new Date(s + "T00:00:00");
 
-  type DisabledMode =
-    | "none"
-    | "all"
-    | "date"
-    | "dates"
-    | "range"
-    | "weekdays"
-    | "before"
-    | "after"
-    | "outside";
+  type DisabledMode = "none" | "all" | "date" | "dates" | "range" | "weekdays" | "before" | "after" | "outside";
   const WEEKDAY_LABELS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
   const [disabledMode, setDisabledMode] = useState<DisabledMode>("none");
   const [disabledDate, setDisabledDate] = useState(toISODate(new Date()));
-  const [disabledDates, setDisabledDates] = useState<string[]>([
-    toISODate(new Date()),
-  ]);
+  const [disabledDates, setDisabledDates] = useState<string[]>([toISODate(new Date())]);
   const [disabledFrom, setDisabledFrom] = useState(toISODate(getOffsetDay(-3)));
   const [disabledTo, setDisabledTo] = useState(toISODate(getOffsetDay(3)));
   const [disabledBefore, setDisabledBefore] = useState(toISODate(new Date()));
@@ -249,48 +227,29 @@ export const KitchenSink = () => {
 
   const getDisabledValue = (): DisabledRule | DisabledRule[] | undefined => {
     switch (disabledMode) {
-      case "all":
-        return true;
-      case "date":
-        return parseDate(disabledDate);
-      case "dates":
-        return disabledDates.map(parseDate);
-      case "range":
-        return { from: parseDate(disabledFrom), to: parseDate(disabledTo) };
-      case "weekdays":
-        return disabledWeekdays.length
-          ? { dayOfWeek: disabledWeekdays }
-          : undefined;
-      case "before":
-        return { before: parseDate(disabledBefore) };
-      case "after":
-        return { after: parseDate(disabledAfter) };
-      case "outside":
-        return {
-          before: parseDate(disabledBefore),
-          after: parseDate(disabledAfter),
-        };
-      default:
-        return undefined;
+      case "all":   return true;
+      case "date":  return parseDate(disabledDate);
+      case "dates": return disabledDates.map(parseDate);
+      case "range": return { from: parseDate(disabledFrom), to: parseDate(disabledTo) };
+      case "weekdays": return disabledWeekdays.length ? { dayOfWeek: disabledWeekdays } : undefined;
+      case "before": return { before: parseDate(disabledBefore) };
+      case "after":  return { after: parseDate(disabledAfter) };
+      case "outside": return { before: parseDate(disabledBefore), after: parseDate(disabledAfter) };
+      default: return undefined;
     }
   };
 
-  const [config, setConfig] = useState({
+  // Props passed directly to <Calendar>
+  const [calendarProps, setCalendarProps] = useState({
     showYearPicker: false,
-    monthsGrid: false,
     time: true,
-    timeGrid: false,
     months: true,
-    presets: false,
     compactMonths: false,
-    manualSelect: false,
-    showSelectedDates: false,
     compactYears: true,
     showHomeButton: false,
     showClearButton: false,
     showThemeToggle: false,
     hour12: false,
-    shortMonths: false,
     gradient: false,
     highlightWeekends: true,
     showWeekNumber: false,
@@ -300,13 +259,34 @@ export const KitchenSink = () => {
     twoMonthsLayout: false,
     monthsColumn: false,
     highlightToday: true,
-    allowCleanSelected: true,
-    allowCleanManualSelect: true,
-    allowNavigateSelected: true,
   });
 
-  const toggle = (key: keyof typeof config) =>
-    setConfig((prev) => ({ ...prev, [key]: !prev[key] }));
+  // Module toggles — each becomes a child component
+  const [modules, setModules] = useState({
+    monthsGrid: false,
+    timeGrid: false,
+    presets: false,
+    selectedDates: false,
+    manualSelect: false,
+    yearsTrack: false,
+  });
+
+  // Module-specific props
+  const [moduleProps, setModuleProps] = useState({
+    monthsGridShort: true,
+    selectedDatesAllowClean: false,
+    selectedDatesAllowNavigate: false,
+    manualSelectAllowClean: true,
+  });
+
+  const toggleModuleProp = (key: keyof typeof moduleProps) =>
+    setModuleProps((prev) => ({ ...prev, [key]: !prev[key] }));
+
+  const toggleProp = (key: keyof typeof calendarProps) =>
+    setCalendarProps((prev) => ({ ...prev, [key]: !prev[key] }));
+
+  const toggleModule = (key: keyof typeof modules) =>
+    setModules((prev) => ({ ...prev, [key]: !prev[key] }));
 
   type ModeOption = { label: string; mode: CalendarMode; max?: number };
   const modeOptions: ModeOption[] = [
@@ -316,6 +296,12 @@ export const KitchenSink = () => {
     { label: "3 dates", mode: "multiple", max: 3 },
     { label: "Unlimited", mode: "multiple" },
   ];
+
+  const handleChange = (v: unknown) => {
+    if (mode === "range") setRange(v as DateRange);
+    else if (mode === "multiple") setDates(v as Date[]);
+    else if (v) setDate(v as Date);
+  };
 
   const subtitle =
     mode === "range"
@@ -328,7 +314,7 @@ export const KitchenSink = () => {
         ? dates.length
           ? dates.map((d) => formatSubtitle(d, activeLocale)).join(" · ")
           : "No dates selected"
-        : formatSubtitle(date, activeLocale, config.time);
+        : formatSubtitle(date, activeLocale, calendarProps.time);
 
   const isLight =
     activeTheme === "light" ||
@@ -374,11 +360,40 @@ export const KitchenSink = () => {
             Props
           </p>
           <div className="panel-props-grid">
-            {(Object.keys(config) as (keyof typeof config)[]).map((key) => (
+            {(Object.keys(calendarProps) as (keyof typeof calendarProps)[]).map((key) => (
               <button
                 key={key}
-                onClick={() => toggle(key)}
-                className={`panel-button-compact ${config[key] ? "active" : ""}`}
+                onClick={() => toggleProp(key)}
+                className={`panel-button-compact ${calendarProps[key] ? "active" : ""}`}
+              >
+                {key}
+              </button>
+            ))}
+          </div>
+
+          <p className="panel-label" style={{ marginTop: 8 }}>
+            Modules
+          </p>
+          <div className="panel-props-grid">
+            {(Object.keys(modules) as (keyof typeof modules)[]).map((key) => (
+              <button
+                key={key}
+                onClick={() => toggleModule(key)}
+                className={`panel-button-compact ${modules[key] ? "active" : ""}`}
+              >
+                {key}
+              </button>
+            ))}
+          </div>
+          <p className="panel-label" style={{ marginTop: 8 }}>
+            Module props
+          </p>
+          <div className="panel-props-grid">
+            {(Object.keys(moduleProps) as (keyof typeof moduleProps)[]).map((key) => (
+              <button
+                key={key}
+                onClick={() => toggleModuleProp(key)}
+                className={`panel-button-compact ${moduleProps[key] ? "active" : ""}`}
               >
                 {key}
               </button>
@@ -389,17 +404,13 @@ export const KitchenSink = () => {
         <div className="kitchen-center">
           <div style={{ width: `${containerWidth}px` }}>
             <Calendar
-              mode={mode}
+              mode={mode as any}
               max={max}
               value={
                 mode === "range" ? range : mode === "multiple" ? dates : date
               }
               startMonth={startMonth}
-              onChange={(d: Date | null) => {
-                if (d) setDate(d);
-              }}
-              onDatesChange={setDates}
-              onRangeChange={setRange}
+              onChange={handleChange as any}
               theme={activeTheme}
               appearance={activeAppearance as any}
               locale={activeLocale}
@@ -409,8 +420,20 @@ export const KitchenSink = () => {
               disabled={getDisabledValue()}
               rangeMinDays={mode === "range" ? rangeMinDays : undefined}
               rangeMaxDays={mode === "range" ? rangeMaxDays : undefined}
-              {...config}
-            />
+              {...calendarProps}
+            >
+              {modules.monthsGrid && <CalendarMonthGrid shortMonths={moduleProps.monthsGridShort} />}
+              {modules.timeGrid && <CalendarTimeGrid />}
+              {modules.selectedDates && (
+                <CalendarSelectedDates
+                  allowClean={moduleProps.selectedDatesAllowClean}
+                  allowNavigate={moduleProps.selectedDatesAllowNavigate}
+                />
+              )}
+              {modules.manualSelect && <CalendarManualSelect allowClean={moduleProps.manualSelectAllowClean} />}
+              {modules.yearsTrack && <CalendarYearsTrack />}
+              {modules.presets && <CalendarPresets />}
+            </Calendar>
           </div>
         </div>
 
@@ -421,18 +444,8 @@ export const KitchenSink = () => {
             value={activeAppearance}
             onChange={(e) => setActiveAppearance(e.target.value)}
           >
-            {[
-              "default",
-              "soft",
-              "bubble",
-              "compact",
-              "square",
-              "neo",
-              "brutalist",
-            ].map((a) => (
-              <option key={a} value={a}>
-                {a}
-              </option>
+            {["default", "soft", "bubble", "compact", "square", "neo", "brutalist"].map((a) => (
+              <option key={a} value={a}>{a}</option>
             ))}
           </select>
 
@@ -451,16 +464,12 @@ export const KitchenSink = () => {
             </optgroup>
             <optgroup label="Dark">
               {DARK_THEMES.map((t) => (
-                <option key={t} value={t}>
-                  {THEME_LABELS[t]}
-                </option>
+                <option key={t} value={t}>{THEME_LABELS[t]}</option>
               ))}
             </optgroup>
             <optgroup label="Light">
               {LIGHT_THEMES.map((t) => (
-                <option key={t} value={t}>
-                  {THEME_LABELS[t]}
-                </option>
+                <option key={t} value={t}>{THEME_LABELS[t]}</option>
               ))}
             </optgroup>
           </select>
@@ -540,9 +549,7 @@ export const KitchenSink = () => {
                   value={rangeMinDays ?? ""}
                   placeholder="—"
                   onChange={(e) =>
-                    setRangeMinDays(
-                      e.target.value ? Number(e.target.value) : undefined,
-                    )
+                    setRangeMinDays(e.target.value ? Number(e.target.value) : undefined)
                   }
                 />
               </div>
@@ -554,9 +561,7 @@ export const KitchenSink = () => {
                   value={rangeMaxDays ?? ""}
                   placeholder="—"
                   onChange={(e) =>
-                    setRangeMaxDays(
-                      e.target.value ? Number(e.target.value) : undefined,
-                    )
+                    setRangeMaxDays(e.target.value ? Number(e.target.value) : undefined)
                   }
                 />
               </div>

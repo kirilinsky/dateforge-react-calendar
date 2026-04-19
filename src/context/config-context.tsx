@@ -5,7 +5,6 @@ export interface CalendarConfig {
   locale: string;
   startOfWeek: StartOfWeek;
   hour12: boolean;
-  shortMonths: boolean;
   range: boolean;
   multiselect: number | boolean | undefined;
   rangeMinDays?: number;
@@ -14,15 +13,11 @@ export interface CalendarConfig {
   maxDate?: Date;
   disabled?: DisabledRule | DisabledRule[];
   time: boolean;
-  timeGrid: boolean;
   months: boolean;
-  monthsGrid: boolean;
   compactMonths: boolean;
   compactYears: boolean;
   showYearPicker: boolean;
-  presets: boolean;
   gradient: boolean;
-  showSelectedDates: boolean;
   highlightWeekends: boolean;
   highlightToday: boolean;
   showWeekNumber: boolean;
@@ -31,13 +26,9 @@ export interface CalendarConfig {
   hideDisabled: boolean;
   twoMonthsLayout: boolean;
   monthsColumn: boolean;
-  manualSelect: boolean;
   showHomeButton: boolean;
   showClearButton: boolean;
   showThemeToggle: boolean;
-  allowCleanSelected: boolean;
-  allowNavigateSelected: boolean;
-  allowCleanManualSelect: boolean;
 }
 
 export const ConfigContext = createContext<CalendarConfig | undefined>(undefined);

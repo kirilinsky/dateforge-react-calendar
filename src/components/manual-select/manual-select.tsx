@@ -280,8 +280,15 @@ const DateSlot: React.FC<DateSlotProps> = ({
   );
 };
 
-export const ManualSelectComponent: React.FC = () => {
-  const { range, multiselect, disabled, minDate, maxDate, allowCleanManualSelect } = useConfig();
+interface CalendarManualSelectProps {
+  allowClean?: boolean;
+}
+
+export const ManualSelectComponent: React.FC<CalendarManualSelectProps> = ({
+  allowClean = true,
+}) => {
+  const { range, multiselect, disabled, minDate, maxDate } = useConfig();
+  const allowCleanManualSelect = allowClean;
   const { viewDate: date } = useNavigation();
   const { rangeStart, rangeEnd, selectedDates, onChangeDate, onRangeSet, onDatesSet } = useSelection();
 
@@ -452,3 +459,5 @@ export const ManualSelectComponent: React.FC = () => {
     </div>
   );
 };
+
+export { ManualSelectComponent as CalendarManualSelect };

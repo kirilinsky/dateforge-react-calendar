@@ -1,31 +1,28 @@
+import React from "react";
 import { DaysComponent } from "../days/days";
 import { HeaderComponent } from "../header/header";
-import { MonthsComponent } from "../months/months";
-import { PresetsComponent } from "../presets/presets";
-import { SelectedDatesComponent } from "../selected-dates/selected-dates";
-import { ManualSelectComponent } from "../manual-select/manual-select";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import { useSelection } from "@/context/selection-context";
 import { useUI } from "@/context/ui-context";
-import { TimeComponent } from "../time/time";
 import { TimePopup } from "../time-popup/time-popup";
 import { MonthPopup, YearPopup } from "../month-year-track/month-year-track";
-import { getTwoMonthsNarrowThreshold } from "@/helpers/get-grid-layout";
 import styles from "./layout.module.css";
+
+const TWO_MONTHS_NARROW_THRESHOLD = 680;
 
 export const CalendarLayout: React.FC<{
   appearanceKey?: string;
   customAppearanceVars?: React.CSSProperties;
-}> = ({ appearanceKey, customAppearanceVars }) => {
+  modules?: React.ReactNode;
+}> = ({ appearanceKey, customAppearanceVars, modules }) => {
   const {
-    presets, showYearPicker, months, compactMonths, compactYears,
-    monthsGrid, timeGrid, time, gradient, showSelectedDates,
-    twoMonthsLayout, monthsColumn, manualSelect,
-    hour12, locale, shortMonths, minDate, maxDate,
+    showYearPicker, months, compactMonths, compactYears,
+    twoMonthsLayout, monthsColumn,
+    hour12, locale, minDate, maxDate, gradient,
   } = useConfig();
   const { viewDate: date, navigateTo } = useNavigation();
-  const { selectedDates, onChangeTime } = useSelection();
+  const { onChangeTime } = useSelection();
   const {
     dark, showTimePopup, setShowTimePopup,
     showMonthPopup, setShowMonthPopup,
@@ -40,17 +37,14 @@ export const CalendarLayout: React.FC<{
   const twoMonthsStacked =
     !!twoMonthsLayout &&
     (!!monthsColumn ||
-      (containerWidth > 0 &&
-        containerWidth < getTwoMonthsNarrowThreshold({ monthsGrid, timeGrid })));
+      (containerWidth > 0 && containerWidth < TWO_MONTHS_NARROW_THRESHOLD));
 
   const nextMonthLabel = nextMonthDate
     ? new Intl.DateTimeFormat(locale, {
-        month: shortMonths ? "short" : "long",
+        month: "short",
         year: "numeric",
       }).format(nextMonthDate)
     : null;
-
-  const hasSelectedDates = !!showSelectedDates && selectedDates.length > 0;
 
   return (
     <div
@@ -82,7 +76,6 @@ export const CalendarLayout: React.FC<{
           locale={locale}
           minDate={minDate}
           maxDate={maxDate}
-          shortMonths={shortMonths}
           onConfirm={(newDate) => {
             navigateTo(newDate);
             setShowMonthPopup(false);
@@ -102,11 +95,9 @@ export const CalendarLayout: React.FC<{
           onClose={() => setShowYearPopup(false)}
         />
       )}
-      {presets && <PresetsComponent />}
-      {(showYearPicker || compactMonths || compactYears || time || months) && (
+      {(showYearPicker || compactMonths || compactYears || months) && (
         <HeaderComponent />
       )}
-      {manualSelect && <ManualSelectComponent />}
       <DaysComponent hideOtherMonths={!!twoMonthsLayout} />
       {twoMonthsStacked && nextMonthLabel && (
         <div style={{ gridArea: "LB" }} className={styles.secondMonthLabel}>
@@ -121,9 +112,7 @@ export const CalendarLayout: React.FC<{
           dataArea="days-2"
         />
       )}
-      {monthsGrid && <MonthsComponent />}
-      {timeGrid && <TimeComponent />}
-      {hasSelectedDates && <SelectedDatesComponent />}
+      {modules}
     </div>
   );
 };

@@ -27,8 +27,16 @@ const getRangeSep = (
   }
 };
 
-export const SelectedDatesComponent: React.FC = () => {
-  const { locale, range, allowCleanSelected, allowNavigateSelected } = useConfig();
+interface CalendarSelectedDatesProps {
+  allowClean?: boolean;
+  allowNavigate?: boolean;
+}
+
+export const SelectedDatesComponent: React.FC<CalendarSelectedDatesProps> = ({
+  allowClean = false,
+  allowNavigate = false,
+}) => {
+  const { locale, range } = useConfig();
   const { viewDate: date, navigateTo } = useNavigation();
   const { selectedDates, rangeStart, rangeEnd, onChangeDate } = useSelection();
 
@@ -46,7 +54,7 @@ export const SelectedDatesComponent: React.FC = () => {
       styles.chip,
       shared.interactive,
       shared.hoverable,
-      isCurrentMonth(d) && allowNavigateSelected ? shared.activeItem : styles.inactiveChip,
+      isCurrentMonth(d) && allowNavigate ? shared.activeItem : styles.inactiveChip,
     ]
       .filter(Boolean)
       .join(" ");
@@ -57,12 +65,12 @@ export const SelectedDatesComponent: React.FC = () => {
       className={`${styles.clearBtn} ${shared.interactive} ${shared.hoverable}`}
       onClick={() => onChangeDate(null)}
       style={
-        allowCleanSelected
+        allowClean
           ? undefined
           : { visibility: "hidden", pointerEvents: "none" }
       }
-      tabIndex={allowCleanSelected ? undefined : -1}
-      aria-hidden={!allowCleanSelected}
+      tabIndex={allowClean ? undefined : -1}
+      aria-hidden={!allowClean}
     >
       ×
     </button>
@@ -77,7 +85,7 @@ export const SelectedDatesComponent: React.FC = () => {
       <div className={styles.selectedContainer} data-area="selected-dates" style={{ gridArea: "SD" }}>
         <button
           type="button"
-          onClick={() => allowNavigateSelected && navigateTo(rangeStart)}
+          onClick={() => allowNavigate && navigateTo(rangeStart)}
           className={chipClass(rangeStart)}
         >
           {fmt.format(rangeStart)}
@@ -86,7 +94,7 @@ export const SelectedDatesComponent: React.FC = () => {
         {rangeEnd && (
           <button
             type="button"
-            onClick={() => allowNavigateSelected && navigateTo(rangeEnd)}
+            onClick={() => allowNavigate && navigateTo(rangeEnd)}
             className={chipClass(rangeEnd)}
           >
             {fmt.format(rangeEnd)}
@@ -107,7 +115,7 @@ export const SelectedDatesComponent: React.FC = () => {
           <button
             key={i}
             type="button"
-            onClick={() => allowNavigateSelected && navigateTo(d)}
+            onClick={() => allowNavigate && navigateTo(d)}
             className={[
               styles.chip,
               shared.interactive,
@@ -125,3 +133,5 @@ export const SelectedDatesComponent: React.FC = () => {
     </div>
   );
 };
+
+export { SelectedDatesComponent as CalendarSelectedDates };

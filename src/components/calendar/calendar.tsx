@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import "@/styles/layers.css";
-import { CalendarProps } from "@/types/calendar";
+import { CalendarMode, CalendarProps } from "@/types/calendar";
 import { DARK_THEMES, CustomTheme } from "@/types/themes";
 import { CustomAppearance } from "@/types/appearances";
 import { CalendarProvider } from "@/components/provider/provider";
@@ -12,32 +12,28 @@ const isCustomTheme = (t: unknown): t is CustomTheme =>
 const isCustomAppearance = (a: unknown): a is CustomAppearance =>
   typeof a === "object" && a !== null && (a as CustomAppearance).__type === "custom-appearance";
 
-export const Calendar: React.FC<CalendarProps> = ({
+export function Calendar<M extends CalendarMode = "single">({
   width = "100%",
   theme: themeProp,
   appearance: appearanceProp,
-  presets = false,
   compactMonths = false,
-  manualSelect = false,
   compactYears = true,
   showYearPicker = false,
   time = true,
-  timeGrid = false,
   months = true,
   hour12 = false,
-  monthsGrid = false,
   locale = "en",
   startOfWeek = 1,
   gradient = false,
   highlightWeekends = true,
   mode,
   max,
-  showSelectedDates = false,
   twoMonthsLayout = false,
   monthsColumn = false,
   highlightToday = true,
+  children,
   ...restProps
-}) => {
+}: CalendarProps<M>) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState<number>(() => {
     if (typeof width === "number") return width;
@@ -91,15 +87,12 @@ export const Calendar: React.FC<CalendarProps> = ({
   return (
     <CalendarProvider
       locale={locale}
-      presets={presets}
       compactMonths={compactMonths}
       compactYears={compactYears}
       showYearPicker={showYearPicker}
       time={time}
       hour12={hour12}
-      timeGrid={timeGrid}
       months={months}
-      monthsGrid={monthsGrid}
       startOfWeek={startOfWeek}
       appearance={appearanceProp}
       gradient={gradient}
@@ -111,14 +104,12 @@ export const Calendar: React.FC<CalendarProps> = ({
       width={width}
       mode={mode}
       max={max}
-      showSelectedDates={showSelectedDates}
-      manualSelect={manualSelect}
       twoMonthsLayout={twoMonthsLayout}
       monthsColumn={monthsColumn}
       highlightToday={highlightToday}
       containerWidth={containerWidth}
       toggleTheme={toggleTheme}
-      {...restProps}
+      {...(restProps as import("@/types/calendar").CalendarProps<CalendarMode>)}
     >
       <div
         ref={wrapperRef}
@@ -128,8 +119,9 @@ export const Calendar: React.FC<CalendarProps> = ({
         <CalendarLayout
           appearanceKey={appearanceKey}
           customAppearanceVars={customAppearanceVars}
+          modules={children}
         />
       </div>
     </CalendarProvider>
   );
-};
+}

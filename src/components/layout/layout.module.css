@@ -129,7 +129,7 @@
       :has([data-area="time"])
     ):not(:has([data-area="days-2"])) {
     grid-template-columns: 1fr;
-    grid-template-areas: "HH" "MS" "DD" "SD" "PP";
+    grid-template-areas: "HH" "MS" "DD" "SD" "YT" "PP";
   }
 
   .calendarContainer:has([data-area="months"]):not(
@@ -141,6 +141,7 @@
       "MS MS"
       "MM DD"
       "SD SD"
+      "YT YT"
       "PP PP";
   }
 
@@ -153,6 +154,7 @@
       "MS MS"
       "DD TT"
       "SD SD"
+      "YT YT"
       "PP PP";
   }
 
@@ -165,6 +167,7 @@
       "MS MS MS"
       "MM DD TT"
       "SD SD SD"
+      "YT YT YT"
       "PP PP PP";
   }
 
@@ -179,6 +182,7 @@
         "MM"
         "DD"
         "SD"
+        "YT"
         "PP";
       --months-cols: repeat(4, minmax(0, 1fr));
       --months-rows: repeat(3, auto);
@@ -196,6 +200,7 @@
         "MS"
         "DD"
         "SD"
+        "YT"
         "TT"
         "PP";
       --time-border-left: none;
@@ -215,6 +220,7 @@
         "MM MM"
         "DD TT"
         "SD SD"
+        "YT YT"
         "PP PP";
       --months-cols: repeat(4, minmax(0, 1fr));
       --months-rows: repeat(3, auto);
@@ -237,6 +243,7 @@
         "DD"
         "TT"
         "SD"
+        "YT"
         "PP";
       --months-cols: repeat(4, minmax(0, 1fr));
       --months-rows: repeat(3, auto);
@@ -261,6 +268,7 @@
         "DD"
         "TT"
         "SD"
+        "YT"
         "PP";
       --months-border-right: none;
       --months-border-bottom: var(--cal-border) solid var(--c-s);
@@ -287,6 +295,7 @@
         "DD"
         "TT"
         "SD"
+        "YT"
         "PP";
       --months-cols: repeat(4, minmax(0, 1fr));
       --months-rows: repeat(3, auto);
@@ -317,6 +326,7 @@
       "MS MS"
       "DD D2"
       "SD SD"
+      "YT YT"
       "PP PP";
   }
 
@@ -329,6 +339,7 @@
       "MS MS MS"
       "MM DD D2"
       "SD SD SD"
+      "YT YT YT"
       "PP PP PP";
   }
 
@@ -341,6 +352,7 @@
       "MS MS MS"
       "DD D2 TT"
       "SD SD SD"
+      "YT YT YT"
       "PP PP PP";
   }
 
@@ -353,6 +365,7 @@
       "MS MS MS MS"
       "MM DD D2 TT"
       "SD SD SD SD"
+      "YT YT YT YT"
       "PP PP PP PP";
   }
 
@@ -367,6 +380,7 @@
       "D2"
       "TT"
       "SD"
+      "YT"
       "PP";
     --months-border-right: none;
     --months-border-bottom: var(--cal-border) solid var(--c-s);

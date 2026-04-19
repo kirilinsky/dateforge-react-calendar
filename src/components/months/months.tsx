@@ -5,8 +5,14 @@ import { useNavigation } from "@/context/navigation-context";
 import { getMonthListData, setMonth } from "@/utils/date-utils";
 import shared from "@/global/global.module.css";
 
-export const MonthsComponent: React.FC = () => {
-  const { locale, minDate, maxDate, shortMonths } = useConfig();
+interface CalendarMonthGridProps {
+  shortMonths?: boolean;
+}
+
+export const MonthsComponent: React.FC<CalendarMonthGridProps> = ({
+  shortMonths = true,
+}) => {
+  const { locale, minDate, maxDate } = useConfig();
   const { viewDate, navigateTo } = useNavigation();
   const date = viewDate;
 
@@ -14,7 +20,7 @@ export const MonthsComponent: React.FC = () => {
   const currentYear = date.getFullYear();
 
   const mNames = useMemo(
-    () => getMonthListData(locale, currentYear, minDate, maxDate, shortMonths ?? true),
+    () => getMonthListData(locale, currentYear, minDate, maxDate, shortMonths),
     [locale, currentYear, minDate, maxDate, shortMonths],
   );
 
@@ -38,3 +44,5 @@ export const MonthsComponent: React.FC = () => {
     </div>
   );
 };
+
+export { MonthsComponent as CalendarMonthGrid };

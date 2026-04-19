@@ -11,9 +11,17 @@ import {
 } from "@/utils/date-utils";
 import shared from "@/global/global.module.css";
 
-export const PresetsComponent: React.FC = () => {
+interface CalendarPresetsProps {
+  showYears?: boolean;
+  showMonths?: boolean;
+}
+
+export const PresetsComponent: React.FC<CalendarPresetsProps> = ({
+  showYears = true,
+  showMonths = true,
+}) => {
   const {
-    monthsGrid, minDate, maxDate, showYearPicker, locale,
+    minDate, maxDate, showYearPicker, locale,
     compactMonths, compactYears, months, disabled,
   } = useConfig();
   const { viewDate: date } = useNavigation();
@@ -22,16 +30,17 @@ export const PresetsComponent: React.FC = () => {
   const presets = useMemo(
     () =>
       getFilteredPresets(
-        showYearPicker || !!compactYears,
-        monthsGrid || !!compactMonths || !!months,
+        showYears && (showYearPicker || !!compactYears),
+        showMonths && (!!compactMonths || !!months),
         minDate,
         maxDate,
         disabled,
       ),
     [
+      showYears,
+      showMonths,
       showYearPicker,
       months,
-      monthsGrid,
       minDate,
       maxDate,
       compactYears,
@@ -73,3 +82,5 @@ export const PresetsComponent: React.FC = () => {
     </div>
   );
 };
+
+export { PresetsComponent as CalendarPresets };
