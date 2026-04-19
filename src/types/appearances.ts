@@ -1,5 +1,6 @@
 export type AppearanceTokens = {
   radius: string;
+  containerRadius: string;
   border: string;
   spacing: string;
   shadowSm: string;
@@ -8,12 +9,13 @@ export type AppearanceTokens = {
 };
 
 export const APPEARANCE_TOKEN_TO_VAR: Record<keyof AppearanceTokens, string> = {
-  radius:   "--cal-radius",
-  border:   "--cal-border",
-  spacing:  "--cal-spacing",
-  shadowSm: "--cal-shadow-sm",
-  shadowMd: "--cal-shadow-md",
-  shadowLg: "--cal-shadow-lg",
+  radius:          "--cal-radius",
+  containerRadius: "--cal-container-radius",
+  border:          "--cal-border",
+  spacing:         "--cal-spacing",
+  shadowSm:        "--cal-shadow-sm",
+  shadowMd:        "--cal-shadow-md",
+  shadowLg:        "--cal-shadow-lg",
 };
 
 export type CustomAppearance = {

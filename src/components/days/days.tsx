@@ -16,7 +16,8 @@ export const DaysComponent: React.FC<{
   dateOverride?: Date;
   gridArea?: string;
   hideOtherMonths?: boolean;
-}> = ({ dateOverride, gridArea = "DD", hideOtherMonths = false }) => {
+  dataArea?: string;
+}> = ({ dateOverride, gridArea = "DD", hideOtherMonths = false, dataArea = "days" }) => {
   const {
     minDate, maxDate, disabled, hideLimited, hideDisabled,
     startOfWeek, showWeekNumber, range, rangeMinDays, rangeMaxDays,
@@ -187,7 +188,7 @@ export const DaysComponent: React.FC<{
   return (
     <div
       aria-label="days"
-      data-area="days"
+      data-area={dataArea}
       key={animationKey}
       style={{ gridArea }}
       onTouchEnd={handleTouchEnd}

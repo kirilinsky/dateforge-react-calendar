@@ -2,6 +2,14 @@
 
 ### 🚀 Version 6.0.0
 
+- **🗂️ CSS-only responsive layout via `:has()`** — `getGridLayout()` and `getLayoutMode()` removed entirely. All grid logic is now in CSS: `.calendarContainer` detects child blocks via `:has([data-area="..."])` and switches `grid-template-columns` / `grid-template-areas` declaratively. Responsive breakpoints implemented via `@container` — no JS, no `ResizeObserver`.
+- **📐 Smart breakpoints for panel combinations** — at 350–660px with `monthsGrid` + `timeGrid` active: months span full width (4 columns), days and time sit side by side. At ≤350px — full vertical stack. Single panels collapse at ≤460px.
+- **🧱 CSS `@layer cal-base`** — all component styles wrapped in `@layer cal-base`. Layer order: `cal-base → themes → appearances → cal-user`. User styles in `@layer cal-user` win without `!important`.
+- **💅 New appearance `"bubble"`** — highly rounded borders (`--cal-radius: 1.5em`), harmonious container via `--cal-container-radius: 2.2em`.
+- **🔵 `--cal-container-radius`** — new CSS variable for independent control of the container border-radius (decoupled from `--cal-radius * 1.6`).
+- **📅 Presets: 12 items, chronological order** — added «2 weeks ago» and «In 2 months». Order reworked from past to future: Last year → … → Today → … → Next year. Presets grid: `repeat(4, 1fr)` — identical to the months grid.
+- **🎨 Unified button style** — presets and months share the same size, padding, and transparent background for inactive items.
+- **📦 `dist/style.css` as an explicit import** — CSS is no longer injected into the JS bundle. Requires explicit `import 'react-calendar-datetime/style.css'`.
 - **🎨 CSS `@layer` architecture** — All component styles now live inside named `@layer` blocks (`base`, `themes`, etc.), giving consumer apps full specificity control without `!important`.
 - **🖌️ Themes as separate CSS files** — Theme definitions moved out of the main bundle. Each theme ships as its own `dist/themes/<name>.css`; `dist/themes/index.css` bundles all of them. Import only what you need. `src/themes.gen.css` is auto-generated via `npm run build` — do not edit manually.
 - **🧩 `createTheme()` utility** — New `createTheme(tokens, base)` helper lets you build a fully typed custom theme object and pass it directly as the `theme` prop. No CSS required.

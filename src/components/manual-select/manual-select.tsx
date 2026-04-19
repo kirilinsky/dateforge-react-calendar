@@ -352,6 +352,7 @@ export const ManualSelectComponent: React.FC = () => {
     return (
       <div
         className={`${styles.container} ${styles.containerMulti}`}
+        data-area="manual-select"
         style={{ gridArea: "MS" }}
       >
         <div className={styles.datesArea}>
@@ -418,7 +419,7 @@ export const ManualSelectComponent: React.FC = () => {
 
   if (range) {
     return (
-      <div className={styles.container} style={{ gridArea: "MS" }}>
+      <div className={styles.container} data-area="manual-select" style={{ gridArea: "MS" }}>
         <DateSlot
           date={rangeStart}
           isAllowed={isAllowed}
@@ -440,7 +441,7 @@ export const ManualSelectComponent: React.FC = () => {
   }
 
   return (
-    <div className={styles.container} style={{ gridArea: "MS" }}>
+    <div className={styles.container} data-area="manual-select" style={{ gridArea: "MS" }}>
       <DateSlot
         date={selectedDates[0] ?? null}
         isAllowed={isAllowed}

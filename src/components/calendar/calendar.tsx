@@ -1,10 +1,9 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "@/styles/layers.css";
 import { CalendarProps } from "@/types/calendar";
 import { DARK_THEMES, CustomTheme } from "@/types/themes";
 import { CustomAppearance } from "@/types/appearances";
 import { CalendarProvider } from "@/components/provider/provider";
-import { getGridLayout, getLayoutMode } from "@/helpers/get-grid-layout";
 import { CalendarLayout } from "../layout/layout";
 
 const isCustomTheme = (t: unknown): t is CustomTheme =>
@@ -57,46 +56,6 @@ export const Calendar: React.FC<CalendarProps> = ({
     return () => ro.disconnect();
   }, []);
 
-  const containerStyle = useMemo(
-    () =>
-      ({
-        width,
-        ...getGridLayout(
-          {
-            presets,
-            compactMonths,
-            manualSelect,
-            compactYears,
-            showYearPicker,
-            timeGrid,
-            time,
-            months,
-            monthsGrid,
-            selectedDates: showSelectedDates,
-            twoMonthsLayout,
-            monthsColumn,
-          },
-          containerWidth,
-        ),
-      }) as React.CSSProperties,
-    [
-      width,
-      presets,
-      compactYears,
-      compactMonths,
-      manualSelect,
-      showYearPicker,
-      time,
-      timeGrid,
-      months,
-      monthsGrid,
-      showSelectedDates,
-      twoMonthsLayout,
-      monthsColumn,
-      containerWidth,
-    ],
-  );
-
   const [isToggled, setIsToggled] = useState(false);
 
   const systemTheme = useState<"light" | "dark">(() =>
@@ -123,13 +82,6 @@ export const Calendar: React.FC<CalendarProps> = ({
 
   const activeTheme = isToggled ? (isBaseDark ? "light" : "dark") : baseTheme;
   const toggleTheme = () => setIsToggled((v) => !v);
-
-  const layoutMode = getLayoutMode(containerWidth, {
-    monthsGrid,
-    timeGrid,
-    twoMonthsLayout,
-    monthsColumn,
-  });
 
   const customAppearance = isCustomAppearance(appearanceProp) ? appearanceProp : undefined;
   const appearanceKey = customAppearance ? undefined : (appearanceProp as string | undefined);
@@ -171,11 +123,9 @@ export const Calendar: React.FC<CalendarProps> = ({
       <div
         ref={wrapperRef}
         data-theme={activeTheme}
-        data-layout={layoutMode}
         style={{ containerType: "inline-size", width, ...customThemeVars }}
       >
         <CalendarLayout
-          containerStyle={containerStyle}
           appearanceKey={appearanceKey}
           customAppearanceVars={customAppearanceVars}
         />

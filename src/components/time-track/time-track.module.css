@@ -43,6 +43,7 @@
 
 .drums {
   display: flex;
+  flex-direction: row;
   align-items: stretch;
   gap: 1px;
   width: 100%;

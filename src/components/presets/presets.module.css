@@ -2,11 +2,11 @@
 
 .presetsContainer {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(8em, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   align-items: stretch;
-  gap: 0.35em;
-  padding: var(--cal-spacing);
-  border-top: var(--cal-border) solid var(--c-s); 
+  gap: 0.25em;
+  padding: 0.75em 0.3em;
+  border-top: var(--cal-border) solid var(--c-s);
   height: auto;
   z-index: 3;
   transition: all var(--cal-transition) linear;
@@ -15,53 +15,29 @@
   }
 }
 
-.presetsContainer[data-count="10"] {
-  grid-template-columns: repeat(5, 1fr);
-}
-
-.presetsContainer[data-count="9"] {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.presetsContainer[data-count="8"] {
-  grid-template-columns: repeat(4, 1fr);
-}
-
-.presetsContainer[data-count="7"] {
-  grid-template-columns: repeat(4, 1fr);
-}
-
 @container (max-width: 320px) {
-  .presetsContainer,
-  .presetsContainer[data-count="10"],
-  .presetsContainer[data-count="9"],
-  .presetsContainer[data-count="8"],
-  .presetsContainer[data-count="7"],
-  .presetsContainer[data-count="5"] {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@container (min-width: 620px) {
-  .presetsContainer[data-count="9"],
-  .presetsContainer[data-count="10"] {
-    grid-template-columns: repeat(5, 1fr);
+  .presetsContainer {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
 .presetItem {
+  justify-self: center;
+  align-self: center;
+  width: 95%;
   height: auto !important;
   min-height: 2.1em;
-  padding: 0.45em !important;
-  font-size: 0.85em !important;
-  line-height: 1.3;
+  padding-top: 1em !important;
+  padding-bottom: 1em !important;
+  font-size: 0.8em !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   text-align: center;
-  white-space: normal;
-  word-break: break-word;
 }
 
 .inactiveItem {
-  background: var(--c-t);
+  background: transparent;
 }
 
 }

@@ -19,6 +19,8 @@
 
 .dayGridContainer.withWeekNumbers {
   grid-template-columns: 2.2em repeat(7, 1fr);
+  padding: var(--days-wn-padding, 0.85em);
+  gap: var(--days-wn-gap, 0.15em);
 }
 
 .weekNumberItem {

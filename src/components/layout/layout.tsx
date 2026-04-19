@@ -15,10 +15,9 @@ import { getTwoMonthsNarrowThreshold } from "@/helpers/get-grid-layout";
 import styles from "./layout.module.css";
 
 export const CalendarLayout: React.FC<{
-  containerStyle: React.CSSProperties;
   appearanceKey?: string;
   customAppearanceVars?: React.CSSProperties;
-}> = ({ containerStyle, appearanceKey, customAppearanceVars }) => {
+}> = ({ appearanceKey, customAppearanceVars }) => {
   const {
     presets, showYearPicker, months, compactMonths, compactYears,
     monthsGrid, timeGrid, time, gradient, showSelectedDates,
@@ -42,8 +41,7 @@ export const CalendarLayout: React.FC<{
     !!twoMonthsLayout &&
     (!!monthsColumn ||
       (containerWidth > 0 &&
-        containerWidth <
-          getTwoMonthsNarrowThreshold({ monthsGrid, timeGrid })));
+        containerWidth < getTwoMonthsNarrowThreshold({ monthsGrid, timeGrid })));
 
   const nextMonthLabel = nextMonthDate
     ? new Intl.DateTimeFormat(locale, {
@@ -60,12 +58,12 @@ export const CalendarLayout: React.FC<{
         styles.calendarContainer,
         gradient ? styles.gradient : "",
         dark ? styles.dark : "",
-        twoMonthsLayout && !twoMonthsStacked ? styles.twoMonthsWide : "",
       ]
         .filter(Boolean)
         .join(" ")}
       data-appearance={appearanceKey}
-      style={{ ...containerStyle, ...customAppearanceVars }}
+      data-stacked={twoMonthsStacked || undefined}
+      style={customAppearanceVars}
     >
       {showTimePopup && (
         <TimePopup
@@ -120,6 +118,7 @@ export const CalendarLayout: React.FC<{
           dateOverride={nextMonthDate}
           gridArea="D2"
           hideOtherMonths
+          dataArea="days-2"
         />
       )}
       {monthsGrid && <MonthsComponent />}

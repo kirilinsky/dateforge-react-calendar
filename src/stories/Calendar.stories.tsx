@@ -284,21 +284,21 @@ export const KitchenSink = () => {
     presets: false,
     compactMonths: false,
     manualSelect: false,
+    showSelectedDates: false,
     compactYears: true,
+    showHomeButton: false,
+    showClearButton: false,
+    showThemeToggle: false,
+    hour12: false,
+    shortMonths: false,
     gradient: false,
     highlightWeekends: true,
     showWeekNumber: false,
     hideLimited: false,
     hideDisabled: false,
     hideWeekdays: false,
-    shortMonths: false,
-    hour12: false,
-    showSelectedDates: false,
     twoMonthsLayout: false,
     monthsColumn: false,
-    showHomeButton: false,
-    showClearButton: false,
-    showThemeToggle: false,
     highlightToday: true,
     allowCleanSelected: true,
     allowCleanManualSelect: true,
@@ -421,13 +421,19 @@ export const KitchenSink = () => {
             value={activeAppearance}
             onChange={(e) => setActiveAppearance(e.target.value)}
           >
-            {["default", "soft", "compact", "square", "neo", "brutalist"].map(
-              (a) => (
-                <option key={a} value={a}>
-                  {a}
-                </option>
-              ),
-            )}
+            {[
+              "default",
+              "soft",
+              "bubble",
+              "compact",
+              "square",
+              "neo",
+              "brutalist",
+            ].map((a) => (
+              <option key={a} value={a}>
+                {a}
+              </option>
+            ))}
           </select>
 
           <p className="panel-label" style={{ marginTop: 12 }}>
