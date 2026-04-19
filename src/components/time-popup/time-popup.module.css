@@ -15,7 +15,7 @@
 .popup {
   position: relative;
   background: var(--c-b);
-  border-radius: calc(var(--cal-radius, 0.5em) * 2);
+  border-radius: calc(var(--cal-radius, 0.5em) * 1.5);
   padding: 0.8em;
   width: 55%;
   max-width: 13.9em;
