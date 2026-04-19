@@ -22,7 +22,7 @@ export default defineConfig({
     ],
   },
   css: {
-    inject: true,
+    inject: false,
     minify: true,
   },
 });
