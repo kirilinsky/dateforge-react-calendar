@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import "@/styles/layers.css";
 import { CalendarProps } from "@/types/calendar";
 import { DARK_THEMES, CustomTheme } from "@/types/themes";
 import { CustomAppearance } from "@/types/appearances";

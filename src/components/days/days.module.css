@@ -1,3 +1,5 @@
+@layer cal-base {
+
 .dayGridContainer {
   container-type: inline-size;
   background: var(--c-b);
@@ -156,4 +158,6 @@
 
 .left {
   animation: slideInLeft 0.31s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
 }

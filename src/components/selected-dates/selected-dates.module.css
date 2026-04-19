@@ -1,3 +1,5 @@
+@layer cal-base {
+
 .selectedContainer {
   display: flex;
   flex-wrap: wrap;
@@ -42,4 +44,6 @@
   align-self: center;
   user-select: none;
   white-space: pre;
+}
+
 }

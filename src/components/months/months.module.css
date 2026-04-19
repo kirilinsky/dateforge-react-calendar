@@ -1,3 +1,5 @@
+@layer cal-base {
+
 .monthsContainer {
   grid-area: MM;
   display: grid;
@@ -28,4 +30,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
 }

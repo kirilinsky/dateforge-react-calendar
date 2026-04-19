@@ -1,3 +1,5 @@
+@layer cal-base {
+
 .headerContainer {
   display: flex;
   align-items: center;
@@ -152,4 +154,6 @@
     font-size: 0.85em;
     margin: 0;
   }
+}
+
 }

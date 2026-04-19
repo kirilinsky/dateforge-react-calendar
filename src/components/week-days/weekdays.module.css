@@ -1,3 +1,5 @@
+@layer cal-base {
+
 .header {
   display: flex;
   align-items: center;
@@ -14,4 +16,6 @@
 .weekendLight {
   color: var(--c-we);
   opacity: 0.6;
+}
+
 }

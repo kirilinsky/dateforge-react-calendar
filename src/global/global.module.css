@@ -1,3 +1,5 @@
+@layer cal-base {
+
 .flexCenter {
   display: flex;
   align-items: center;
@@ -5,7 +7,9 @@
 }
 
 .interactive {
-  composes: flexCenter;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   background: transparent;
   color: var(--c-c);
@@ -51,4 +55,6 @@
 
 .selectedOtherItem {
   opacity: 0.9;
+}
+
 }

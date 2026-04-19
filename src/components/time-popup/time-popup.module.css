@@ -1,3 +1,5 @@
+@layer cal-base {
+
 .backdrop {
   position: absolute;
   inset: 0;
@@ -46,4 +48,6 @@
 
 .confirm:hover {
   opacity: 0.85;
+}
+
 }

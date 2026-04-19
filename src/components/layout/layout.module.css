@@ -1,5 +1,3 @@
-@layer base, themes, appearances;
-
 @layer themes {
   :global([data-theme="light"]) {
     --c-a: #ffffff;
@@ -28,7 +26,7 @@
   }
 }
 
-@layer base {
+@layer cal-base {
   .calendarContainer {
     --cal-radius: 0.5em;
     --cal-font: system-ui, -apple-system, sans-serif;

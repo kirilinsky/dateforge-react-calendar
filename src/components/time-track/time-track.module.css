@@ -1,3 +1,5 @@
+@layer cal-base {
+
 .root {
   display: flex;
   flex-direction: column;
@@ -110,4 +112,6 @@
   opacity: 0.4;
   flex-shrink: 0;
   align-self: center;
+}
+
 }
