@@ -19,6 +19,12 @@
     "./themes/*": {
       "default": "./dist/themes/*.css"
     },
+    "./appearances": {
+      "default": "./dist/appearances/index.css"
+    },
+    "./appearances/*": {
+      "default": "./dist/appearances/*.css"
+    },
     "./style.css": {
       "default": "./dist/style.css"
     }
@@ -37,7 +43,7 @@
   "scripts": {
     "start": "ladle serve",
     "dev": "tsdown --watch",
-    "build": "tsdown --dts && npx tsx scripts/generate-theme.ts",
+    "build": "tsdown --dts && npx tsx scripts/generate-theme.ts && npx tsx scripts/generate-appearance.ts",
     "clean": "rm -rf dist"
   },
   "peerDependencies": {

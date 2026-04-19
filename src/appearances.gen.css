@@ -1,82 +1,82 @@
 /* generated — do not edit manually, run: npm run build */
 @layer appearances {
-  [data-appearance="soft"] {
-    --cal-radius: 0.75em;
-    --cal-border: 1px;
-    --cal-spacing: 0.7em;
-    --cal-shadow-sm: 0 0.15em 0.5em var(--c-x);
-    --cal-shadow-md: 0 0.25em 0.8em var(--c-x);
-    --cal-shadow-lg: 0 0.3em 1.2em var(--c-x);
-  }
-
-  [data-appearance="compact"] {
-    --cal-radius: 0.3em;
-    --cal-border: 1px;
-    --cal-spacing: 0.35em;
-    --cal-shadow-sm: 0 0.05em 0.15em var(--c-x);
-    --cal-shadow-md: 0 0.1em 0.3em var(--c-x);
-    --cal-shadow-lg: 0 0.1em 0.4em var(--c-x);
-  }
-
-  [data-appearance="square"] {
-    --cal-radius: 0;
-    --cal-border: 1px;
-    --cal-spacing: 0.5em;
-  }
-
-  [data-appearance="neo"] {
-    --cal-radius: 0.2em;
-    --cal-border: 2px;
-    --cal-spacing: 0.55em;
-    --cal-shadow-sm: none;
-    --cal-shadow-md: none;
-    --cal-shadow-lg: 3px 3px 0 var(--c-s);
-    --hover-bg: var(--c-t);
-    --hover-color: inherit;
-    --hover-shadow: none;
-    --hover-outline: 2px solid var(--c-h);
-    --active-shadow: 2px 2px 0 var(--c-s);
-  }
-
-  [data-appearance="neo"] button {
-    font-weight: 600;
-  }
-
   [data-appearance="brutalist"] {
-    --cal-radius: 0;
-    --cal-border: 2px;
-    --cal-shadow-sm: none;
-    --cal-shadow-md: none;
-    --cal-shadow-lg: 2px 2px 0 var(--c-s);
-    --hover-bg: var(--c-t);
-    --hover-shadow: none;
-    --hover-outline: var(--cal-border) solid var(--c-c);
-    --active-shadow: 3px 3px 0 var(--c-h);
-    --months-border-right: var(--cal-border) solid var(--c-s);
-    --months-border-top: var(--cal-border) solid var(--c-s);
-    --time-border-left: var(--cal-border) solid var(--c-s);
-    --time-border-top: var(--cal-border) solid var(--c-s);
-    font-family: ui-monospace, "Cascadia Code", Menlo, monospace;
-  }
-
-  [data-appearance="brutalist"] button {
-    font-weight: 700;
-    letter-spacing: 0.03em;
-  }
-
-  [data-appearance="brutalist"] > div[style*="HH"],
-  [data-appearance="brutalist"] > div[style*="PP"] {
-    border-color: var(--c-s);
-  }
+      --cal-radius: 0;
+      --cal-border: 2px;
+      --cal-shadow-sm: none;
+      --cal-shadow-md: none;
+      --cal-shadow-lg: 2px 2px 0 var(--c-s);
+      --hover-bg: var(--c-t);
+      --hover-shadow: none;
+      --hover-outline: var(--cal-border) solid var(--c-c);
+      --active-shadow: 3px 3px 0 var(--c-h);
+      --months-border-right: var(--cal-border) solid var(--c-s);
+      --months-border-top: var(--cal-border) solid var(--c-s);
+      --time-border-left: var(--cal-border) solid var(--c-s);
+      --time-border-top: var(--cal-border) solid var(--c-s);
+      font-family: ui-monospace, "Cascadia Code", Menlo, monospace;
+    }
+  
+    [data-appearance="brutalist"] button {
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+  
+    [data-appearance="brutalist"] > div[style*="HH"],
+    [data-appearance="brutalist"] > div[style*="PP"] {
+      border-color: var(--c-s);
+    }
 
   [data-appearance="bubble"] {
-    --cal-radius: 1.5em;
-    --cal-container-radius: 2.2em;
-    --header-min-height: 4em;
-    --cal-border: 1px;
-    --cal-spacing: 0.7em;
-    --cal-shadow-sm: 0 0.15em 0.5em var(--c-x);
-    --cal-shadow-md: 0 0.25em 0.9em var(--c-x);
-    --cal-shadow-lg: 0 0.35em 1.4em var(--c-x);
-  }
+      --cal-radius: 1.5em;
+      --cal-container-radius: 2.2em;
+      --header-min-height: 4em;
+      --cal-border: 1px;
+      --cal-spacing: 0.7em;
+      --cal-shadow-sm: 0 0.15em 0.5em var(--c-x);
+      --cal-shadow-md: 0 0.25em 0.9em var(--c-x);
+      --cal-shadow-lg: 0 0.35em 1.4em var(--c-x);
+    }
+
+  [data-appearance="compact"] {
+      --cal-radius: 0.3em;
+      --cal-border: 1px;
+      --cal-spacing: 0.35em;
+      --cal-shadow-sm: 0 0.05em 0.15em var(--c-x);
+      --cal-shadow-md: 0 0.1em 0.3em var(--c-x);
+      --cal-shadow-lg: 0 0.1em 0.4em var(--c-x);
+    }
+
+  [data-appearance="neo"] {
+      --cal-radius: 0.2em;
+      --cal-border: 2px;
+      --cal-spacing: 0.55em;
+      --cal-shadow-sm: none;
+      --cal-shadow-md: none;
+      --cal-shadow-lg: 3px 3px 0 var(--c-s);
+      --hover-bg: var(--c-t);
+      --hover-color: inherit;
+      --hover-shadow: none;
+      --hover-outline: 2px solid var(--c-h);
+      --active-shadow: 2px 2px 0 var(--c-s);
+    }
+  
+    [data-appearance="neo"] button {
+      font-weight: 600;
+    }
+
+  [data-appearance="soft"] {
+      --cal-radius: 0.75em;
+      --cal-border: 1px;
+      --cal-spacing: 0.7em;
+      --cal-shadow-sm: 0 0.15em 0.5em var(--c-x);
+      --cal-shadow-md: 0 0.25em 0.8em var(--c-x);
+      --cal-shadow-lg: 0 0.3em 1.2em var(--c-x);
+    }
+
+  [data-appearance="square"] {
+      --cal-radius: 0;
+      --cal-border: 1px;
+      --cal-spacing: 0.5em;
+    }
 }
