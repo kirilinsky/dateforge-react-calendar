@@ -1,6 +1,8 @@
 import React, { useMemo } from "react";
 import styles from "./presets.module.css";
-import { useCalendarContext } from "../provider/provider";
+import { useConfig } from "@/context/config-context";
+import { useNavigation } from "@/context/navigation-context";
+import { useSelection } from "@/context/selection-context";
 import {
   getFilteredPresets,
   getPresetDate,
@@ -11,19 +13,11 @@ import shared from "@/global/global.module.css";
 
 export const PresetsComponent: React.FC = () => {
   const {
-    monthsGrid,
-    date,
-    selectedDate,
-    minDate,
-    maxDate,
-    showYearPicker,
-    onChangeDate,
-    locale,
-    compactMonths,
-    compactYears,
-    months,
-    disabled,
-  } = useCalendarContext();
+    monthsGrid, minDate, maxDate, showYearPicker, locale,
+    compactMonths, compactYears, months, disabled,
+  } = useConfig();
+  const { viewDate: date } = useNavigation();
+  const { selectedDate, onChangeDate } = useSelection();
 
   const presets = useMemo(
     () =>
@@ -49,6 +43,7 @@ export const PresetsComponent: React.FC = () => {
   return (
     <div
       className={styles.presetsContainer}
+      data-area="presets"
       style={{ gridArea: "PP" }}
       data-count={presets.length}
     >

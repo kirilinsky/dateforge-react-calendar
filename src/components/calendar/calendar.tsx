@@ -151,7 +151,10 @@ export const Calendar: React.FC<CalendarProps> = ({
       appearance={appearanceProp}
       gradient={gradient}
       highlightWeekends={highlightWeekends}
-      theme={themeProp}
+      isDark={
+        activeTheme === "dark" ||
+        (DARK_THEMES as readonly string[]).includes(activeTheme)
+      }
       width={width}
       mode={mode}
       max={max}

@@ -1,32 +1,22 @@
 import React, {
-  createContext,
-  useContext,
-  useMemo,
-  useCallback,
   ReactNode,
-  useState,
+  useReducer,
   useEffect,
   useRef,
+  useMemo,
+  useCallback,
 } from "react";
-import { CalendarContextValue, CalendarProps } from "@/types/calendar";
-import { DARK_THEMES } from "@/types/themes";
-import { isSameDay } from "@/utils/date-utils";
-
-const CalendarContext = createContext<CalendarContextValue | undefined>(
-  undefined,
-);
-
-export const useCalendarContext = () => {
-  const context = useContext(CalendarContext);
-  if (!context)
-    throw new Error("useCalendarContext must be used within Provider");
-  return context;
-};
-
-const toValidDate = (d?: Date) => {
-  const parsed = d ? new Date(d) : new Date();
-  return isNaN(parsed.getTime()) ? new Date() : parsed;
-};
+import { CalendarProps } from "@/types/calendar";
+import {
+  calendarReducer,
+  buildInitialState,
+  toValidDate,
+  SelectConfig,
+} from "@/core/state";
+import { ConfigContext, CalendarConfig } from "@/context/config-context";
+import { NavigationContext } from "@/context/navigation-context";
+import { SelectionContext } from "@/context/selection-context";
+import { UIContext } from "@/context/ui-context";
 
 const isDateRange = (v: unknown): v is import("@/types/calendar").DateRange =>
   v !== null &&
@@ -36,11 +26,16 @@ const isDateRange = (v: unknown): v is import("@/types/calendar").DateRange =>
   "from" in (v as object);
 
 export const CalendarProvider: React.FC<
-  CalendarProps & { children: ReactNode; containerWidth?: number; toggleTheme?: () => void }
+  CalendarProps & {
+    children: ReactNode;
+    containerWidth?: number;
+    toggleTheme?: () => void;
+    isDark?: boolean;
+  }
 > = ({
   children,
   toggleTheme,
-  theme,
+  isDark,
   value: externalValue,
   mode = "single",
   max,
@@ -51,276 +46,334 @@ export const CalendarProvider: React.FC<
   rangeMinDays,
   rangeMaxDays,
   containerWidth = 0,
-  ...props
+  locale = "en",
+  startOfWeek = 1,
+  hour12 = false,
+  shortMonths = true,
+  time = true,
+  timeGrid = false,
+  months = true,
+  monthsGrid = false,
+  compactMonths = false,
+  compactYears = true,
+  showYearPicker = false,
+  presets = false,
+  gradient = false,
+  showSelectedDates = false,
+  highlightWeekends = true,
+  highlightToday = true,
+  showWeekNumber = false,
+  hideWeekdays = false,
+  hideLimited = false,
+  hideDisabled = false,
+  twoMonthsLayout = false,
+  monthsColumn = false,
+  manualSelect = false,
+  showHomeButton = false,
+  showClearButton = false,
+  showThemeToggle = false,
+  allowCleanSelected = false,
+  allowNavigateSelected = false,
+  allowCleanManualSelect = false,
+  minDate,
+  maxDate,
+  disabled,
 }) => {
   const range = mode === "range";
   const multiselect: number | boolean | undefined =
     mode === "multiple" ? (max ?? true) : undefined;
-  const externalRangeObj = isDateRange(externalValue)
-    ? externalValue
-    : undefined;
-  const externalDates = Array.isArray(externalValue)
-    ? externalValue
-    : undefined;
-  const externalSingle =
-    externalValue instanceof Date
-      ? externalValue
-      : !externalRangeObj
-        ? externalDates?.[0]
-        : undefined;
 
-  const [internalDate, setInternalDate] = useState<Date>(() => {
-    if (externalRangeObj?.from) return toValidDate(externalRangeObj.from);
-    if (externalSingle) return toValidDate(externalSingle);
-    if (startMonth) return toValidDate(startMonth);
-    return new Date();
-  });
-  const [selectedDates, setSelectedDates] = useState<Date[]>(() => {
-    if (range) return [];
-    if (externalDates) return externalDates.map(toValidDate);
-    if (externalSingle) return [toValidDate(externalSingle)];
-    return [];
-  });
+  const selectConfig: SelectConfig = {
+    range,
+    multiselect,
+    rangeMinDays,
+    rangeMaxDays,
+  };
 
-  const [rangeStart, setRangeStart] = useState<Date | null>(() => {
-    if (!range) return null;
-    if (externalRangeObj?.from) return toValidDate(externalRangeObj.from);
-    if (externalDates?.[0]) return toValidDate(externalDates[0]);
-    if (externalSingle) return toValidDate(externalSingle);
-    return null;
-  });
-  const [rangeEnd, setRangeEnd] = useState<Date | null>(() => {
-    if (!range) return null;
-    if (externalRangeObj?.to) return toValidDate(externalRangeObj.to);
-    if (externalDates?.[1]) return toValidDate(externalDates[1]);
-    return null;
-  });
-  const [hoverDate, setHoverDate] = useState<Date | null>(null);
+  const [state, dispatch] = useReducer(calendarReducer, undefined, () =>
+    buildInitialState({ externalValue, startMonth, range }),
+  );
 
-  const selectedDatesRef = useRef(selectedDates);
-  selectedDatesRef.current = selectedDates;
-  const rangeStartRef = useRef(rangeStart);
-  rangeStartRef.current = rangeStart;
-  const rangeEndRef = useRef(rangeEnd);
-  rangeEndRef.current = rangeEnd;
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+  const onDatesChangeRef = useRef(onDatesChange);
+  onDatesChangeRef.current = onDatesChange;
+  const onRangeChangeRef = useRef(onRangeChange);
+  onRangeChangeRef.current = onRangeChange;
 
   useEffect(() => {
-    if (startMonth) setInternalDate(toValidDate(startMonth));
+    if (startMonth) {
+      dispatch({ type: "NAVIGATE", date: toValidDate(startMonth) });
+    }
   }, [startMonth]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const [showTimePopup, setShowTimePopup] = useState(false);
-  const [showMonthPopup, setShowMonthPopup] = useState(false);
-  const [showYearPopup, setShowYearPopup] = useState(false);
-
   useEffect(() => {
+    const externalRangeObj = isDateRange(externalValue)
+      ? externalValue
+      : undefined;
+    const externalDates = Array.isArray(externalValue)
+      ? externalValue
+      : undefined;
+    const externalSingle =
+      externalValue instanceof Date
+        ? externalValue
+        : !externalRangeObj
+          ? externalDates?.[0]
+          : undefined;
+
     if (range) {
-      if (externalRangeObj) {
-        setRangeStart(
-          externalRangeObj.from ? toValidDate(externalRangeObj.from) : null,
-        );
-        setRangeEnd(
-          externalRangeObj.to ? toValidDate(externalRangeObj.to) : null,
-        );
-        if (externalRangeObj.from)
-          setInternalDate(toValidDate(externalRangeObj.from));
-      } else if (externalDates?.length) {
-        setRangeStart(toValidDate(externalDates[0]));
-        setRangeEnd(externalDates[1] ? toValidDate(externalDates[1]) : null);
-        if (externalDates[0]) setInternalDate(toValidDate(externalDates[0]));
-      } else if (externalSingle) {
-        setRangeStart(toValidDate(externalSingle));
-        setRangeEnd(null);
-        setInternalDate(toValidDate(externalSingle));
-      }
+      const from = externalRangeObj?.from
+        ? toValidDate(externalRangeObj.from)
+        : externalDates?.[0]
+          ? toValidDate(externalDates[0])
+          : externalSingle
+            ? toValidDate(externalSingle)
+            : null;
+      const to = externalRangeObj?.to
+        ? toValidDate(externalRangeObj.to)
+        : externalDates?.[1]
+          ? toValidDate(externalDates[1])
+          : null;
+      dispatch({
+        type: "SYNC_EXTERNAL",
+        viewDate: from ?? state.viewDate,
+        selectedDates: [],
+        rangeStart: from,
+        rangeEnd: to,
+      });
     } else if (externalDates) {
-      setSelectedDates(externalDates.map(toValidDate));
+      dispatch({
+        type: "SYNC_EXTERNAL",
+        viewDate: externalDates[0]
+          ? toValidDate(externalDates[0])
+          : state.viewDate,
+        selectedDates: externalDates.map(toValidDate),
+        rangeStart: null,
+        rangeEnd: null,
+      });
     } else {
-      const parsed = toValidDate(externalSingle);
-      setInternalDate(parsed);
-      setSelectedDates(externalSingle ? [parsed] : []);
+      const parsed = externalSingle ? toValidDate(externalSingle) : null;
+      dispatch({
+        type: "SYNC_EXTERNAL",
+        viewDate: parsed ?? state.viewDate,
+        selectedDates: parsed ? [parsed] : [],
+        rangeStart: null,
+        rangeEnd: null,
+      });
     }
   }, [externalValue]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const isDark = useMemo(() => {
-    if (!theme) return false;
-    if (typeof theme === "object") return theme.base === "dark";
-    if (theme === "dark") return true;
-    return (DARK_THEMES as readonly string[]).includes(theme);
-  }, [theme]);
+  const stateRef = useRef(state);
+  stateRef.current = state;
 
   const handleChangeDate = useCallback(
     (d: Date | null) => {
+      const action = { type: "SELECT" as const, date: d, config: selectConfig };
+      const next = calendarReducer(stateRef.current, action);
+      dispatch(action);
+
       if (range) {
-        if (!d) {
-          setRangeStart(null);
-          setRangeEnd(null);
-          setHoverDate(null);
-          onRangeChange?.({ from: null, to: null });
-          return;
-        }
-        const prevStart = rangeStartRef.current;
-        const prevEnd = rangeEndRef.current;
-
-        if (!prevStart || (prevStart && prevEnd)) {
-          setRangeStart(d);
-          setRangeEnd(null);
-          setInternalDate(d);
-          setHoverDate(null);
-          onRangeChange?.({ from: d, to: null });
-          return;
-        }
-
-        if (isSameDay(d, prevStart)) {
-          setRangeStart(null);
-          setRangeEnd(null);
-          setHoverDate(null);
-          onRangeChange?.({ from: null, to: null });
-          return;
-        }
-
-        const [s, e] = d < prevStart ? [d, prevStart] : [prevStart, d];
-        const diffDays = Math.round((e.getTime() - s.getTime()) / 86400000) + 1;
-        if (rangeMinDays !== undefined && diffDays < rangeMinDays) return;
-        if (rangeMaxDays !== undefined && diffDays > rangeMaxDays) return;
-        setRangeStart(s);
-        setRangeEnd(e);
-        setInternalDate(s);
-        setHoverDate(null);
-        onRangeChange?.({ from: s, to: e });
+        onRangeChangeRef.current?.({
+          from: next.rangeStart,
+          to: next.rangeEnd,
+        });
         return;
       }
-
-      if (multiselect && d) {
-        const maxCount = multiselect === true ? Infinity : Number(multiselect);
-        const prev = selectedDatesRef.current;
-        const alreadyIndex = prev.findIndex((s) => isSameDay(s, d));
-
-        let next: Date[];
-        if (alreadyIndex >= 0) {
-          next = prev.filter((_, i) => i !== alreadyIndex);
-        } else if (prev.length >= maxCount) {
-          return;
-        } else {
-          next = [...prev, d];
+      if (multiselect) {
+        if (next.selectedDates !== stateRef.current.selectedDates) {
+          onDatesChangeRef.current?.(next.selectedDates);
         }
-
-        setSelectedDates(next);
-        setInternalDate(d);
-        onDatesChange?.(next);
-      } else {
-        if (d) {
-          const prev = selectedDatesRef.current[0];
-          if (prev && isSameDay(prev, d)) {
-            setSelectedDates([]);
-            onChange?.(null);
-            return;
-          }
-          setInternalDate(d);
-          setSelectedDates([d]);
-        } else {
-          setSelectedDates([]);
-        }
-        onChange?.(d);
+        return;
       }
+      onChangeRef.current?.(next.selectedDates[0] ?? null);
     },
-    [multiselect, range, onChange, onDatesChange, onRangeChange],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [range, multiselect, selectConfig],
   );
 
-  const handleChangeTime = useCallback(
-    (d: Date) => {
-      setInternalDate(d);
-      setSelectedDates((prev) => (prev.length > 0 ? [d] : prev));
-      onChange?.(d);
-    },
-    [onChange],
-  );
-
-  const handleDatesSet = useCallback(
-    (dates: Date[]) => {
-      setSelectedDates(dates);
-      onDatesChange?.(dates);
-    },
-    [onDatesChange],
-  );
-
-  const handleRangeSet = useCallback(
-    (from: Date | null, to: Date | null) => {
-      setRangeStart(from);
-      setRangeEnd(to);
-      if (from) setInternalDate(from);
-      onRangeChange?.({ from, to });
-    },
-    [onRangeChange],
-  );
-
-  const navigateTo = useCallback((d: Date) => {
-    setInternalDate(d);
+  const handleChangeTime = useCallback((d: Date) => {
+    dispatch({ type: "CHANGE_TIME", date: d });
+    onChangeRef.current?.(d);
   }, []);
 
-  const selectedDate = range ? rangeStart : (selectedDates[0] ?? null);
+  const handleDatesSet = useCallback((dates: Date[]) => {
+    dispatch({ type: "SET_DATES", dates });
+    onDatesChangeRef.current?.(dates);
+  }, []);
 
+  const handleRangeSet = useCallback((from: Date | null, to: Date | null) => {
+    dispatch({ type: "SET_RANGE", from, to });
+    onRangeChangeRef.current?.({ from, to });
+  }, []);
+
+  const navigateTo = useCallback((d: Date) => {
+    dispatch({ type: "NAVIGATE", date: d });
+  }, []);
+
+  const setHoverDate = useCallback((d: Date | null) => {
+    dispatch({ type: "HOVER", date: d });
+  }, []);
+
+  const setShowTimePopup = useCallback((v: boolean) => {
+    dispatch(
+      v ? { type: "OPEN_POPUP", popup: "time" } : { type: "CLOSE_POPUP" },
+    );
+  }, []);
+
+  const setShowMonthPopup = useCallback((v: boolean) => {
+    dispatch(
+      v ? { type: "OPEN_POPUP", popup: "month" } : { type: "CLOSE_POPUP" },
+    );
+  }, []);
+
+  const setShowYearPopup = useCallback((v: boolean) => {
+    dispatch(
+      v ? { type: "OPEN_POPUP", popup: "year" } : { type: "CLOSE_POPUP" },
+    );
+  }, []);
+
+  const selectedDate = range
+    ? state.rangeStart
+    : (state.selectedDates[0] ?? null);
   const contextSelectedDates = range
-    ? ([rangeStart, rangeEnd].filter(Boolean) as Date[])
-    : selectedDates;
+    ? ([state.rangeStart, state.rangeEnd].filter(Boolean) as Date[])
+    : state.selectedDates;
 
-  const contextValue = useMemo<CalendarContextValue>(
-    () =>
-      ({
-        ...props,
-        rangeMinDays,
-        rangeMaxDays,
-        multiselect,
-        range,
-        dark: isDark,
-        toggleTheme: toggleTheme ?? (() => {}),
-        date: internalDate,
-        selectedDate,
-        selectedDates: contextSelectedDates,
-        rangeStart,
-        rangeEnd,
-        hoverDate,
-        setHoverDate,
-        navigateTo,
-        showTimePopup,
-        setShowTimePopup,
-        showMonthPopup,
-        setShowMonthPopup,
-        showYearPopup,
-        setShowYearPopup,
-        onChangeDate: handleChangeDate,
-        onDatesSet: handleDatesSet,
-        onRangeSet: handleRangeSet,
-        onChangeTime: handleChangeTime,
-        containerWidth,
-      }) as CalendarContextValue,
-    [
-      props,
+  const config = useMemo<CalendarConfig>(
+    () => ({
+      locale,
+      startOfWeek,
+      hour12,
+      shortMonths,
+      range,
       multiselect,
       rangeMinDays,
       rangeMaxDays,
+      minDate,
+      maxDate,
+      disabled,
+      time,
+      timeGrid,
+      months,
+      monthsGrid,
+      compactMonths,
+      compactYears,
+      showYearPicker,
+      presets,
+      gradient,
+      showSelectedDates,
+      highlightWeekends,
+      highlightToday,
+      showWeekNumber,
+      hideWeekdays,
+      hideLimited,
+      hideDisabled,
+      twoMonthsLayout,
+      monthsColumn,
+      manualSelect,
+      showHomeButton,
+      showClearButton,
+      showThemeToggle,
+      allowCleanSelected,
+      allowNavigateSelected,
+      allowCleanManualSelect,
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      locale,
+      startOfWeek,
+      hour12,
+      shortMonths,
       range,
-      isDark,
-      internalDate,
+      multiselect,
+      rangeMinDays,
+      rangeMaxDays,
+      minDate,
+      maxDate,
+      disabled,
+      time,
+      timeGrid,
+      months,
+      monthsGrid,
+      compactMonths,
+      compactYears,
+      showYearPicker,
+      presets,
+      gradient,
+      showSelectedDates,
+      highlightWeekends,
+      highlightToday,
+      showWeekNumber,
+      hideWeekdays,
+      hideLimited,
+      hideDisabled,
+      twoMonthsLayout,
+      monthsColumn,
+      manualSelect,
+      showHomeButton,
+      showClearButton,
+      showThemeToggle,
+      allowCleanSelected,
+      allowNavigateSelected,
+      allowCleanManualSelect,
+    ],
+  );
+
+  const navigation = useMemo(
+    () => ({ viewDate: state.viewDate, navigateTo }),
+    [state.viewDate, navigateTo],
+  );
+
+  const selection = useMemo(
+    () => ({
+      selectedDate,
+      selectedDates: contextSelectedDates,
+      rangeStart: state.rangeStart,
+      rangeEnd: state.rangeEnd,
+      hoverDate: state.hoverDate,
+      setHoverDate,
+      onChangeDate: handleChangeDate,
+      onDatesSet: handleDatesSet,
+      onRangeSet: handleRangeSet,
+      onChangeTime: handleChangeTime,
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
       selectedDate,
       contextSelectedDates,
-      rangeStart,
-      rangeEnd,
-      hoverDate,
+      state.rangeStart,
+      state.rangeEnd,
+      state.hoverDate,
       handleChangeDate,
       handleDatesSet,
       handleRangeSet,
       handleChangeTime,
-      navigateTo,
-      showTimePopup,
-      showMonthPopup,
-      showYearPopup,
-      containerWidth,
     ],
   );
 
+  const ui = useMemo(
+    () => ({
+      dark: isDark ?? false,
+      toggleTheme: toggleTheme ?? (() => {}),
+      containerWidth,
+      showTimePopup: state.openPopup === "time",
+      setShowTimePopup,
+      showMonthPopup: state.openPopup === "month",
+      setShowMonthPopup,
+      showYearPopup: state.openPopup === "year",
+      setShowYearPopup,
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isDark, toggleTheme, containerWidth, state.openPopup],
+  );
+
   return (
-    <CalendarContext.Provider value={contextValue}>
-      {children}
-    </CalendarContext.Provider>
+    <ConfigContext.Provider value={config}>
+      <NavigationContext.Provider value={navigation}>
+        <SelectionContext.Provider value={selection}>
+          <UIContext.Provider value={ui}>{children}</UIContext.Provider>
+        </SelectionContext.Provider>
+      </NavigationContext.Provider>
+    </ConfigContext.Provider>
   );
 };

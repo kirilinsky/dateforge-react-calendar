@@ -4,7 +4,10 @@ import { MonthsComponent } from "../months/months";
 import { PresetsComponent } from "../presets/presets";
 import { SelectedDatesComponent } from "../selected-dates/selected-dates";
 import { ManualSelectComponent } from "../manual-select/manual-select";
-import { useCalendarContext } from "../provider/provider";
+import { useConfig } from "@/context/config-context";
+import { useNavigation } from "@/context/navigation-context";
+import { useSelection } from "@/context/selection-context";
+import { useUI } from "@/context/ui-context";
 import { TimeComponent } from "../time/time";
 import { TimePopup } from "../time-popup/time-popup";
 import { MonthPopup, YearPopup } from "../month-year-track/month-year-track";
@@ -17,37 +20,19 @@ export const CalendarLayout: React.FC<{
   customAppearanceVars?: React.CSSProperties;
 }> = ({ containerStyle, appearanceKey, customAppearanceVars }) => {
   const {
-    presets,
-    showYearPicker,
-    months,
-    compactMonths,
-    compactYears,
-    monthsGrid,
-    timeGrid,
-    time,
-    gradient,
-    dark,
-    showTimePopup,
-    setShowTimePopup,
-    showMonthPopup,
-    setShowMonthPopup,
-    showYearPopup,
-    setShowYearPopup,
-    date,
-    onChangeTime,
-    navigateTo,
-    hour12,
-    locale,
-    shortMonths,
-    minDate,
-    maxDate,
-    selectedDates,
-    showSelectedDates,
-    twoMonthsLayout,
-    monthsColumn,
+    presets, showYearPicker, months, compactMonths, compactYears,
+    monthsGrid, timeGrid, time, gradient, showSelectedDates,
+    twoMonthsLayout, monthsColumn, manualSelect,
+    hour12, locale, shortMonths, minDate, maxDate,
+  } = useConfig();
+  const { viewDate: date, navigateTo } = useNavigation();
+  const { selectedDates, onChangeTime } = useSelection();
+  const {
+    dark, showTimePopup, setShowTimePopup,
+    showMonthPopup, setShowMonthPopup,
+    showYearPopup, setShowYearPopup,
     containerWidth,
-    manualSelect,
-  } = useCalendarContext();
+  } = useUI();
 
   const nextMonthDate = twoMonthsLayout
     ? new Date(date.getFullYear(), date.getMonth() + 1, 1)

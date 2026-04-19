@@ -1,16 +1,21 @@
 import React from "react";
 import styles from "./time.module.css";
 import shared from "@/global/global.module.css";
-import { useCalendarContext } from "../provider/provider";
+import { useConfig } from "@/context/config-context";
+import { useNavigation } from "@/context/navigation-context";
+import { useSelection } from "@/context/selection-context";
 import { useThrottle } from "@/hooks/use-throttle";
 import { TimeTrack } from "../time-track/time-track";
 
 export const TimeComponent: React.FC = () => {
-  const { onChangeTime, date, hour12 } = useCalendarContext();
-  const throttled = useThrottle(onChangeTime, 70);
+  const { hour12 } = useConfig();
+  const { viewDate: date } = useNavigation();
+  const { onChangeTime } = useSelection();
+  const throttled = useThrottle(onChangeTime, 50);
 
   return (
     <div
+      data-area="time"
       style={{ gridArea: "TT" }}
       className={`${styles.timeContainer} ${shared.flexCenter}`}
     >

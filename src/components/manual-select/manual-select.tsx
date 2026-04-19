@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import styles from "./manual-select.module.css";
 import shared from "@/global/global.module.css";
 import { Check, Clear } from "@/Icons";
-import { useCalendarContext } from "../provider/provider";
+import { useConfig } from "@/context/config-context";
+import { useNavigation } from "@/context/navigation-context";
+import { useSelection } from "@/context/selection-context";
 import { checkIsDateDisabled, isSameDay } from "@/utils/date-utils";
 
 
@@ -279,21 +281,9 @@ const DateSlot: React.FC<DateSlotProps> = ({
 };
 
 export const ManualSelectComponent: React.FC = () => {
-  const {
-    range,
-    rangeStart,
-    rangeEnd,
-    selectedDates,
-    multiselect,
-    onChangeDate,
-    onRangeSet,
-    onDatesSet,
-    disabled,
-    minDate,
-    maxDate,
-    date,
-    allowCleanManualSelect = true,
-  } = useCalendarContext();
+  const { range, multiselect, disabled, minDate, maxDate, allowCleanManualSelect } = useConfig();
+  const { viewDate: date } = useNavigation();
+  const { rangeStart, rangeEnd, selectedDates, onChangeDate, onRangeSet, onDatesSet } = useSelection();
 
   const withTime = (d: Date, ref?: Date): Date => {
     const src = ref ?? date;

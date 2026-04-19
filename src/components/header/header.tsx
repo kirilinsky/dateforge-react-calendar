@@ -2,7 +2,10 @@ import React, { useMemo } from "react";
 import styles from "./header.module.css";
 import shared from "@/global/global.module.css";
 import { Clear, Down, Home, ThemeToggle } from "@/Icons";
-import { useCalendarContext } from "../provider/provider";
+import { useConfig } from "@/context/config-context";
+import { useNavigation } from "@/context/navigation-context";
+import { useSelection } from "@/context/selection-context";
+import { useUI } from "@/context/ui-context";
 import {
   addDate,
   checkYearNavigation,
@@ -13,34 +16,17 @@ import { getTwoMonthsNarrowThreshold } from "@/helpers/get-grid-layout";
 
 export const HeaderComponent: React.FC = () => {
   const {
-    navigateTo,
-    compactMonths,
-    compactYears,
-    minDate,
-    maxDate,
-    showYearPicker,
-    months,
-    date,
-    time,
-    locale,
-    hour12,
-    setShowTimePopup,
-    setShowMonthPopup,
-    setShowYearPopup,
-    shortMonths,
-    disabled,
-    twoMonthsLayout,
-    monthsColumn,
-    monthsGrid,
-    timeGrid,
-    containerWidth,
-    showHomeButton,
-    showClearButton,
-    showThemeToggle,
-    toggleTheme,
-    selectedDates,
-    onChangeDate,
-  } = useCalendarContext();
+    compactMonths, compactYears, minDate, maxDate, showYearPicker,
+    months, time, locale, hour12, shortMonths, disabled,
+    twoMonthsLayout, monthsColumn, monthsGrid, timeGrid,
+    showHomeButton, showClearButton, showThemeToggle,
+  } = useConfig();
+  const { viewDate: date, navigateTo } = useNavigation();
+  const { selectedDates, onChangeDate } = useSelection();
+  const {
+    setShowTimePopup, setShowMonthPopup, setShowYearPopup,
+    containerWidth, toggleTheme,
+  } = useUI();
 
   const twoMonthsStacked =
     !!twoMonthsLayout &&
@@ -97,6 +83,7 @@ export const HeaderComponent: React.FC = () => {
       ]
         .filter(Boolean)
         .join(" ")}
+      data-area="header"
       style={{ gridArea: "HH" }}
     >
       {time && (

@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./days.module.css";
-import { useCalendarContext } from "../provider/provider";
+import { useConfig } from "@/context/config-context";
+import { useNavigation } from "@/context/navigation-context";
+import { useSelection } from "@/context/selection-context";
 import {
   getFirstDayOffset,
   getNextMonthFromSwipe,
@@ -16,27 +18,15 @@ export const DaysComponent: React.FC<{
   hideOtherMonths?: boolean;
 }> = ({ dateOverride, gridArea = "DD", hideOtherMonths = false }) => {
   const {
-    minDate,
-    maxDate,
-    date,
-    selectedDates,
-    onChangeDate,
-    disabled,
-    navigateTo,
-    hideLimited,
-    hideDisabled,
-    startOfWeek,
-    showWeekNumber,
-    range,
-    rangeStart,
-    rangeEnd,
-    hoverDate,
-    setHoverDate,
-    rangeMinDays,
-    rangeMaxDays,
-    twoMonthsLayout,
-    highlightToday,
-  } = useCalendarContext();
+    minDate, maxDate, disabled, hideLimited, hideDisabled,
+    startOfWeek, showWeekNumber, range, rangeMinDays, rangeMaxDays,
+    twoMonthsLayout, highlightToday,
+  } = useConfig();
+  const { viewDate: date, navigateTo } = useNavigation();
+  const {
+    selectedDates, onChangeDate,
+    rangeStart, rangeEnd, hoverDate, setHoverDate,
+  } = useSelection();
 
   const today = useMemo(() => new Date(), []);
 
@@ -197,6 +187,7 @@ export const DaysComponent: React.FC<{
   return (
     <div
       aria-label="days"
+      data-area="days"
       key={animationKey}
       style={{ gridArea }}
       onTouchEnd={handleTouchEnd}
@@ -318,6 +309,9 @@ export const DaysComponent: React.FC<{
                     isPreviewEnd ||
                     isPreviewMid;
 
+                  const dayOfWeek = fullDate.getDay();
+                  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+
                   return (
                     <button
                       key={i}
@@ -326,6 +320,15 @@ export const DaysComponent: React.FC<{
                       onClick={() => handleSetDay(fullDate, isDisabled)}
                       onMouseEnter={() => handleMouseEnter(fullDate)}
                       aria-selected={isSelected}
+                      data-cell=""
+                      data-selected={isSelected || undefined}
+                      data-today={isToday || undefined}
+                      data-disabled={isDisabled || undefined}
+                      data-in-range={isInRange || undefined}
+                      data-range-start={isRangeStart || undefined}
+                      data-range-end={isRangeEnd || undefined}
+                      data-weekend={isWeekend || undefined}
+                      data-other-month={isOtherMonth || undefined}
                       className={[
                         styles.dayItem,
                         shared.interactive,

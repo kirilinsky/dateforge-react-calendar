@@ -1,7 +1,9 @@
 import React from "react";
 import styles from "./selected-dates.module.css";
 import shared from "@/global/global.module.css";
-import { useCalendarContext } from "../provider/provider";
+import { useConfig } from "@/context/config-context";
+import { useNavigation } from "@/context/navigation-context";
+import { useSelection } from "@/context/selection-context";
 
 const getRangeSep = (
   fmt: Intl.DateTimeFormat,
@@ -26,18 +28,9 @@ const getRangeSep = (
 };
 
 export const SelectedDatesComponent: React.FC = () => {
-  const {
-    selectedDates,
-    date,
-    navigateTo,
-    locale,
-    range,
-    rangeStart,
-    rangeEnd,
-    onChangeDate,
-    allowCleanSelected = true,
-    allowNavigateSelected = true,
-  } = useCalendarContext();
+  const { locale, range, allowCleanSelected, allowNavigateSelected } = useConfig();
+  const { viewDate: date, navigateTo } = useNavigation();
+  const { selectedDates, rangeStart, rangeEnd, onChangeDate } = useSelection();
 
   const fmt = new Intl.DateTimeFormat(locale, {
     day: "numeric",
