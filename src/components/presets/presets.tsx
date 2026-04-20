@@ -53,7 +53,6 @@ export const PresetsComponent: React.FC<CalendarPresetsProps> = ({
     <div
       className={styles.presetsContainer}
       data-area="presets"
-      style={{ gridArea: "PP" }}
       data-count={presets.length}
     >
       {presets.map((preset) => {

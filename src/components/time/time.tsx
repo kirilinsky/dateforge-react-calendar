@@ -16,7 +16,6 @@ export const TimeComponent: React.FC = () => {
   return (
     <div
       data-area="time"
-      style={{ gridArea: "TT" }}
       className={`${styles.timeContainer} ${shared.flexCenter}`}
     >
       <TimeTrack date={date} hour12={hour12} onChange={throttled} />

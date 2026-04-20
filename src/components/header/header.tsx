@@ -80,7 +80,6 @@ export const HeaderComponent: React.FC = () => {
         .filter(Boolean)
         .join(" ")}
       data-area="header"
-      style={{ gridArea: "HH" }}
     >
       {time && (
         <button

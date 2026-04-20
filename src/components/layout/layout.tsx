@@ -100,14 +100,13 @@ export const CalendarLayout: React.FC<{
       )}
       <DaysComponent hideOtherMonths={!!twoMonthsLayout} />
       {twoMonthsStacked && nextMonthLabel && (
-        <div style={{ gridArea: "LB" }} className={styles.secondMonthLabel}>
+        <div data-area="label-break" className={styles.secondMonthLabel}>
           {nextMonthLabel}
         </div>
       )}
       {nextMonthDate && (
         <DaysComponent
           dateOverride={nextMonthDate}
-          gridArea="D2"
           hideOtherMonths
           dataArea="days-2"
         />

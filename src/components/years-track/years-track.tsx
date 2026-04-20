@@ -21,7 +21,6 @@ export const YearsTrackComponent: React.FC<CalendarYearsTrackProps> = ({
     <div
       className={styles.yearsTrackContainer}
       data-area="years-track"
-      style={{ gridArea: "YT" }}
     >
       {stubYears.map((year) => (
         <button

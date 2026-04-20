@@ -14,10 +14,9 @@ import WeekDays from "../week-days/week-days";
 
 export const DaysComponent: React.FC<{
   dateOverride?: Date;
-  gridArea?: string;
   hideOtherMonths?: boolean;
   dataArea?: string;
-}> = ({ dateOverride, gridArea = "DD", hideOtherMonths = false, dataArea = "days" }) => {
+}> = ({ dateOverride, hideOtherMonths = false, dataArea = "days" }) => {
   const {
     minDate, maxDate, disabled, hideLimited, hideDisabled,
     startOfWeek, showWeekNumber, range, rangeMinDays, rangeMaxDays,
@@ -190,7 +189,6 @@ export const DaysComponent: React.FC<{
       aria-label="days"
       data-area={dataArea}
       key={animationKey}
-      style={{ gridArea }}
       onTouchEnd={handleTouchEnd}
       onTouchStart={handleTouchStart}
       onMouseLeave={handleMouseLeave}
@@ -203,7 +201,7 @@ export const DaysComponent: React.FC<{
         .join(" ")}
     >
       <WeekDays />
-      <div role="row" style={{ display: "contents", gridArea: "DD" }}>
+      <div role="row" style={{ display: "contents" }}>
         {weeksData.map((week, wIndex) => {
           const isLastRow = wIndex === weeksData.length - 1;
           if (

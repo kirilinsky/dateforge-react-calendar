@@ -82,7 +82,7 @@ export const SelectedDatesComponent: React.FC<CalendarSelectedDatesProps> = ({
     const sep = rangeEnd ? getRangeSep(fmt, rangeStart, rangeEnd) : " – ";
 
     return (
-      <div className={styles.selectedContainer} data-area="selected-dates" style={{ gridArea: "SD" }}>
+      <div className={styles.selectedContainer} data-area="selected-dates">
         <button
           type="button"
           onClick={() => allowNavigate && navigateTo(rangeStart)}
@@ -108,7 +108,7 @@ export const SelectedDatesComponent: React.FC<CalendarSelectedDatesProps> = ({
   if (!selectedDates.length) return null;
 
   return (
-    <div className={styles.selectedContainer} data-area="selected-dates" style={{ gridArea: "SD" }}>
+    <div className={styles.selectedContainer} data-area="selected-dates">
       {selectedDates.map((d, i) => {
         const isActive = isCurrentMonth(d) && d.getDate() === date.getDate();
         return (

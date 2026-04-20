@@ -369,6 +369,17 @@
       "PP PP PP PP";
   }
 
+  .calendarContainer > [data-area="header"] { grid-area: HH; }
+  .calendarContainer > [data-area="days"] { grid-area: DD; }
+  .calendarContainer > [data-area="days-2"] { grid-area: D2; }
+  .calendarContainer > [data-area="months"] { grid-area: MM; }
+  .calendarContainer > [data-area="time"] { grid-area: TT; }
+  .calendarContainer > [data-area="manual-select"] { grid-area: MS; }
+  .calendarContainer > [data-area="selected-dates"] { grid-area: SD; }
+  .calendarContainer > [data-area="years-track"] { grid-area: YT; }
+  .calendarContainer > [data-area="presets"] { grid-area: PP; }
+  .calendarContainer > [data-area="label-break"] { grid-area: LB; }
+
   .calendarContainer[data-stacked] {
     grid-template-columns: 1fr;
     grid-template-areas:
