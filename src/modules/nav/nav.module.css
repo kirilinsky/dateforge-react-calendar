@@ -5,6 +5,7 @@
 }
 
 .headerContainer {
+  container-type: inline-size;
   grid-column: 1 / -1;
   display: flex;
   align-items: center;
@@ -120,19 +121,15 @@
   min-width: 0;
 }
 
-.twoMonthsSelector {
-  flex-grow: 1;
-  flex-shrink: 0;
-  flex-basis: 12em;
-  min-width: 0;
+/* Month name: long by default, short on narrow containers */
+.monthNameShort { display: none; }
 
-  & .currentYear {
-    flex-basis: 3em;
-    min-width: 3em;
-  }
+@container (max-width: 16.25em) {
+  .monthNameLong  { display: none; }
+  .monthNameShort { display: inline; }
 }
 
-@container (max-width: 340px) {
+@container (max-width: 21.25em) {
   .headerContainer {
     font-size: 1em;
     padding: 0.5em;
@@ -144,20 +141,11 @@
   }
 }
 
-@container (max-width: 220px) {
+@container (max-width: 13.75em) {
   .headerContainer {
     font-size: 0.92em;
     padding: 0.4em;
     gap: 0.25em;
-  }
-  .twoMonthsHeader .monthButton,
-  .twoMonthsHeader .timeButton {
-    flex: 0 0 auto;
-    width: fit-content;
-  }
-  .twoMonthsSelector .currentYear {
-    font-size: 0.85em;
-    margin: 0;
   }
 }
 

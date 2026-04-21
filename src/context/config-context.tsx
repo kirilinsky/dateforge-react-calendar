@@ -12,8 +12,6 @@ export interface CalendarConfig {
   maxDate?: Date;
   disabled?: DisabledRule | DisabledRule[];
   gradient: boolean;
-  twoMonthsLayout: boolean;
-  monthsColumn: boolean;
 }
 
 export const ConfigContext = createContext<CalendarConfig | undefined>(undefined);

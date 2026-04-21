@@ -43,7 +43,7 @@ export const CalendarDays: React.FC<{
   const {
     minDate, maxDate, disabled,
     range, rangeMinDays, rangeMaxDays,
-    twoMonthsLayout, locale,
+    locale,
   } = useConfig();
 
   const { viewDate: rawDate, navigateTo } = useNavigation();
@@ -207,13 +207,15 @@ export const CalendarDays: React.FC<{
 
   return (
     <div
-      aria-label="days"
       data-area={resolvedArea}
-      key={animationKey}
       onTouchEnd={handleTouchEnd}
       onTouchStart={handleTouchStart}
       onMouseLeave={handleMouseLeave}
-      style={col !== undefined ? { gridColumn: col } : undefined}
+      style={col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined}
+    >
+    <div
+      aria-label="days"
+      key={animationKey}
       className={[
         styles.dayGridContainer,
         direction !== "none" ? styles[direction] : "",
@@ -234,7 +236,7 @@ export const CalendarDays: React.FC<{
           const isLastRow = wIndex === weeksData.length - 1;
           if (
             isLastRow &&
-            (hideLimited || hideDisabled || twoMonthsLayout) &&
+            (hideLimited || hideDisabled) &&
             week.days.every((d) =>
               isDayHidden({
                 fullDate: d.fullDate,
@@ -397,6 +399,7 @@ export const CalendarDays: React.FC<{
           );
         })}
       </div>
+    </div>
     </div>
   );
 };

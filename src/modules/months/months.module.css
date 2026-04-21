@@ -10,7 +10,7 @@
     transition: all var(--cal-transition) linear;
   }
 
-  @container (min-width: 160px) {
+  @container (min-width: 10em) {
     .monthsContainer {
       grid-template-columns: repeat(4, minmax(0, 1fr));
       grid-template-rows: repeat(3, auto);

@@ -49,8 +49,6 @@ export const CalendarProvider: React.FC<
   locale = "en",
   hour12 = false,
   gradient = false,
-  twoMonthsLayout = false,
-  monthsColumn = false,
   minDate,
   maxDate,
   disabled,
@@ -231,8 +229,6 @@ export const CalendarProvider: React.FC<
       maxDate,
       disabled,
       gradient,
-      twoMonthsLayout,
-      monthsColumn,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -246,8 +242,6 @@ export const CalendarProvider: React.FC<
       maxDate,
       disabled,
       gradient,
-      twoMonthsLayout,
-      monthsColumn,
     ],
   );
 

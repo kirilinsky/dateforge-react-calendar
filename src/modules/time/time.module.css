@@ -12,7 +12,7 @@
   justify-content: flex-start;
 }
 
-@container (min-width: 240px) {
+@container (min-width: 15em) {
   .timeContainer {
     min-height: 8em;
     align-items: center;

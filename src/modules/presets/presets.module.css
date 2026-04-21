@@ -1,6 +1,7 @@
 @layer cal-base {
 
 .presetsContainer {
+  container-type: inline-size;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   align-items: stretch;
@@ -11,7 +12,7 @@
   transition: all var(--cal-transition) linear;
 }
 
-@container (max-width: 320px) {
+@container (max-width: 20em) {
   .presetsContainer {
     grid-template-columns: repeat(3, 1fr);
   }

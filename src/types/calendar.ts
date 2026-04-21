@@ -25,7 +25,7 @@ export type CalendarValue<M extends CalendarMode> =
 
 export interface CalendarProps<M extends CalendarMode = "single"> {
   children?: React.ReactNode;
-  cols?: 1 | 2 | 3 | 4 | 5 | 6;
+  cols?: number;
   value?: CalendarValue<M>;
   mode?: M;
   max?: number;
@@ -46,6 +46,4 @@ export interface CalendarProps<M extends CalendarMode = "single"> {
   appearance?: CalendarAppearance;
   gradient?: boolean;
   disabled?: DisabledRule | DisabledRule[];
-  twoMonthsLayout?: boolean;
-  monthsColumn?: boolean;
 }

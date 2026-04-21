@@ -26,6 +26,16 @@
   }
 }
 
+/*
+  Container query breakpoint scale (em-based, relative to each module's font-size):
+    10em    — months: 2-col → 4-col grid
+    13.75em — nav: micro compact (font-size 0.92em)
+    15em    — time: min-height 10em → 8em, centered
+    16.25em — nav: month name long → short
+    20em    — presets: 4-col → 3-col grid
+    21.25em — nav: compact spacing (font-size 1em)
+*/
+
 @layer cal-base {
   .calendarContainer {
     --cal-radius: 0.5em;
@@ -94,6 +104,7 @@
     min-width: 0;
     overflow: hidden;
     background: var(--c-b);
+    grid-column: 1 / -1;
   }
 
    .calendarContainer.gradient > [data-area] {

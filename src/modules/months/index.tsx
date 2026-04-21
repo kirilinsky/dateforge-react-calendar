@@ -27,7 +27,7 @@ export const CalendarMonthGrid: React.FC<CalendarMonthGridProps> = ({
   const handleClick = (i: number) => navigateTo(setMonth(viewDate, i));
 
   return (
-    <div className={styles.monthsContainer} data-area="months" style={col !== undefined ? { gridColumn: col } : undefined}>
+    <div className={styles.monthsContainer} data-area="months" style={col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined}>
       {mNames.map((n, i) => (
         <button
           key={i}

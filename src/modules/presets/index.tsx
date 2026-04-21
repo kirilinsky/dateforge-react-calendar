@@ -30,7 +30,7 @@ export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
       className={styles.presetsContainer}
       data-area="presets"
       data-count={presets.length}
-      style={col !== undefined ? { gridColumn: col } : undefined}
+      style={col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined}
     >
       {presets.map((preset) => {
         const isActive = !!selectedDate && isSameDay(preset.targetDate, selectedDate);

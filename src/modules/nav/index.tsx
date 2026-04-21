@@ -14,6 +14,7 @@ export interface CalendarNavProps {
   showHome?: boolean;
   showClear?: boolean;
   showThemeToggle?: boolean;
+  col?: number | string;
 }
 
 export const CalendarNav: React.FC<CalendarNavProps> = ({
@@ -25,15 +26,12 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
   showHome = false,
   showClear = false,
   showThemeToggle = false,
+  col,
 }) => {
-  const { minDate, maxDate, locale, hour12, disabled, twoMonthsLayout, monthsColumn } = useConfig();
+  const { minDate, maxDate, locale, hour12, disabled } = useConfig();
   const { viewDate: date, navigateTo } = useNavigation();
   const { selectedDates, onChangeDate } = useSelection();
-  const { setShowTimePopup, setShowMonthPopup, setShowYearPopup, containerWidth, toggleTheme } = useUI();
-
-  const twoMonthsStacked =
-    !!twoMonthsLayout &&
-    (!!monthsColumn || (containerWidth > 0 && containerWidth < 680));
+  const { setShowTimePopup, setShowMonthPopup, setShowYearPopup, toggleTheme } = useUI();
 
   const today = new Date();
   const isCurrentMonth =
@@ -57,15 +55,8 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
     [cur, date, minDate, maxDate, disabled],
   );
 
-  const monthFormat = containerWidth > 0 && containerWidth < 260 ? "short" : "long";
-  const currentMonthName = new Intl.DateTimeFormat(locale, { month: monthFormat }).format(date);
-
-  const nextMonthDate = useMemo(
-    () => new Date(date.getFullYear(), date.getMonth() + 1, 1),
-    [date],
-  );
-  const nextMonthName = new Intl.DateTimeFormat(locale, { month: monthFormat }).format(nextMonthDate);
-  const nextMonthYear = nextMonthDate.getFullYear();
+  const monthNameLong  = new Intl.DateTimeFormat(locale, { month: "long"  }).format(date);
+  const monthNameShort = new Intl.DateTimeFormat(locale, { month: "short" }).format(date);
 
   const ch = (v: number) => navigateTo(addDate(date, v, "year", minDate, maxDate));
   const cm = (v: number) => navigateTo(addDate(date, v, "month", minDate, maxDate));
@@ -78,13 +69,9 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
 
   return (
     <div
-      className={[
-        styles.headerContainer,
-        twoMonthsLayout && styles.twoMonthsHeader,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      className={styles.headerContainer}
       data-area="header"
+      style={col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined}
     >
       {showTime && (
         <button
@@ -101,12 +88,11 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           className={`${styles.monthButton} ${shared.interactive}`}
           onClick={() => setShowMonthPopup(true)}
         >
-          <Down /> {currentMonthName}
-          {twoMonthsLayout ? ` — ${nextMonthName}` : ""}
+          <Down /> <span className={styles.monthNameLong}>{monthNameLong}</span><span className={styles.monthNameShort}>{monthNameShort}</span>
         </button>
       )}
 
-      {showMonthPicker && (!twoMonthsLayout || twoMonthsStacked) && (
+      {showMonthPicker && (
         <div className={styles.yearsSelector}>
           {canGoPrevMonth && (
             <button className={`${styles.arrow} ${shared.interactive} ${shared.hoverable}`} onClick={() => cm(-1)}>
@@ -117,31 +103,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
             onClick={() => !monthFixed && setShowMonthPopup(true)}
             className={`${styles.currentYear} ${shared.interactive} ${shared.hoverable} ${monthFixed ? styles.staticButton : ""}`}
           >
-            {currentMonthName}
-          </button>
-          {canGoNextMonth && (
-            <button className={`${styles.arrow} ${shared.interactive} ${shared.hoverable}`} onClick={() => cm(1)}>
-              ›
-            </button>
-          )}
-        </div>
-      )}
-
-      {showMonthPicker && twoMonthsLayout && !twoMonthsStacked && (
-        <div className={`${styles.yearsSelector} ${styles.twoMonthsSelector}`}>
-          {canGoPrevMonth && (
-            <button className={`${styles.arrow} ${shared.interactive} ${shared.hoverable}`} onClick={() => cm(-1)}>
-              ‹
-            </button>
-          )}
-          <button
-            onClick={() => !monthFixed && setShowMonthPopup(true)}
-            className={`${styles.currentYear} ${shared.interactive} ${shared.hoverable} ${monthFixed ? styles.staticButton : ""}`}
-          >
-            {currentMonthName} {cur}
-          </button>
-          <button className={`${styles.currentYear} ${shared.interactive} ${shared.hoverable} ${styles.staticButton}`}>
-            {nextMonthName} {nextMonthYear}
+            <span className={styles.monthNameLong}>{monthNameLong}</span><span className={styles.monthNameShort}>{monthNameShort}</span>
           </button>
           {canGoNextMonth && (
             <button className={`${styles.arrow} ${shared.interactive} ${shared.hoverable}`} onClick={() => cm(1)}>

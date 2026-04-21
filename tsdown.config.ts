@@ -24,7 +24,23 @@ export default defineConfig([
     outDir: "dist",
     clean: true,
     deps: sharedDeps,
-  }, 
+  },
+  {
+    ...sharedOptions,
+    entry: { index: "themes/index.ts" },
+    outDir: "dist/themes",
+    clean: false,
+    css: { inject: false },
+    deps: sharedDeps,
+  },
+  {
+    ...sharedOptions,
+    entry: { index: "appearances/index.ts" },
+    outDir: "dist/appearances",
+    clean: false,
+    css: { inject: false },
+    deps: sharedDeps,
+  },
   {
     ...sharedOptions,
     entry: {

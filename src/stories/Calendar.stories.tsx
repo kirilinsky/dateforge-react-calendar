@@ -91,7 +91,7 @@ export const Default = () => {
         <Calendar
           value={date}
           theme="industrial"
-          appearance="brutalist"
+          appearance="soft"
           onChange={(d) => {
             if (d) setDate(d);
           }}
@@ -580,8 +580,6 @@ export const KitchenSink = () => {
               "bubble",
               "compact",
               "square",
-              "neo",
-              "brutalist",
             ].map((a) => (
               <option key={a} value={a}>
                 {a}

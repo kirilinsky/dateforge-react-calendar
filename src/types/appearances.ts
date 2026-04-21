@@ -23,7 +23,7 @@ export type CustomAppearance = {
   readonly vars: Record<string, string>;
 };
 
-export type BuiltInAppearance = "default" | "compact" | "square" | "brutalist";
+export type BuiltInAppearance = "default" | "soft" | "compact" | "square" | "bubble";
 
 export type CalendarAppearance =
   | BuiltInAppearance

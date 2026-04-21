@@ -18,7 +18,7 @@ export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({ col }) => {
     <div
       data-area="time"
       className={`${styles.timeContainer} ${shared.flexCenter}`}
-      style={col !== undefined ? { gridColumn: col } : undefined}
+      style={col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined}
     >
       <TimeTrack date={date} hour12={hour12} onChange={throttled} />
     </div>

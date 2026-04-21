@@ -130,7 +130,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
         .filter(Boolean)
         .join(" ")}
       data-area="selected-dates"
-      style={col !== undefined ? { gridColumn: col } : undefined}
+      style={col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined}
     >
       <div className={styles.inner}>{content}</div>
     </div>

@@ -26,7 +26,7 @@ export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({
   };
 
   return (
-    <div className={styles.yearsTrackContainer} data-area="years-track" style={col !== undefined ? { gridColumn: col } : undefined}>
+    <div className={styles.yearsTrackContainer} data-area="years-track" style={col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined}>
       {years.map((year) => (
         <button
           key={year}

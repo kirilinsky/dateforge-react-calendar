@@ -21,8 +21,6 @@ export function Calendar<M extends CalendarMode = "single">({
   gradient = false,
   mode,
   max,
-  twoMonthsLayout = false,
-  monthsColumn = false,
   cols,
   children,
   ...restProps
@@ -90,8 +88,6 @@ export function Calendar<M extends CalendarMode = "single">({
       width={width}
       mode={mode}
       max={max}
-      twoMonthsLayout={twoMonthsLayout}
-      monthsColumn={monthsColumn}
       containerWidth={containerWidth}
       toggleTheme={toggleTheme}
       {...(restProps as import("@/types/calendar").CalendarProps<CalendarMode>)}

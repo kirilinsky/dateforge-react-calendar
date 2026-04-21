@@ -11,7 +11,7 @@ import styles from "./layout.module.css";
 export const CalendarLayout: React.FC<{
   appearanceKey?: string;
   customAppearanceVars?: React.CSSProperties;
-  cols?: 1 | 2 | 3 | 4 | 5 | 6;
+  cols?: number;
   modules?: React.ReactNode;
 }> = ({ appearanceKey, customAppearanceVars, cols, modules }) => {
   const { hour12, locale, minDate, maxDate, gradient } = useConfig();

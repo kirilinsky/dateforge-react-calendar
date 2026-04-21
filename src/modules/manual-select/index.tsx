@@ -337,7 +337,7 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
     const addSaveAllowed = !!addTypedDate && isAllowed(addTypedDate);
 
     return (
-      <div className={`${styles.container} ${styles.containerMulti}`} data-area="manual-select" style={col !== undefined ? { gridColumn: col } : undefined}>
+      <div className={`${styles.container} ${styles.containerMulti}`} data-area="manual-select" style={col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined}>
         <div className={styles.datesArea}>
           {canAddMore && (
             <div
@@ -392,7 +392,7 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
 
   if (range) {
     return (
-      <div className={styles.container} data-area="manual-select" style={col !== undefined ? { gridColumn: col } : undefined}>
+      <div className={styles.container} data-area="manual-select" style={col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined}>
         <DateSlot
           date={rangeStart}
           isAllowed={isAllowed}
