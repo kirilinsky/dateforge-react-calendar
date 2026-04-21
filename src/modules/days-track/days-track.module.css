@@ -3,7 +3,7 @@
 .container {
   position: relative;
   overflow: hidden;
-  height: var(--years-track-height, 4em);
+  height: var(--days-track-height, 4em);
   cursor: grab;
   touch-action: pan-y;
   z-index: 3;
@@ -35,7 +35,7 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 4.5em;
+  width: 4em;
   height: 2.6em;
   transform: translate(-50%, -50%);
   background: var(--c-h);
@@ -57,7 +57,7 @@
 
 .item {
   flex-shrink: 0;
-  width: 4.5em;
+  width: 4em;
   height: 2.6em;
   display: flex;
   align-items: center;

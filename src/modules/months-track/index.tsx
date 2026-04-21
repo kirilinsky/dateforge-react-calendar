@@ -1,36 +1,36 @@
 import React, { useEffect, useState } from "react";
-import styles from "./years-track.module.css";
+import styles from "./months-track.module.css";
 import { useNavigation, useConfig } from "react-calendar-datetime";
 import { useTrack } from "@/hooks/use-track";
 
-const MIN_YEAR = 1900;
-const MAX_YEAR = 2100;
-const YEARS = Array.from({ length: MAX_YEAR - MIN_YEAR + 1 }, (_, i) => MIN_YEAR + i);
-const HALF = 6;
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const HALF = 4;
 const OFFSETS = Array.from({ length: HALF * 2 + 1 }, (_, i) => i - HALF);
 
-interface CalendarYearsTrackProps {
+interface CalendarMonthsTrackProps {
   col?: number | string;
 }
 
-export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({ col }) => {
+export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({ col }) => {
   const { viewDate, navigateTo } = useNavigation();
   const { minDate, maxDate } = useConfig();
-  const currentIndex = Math.max(0, Math.min(YEARS.length - 1, viewDate.getFullYear() - MIN_YEAR));
+  const year = viewDate.getFullYear();
+  const currentIndex = viewDate.getMonth();
   const [itemWidth, setItemWidth] = useState(52);
 
-  const minIndex = minDate ? Math.max(0, minDate.getFullYear() - MIN_YEAR) : undefined;
-  const maxIndex = maxDate ? Math.min(YEARS.length - 1, maxDate.getFullYear() - MIN_YEAR) : undefined;
+  const minIndex = minDate && minDate.getFullYear() === year ? minDate.getMonth() : undefined;
+  const maxIndex = maxDate && maxDate.getFullYear() === year ? maxDate.getMonth() : undefined;
 
   const { ref, position, scrollTo, onPointerDown, onPointerMove, onPointerUp, onPointerCancel } = useTrack({
-    count: YEARS.length,
+    count: MONTHS.length,
     initialIndex: currentIndex,
     pixelsPerItem: itemWidth,
+    circular: true,
     minIndex,
     maxIndex,
     onChange: (index) => {
       const next = new Date(viewDate);
-      next.setFullYear(YEARS[index]);
+      next.setMonth(index);
       navigateTo(next);
     },
   });
@@ -46,7 +46,7 @@ export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({ col }) =
 
   return (
     <div
-      data-area="years-track"
+      data-area="months-track"
       ref={ref}
       className={styles.container}
       onPointerDown={onPointerDown}
@@ -58,8 +58,9 @@ export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({ col }) =
       <div className={styles.highlight} />
       <div className={styles.strip} style={{ transform: `translateX(${stripOffset}px)` }}>
         {OFFSETS.map((o) => {
-          const idx = Math.max(0, Math.min(YEARS.length - 1, Math.round(position) + o));
-          const dist = Math.abs(Math.round(position) + o - position);
+          const raw = Math.round(position) + o;
+          const idx = ((raw % MONTHS.length) + MONTHS.length) % MONTHS.length;
+          const dist = Math.abs(raw - position);
           const isActive = dist < 0.5;
           const opacity = Math.max(0.2, 1 - dist * 0.18);
           const scale = Math.max(0.6, 1 - dist * 0.08);
@@ -72,7 +73,7 @@ export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({ col }) =
               style={{ opacity, transform: `scale(${scale})` }}
               onClick={!isActive ? () => scrollTo(Math.round(position) + o) : undefined}
             >
-              {YEARS[idx]}
+              {MONTHS[idx]}
             </div>
           );
         })}

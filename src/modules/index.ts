@@ -6,3 +6,5 @@ export { CalendarPresets }       from "./presets";
 export { CalendarSelectedDates } from "./selected-dates";
 export { CalendarManualSelect }  from "./manual-select";
 export { CalendarYearsTrack }    from "./years-track";
+export { CalendarMonthsTrack }   from "./months-track";
+export { CalendarDaysTrack }     from "./days-track";

@@ -9,17 +9,14 @@ import { CalendarTimeGrid } from "../modules/time";
 import { CalendarSelectedDates } from "../modules/selected-dates";
 import { CalendarManualSelect } from "../modules/manual-select";
 import { CalendarYearsTrack } from "../modules/years-track";
-import { createTheme } from "../utils/create-theme";
+import { CalendarDaysTrack } from "../modules/days-track";
+import { CalendarMonthsTrack } from "../modules/months-track";
 import { createDisabled } from "../utils/create-disabled";
 import "./calendar.css";
 import "../themes.gen.css";
 import "../appearances.gen.css";
 import { DARK_THEMES, LIGHT_THEMES } from "../types/themes";
-import {
-  CalendarMode,
-  DateRange,
-  StartOfWeek,
-} from "../types/calendar";
+import { CalendarMode, DateRange, StartOfWeek } from "../types/calendar";
 
 const LOCALES_LIST = [
   { locale: "en", label: "English" },
@@ -83,27 +80,6 @@ const StoryWrapper = ({ children, title, subtitle, light = true }: any) => (
   </div>
 );
 
-export const Default = () => {
-  const [date, setDate] = useState<Date>(new Date());
-  return (
-    <StoryWrapper title="Default" subtitle={formatSubtitle(date)}>
-      <div className="calendar-fixed-container">
-        <Calendar
-          value={date}
-          theme="industrial"
-          appearance="soft"
-          onChange={(d) => {
-            if (d) setDate(d);
-          }}
-        >
-          <CalendarNav showMonthPicker showYearPicker showTime />
-          <CalendarDays />
-        </Calendar>
-      </div>
-    </StoryWrapper>
-  );
-};
-
 export const TwoMonthsLayout = () => {
   const [date, setDate] = useState<Date>(new Date());
   return (
@@ -151,47 +127,6 @@ export const RangePicker = () => {
           <CalendarNav showMonthPicker />
           <CalendarDays />
           <CalendarSelectedDates />
-        </Calendar>
-      </div>
-    </StoryWrapper>
-  );
-};
-
-export const CustomThemeDemo = () => {
-  const [date, setDate] = useState<Date>(new Date());
-
-  const oceanTheme = createTheme(
-    {
-      accent: "#ffffff",
-      backdrop: "#0a1628",
-      highlight: "#0ea5e9",
-      tone: "#0f2044",
-      text: "#e0f2fe",
-      stroke: "#1e3a5f",
-      shadow: "#0ea5e940",
-      disabled: "#1e3a5f",
-      weekend: "#f83875",
-      range: "#06b6d4",
-    },
-    "dark",
-  );
-
-  return (
-    <StoryWrapper
-      title="createTheme — Ocean"
-      subtitle={formatSubtitle(date)}
-      light={false}
-    >
-      <div className="calendar-fixed-container">
-        <Calendar
-          value={date}
-          theme={oceanTheme}
-          onChange={(d) => {
-            if (d) setDate(d);
-          }}
-        >
-          <CalendarNav />
-          <CalendarDays />
         </Calendar>
       </div>
     </StoryWrapper>
@@ -265,7 +200,11 @@ export const KitchenSink = () => {
       case "dates":
         return createDisabled({ dates: disabledDates.map(parseDate) });
       case "range":
-        return createDisabled({ ranges: [{ from: parseDate(disabledFrom), to: parseDate(disabledTo) }] });
+        return createDisabled({
+          ranges: [
+            { from: parseDate(disabledFrom), to: parseDate(disabledTo) },
+          ],
+        });
       case "weekdays":
         return disabledWeekdays.length
           ? createDisabled({ weekdays: disabledWeekdays })
@@ -275,7 +214,10 @@ export const KitchenSink = () => {
       case "after":
         return createDisabled({ after: parseDate(disabledAfter) });
       case "outside":
-        return createDisabled({ before: parseDate(disabledBefore), after: parseDate(disabledAfter) });
+        return createDisabled({
+          before: parseDate(disabledBefore),
+          after: parseDate(disabledAfter),
+        });
       default:
         return undefined;
     }
@@ -323,6 +265,8 @@ export const KitchenSink = () => {
     selectedDates: false,
     manualSelect: false,
     yearsTrack: false,
+    daysTrack: false,
+    monthsTrack: false,
   });
 
   const [moduleProps, setModuleProps] = useState({
@@ -494,21 +438,27 @@ export const KitchenSink = () => {
             Module props
           </p>
           <div className="panel-props-grid">
-            {(Object.keys(moduleProps) as (keyof typeof moduleProps)[]).map((key) => (
-              <button
-                key={key}
-                onClick={() => toggleModuleProp(key)}
-                className={`panel-button-compact ${moduleProps[key] ? "active" : ""}`}
-              >
-                {key}
-              </button>
-            ))}
+            {(Object.keys(moduleProps) as (keyof typeof moduleProps)[]).map(
+              (key) => (
+                <button
+                  key={key}
+                  onClick={() => toggleModuleProp(key)}
+                  className={`panel-button-compact ${moduleProps[key] ? "active" : ""}`}
+                >
+                  {key}
+                </button>
+              ),
+            )}
           </div>
           <p className="panel-label" style={{ marginTop: 8 }}>
             Selected dates
           </p>
           <div className="panel-props-grid">
-            {(Object.keys(selectedDatesProps) as (keyof typeof selectedDatesProps)[]).map((key) => (
+            {(
+              Object.keys(
+                selectedDatesProps,
+              ) as (keyof typeof selectedDatesProps)[]
+            ).map((key) => (
               <button
                 key={key}
                 onClick={() => toggleSelectedDatesProp(key)}
@@ -555,6 +505,8 @@ export const KitchenSink = () => {
                 />
               )}
               {modules.yearsTrack && <CalendarYearsTrack />}
+              {modules.monthsTrack && <CalendarMonthsTrack />}
+              {modules.daysTrack && <CalendarDaysTrack />}
               {modules.presets && <CalendarPresets />}
 
               {calendarProps.twoMonthsLayout && (
@@ -571,13 +523,7 @@ export const KitchenSink = () => {
             value={activeAppearance}
             onChange={(e) => setActiveAppearance(e.target.value)}
           >
-            {[
-              "default",
-              "soft",
-              "bubble",
-              "compact",
-              "square",
-            ].map((a) => (
+            {["default", "soft", "bubble", "compact", "square"].map((a) => (
               <option key={a} value={a}>
                 {a}
               </option>
