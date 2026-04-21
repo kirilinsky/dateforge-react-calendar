@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { DisabledRule } from "@/types/calendar";
+import { DisabledConfig } from "@/types/calendar";
 
 export interface CalendarConfig {
   locale: string;
@@ -10,7 +10,7 @@ export interface CalendarConfig {
   rangeMaxDays?: number;
   minDate?: Date;
   maxDate?: Date;
-  disabled?: DisabledRule | DisabledRule[];
+  disabled?: DisabledConfig;
   gradient: boolean;
 }
 

@@ -1,4 +1,4 @@
-import { DisabledRule } from "@/types/calendar";
+import { DisabledConfig } from "@/types/calendar";
 import { navBoundsFromDisabled } from "./date-core";
 
 export const getNextMonthFromSwipe = (
@@ -7,7 +7,7 @@ export const getNextMonthFromSwipe = (
   startDate?: Date,
   endDate?: Date,
   threshold = 50,
-  disabled?: DisabledRule | DisabledRule[],
+  disabled?: DisabledConfig,
 ): Date | null => {
   if (Math.abs(deltaX) < threshold) return null;
   const dir = deltaX > 0 ? 1 : -1;

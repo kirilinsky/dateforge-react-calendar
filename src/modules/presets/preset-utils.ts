@@ -1,5 +1,5 @@
 import { PresetItem } from "@/types/presets";
-import { DisabledRule } from "@/types/calendar";
+import { DisabledConfig } from "@/types/calendar";
 import { PRESET_CONFIG } from "./presets-config";
 import { checkIsDateDisabled } from "@/utils/date-core";
 
@@ -48,7 +48,7 @@ export const getFilteredPresets = (
   showMonths: boolean,
   startDate?: Date | null,
   endDate?: Date | null,
-  disabled?: DisabledRule | DisabledRule[],
+  disabled?: DisabledConfig,
 ): (PresetItem & { targetDate: Date })[] => {
   const excluded = [
     ...(!showMonths ? ["month", "week"] : []),

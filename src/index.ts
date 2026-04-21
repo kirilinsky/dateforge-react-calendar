@@ -1,6 +1,7 @@
 export { Calendar } from "./components/calendar/calendar";
 export { CalendarDays } from "./components/days/days";
 export { createTheme } from "./utils/create-theme";
+export { createDisabled } from "./utils/create-disabled";
 
  export { useConfig } from "./context/config-context";
 export { useNavigation } from "./context/navigation-context";
@@ -14,6 +15,6 @@ export type {
   StartOfWeek,
   CalendarMode,
   DateRange,
-  DisabledRule,
+  DisabledConfig,
 } from "./types/calendar";
 export type { CalendarTheme, ThemeTokens, CustomTheme } from "./types/themes";

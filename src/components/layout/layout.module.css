@@ -28,7 +28,9 @@
 
 /*
   Container query breakpoint scale (em-based, relative to each module's font-size):
-    10em    — months: 2-col → 4-col grid
+    10em    — months: 2-col → 3-col grid
+    16em    — months: 3-col → 4-col grid
+    25em    — months: 4-col → 6-col grid
     13.75em — nav: micro compact (font-size 0.92em)
     15em    — time: min-height 10em → 8em, centered
     16.25em — nav: month name long → short
@@ -65,6 +67,22 @@
     overflow: hidden;
   }
 
+  .calendarContainer * {
+    box-sizing: border-box;
+  }
+
+  .calendarContainer > [data-area] {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    background: var(--c-b);
+    grid-column: 1 / -1;
+  }
+
+  /* Gradient: container holds the unified gradient, modules are transparent.
+     The gap would normally show the same gradient (invisible border), so we
+     use outline — which is NOT clipped by overflow:hidden — to paint var(--c-s)
+     into the 1px gap area, restoring visible borders. */
   .calendarContainer.gradient {
     background:
       radial-gradient(
@@ -77,7 +95,7 @@
         color-mix(in srgb, var(--c-b) 90%, var(--c-h)) 0%,
         transparent 100%
       ),
-      var(--c-b) !important;
+      var(--c-b);
   }
 
   .calendarContainer.gradient.dark {
@@ -92,23 +110,12 @@
         color-mix(in srgb, var(--c-b) 78%, var(--c-h)) 0%,
         transparent 100%
       ),
-      var(--c-b) !important;
+      var(--c-b);
   }
 
-  .calendarContainer * {
-    box-sizing: border-box;
-  }
-
-   .calendarContainer > [data-area] {
-    width: 100%;
-    min-width: 0;
-    overflow: hidden;
-    background: var(--c-b);
-    grid-column: 1 / -1;
-  }
-
-   .calendarContainer.gradient > [data-area] {
+  .calendarContainer.gradient > [data-area] {
     background: transparent;
+    outline: 1px solid var(--c-s);
   }
 
   .secondMonthLabel {

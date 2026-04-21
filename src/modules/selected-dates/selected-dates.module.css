@@ -24,6 +24,7 @@
   min-height: 0;
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.35em;
   padding: 0 var(--cal-spacing);
   padding-top: 0;
@@ -36,9 +37,9 @@
 }
 
 .chip {
-  height: auto !important;
-  min-height: 2.1em;
-  padding: 0.35em 0.75em !important;
+  height: 2.1em;
+  flex-shrink: 0;
+  padding: 0 0.75em !important;
   font-size: 0.78em !important;
   white-space: nowrap;
 }
@@ -48,10 +49,10 @@
 }
 
 .clearBtn {
+  height: 2.1em;
   margin-left: auto;
-  padding: 0.35em 0.6em !important;
+  padding: 0 0.6em !important;
   font-size: 0.9em !important;
-  min-height: 2.1em;
   opacity: 0.5;
   flex-shrink: 0;
 }

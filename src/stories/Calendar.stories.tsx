@@ -10,6 +10,7 @@ import { CalendarSelectedDates } from "../modules/selected-dates";
 import { CalendarManualSelect } from "../modules/manual-select";
 import { CalendarYearsTrack } from "../modules/years-track";
 import { createTheme } from "../utils/create-theme";
+import { createDisabled } from "../utils/create-disabled";
 import "./calendar.css";
 import "../themes.gen.css";
 import "../appearances.gen.css";
@@ -17,7 +18,6 @@ import { DARK_THEMES, LIGHT_THEMES } from "../types/themes";
 import {
   CalendarMode,
   DateRange,
-  DisabledRule,
   StartOfWeek,
 } from "../types/calendar";
 
@@ -256,29 +256,26 @@ export const KitchenSink = () => {
       prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d],
     );
 
-  const getDisabledValue = (): DisabledRule | DisabledRule[] | undefined => {
+  const getDisabledValue = () => {
     switch (disabledMode) {
       case "all":
-        return true;
+        return createDisabled({ all: true });
       case "date":
-        return parseDate(disabledDate);
+        return createDisabled({ dates: [parseDate(disabledDate)] });
       case "dates":
-        return disabledDates.map(parseDate);
+        return createDisabled({ dates: disabledDates.map(parseDate) });
       case "range":
-        return { from: parseDate(disabledFrom), to: parseDate(disabledTo) };
+        return createDisabled({ ranges: [{ from: parseDate(disabledFrom), to: parseDate(disabledTo) }] });
       case "weekdays":
         return disabledWeekdays.length
-          ? { dayOfWeek: disabledWeekdays }
+          ? createDisabled({ weekdays: disabledWeekdays })
           : undefined;
       case "before":
-        return { before: parseDate(disabledBefore) };
+        return createDisabled({ before: parseDate(disabledBefore) });
       case "after":
-        return { after: parseDate(disabledAfter) };
+        return createDisabled({ after: parseDate(disabledAfter) });
       case "outside":
-        return {
-          before: parseDate(disabledBefore),
-          after: parseDate(disabledAfter),
-        };
+        return createDisabled({ before: parseDate(disabledBefore), after: parseDate(disabledAfter) });
       default:
         return undefined;
     }

@@ -3,7 +3,7 @@
     container-type: inline-size;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: repeat(6, 1fr);
+    grid-auto-rows: auto;
     padding: 0.75em 0.3em;
     gap: 0.25em;
     z-index: 2;
@@ -12,19 +12,28 @@
 
   @container (min-width: 10em) {
     .monthsContainer {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @container (min-width: 16em) {
+    .monthsContainer {
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      grid-template-rows: repeat(3, auto);
+    }
+  }
+
+  @container (min-width: 25em) {
+    .monthsContainer {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
     }
   }
 
   .item {
-    justify-self: center;
+    justify-self: stretch;
     align-self: center;
-    width: 95%;
-    height: auto !important;
-    min-height: 2.1em;
-    padding-top: 1em !important;
-    padding-bottom: 1em !important;
+    width: 100%;
+    height: 2.4em;
+    padding: 0 0.5em !important;
     font-size: 0.8em !important;
     white-space: nowrap;
     overflow: hidden;

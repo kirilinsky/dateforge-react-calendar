@@ -58,7 +58,7 @@ export const getCalendarData = (
   selectedDates: Date[],
   startDate?: Date | null,
   endDate?: Date | null,
-  disabled?: import("@/types/calendar").DisabledRule | import("@/types/calendar").DisabledRule[],
+  disabled?: import("@/types/calendar").DisabledConfig,
   rangeOpts?: RangeOptions,
 ) => {
   const DAY_MS = 86400000;

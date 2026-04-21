@@ -11,6 +11,11 @@ export type DisabledRule =
   | { dayOfWeek: number[] }
   | { before?: Date; after?: Date };
 
+export interface DisabledConfig {
+  readonly __type: "disabled-config";
+  readonly rules: DisabledRule[];
+}
+
 export type DateRange = {
   from: Date | null;
   to: Date | null;
@@ -33,10 +38,6 @@ export interface CalendarProps<M extends CalendarMode = "single"> {
   maxDate?: Date;
   startMonth?: Date;
   onChange?: (value: CalendarValue<M>) => void;
-  /** @deprecated use onChange — will be removed in v7 */
-  onDatesChange?: (dates: Date[]) => void;
-  /** @deprecated use onChange — will be removed in v7 */
-  onRangeChange?: (range: DateRange) => void;
   rangeMinDays?: number;
   rangeMaxDays?: number;
   locale?: string;
@@ -45,5 +46,5 @@ export interface CalendarProps<M extends CalendarMode = "single"> {
   hour12?: boolean;
   appearance?: CalendarAppearance;
   gradient?: boolean;
-  disabled?: DisabledRule | DisabledRule[];
+  disabled?: DisabledConfig;
 }

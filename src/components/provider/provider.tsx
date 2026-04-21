@@ -40,8 +40,6 @@ export const CalendarProvider: React.FC<
   mode = "single",
   max,
   onChange,
-  onDatesChange,
-  onRangeChange,
   startMonth,
   rangeMinDays,
   rangeMaxDays,
@@ -71,10 +69,6 @@ export const CalendarProvider: React.FC<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onChangeRef = useRef<((v: any) => void) | undefined>(onChange as any);
   onChangeRef.current = onChange as any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  const onDatesChangeRef = useRef(onDatesChange);
-  onDatesChangeRef.current = onDatesChange;
-  const onRangeChangeRef = useRef(onRangeChange);
-  onRangeChangeRef.current = onRangeChange;
 
   useEffect(() => {
     if (startMonth) {
@@ -150,13 +144,11 @@ export const CalendarProvider: React.FC<
       if (range) {
         const rangeVal: DateRange = { from: next.rangeStart, to: next.rangeEnd };
         onChangeRef.current?.(rangeVal);
-        onRangeChangeRef.current?.(rangeVal);
         return;
       }
       if (multiselect) {
         if (next.selectedDates !== stateRef.current.selectedDates) {
           onChangeRef.current?.(next.selectedDates);
-          onDatesChangeRef.current?.(next.selectedDates);
         }
         return;
       }
@@ -174,14 +166,12 @@ export const CalendarProvider: React.FC<
   const handleDatesSet = useCallback((dates: Date[]) => {
     dispatch({ type: "SET_DATES", dates });
     onChangeRef.current?.(dates);
-    onDatesChangeRef.current?.(dates);
   }, []);
 
   const handleRangeSet = useCallback((from: Date | null, to: Date | null) => {
     dispatch({ type: "SET_RANGE", from, to });
     const rangeVal: DateRange = { from, to };
     onChangeRef.current?.(rangeVal);
-    onRangeChangeRef.current?.(rangeVal);
   }, []);
 
   const navigateTo = useCallback((d: Date) => {

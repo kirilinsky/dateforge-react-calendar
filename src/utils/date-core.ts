@@ -1,4 +1,4 @@
-import { DisabledRule } from "@/types/calendar";
+import { DisabledConfig, DisabledRule } from "@/types/calendar";
 
 const daysInMonth = (year: number, month: number) =>
   new Date(year, month + 1, 0).getDate();
@@ -78,11 +78,10 @@ export const checkIsDateDisabled = (
   viewDate: Date,
   startDate?: Date | null,
   endDate?: Date | null,
-  disabled?: DisabledRule | DisabledRule[],
+  disabled?: DisabledConfig,
 ): boolean => {
-  if (disabled !== undefined) {
-    const rules = Array.isArray(disabled) ? disabled : [disabled];
-    if (rules.some((rule) => checkDisabledRule(viewDate, rule))) return true;
+  if (disabled?.rules.length) {
+    if (disabled.rules.some((rule) => checkDisabledRule(viewDate, rule))) return true;
   }
   if (!startDate && !endDate) return false;
   const t = viewDate.getTime();
@@ -92,14 +91,9 @@ export const checkIsDateDisabled = (
 };
 
 export const navBoundsFromDisabled = (
-  disabled?: DisabledRule | DisabledRule[],
+  disabled?: DisabledConfig,
 ): { min?: Date; max?: Date } => {
-  const rules =
-    disabled === undefined
-      ? []
-      : Array.isArray(disabled)
-        ? disabled
-        : [disabled];
+  const rules = disabled?.rules ?? [];
   let min: Date | undefined;
   let max: Date | undefined;
   for (const rule of rules) {
@@ -118,7 +112,7 @@ export const checkYearNavigation = (
   startDate?: Date | null,
   endDate?: Date | null,
   currentDate?: Date | null,
-  disabled?: DisabledRule | DisabledRule[],
+  disabled?: DisabledConfig,
 ) => {
   const { min: dMin, max: dMax } = navBoundsFromDisabled(disabled);
 
