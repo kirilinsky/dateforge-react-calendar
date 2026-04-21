@@ -1,25 +1,16 @@
 import React from "react";
 import styles from "./selected-dates.module.css";
 import shared from "@/global/global.module.css";
-import { useConfig } from "@/context/config-context";
-import { useNavigation } from "@/context/navigation-context";
-import { useSelection } from "@/context/selection-context";
+import { useConfig, useNavigation, useSelection } from "react-calendar-datetime";
 
-const getRangeSep = (
-  fmt: Intl.DateTimeFormat,
-  start: Date,
-  end: Date,
-): string => {
+const getRangeSep = (fmt: Intl.DateTimeFormat, start: Date, end: Date): string => {
   try {
     const parts = fmt.formatRangeToParts(start, end);
     const sources = parts.map((p) => (p as any).source as string);
     const afterStart = sources.lastIndexOf("startRange") + 1;
     const beforeEnd = sources.indexOf("endRange");
     if (afterStart > 0 && beforeEnd > afterStart) {
-      return parts
-        .slice(afterStart, beforeEnd)
-        .map((p) => p.value)
-        .join("");
+      return parts.slice(afterStart, beforeEnd).map((p) => p.value).join("");
     }
     return " – ";
   } catch {
@@ -32,7 +23,7 @@ interface CalendarSelectedDatesProps {
   allowNavigate?: boolean;
 }
 
-export const SelectedDatesComponent: React.FC<CalendarSelectedDatesProps> = ({
+export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
   allowClean = false,
   allowNavigate = false,
 }) => {
@@ -64,11 +55,7 @@ export const SelectedDatesComponent: React.FC<CalendarSelectedDatesProps> = ({
       type="button"
       className={`${styles.clearBtn} ${shared.interactive} ${shared.hoverable}`}
       onClick={() => onChangeDate(null)}
-      style={
-        allowClean
-          ? undefined
-          : { visibility: "hidden", pointerEvents: "none" }
-      }
+      style={allowClean ? undefined : { visibility: "hidden", pointerEvents: "none" }}
       tabIndex={allowClean ? undefined : -1}
       aria-hidden={!allowClean}
     >
@@ -78,9 +65,7 @@ export const SelectedDatesComponent: React.FC<CalendarSelectedDatesProps> = ({
 
   if (range) {
     if (!rangeStart) return null;
-
     const sep = rangeEnd ? getRangeSep(fmt, rangeStart, rangeEnd) : " – ";
-
     return (
       <div className={styles.selectedContainer} data-area="selected-dates">
         <button
@@ -133,5 +118,3 @@ export const SelectedDatesComponent: React.FC<CalendarSelectedDatesProps> = ({
     </div>
   );
 };
-
-export { SelectedDatesComponent as CalendarSelectedDates };

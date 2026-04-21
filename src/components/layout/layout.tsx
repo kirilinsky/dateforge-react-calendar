@@ -1,6 +1,5 @@
 import React from "react";
 import { DaysComponent } from "../days/days";
-import { HeaderComponent } from "../header/header";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import { useSelection } from "@/context/selection-context";
@@ -17,7 +16,6 @@ export const CalendarLayout: React.FC<{
   modules?: React.ReactNode;
 }> = ({ appearanceKey, customAppearanceVars, modules }) => {
   const {
-    showYearPicker, months, compactMonths, compactYears,
     twoMonthsLayout, monthsColumn,
     hour12, locale, minDate, maxDate, gradient,
   } = useConfig();
@@ -94,9 +92,6 @@ export const CalendarLayout: React.FC<{
           }}
           onClose={() => setShowYearPopup(false)}
         />
-      )}
-      {(showYearPicker || compactMonths || compactYears || months) && (
-        <HeaderComponent />
       )}
       <DaysComponent hideOtherMonths={!!twoMonthsLayout} />
       {twoMonthsStacked && nextMonthLabel && (

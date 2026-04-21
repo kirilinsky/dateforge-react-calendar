@@ -16,7 +16,8 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true, 
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "react-calendar-datetime": ["./src/index.ts"]
     }
   },
   "include": ["src/**/*", "global.d.ts", "themes/themes.ts"],

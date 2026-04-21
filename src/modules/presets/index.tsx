@@ -1,14 +1,8 @@
 import React, { useMemo } from "react";
 import styles from "./presets.module.css";
-import { useConfig } from "@/context/config-context";
-import { useNavigation } from "@/context/navigation-context";
-import { useSelection } from "@/context/selection-context";
-import {
-  getFilteredPresets,
-  getPresetDate,
-  getRelativeLabel,
-  isSameDay,
-} from "@/utils/date-utils";
+import { useConfig, useNavigation, useSelection } from "react-calendar-datetime";
+import { isSameDay } from "@/utils/date-core";
+import { getFilteredPresets, getPresetDate, getRelativeLabel } from "./preset-utils";
 import shared from "@/global/global.module.css";
 
 interface CalendarPresetsProps {
@@ -16,7 +10,7 @@ interface CalendarPresetsProps {
   showMonths?: boolean;
 }
 
-export const PresetsComponent: React.FC<CalendarPresetsProps> = ({
+export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
   showYears = true,
   showMonths = true,
 }) => {
@@ -36,17 +30,7 @@ export const PresetsComponent: React.FC<CalendarPresetsProps> = ({
         maxDate,
         disabled,
       ),
-    [
-      showYears,
-      showMonths,
-      showYearPicker,
-      months,
-      minDate,
-      maxDate,
-      compactYears,
-      compactMonths,
-      disabled,
-    ],
+    [showYears, showMonths, showYearPicker, months, minDate, maxDate, compactYears, compactMonths, disabled],
   );
 
   return (
@@ -56,8 +40,7 @@ export const PresetsComponent: React.FC<CalendarPresetsProps> = ({
       data-count={presets.length}
     >
       {presets.map((preset) => {
-        const isActive =
-          !!selectedDate && isSameDay(preset.targetDate, selectedDate);
+        const isActive = !!selectedDate && isSameDay(preset.targetDate, selectedDate);
         return (
           <button
             key={preset.id}
@@ -81,5 +64,3 @@ export const PresetsComponent: React.FC<CalendarPresetsProps> = ({
     </div>
   );
 };
-
-export { PresetsComponent as CalendarPresets };

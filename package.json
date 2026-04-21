@@ -1,6 +1,6 @@
 {
   "name": "react-calendar-datetime",
-  "version": "6.0.0-beta.2",
+  "version": "6.0.0-beta.3",
   "description": "Zero-dependency React datepicker and time picker. Supports date range, multi-select, themes, gestures and responsive layout.",
   "type": "module",
   "types": "./dist/index.d.ts",
@@ -8,10 +8,49 @@
   "module": "./dist/index.mjs",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs",
-      "default": "./dist/index.mjs"
+      "types":   "./dist/index.d.ts",
+      "import":  "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./modules": {
+      "types":   "./dist/modules/index.d.ts",
+      "import":  "./dist/modules/index.mjs",
+      "require": "./dist/modules/index.cjs"
+    },
+    "./modules/nav": {
+      "types":   "./dist/modules/nav.d.ts",
+      "import":  "./dist/modules/nav.mjs",
+      "require": "./dist/modules/nav.cjs"
+    },
+    "./modules/months": {
+      "types":   "./dist/modules/months.d.ts",
+      "import":  "./dist/modules/months.mjs",
+      "require": "./dist/modules/months.cjs"
+    },
+    "./modules/time": {
+      "types":   "./dist/modules/time.d.ts",
+      "import":  "./dist/modules/time.mjs",
+      "require": "./dist/modules/time.cjs"
+    },
+    "./modules/presets": {
+      "types":   "./dist/modules/presets.d.ts",
+      "import":  "./dist/modules/presets.mjs",
+      "require": "./dist/modules/presets.cjs"
+    },
+    "./modules/selected-dates": {
+      "types":   "./dist/modules/selected-dates.d.ts",
+      "import":  "./dist/modules/selected-dates.mjs",
+      "require": "./dist/modules/selected-dates.cjs"
+    },
+    "./modules/manual-select": {
+      "types":   "./dist/modules/manual-select.d.ts",
+      "import":  "./dist/modules/manual-select.mjs",
+      "require": "./dist/modules/manual-select.cjs"
+    },
+    "./modules/years-track": {
+      "types":   "./dist/modules/years-track.d.ts",
+      "import":  "./dist/modules/years-track.mjs",
+      "require": "./dist/modules/years-track.cjs"
     },
     "./themes": {
       "default": "./dist/themes/index.css"
@@ -24,9 +63,6 @@
     },
     "./appearances/*": {
       "default": "./dist/appearances/*.css"
-    },
-    "./style.css": {
-      "default": "./dist/style.css"
     }
   },
   "repository": {
@@ -86,7 +122,8 @@
     "node": ">=18.0.0"
   },
   "sideEffects": [
-    "**/*.css"
+    "dist/**/*.mjs",
+    "dist/**/*.cjs"
   ],
   "author": "Kirilinsky (https://github.com/kirilinsky)",
   "license": "MIT"

@@ -1,18 +1,13 @@
 @layer cal-base {
 
-.yearsTrackContainer {
+.selectedContainer {
   display: flex;
-  flex-wrap: nowrap;
-  overflow-x: auto;
+  flex-wrap: wrap;
   gap: 0.35em;
   padding: var(--cal-spacing);
   border-top: var(--cal-border) solid var(--c-s);
   z-index: 3;
-  scrollbar-width: none;
   transition: box-shadow 0.25s linear;
-  &::-webkit-scrollbar {
-    display: none;
-  }
   &:hover {
     box-shadow: 0 -0.1em 0.1em var(--c-x);
   }
@@ -24,15 +19,31 @@
   padding: 0.35em 0.75em !important;
   font-size: 0.78em !important;
   white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.activeChip {
-  /* active year styling — inherits from shared.activeItem */
 }
 
 .inactiveChip {
   background: var(--c-t);
+}
+
+.clearBtn {
+  margin-left: auto;
+  padding: 0.35em 0.6em !important;
+  font-size: 0.9em !important;
+  min-height: 2.1em;
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+.clearBtn:hover {
+  opacity: 1;
+}
+
+.rangeSep {
+  font-size: 0.8em;
+  color: var(--c-s);
+  align-self: center;
+  user-select: none;
+  white-space: pre;
 }
 
 }

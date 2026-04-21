@@ -1,7 +1,7 @@
 import { PresetItem } from "@/types/presets";
 import { DisabledRule } from "@/types/calendar";
-import { PRESET_CONFIG } from "./presets";
-import { checkIsDateDisabled } from "./date-core";
+import { PRESET_CONFIG } from "./presets-config";
+import { checkIsDateDisabled } from "@/utils/date-core";
 
 const rtfCache: Record<string, Intl.RelativeTimeFormat> = {};
 
@@ -24,20 +24,10 @@ export const getPresetDate = (
   }
   preset.calc(d);
   if (startDate && d.getTime() < startDate.getTime()) {
-    d.setHours(
-      startDate.getHours(),
-      startDate.getMinutes(),
-      startDate.getSeconds(),
-      0,
-    );
+    d.setHours(startDate.getHours(), startDate.getMinutes(), startDate.getSeconds(), 0);
   }
   if (endDate && d.getTime() > endDate.getTime()) {
-    d.setHours(
-      endDate.getHours(),
-      endDate.getMinutes(),
-      endDate.getSeconds(),
-      0,
-    );
+    d.setHours(endDate.getHours(), endDate.getMinutes(), endDate.getSeconds(), 0);
   }
   return d;
 };

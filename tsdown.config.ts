@@ -1,28 +1,49 @@
 import { defineConfig } from "tsdown";
 import pkg from "./package.json" with { type: "json" };
 
-export default defineConfig({
-  entry: ["src/index.ts"],
-  outDir: "dist",
-  format: ["cjs", "esm"],
-  outExtensions: () => ({
-    dts: ".d.ts",
-  }),
-  clean: true,
+const peers = Object.keys(pkg.peerDependencies || {});
+
+const sharedDeps = {
+  neverBundle: ["react", "react-dom", "react/jsx-runtime", ...peers],
+};
+
+const sharedOptions = {
+  format: ["cjs", "esm"] satisfies import("tsdown").UserConfig["format"],
+  outExtensions: () => ({ dts: ".d.ts" }),
   minify: true,
   dts: true,
   treeshake: true,
-  target: "es2022",
-  deps: {
-    neverBundle: [
-      "react",
-      "react-dom",
-      "react/jsx-runtime",
-      ...Object.keys(pkg.peerDependencies || {}),
-    ],
+  target: "es2022" as const,
+  css: { inject: true, minify: true },
+};
+
+export default defineConfig([
+   {
+    ...sharedOptions,
+    entry: { index: "src/index.ts" },
+    outDir: "dist",
+    clean: true,
+    deps: sharedDeps,
+  }, 
+  {
+    ...sharedOptions,
+    entry: {
+      "index":          "src/modules/index.ts",
+      "nav":            "src/modules/nav/index.tsx",
+      "months":         "src/modules/months/index.tsx",
+      "time":           "src/modules/time/index.tsx",
+      "presets":        "src/modules/presets/index.tsx",
+      "selected-dates": "src/modules/selected-dates/index.tsx",
+      "manual-select":  "src/modules/manual-select/index.tsx",
+      "years-track":    "src/modules/years-track/index.tsx",
+    },
+    outDir: "dist/modules",
+    clean: false,
+    deps: {
+      neverBundle: [
+        ...sharedDeps.neverBundle,
+        "react-calendar-datetime",
+      ],
+    },
   },
-  css: {
-    inject: false,
-    minify: true,
-  },
-});
+]);

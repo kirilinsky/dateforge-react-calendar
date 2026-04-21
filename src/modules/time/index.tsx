@@ -1,13 +1,10 @@
 import React from "react";
 import styles from "./time.module.css";
 import shared from "@/global/global.module.css";
-import { useConfig } from "@/context/config-context";
-import { useNavigation } from "@/context/navigation-context";
-import { useSelection } from "@/context/selection-context";
-import { useThrottle } from "@/hooks/use-throttle";
-import { TimeTrack } from "../time-track/time-track";
+import { useConfig, useNavigation, useSelection, useThrottle } from "react-calendar-datetime";
+import { TimeTrack } from "@/components/time-track/time-track";
 
-export const TimeComponent: React.FC = () => {
+export const CalendarTimeGrid: React.FC = () => {
   const { hour12 } = useConfig();
   const { viewDate: date } = useNavigation();
   const { onChangeTime } = useSelection();
@@ -22,5 +19,3 @@ export const TimeComponent: React.FC = () => {
     </div>
   );
 };
-
-export { TimeComponent as CalendarTimeGrid };

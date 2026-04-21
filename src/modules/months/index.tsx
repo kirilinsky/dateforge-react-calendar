@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import styles from "./months.module.css";
-import { useConfig } from "@/context/config-context";
-import { useNavigation } from "@/context/navigation-context";
+import { useConfig, useNavigation } from "react-calendar-datetime";
 import { getMonthListData, setMonth } from "@/utils/date-utils";
 import shared from "@/global/global.module.css";
 
@@ -9,22 +8,21 @@ interface CalendarMonthGridProps {
   shortMonths?: boolean;
 }
 
-export const MonthsComponent: React.FC<CalendarMonthGridProps> = ({
+export const CalendarMonthGrid: React.FC<CalendarMonthGridProps> = ({
   shortMonths = true,
 }) => {
   const { locale, minDate, maxDate } = useConfig();
   const { viewDate, navigateTo } = useNavigation();
-  const date = viewDate;
 
-  const currentMonth = date.getMonth();
-  const currentYear = date.getFullYear();
+  const currentMonth = viewDate.getMonth();
+  const currentYear = viewDate.getFullYear();
 
   const mNames = useMemo(
     () => getMonthListData(locale, currentYear, minDate, maxDate, shortMonths),
     [locale, currentYear, minDate, maxDate, shortMonths],
   );
 
-  const handleClick = (i: number) => navigateTo(setMonth(date, i));
+  const handleClick = (i: number) => navigateTo(setMonth(viewDate, i));
 
   return (
     <div className={styles.monthsContainer} data-area="months">
@@ -44,5 +42,3 @@ export const MonthsComponent: React.FC<CalendarMonthGridProps> = ({
     </div>
   );
 };
-
-export { MonthsComponent as CalendarMonthGrid };

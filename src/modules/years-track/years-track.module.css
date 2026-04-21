@@ -1,0 +1,34 @@
+@layer cal-base {
+
+.yearsTrackContainer {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  gap: 0.35em;
+  padding: var(--cal-spacing);
+  border-top: var(--cal-border) solid var(--c-s);
+  z-index: 3;
+  scrollbar-width: none;
+  transition: box-shadow 0.25s linear;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  &:hover {
+    box-shadow: 0 -0.1em 0.1em var(--c-x);
+  }
+}
+
+.chip {
+  height: auto !important;
+  min-height: 2.1em;
+  padding: 0.35em 0.75em !important;
+  font-size: 0.78em !important;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.inactiveChip {
+  background: var(--c-t);
+}
+
+}

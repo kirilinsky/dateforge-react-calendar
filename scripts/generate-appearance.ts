@@ -15,7 +15,6 @@ for (const file of files) {
   const src = readFileSync(`${srcDir}/${file}`, "utf8");
   writeFileSync(`${distDir}/${file}`, src);
 
-  // Extract content inside @layer appearances { ... }
   const match = src.match(/@layer appearances\s*\{([\s\S]*)\}/);
   if (match) innerBlocks.push(match[1].trim());
 }

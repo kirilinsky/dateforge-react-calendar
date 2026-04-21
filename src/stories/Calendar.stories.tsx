@@ -1,12 +1,13 @@
 /// <reference path="../../global.d.ts" />
 import { useState } from "react";
 import { Calendar } from "../components/calendar/calendar";
-import { CalendarPresets } from "../components/presets/presets";
-import { CalendarMonthGrid } from "../components/months/months";
-import { CalendarTimeGrid } from "../components/time/time";
-import { CalendarSelectedDates } from "../components/selected-dates/selected-dates";
-import { CalendarManualSelect } from "../components/manual-select/manual-select";
-import { CalendarYearsTrack } from "../components/years-track/years-track";
+import { CalendarNav } from "../modules/nav";
+import { CalendarPresets } from "../modules/presets";
+import { CalendarMonthGrid } from "../modules/months";
+import { CalendarTimeGrid } from "../modules/time";
+import { CalendarSelectedDates } from "../modules/selected-dates";
+import { CalendarManualSelect } from "../modules/manual-select";
+import { CalendarYearsTrack } from "../modules/years-track";
 import { createTheme } from "../utils/create-theme";
 import "./calendar.css";
 import "../themes.gen.css";
@@ -86,7 +87,9 @@ export const Default = () => {
           theme="industrial"
           appearance="brutalist"
           onChange={(d) => { if (d) setDate(d); }}
-        />
+        >
+          <CalendarNav />
+        </Calendar>
       </div>
     </StoryWrapper>
   );
@@ -104,7 +107,9 @@ export const TwoMonthsLayout = () => {
           months
           time={false}
           theme="light"
-        />
+        >
+          <CalendarNav />
+        </Calendar>
       </div>
     </StoryWrapper>
   );
@@ -138,6 +143,7 @@ export const RangePicker = () => {
           months
           time={false}
         >
+          <CalendarNav />
           <CalendarSelectedDates />
         </Calendar>
       </div>
@@ -175,7 +181,9 @@ export const CustomThemeDemo = () => {
           value={date}
           theme={oceanTheme}
           onChange={(d) => { if (d) setDate(d); }}
-        />
+        >
+          <CalendarNav />
+        </Calendar>
       </div>
     </StoryWrapper>
   );
@@ -263,6 +271,7 @@ export const KitchenSink = () => {
 
   // Module toggles — each becomes a child component
   const [modules, setModules] = useState({
+    nav: true,
     monthsGrid: false,
     timeGrid: false,
     presets: false,
@@ -271,8 +280,7 @@ export const KitchenSink = () => {
     yearsTrack: false,
   });
 
-  // Module-specific props
-  const [moduleProps, setModuleProps] = useState({
+   const [moduleProps, setModuleProps] = useState({
     monthsGridShort: true,
     selectedDatesAllowClean: false,
     selectedDatesAllowNavigate: false,
@@ -422,6 +430,7 @@ export const KitchenSink = () => {
               rangeMaxDays={mode === "range" ? rangeMaxDays : undefined}
               {...calendarProps}
             >
+              {modules.nav && <CalendarNav />}
               {modules.monthsGrid && <CalendarMonthGrid shortMonths={moduleProps.monthsGridShort} />}
               {modules.timeGrid && <CalendarTimeGrid />}
               {modules.selectedDates && (

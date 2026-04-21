@@ -1,11 +1,12 @@
 export { Calendar } from "./components/calendar/calendar";
-export { CalendarPresets } from "./components/presets/presets";
-export { CalendarMonthGrid } from "./components/months/months";
-export { CalendarTimeGrid } from "./components/time/time";
-export { CalendarSelectedDates } from "./components/selected-dates/selected-dates";
-export { CalendarManualSelect } from "./components/manual-select/manual-select";
-export { CalendarYearsTrack } from "./components/years-track/years-track";
 export { createTheme } from "./utils/create-theme";
+
+ export { useConfig } from "./context/config-context";
+export { useNavigation } from "./context/navigation-context";
+export { useSelection } from "./context/selection-context";
+export { useUI } from "./context/ui-context";
+export { useThrottle } from "./hooks/use-throttle";
+
 export type {
   CalendarProps,
   CalendarValue,

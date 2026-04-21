@@ -2,11 +2,8 @@ import React, { useEffect, useState } from "react";
 import styles from "./manual-select.module.css";
 import shared from "@/global/global.module.css";
 import { Check, Clear } from "@/Icons";
-import { useConfig } from "@/context/config-context";
-import { useNavigation } from "@/context/navigation-context";
-import { useSelection } from "@/context/selection-context";
-import { checkIsDateDisabled, isSameDay } from "@/utils/date-utils";
-
+import { useConfig, useNavigation, useSelection } from "react-calendar-datetime";
+import { checkIsDateDisabled, isSameDay } from "@/utils/date-core";
 
 const dateToMask = (d: Date | null): string => {
   if (!d) return "";
@@ -111,9 +108,7 @@ const MaskedDateInput: React.FC<MaskedDateInputProps> = ({
     <input
       type="text"
       inputMode="numeric"
-      className={[className, invalid && classNameInvalid]
-        .filter(Boolean)
-        .join(" ")}
+      className={[className, invalid && classNameInvalid].filter(Boolean).join(" ")}
       value={text}
       placeholder={placeholder}
       onChange={handleChange}
@@ -223,11 +218,7 @@ const DateSlot: React.FC<DateSlotProps> = ({
 
   if (!editing && date) {
     return (
-      <button
-        type="button"
-        className={styles.chip}
-        onClick={enterEditMode}
-      >
+      <button type="button" className={styles.chip} onClick={enterEditMode}>
         {dateToMask(date)}
       </button>
     );
@@ -237,10 +228,7 @@ const DateSlot: React.FC<DateSlotProps> = ({
 
   return (
     <div
-      className={[
-        styles.inputWrapper,
-        wrapperInvalid && styles.inputWrapperInvalid,
-      ]
+      className={[styles.inputWrapper, wrapperInvalid && styles.inputWrapperInvalid]
         .filter(Boolean)
         .join(" ")}
     >
@@ -284,23 +272,17 @@ interface CalendarManualSelectProps {
   allowClean?: boolean;
 }
 
-export const ManualSelectComponent: React.FC<CalendarManualSelectProps> = ({
+export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
   allowClean = true,
 }) => {
   const { range, multiselect, disabled, minDate, maxDate } = useConfig();
-  const allowCleanManualSelect = allowClean;
   const { viewDate: date } = useNavigation();
   const { rangeStart, rangeEnd, selectedDates, onChangeDate, onRangeSet, onDatesSet } = useSelection();
 
   const withTime = (d: Date, ref?: Date): Date => {
     const src = ref ?? date;
     const result = new Date(d);
-    result.setHours(
-      src.getHours(),
-      src.getMinutes(),
-      src.getSeconds(),
-      src.getMilliseconds(),
-    );
+    result.setHours(src.getHours(), src.getMinutes(), src.getSeconds(), src.getMilliseconds());
     return result;
   };
 
@@ -329,13 +311,9 @@ export const ManualSelectComponent: React.FC<CalendarManualSelectProps> = ({
           setAddInputKey((k) => k + 1);
         }
       }}
-      style={
-        allowCleanManualSelect
-          ? undefined
-          : { visibility: "hidden", pointerEvents: "none" }
-      }
-      tabIndex={allowCleanManualSelect ? undefined : -1}
-      aria-hidden={!allowCleanManualSelect}
+      style={allowClean ? undefined : { visibility: "hidden", pointerEvents: "none" }}
+      tabIndex={allowClean ? undefined : -1}
+      aria-hidden={!allowClean}
       disabled={!hasValue}
     >
       ×
@@ -357,17 +335,11 @@ export const ManualSelectComponent: React.FC<CalendarManualSelectProps> = ({
     const addSaveAllowed = !!addTypedDate && isAllowed(addTypedDate);
 
     return (
-      <div
-        className={`${styles.container} ${styles.containerMulti}`}
-        data-area="manual-select"
-      >
+      <div className={`${styles.container} ${styles.containerMulti}`} data-area="manual-select">
         <div className={styles.datesArea}>
           {canAddMore && (
             <div
-              className={[
-                styles.inputWrapper,
-                addWrapperInvalid && styles.inputWrapperInvalid,
-              ]
+              className={[styles.inputWrapper, addWrapperInvalid && styles.inputWrapperInvalid]
                 .filter(Boolean)
                 .join(" ")}
             >
@@ -385,10 +357,7 @@ export const ManualSelectComponent: React.FC<CalendarManualSelectProps> = ({
               {addHasText && (
                 <button
                   type="button"
-                  className={[
-                    styles.saveBtn,
-                    !addSaveAllowed && styles.saveBtnInvalid,
-                  ]
+                  className={[styles.saveBtn, !addSaveAllowed && styles.saveBtnInvalid]
                     .filter(Boolean)
                     .join(" ")}
                   onClick={handleAddSave}
@@ -404,12 +373,8 @@ export const ManualSelectComponent: React.FC<CalendarManualSelectProps> = ({
               date={d}
               isAllowed={isAllowed}
               onSave={(newDate) => {
-                const d = selectedDates[i];
-                onDatesSet(
-                  selectedDates.map((s, j) =>
-                    j === i ? withTime(newDate, d) : s,
-                  ),
-                );
+                const orig = selectedDates[i];
+                onDatesSet(selectedDates.map((s, j) => j === i ? withTime(newDate, orig) : s));
                 setEditingKey(null);
               }}
               onClear={() => onDatesSet(selectedDates.filter((_, j) => j !== i))}
@@ -458,5 +423,3 @@ export const ManualSelectComponent: React.FC<CalendarManualSelectProps> = ({
     </div>
   );
 };
-
-export { ManualSelectComponent as CalendarManualSelect };
