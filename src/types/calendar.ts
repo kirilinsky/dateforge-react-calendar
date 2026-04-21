@@ -25,6 +25,7 @@ export type CalendarValue<M extends CalendarMode> =
 
 export interface CalendarProps<M extends CalendarMode = "single"> {
   children?: React.ReactNode;
+  cols?: 1 | 2 | 3 | 4 | 5 | 6;
   value?: CalendarValue<M>;
   mode?: M;
   max?: number;
@@ -41,25 +42,10 @@ export interface CalendarProps<M extends CalendarMode = "single"> {
   locale?: string;
   theme?: CalendarTheme;
   width?: string | number;
-  startOfWeek?: StartOfWeek;
-  time?: boolean;
   hour12?: boolean;
-  showYearPicker?: boolean;
-  months?: boolean;
-  compactYears?: boolean;
-  compactMonths?: boolean;
   appearance?: CalendarAppearance;
   gradient?: boolean;
-  highlightWeekends?: boolean;
-  showWeekNumber?: boolean;
-  hideLimited?: boolean;
-  hideDisabled?: boolean;
-  hideWeekdays?: boolean;
   disabled?: DisabledRule | DisabledRule[];
   twoMonthsLayout?: boolean;
   monthsColumn?: boolean;
-  showHomeButton?: boolean;
-  showClearButton?: boolean;
-  showThemeToggle?: boolean;
-  highlightToday?: boolean;
 }

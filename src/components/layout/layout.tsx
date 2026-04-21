@@ -1,5 +1,5 @@
 import React from "react";
-import { DaysComponent } from "../days/days";
+import { CalendarDays } from "../days/days";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import { useSelection } from "@/context/selection-context";
@@ -8,41 +8,26 @@ import { TimePopup } from "../time-popup/time-popup";
 import { MonthPopup, YearPopup } from "../month-year-track/month-year-track";
 import styles from "./layout.module.css";
 
-const TWO_MONTHS_NARROW_THRESHOLD = 680;
-
 export const CalendarLayout: React.FC<{
   appearanceKey?: string;
   customAppearanceVars?: React.CSSProperties;
+  cols?: 1 | 2 | 3 | 4 | 5 | 6;
   modules?: React.ReactNode;
-}> = ({ appearanceKey, customAppearanceVars, modules }) => {
-  const {
-    twoMonthsLayout, monthsColumn,
-    hour12, locale, minDate, maxDate, gradient,
-  } = useConfig();
+}> = ({ appearanceKey, customAppearanceVars, cols, modules }) => {
+  const { hour12, locale, minDate, maxDate, gradient } = useConfig();
   const { viewDate: date, navigateTo } = useNavigation();
   const { onChangeTime } = useSelection();
   const {
     dark, showTimePopup, setShowTimePopup,
     showMonthPopup, setShowMonthPopup,
     showYearPopup, setShowYearPopup,
-    containerWidth,
   } = useUI();
 
-  const nextMonthDate = twoMonthsLayout
-    ? new Date(date.getFullYear(), date.getMonth() + 1, 1)
-    : null;
-
-  const twoMonthsStacked =
-    !!twoMonthsLayout &&
-    (!!monthsColumn ||
-      (containerWidth > 0 && containerWidth < TWO_MONTHS_NARROW_THRESHOLD));
-
-  const nextMonthLabel = nextMonthDate
-    ? new Intl.DateTimeFormat(locale, {
-        month: "short",
-        year: "numeric",
-      }).format(nextMonthDate)
-    : null;
+  const containerStyle: React.CSSProperties = {
+    ...customAppearanceVars,
+    gridTemplateColumns: `repeat(${cols ?? 1}, 1fr)`,
+    gridAutoFlow: "dense",
+  };
 
   return (
     <div
@@ -54,8 +39,7 @@ export const CalendarLayout: React.FC<{
         .filter(Boolean)
         .join(" ")}
       data-appearance={appearanceKey}
-      data-stacked={twoMonthsStacked || undefined}
-      style={customAppearanceVars}
+      style={containerStyle}
     >
       {showTimePopup && (
         <TimePopup
@@ -93,20 +77,7 @@ export const CalendarLayout: React.FC<{
           onClose={() => setShowYearPopup(false)}
         />
       )}
-      <DaysComponent hideOtherMonths={!!twoMonthsLayout} />
-      {twoMonthsStacked && nextMonthLabel && (
-        <div data-area="label-break" className={styles.secondMonthLabel}>
-          {nextMonthLabel}
-        </div>
-      )}
-      {nextMonthDate && (
-        <DaysComponent
-          dateOverride={nextMonthDate}
-          hideOtherMonths
-          dataArea="days-2"
-        />
-      )}
-      {modules}
+      {modules ?? <CalendarDays />}
     </div>
   );
 };

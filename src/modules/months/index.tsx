@@ -6,10 +6,12 @@ import shared from "@/global/global.module.css";
 
 interface CalendarMonthGridProps {
   shortMonths?: boolean;
+  col?: number | string;
 }
 
 export const CalendarMonthGrid: React.FC<CalendarMonthGridProps> = ({
   shortMonths = true,
+  col,
 }) => {
   const { locale, minDate, maxDate } = useConfig();
   const { viewDate, navigateTo } = useNavigation();
@@ -25,7 +27,7 @@ export const CalendarMonthGrid: React.FC<CalendarMonthGridProps> = ({
   const handleClick = (i: number) => navigateTo(setMonth(viewDate, i));
 
   return (
-    <div className={styles.monthsContainer} data-area="months">
+    <div className={styles.monthsContainer} data-area="months" style={col !== undefined ? { gridColumn: col } : undefined}>
       {mNames.map((n, i) => (
         <button
           key={i}

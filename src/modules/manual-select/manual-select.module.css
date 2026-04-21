@@ -20,7 +20,6 @@
     flex-wrap: wrap;
     gap: 0.4em;
     padding: var(--cal-spacing);
-    border-bottom: var(--cal-border) solid var(--c-s);
     z-index: 3;
   }
 

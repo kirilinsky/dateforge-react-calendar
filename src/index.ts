@@ -1,4 +1,5 @@
 export { Calendar } from "./components/calendar/calendar";
+export { CalendarDays } from "./components/days/days";
 export { createTheme } from "./utils/create-theme";
 
  export { useConfig } from "./context/config-context";

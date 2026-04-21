@@ -11,18 +11,46 @@ import {
 } from "@/utils/date-utils";
 import shared from "@/global/global.module.css";
 import WeekDays from "../week-days/week-days";
+import { StartOfWeek } from "@/types/calendar";
 
-export const DaysComponent: React.FC<{
-  dateOverride?: Date;
+export const CalendarDays: React.FC<{
+  offset?: number;
   hideOtherMonths?: boolean;
+  col?: number | string;
   dataArea?: string;
-}> = ({ dateOverride, hideOtherMonths = false, dataArea = "days" }) => {
+  startOfWeek?: StartOfWeek;
+  highlightWeekends?: boolean;
+  showWeekNumber?: boolean;
+  hideWeekdays?: boolean;
+  highlightToday?: boolean;
+  allowSwipeNavigation?: boolean;
+  hideLimited?: boolean;
+  hideDisabled?: boolean;
+}> = ({
+  offset = 0,
+  hideOtherMonths = false,
+  col,
+  dataArea,
+  startOfWeek = 1,
+  highlightWeekends = true,
+  showWeekNumber = false,
+  hideWeekdays = false,
+  highlightToday = true,
+  allowSwipeNavigation = false,
+  hideLimited = false,
+  hideDisabled = false,
+}) => {
   const {
-    minDate, maxDate, disabled, hideLimited, hideDisabled,
-    startOfWeek, showWeekNumber, range, rangeMinDays, rangeMaxDays,
-    twoMonthsLayout, highlightToday,
+    minDate, maxDate, disabled,
+    range, rangeMinDays, rangeMaxDays,
+    twoMonthsLayout, locale,
   } = useConfig();
-  const { viewDate: date, navigateTo } = useNavigation();
+
+  const { viewDate: rawDate, navigateTo } = useNavigation();
+  const date = offset
+    ? new Date(rawDate.getFullYear(), rawDate.getMonth() + offset, 1)
+    : rawDate;
+  const resolvedArea = dataArea ?? (offset > 0 ? `days-${offset + 1}` : "days");
   const {
     selectedDates, onChangeDate,
     rangeStart, rangeEnd, hoverDate, setHoverDate,
@@ -60,10 +88,9 @@ export const DaysComponent: React.FC<{
   const [direction, setDirection] = useState<"left" | "right" | "none">("none");
   const [prevDate, setPrevDate] = useState(date);
 
-  const effectiveDate = dateOverride ?? date;
-  const currentMonth = effectiveDate.getMonth();
-  const currentYear = effectiveDate.getFullYear();
-  const offset = getFirstDayOffset(effectiveDate, startOfWeek);
+  const currentMonth = date.getMonth();
+  const currentYear = date.getFullYear();
+  const firstDayOffset = getFirstDayOffset(date, startOfWeek);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
   useEffect(() => {
@@ -77,30 +104,25 @@ export const DaysComponent: React.FC<{
     }
   }, [date, prevDate]);
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX === null) return;
-    const deltaX = touchStartX - e.changedTouches[0].clientX;
-    const nextDate = getNextMonthFromSwipe(
-      deltaX,
-      date,
-      minDate,
-      maxDate,
-      50,
-      disabled,
-    );
-    if (nextDate) navigateTo(nextDate);
-    setTouchStartX(null);
-  };
+  const handleTouchEnd = allowSwipeNavigation
+    ? (e: React.TouchEvent) => {
+        if (touchStartX === null) return;
+        const deltaX = touchStartX - e.changedTouches[0].clientX;
+        const nextDate = getNextMonthFromSwipe(deltaX, date, minDate, maxDate, 50, disabled);
+        if (nextDate) navigateTo(nextDate);
+        setTouchStartX(null);
+      }
+    : undefined;
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStartX(e.changedTouches[0].clientX);
-  };
+  const handleTouchStart = allowSwipeNavigation
+    ? (e: React.TouchEvent) => { setTouchStartX(e.changedTouches[0].clientX); }
+    : undefined;
 
   const weeksData = useMemo(() => {
     return getCalendarData(
       currentYear,
       currentMonth,
-      offset,
+      firstDayOffset,
       selectedDates,
       minDate,
       maxDate,
@@ -112,7 +134,7 @@ export const DaysComponent: React.FC<{
   }, [
     currentYear,
     currentMonth,
-    offset,
+    firstDayOffset,
     selectedDates,
     minDate,
     maxDate,
@@ -142,9 +164,8 @@ export const DaysComponent: React.FC<{
         next.setHours(maxDate.getHours(), maxDate.getMinutes(), 0, 0);
       }
       onChangeDate(next);
-      if (dateOverride) navigateTo(date);
     },
-    [onChangeDate, navigateTo, date, minDate, maxDate, dateOverride],
+    [onChangeDate, date, minDate, maxDate],
   );
 
   const isPickingRange = range && rangeStart && !rangeEnd;
@@ -187,11 +208,12 @@ export const DaysComponent: React.FC<{
   return (
     <div
       aria-label="days"
-      data-area={dataArea}
+      data-area={resolvedArea}
       key={animationKey}
       onTouchEnd={handleTouchEnd}
       onTouchStart={handleTouchStart}
       onMouseLeave={handleMouseLeave}
+      style={col !== undefined ? { gridColumn: col } : undefined}
       className={[
         styles.dayGridContainer,
         direction !== "none" ? styles[direction] : "",
@@ -200,7 +222,13 @@ export const DaysComponent: React.FC<{
         .filter(Boolean)
         .join(" ")}
     >
-      <WeekDays />
+      <WeekDays
+        locale={locale}
+        startOfWeek={startOfWeek}
+        highlightWeekends={highlightWeekends}
+        showWeekNumber={showWeekNumber}
+        hideWeekdays={hideWeekdays}
+      />
       <div role="row" style={{ display: "contents" }}>
         {weeksData.map((week, wIndex) => {
           const isLastRow = wIndex === weeksData.length - 1;
@@ -309,7 +337,7 @@ export const DaysComponent: React.FC<{
                     isPreviewMid;
 
                   const dayOfWeek = fullDate.getDay();
-                  const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                  const isWeekend = highlightWeekends && (dayOfWeek === 0 || dayOfWeek === 6);
 
                   return (
                     <button

@@ -16,21 +16,14 @@ export function Calendar<M extends CalendarMode = "single">({
   width = "100%",
   theme: themeProp,
   appearance: appearanceProp,
-  compactMonths = false,
-  compactYears = true,
-  showYearPicker = false,
-  time = true,
-  months = true,
   hour12 = false,
   locale = "en",
-  startOfWeek = 1,
   gradient = false,
-  highlightWeekends = true,
   mode,
   max,
   twoMonthsLayout = false,
   monthsColumn = false,
-  highlightToday = true,
+  cols,
   children,
   ...restProps
 }: CalendarProps<M>) {
@@ -87,16 +80,9 @@ export function Calendar<M extends CalendarMode = "single">({
   return (
     <CalendarProvider
       locale={locale}
-      compactMonths={compactMonths}
-      compactYears={compactYears}
-      showYearPicker={showYearPicker}
-      time={time}
       hour12={hour12}
-      months={months}
-      startOfWeek={startOfWeek}
       appearance={appearanceProp}
       gradient={gradient}
-      highlightWeekends={highlightWeekends}
       isDark={
         activeTheme === "dark" ||
         (DARK_THEMES as readonly string[]).includes(activeTheme)
@@ -106,7 +92,6 @@ export function Calendar<M extends CalendarMode = "single">({
       max={max}
       twoMonthsLayout={twoMonthsLayout}
       monthsColumn={monthsColumn}
-      highlightToday={highlightToday}
       containerWidth={containerWidth}
       toggleTheme={toggleTheme}
       {...(restProps as import("@/types/calendar").CalendarProps<CalendarMode>)}
@@ -119,6 +104,7 @@ export function Calendar<M extends CalendarMode = "single">({
         <CalendarLayout
           appearanceKey={appearanceKey}
           customAppearanceVars={customAppearanceVars}
+          cols={cols}
           modules={children}
         />
       </div>

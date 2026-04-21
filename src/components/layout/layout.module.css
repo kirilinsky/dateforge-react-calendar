@@ -39,12 +39,13 @@
 
     container-type: inline-size;
     display: grid;
+    gap: 1px;
     position: relative;
     box-sizing: border-box;
     width: 100%;
     max-width: 864px;
     font-size: clamp(11px, 2.7cqw, 18px);
-    background: var(--c-b);
+    background: var(--c-s);
     color: var(--c-c);
     font-family: var(--cal-font);
     user-select: none;
@@ -88,20 +89,15 @@
     box-sizing: border-box;
   }
 
-  .calendarContainer > div {
+   .calendarContainer > [data-area] {
     width: 100%;
-    height: 100%;
     min-width: 0;
     overflow: hidden;
-    background: inherit;
+    background: var(--c-b);
   }
 
-  .calendarContainer.gradient > div {
-    background: unset !important;
-  }
-
-  .calendarContainer.gradient > div[data-state="open"] {
-    background: var(--c-b) !important;
+   .calendarContainer.gradient > [data-area] {
+    background: transparent;
   }
 
   .secondMonthLabel {
@@ -116,294 +112,6 @@
     border-bottom: var(--cal-border) solid var(--c-s);
     background: var(--c-a);
     color: var(--c-c);
-  }
-
-  /* 
-     - HH / MS / SD / PP always span full width
-     - MM / TT are side panels in the main row only
-     - PP is always last (after SD)
-     - Unused named areas collapse to 0px (auto sizing)
-   */
-
-  .calendarContainer:not(:has([data-area="months"])):not(
-      :has([data-area="time"])
-    ):not(:has([data-area="days-2"])) {
-    grid-template-columns: 1fr;
-    grid-template-areas: "HH" "MS" "DD" "SD" "YT" "PP";
-  }
-
-  .calendarContainer:has([data-area="months"]):not(
-      :has([data-area="time"])
-    ):not(:has([data-area="days-2"])) {
-    grid-template-columns: 2fr 5fr;
-    grid-template-areas:
-      "HH HH"
-      "MS MS"
-      "MM DD"
-      "SD SD"
-      "YT YT"
-      "PP PP";
-  }
-
-  .calendarContainer:not(:has([data-area="months"])):has(
-      [data-area="time"]
-    ):not(:has([data-area="days-2"])) {
-    grid-template-columns: 5fr 1.4fr;
-    grid-template-areas:
-      "HH HH"
-      "MS MS"
-      "DD TT"
-      "SD SD"
-      "YT YT"
-      "PP PP";
-  }
-
-  .calendarContainer:has([data-area="months"]):has([data-area="time"]):not(
-      :has([data-area="days-2"])
-    ) {
-    grid-template-columns: 1.6fr 5fr 1.3fr;
-    grid-template-areas:
-      "HH HH HH"
-      "MS MS MS"
-      "MM DD TT"
-      "SD SD SD"
-      "YT YT YT"
-      "PP PP PP";
-  }
-
-  @container (max-width: 460px) {
-    .calendarContainer:has([data-area="months"]):not(
-        :has([data-area="time"])
-      ):not(:has([data-area="days-2"])) {
-      grid-template-columns: 1fr;
-      grid-template-areas:
-        "HH"
-        "MS"
-        "MM"
-        "DD"
-        "SD"
-        "YT"
-        "PP";
-      --months-cols: repeat(4, minmax(0, 1fr));
-      --months-rows: repeat(3, auto);
-      --months-border-right: none;
-      --months-border-top: var(--cal-border) solid var(--c-s);
-      --months-border-bottom: var(--cal-border) solid var(--c-s);
-    }
-
-    .calendarContainer:not(:has([data-area="months"])):has(
-        [data-area="time"]
-      ):not(:has([data-area="days-2"])) {
-      grid-template-columns: 1fr;
-      grid-template-areas:
-        "HH"
-        "MS"
-        "DD"
-        "SD"
-        "YT"
-        "TT"
-        "PP";
-      --time-border-left: none;
-      --time-border-top: var(--cal-border) solid var(--c-s);
-      --time-item-font: 1em;
-    }
-  }
-
-  @container (350px < width <= 660px) {
-    .calendarContainer:has([data-area="months"]):has([data-area="time"]):not(
-        :has([data-area="days-2"])
-      ) {
-      grid-template-columns: 4.5fr 1.8fr;
-      grid-template-areas:
-        "HH HH"
-        "MS MS"
-        "MM MM"
-        "DD TT"
-        "SD SD"
-        "YT YT"
-        "PP PP";
-      --months-cols: repeat(4, minmax(0, 1fr));
-      --months-rows: repeat(3, auto);
-      --months-border-right: none;
-      --months-border-top: var(--cal-border) solid var(--c-s);
-      --months-border-bottom: var(--cal-border) solid var(--c-s);
-      --time-border-left: var(--cal-border) solid var(--c-s);
-    }
-  }
-
-  @container (max-width: 350px) {
-    .calendarContainer:has([data-area="months"]):has([data-area="time"]):not(
-        :has([data-area="days-2"])
-      ) {
-      grid-template-columns: 1fr;
-      grid-template-areas:
-        "HH"
-        "MS"
-        "MM"
-        "DD"
-        "TT"
-        "SD"
-        "YT"
-        "PP";
-      --months-cols: repeat(4, minmax(0, 1fr));
-      --months-rows: repeat(3, auto);
-      --months-border-right: none;
-      --months-border-top: var(--cal-border) solid var(--c-s);
-      --months-border-bottom: var(--cal-border) solid var(--c-s);
-      --time-border-left: none;
-      --time-border-top: var(--cal-border) solid var(--c-s);
-    }
-  }
-
-  @container (max-width: 300px) {
-    .calendarContainer:is(
-        :has([data-area="months"]),
-        :has([data-area="time"])
-      ):not(:has([data-area="days-2"])) {
-      grid-template-columns: 1fr;
-      grid-template-areas:
-        "HH"
-        "MS"
-        "MM"
-        "DD"
-        "TT"
-        "SD"
-        "YT"
-        "PP";
-      --months-border-right: none;
-      --months-border-bottom: var(--cal-border) solid var(--c-s);
-      --months-border-top: var(--cal-border) solid var(--c-s);
-      --months-cols: repeat(4, minmax(0, 1fr));
-      --months-rows: repeat(3, auto);
-      --time-border-left: none;
-      --time-border-top: var(--cal-border) solid var(--c-s);
-      --time-min-height: 8em;
-      --time-root-max-width: 16em;
-      --time-root-margin: 0 auto;
-      --time-item-font: 1.35em;
-      --time-align: center;
-    }
-
-    .calendarContainer:has([data-area="months"]):has([data-area="time"]):not(
-        :has([data-area="days-2"])
-      ) {
-      grid-template-columns: 1fr;
-      grid-template-areas:
-        "HH"
-        "MS"
-        "MM"
-        "DD"
-        "TT"
-        "SD"
-        "YT"
-        "PP";
-      --months-cols: repeat(4, minmax(0, 1fr));
-      --months-rows: repeat(3, auto);
-      --months-border-right: none;
-      --months-border-bottom: var(--cal-border) solid var(--c-s);
-      --months-border-top: var(--cal-border) solid var(--c-s);
-      --time-border-left: none;
-      --time-border-top: var(--cal-border) solid var(--c-s);
-      --time-min-height: 8em;
-      --time-root-max-width: 16em;
-      --time-root-margin: 0 auto;
-      --time-item-font: 1.35em;
-      --time-align: center;
-    }
-  }
-
-  .calendarContainer:has([data-area="days-2"]):not([data-stacked]) {
-    max-width: 1200px;
-    font-size: clamp(11px, 1.4cqw, 18px);
-  }
-
-  .calendarContainer:has([data-area="days-2"]):not(
-      :has([data-area="months"])
-    ):not(:has([data-area="time"])):not([data-stacked]) {
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-      "HH HH"
-      "MS MS"
-      "DD D2"
-      "SD SD"
-      "YT YT"
-      "PP PP";
-  }
-
-  .calendarContainer:has([data-area="days-2"]):has([data-area="months"]):not(
-      :has([data-area="time"])
-    ):not([data-stacked]) {
-    grid-template-columns: 1.8fr 2.5fr 2.5fr;
-    grid-template-areas:
-      "MM HH HH"
-      "MS MS MS"
-      "MM DD D2"
-      "SD SD SD"
-      "YT YT YT"
-      "PP PP PP";
-  }
-
-  .calendarContainer:has([data-area="days-2"]):not(
-      :has([data-area="months"])
-    ):has([data-area="time"]):not([data-stacked]) {
-    grid-template-columns: 2.5fr 2.5fr 1.4fr;
-    grid-template-areas:
-      "HH HH TT"
-      "MS MS MS"
-      "DD D2 TT"
-      "SD SD SD"
-      "YT YT YT"
-      "PP PP PP";
-  }
-
-  .calendarContainer:has([data-area="days-2"]):has([data-area="months"]):has(
-      [data-area="time"]
-    ):not([data-stacked]) {
-    grid-template-columns: 1.6fr 2.5fr 2.5fr 1.3fr;
-    grid-template-areas:
-      "MM HH HH TT"
-      "MS MS MS MS"
-      "MM DD D2 TT"
-      "SD SD SD SD"
-      "YT YT YT YT"
-      "PP PP PP PP";
-  }
-
-  .calendarContainer > [data-area="header"] { grid-area: HH; }
-  .calendarContainer > [data-area="days"] { grid-area: DD; }
-  .calendarContainer > [data-area="days-2"] { grid-area: D2; }
-  .calendarContainer > [data-area="months"] { grid-area: MM; }
-  .calendarContainer > [data-area="time"] { grid-area: TT; }
-  .calendarContainer > [data-area="manual-select"] { grid-area: MS; }
-  .calendarContainer > [data-area="selected-dates"] { grid-area: SD; }
-  .calendarContainer > [data-area="years-track"] { grid-area: YT; }
-  .calendarContainer > [data-area="presets"] { grid-area: PP; }
-  .calendarContainer > [data-area="label-break"] { grid-area: LB; }
-
-  .calendarContainer[data-stacked] {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "HH"
-      "MS"
-      "MM"
-      "DD"
-      "LB"
-      "D2"
-      "TT"
-      "SD"
-      "YT"
-      "PP";
-    --months-border-right: none;
-    --months-border-bottom: var(--cal-border) solid var(--c-s);
-    --months-border-top: var(--cal-border) solid var(--c-s);
-    --months-cols: repeat(4, minmax(0, 1fr));
-    --months-rows: repeat(3, 1fr);
-    --time-border-left: none;
-    --time-border-top: var(--cal-border) solid var(--c-s);
-    --time-min-height: 8em;
-    --time-root-max-width: 16em;
-    --time-root-margin: 0 auto;
-    --time-item-font: 1.35em;
-    --time-align: center;
+    grid-column: 1 / -1;
   }
 }

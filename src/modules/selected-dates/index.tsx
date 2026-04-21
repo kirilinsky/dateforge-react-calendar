@@ -21,11 +21,15 @@ const getRangeSep = (fmt: Intl.DateTimeFormat, start: Date, end: Date): string =
 interface CalendarSelectedDatesProps {
   allowClean?: boolean;
   allowNavigate?: boolean;
+  animated?: boolean;
+  col?: number | string;
 }
 
 export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
   allowClean = false,
   allowNavigate = false,
+  animated = false,
+  col,
 }) => {
   const { locale, range } = useConfig();
   const { viewDate: date, navigateTo } = useNavigation();
@@ -36,6 +40,10 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
     month: "short",
     year: "numeric",
   });
+
+  const hasContent = range ? !!rangeStart : selectedDates.length > 0;
+
+  if (!animated && !hasContent) return null;
 
   const isCurrentMonth = (d: Date) =>
     d.getFullYear() === date.getFullYear() && d.getMonth() === date.getMonth();
@@ -63,11 +71,9 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
     </button>
   );
 
-  if (range) {
-    if (!rangeStart) return null;
-    const sep = rangeEnd ? getRangeSep(fmt, rangeStart, rangeEnd) : " – ";
-    return (
-      <div className={styles.selectedContainer} data-area="selected-dates">
+  const content = range ? (
+    rangeStart ? (
+      <>
         <button
           type="button"
           onClick={() => allowNavigate && navigateTo(rangeStart)}
@@ -75,7 +81,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
         >
           {fmt.format(rangeStart)}
         </button>
-        <span className={styles.rangeSep}>{rangeEnd ? sep : "…"}</span>
+        <span className={styles.rangeSep}>{rangeEnd ? getRangeSep(fmt, rangeStart, rangeEnd) : "…"}</span>
         {rangeEnd && (
           <button
             type="button"
@@ -86,14 +92,10 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
           </button>
         )}
         {clearBtn}
-      </div>
-    );
-  }
-
-  if (!selectedDates.length) return null;
-
-  return (
-    <div className={styles.selectedContainer} data-area="selected-dates">
+      </>
+    ) : null
+  ) : (
+    <>
       {selectedDates.map((d, i) => {
         const isActive = isCurrentMonth(d) && d.getDate() === date.getDate();
         return (
@@ -115,6 +117,22 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
         );
       })}
       {clearBtn}
+    </>
+  );
+
+  return (
+    <div
+      className={[
+        styles.selectedContainer,
+        animated ? styles.animated : "",
+        animated && hasContent ? styles.visible : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      data-area="selected-dates"
+      style={col !== undefined ? { gridColumn: col } : undefined}
+    >
+      <div className={styles.inner}>{content}</div>
     </div>
   );
 };

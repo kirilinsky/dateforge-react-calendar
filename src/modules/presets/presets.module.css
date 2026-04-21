@@ -6,13 +6,9 @@
   align-items: stretch;
   gap: 0.25em;
   padding: 0.75em 0.3em;
-  border-top: var(--cal-border) solid var(--c-s);
   height: auto;
   z-index: 3;
   transition: all var(--cal-transition) linear;
-  &:hover {
-    box-shadow: 0 -0.1em 0.1em var(--c-x);
-  }
 }
 
 @container (max-width: 320px) {

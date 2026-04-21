@@ -5,12 +5,34 @@
   flex-wrap: wrap;
   gap: 0.35em;
   padding: var(--cal-spacing);
-  border-top: var(--cal-border) solid var(--c-s);
   z-index: 3;
-  transition: box-shadow 0.25s linear;
-  &:hover {
-    box-shadow: 0 -0.1em 0.1em var(--c-x);
-  }
+}
+
+ .animated {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+}
+
+.animated.visible {
+  grid-template-rows: 1fr;
+}
+
+ .inner {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35em;
+  padding: 0 var(--cal-spacing);
+  padding-top: 0;
+  padding-bottom: 0;
+  transition: padding 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.visible .inner {
+  padding: var(--cal-spacing);
 }
 
 .chip {

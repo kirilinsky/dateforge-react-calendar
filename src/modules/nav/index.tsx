@@ -6,22 +6,30 @@ import { useConfig, useNavigation, useSelection, useUI } from "react-calendar-da
 import { addDate, checkYearNavigation, getTimeString, isYearFixed } from "@/utils/date-utils";
 
 export interface CalendarNavProps {
-  col?: number | string;
+  showTime?: boolean;
+  showMonthPicker?: boolean;
+  compactMonths?: boolean;
+  showYearPicker?: boolean;
+  compactYears?: boolean;
+  showHome?: boolean;
+  showClear?: boolean;
+  showThemeToggle?: boolean;
 }
 
-export const CalendarNav: React.FC<CalendarNavProps> = ({ col }) => {
-  const {
-    compactMonths, compactYears, minDate, maxDate, showYearPicker,
-    months, time, locale, hour12, disabled,
-    twoMonthsLayout, monthsColumn,
-    showHomeButton, showClearButton, showThemeToggle,
-  } = useConfig();
+export const CalendarNav: React.FC<CalendarNavProps> = ({
+  showTime = false,
+  showMonthPicker = false,
+  compactMonths = false,
+  showYearPicker = false,
+  compactYears = false,
+  showHome = false,
+  showClear = false,
+  showThemeToggle = false,
+}) => {
+  const { minDate, maxDate, locale, hour12, disabled, twoMonthsLayout, monthsColumn } = useConfig();
   const { viewDate: date, navigateTo } = useNavigation();
   const { selectedDates, onChangeDate } = useSelection();
-  const {
-    setShowTimePopup, setShowMonthPopup, setShowYearPopup,
-    containerWidth, toggleTheme,
-  } = useUI();
+  const { setShowTimePopup, setShowMonthPopup, setShowYearPopup, containerWidth, toggleTheme } = useUI();
 
   const twoMonthsStacked =
     !!twoMonthsLayout &&
@@ -63,8 +71,8 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({ col }) => {
   const cm = (v: number) => navigateTo(addDate(date, v, "month", minDate, maxDate));
 
   const visible =
-    time || compactMonths || months || showYearPicker || compactYears ||
-    showHomeButton || showClearButton || showThemeToggle;
+    showTime || compactMonths || showMonthPicker || showYearPicker ||
+    compactYears || showHome || showClear || showThemeToggle;
 
   if (!visible) return null;
 
@@ -77,9 +85,8 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({ col }) => {
         .filter(Boolean)
         .join(" ")}
       data-area="header"
-      style={col !== undefined ? { gridColumn: col } : undefined}
     >
-      {time && (
+      {showTime && (
         <button
           className={`${styles.timeButton} ${shared.interactive}`}
           onClick={() => setShowTimePopup(true)}
@@ -99,7 +106,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({ col }) => {
         </button>
       )}
 
-      {months && (!twoMonthsLayout || twoMonthsStacked) && (
+      {showMonthPicker && (!twoMonthsLayout || twoMonthsStacked) && (
         <div className={styles.yearsSelector}>
           {canGoPrevMonth && (
             <button className={`${styles.arrow} ${shared.interactive} ${shared.hoverable}`} onClick={() => cm(-1)}>
@@ -120,7 +127,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({ col }) => {
         </div>
       )}
 
-      {months && twoMonthsLayout && !twoMonthsStacked && (
+      {showMonthPicker && twoMonthsLayout && !twoMonthsStacked && (
         <div className={`${styles.yearsSelector} ${styles.twoMonthsSelector}`}>
           {canGoPrevMonth && (
             <button className={`${styles.arrow} ${shared.interactive} ${shared.hoverable}`} onClick={() => cm(-1)}>
@@ -180,7 +187,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({ col }) => {
             <ThemeToggle />
           </button>
         )}
-        {showHomeButton && (
+        {showHome && (
           <button
             className={`${styles.homeButton} ${shared.interactive} ${shared.hoverable} ${isCurrentMonth ? styles.homeButtonDisabled : ""}`}
             disabled={isCurrentMonth}
@@ -194,7 +201,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({ col }) => {
             <Home />
           </button>
         )}
-        {showClearButton && (
+        {showClear && (
           <button
             className={`${styles.homeButton} ${shared.interactive} ${shared.hoverable} ${selectedDates.length === 0 ? styles.homeButtonDisabled : ""}`}
             disabled={selectedDates.length === 0}

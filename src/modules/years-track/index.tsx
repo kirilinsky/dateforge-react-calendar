@@ -5,10 +5,12 @@ import { useNavigation } from "react-calendar-datetime";
 
 interface CalendarYearsTrackProps {
   range?: number;
+  col?: number | string;
 }
 
 export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({
   range = 5,
+  col,
 }) => {
   const { viewDate, navigateTo } = useNavigation();
   const currentYear = viewDate.getFullYear();
@@ -24,7 +26,7 @@ export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({
   };
 
   return (
-    <div className={styles.yearsTrackContainer} data-area="years-track">
+    <div className={styles.yearsTrackContainer} data-area="years-track" style={col !== undefined ? { gridColumn: col } : undefined}>
       {years.map((year) => (
         <button
           key={year}

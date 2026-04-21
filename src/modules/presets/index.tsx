@@ -8,29 +8,21 @@ import shared from "@/global/global.module.css";
 interface CalendarPresetsProps {
   showYears?: boolean;
   showMonths?: boolean;
+  col?: number | string;
 }
 
 export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
   showYears = true,
   showMonths = true,
+  col,
 }) => {
-  const {
-    minDate, maxDate, showYearPicker, locale,
-    compactMonths, compactYears, months, disabled,
-  } = useConfig();
+  const { minDate, maxDate, locale, disabled } = useConfig();
   const { viewDate: date } = useNavigation();
   const { selectedDate, onChangeDate } = useSelection();
 
   const presets = useMemo(
-    () =>
-      getFilteredPresets(
-        showYears && (showYearPicker || !!compactYears),
-        showMonths && (!!compactMonths || !!months),
-        minDate,
-        maxDate,
-        disabled,
-      ),
-    [showYears, showMonths, showYearPicker, months, minDate, maxDate, compactYears, compactMonths, disabled],
+    () => getFilteredPresets(showYears, showMonths, minDate, maxDate, disabled),
+    [showYears, showMonths, minDate, maxDate, disabled],
   );
 
   return (
@@ -38,6 +30,7 @@ export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
       className={styles.presetsContainer}
       data-area="presets"
       data-count={presets.length}
+      style={col !== undefined ? { gridColumn: col } : undefined}
     >
       {presets.map((preset) => {
         const isActive = !!selectedDate && isSameDay(preset.targetDate, selectedDate);
