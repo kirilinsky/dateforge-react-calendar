@@ -6,22 +6,26 @@ import shared from "@/global/global.module.css";
 
 interface CalendarMonthGridProps {
   shortMonths?: boolean;
+  disableLimited?: boolean;
+  hideLimited?: boolean;
   col?: number | string;
 }
 
 export const CalendarMonthGrid: React.FC<CalendarMonthGridProps> = ({
   shortMonths = true,
+  disableLimited = true,
+  hideLimited = false,
   col,
 }) => {
-  const { locale, minDate, maxDate } = useConfig();
+  const { locale, minDate, maxDate, disabled } = useConfig();
   const { viewDate, navigateTo } = useNavigation();
 
   const currentMonth = viewDate.getMonth();
   const currentYear = viewDate.getFullYear();
 
   const mNames = useMemo(
-    () => getMonthListData(locale, currentYear, minDate, maxDate, shortMonths),
-    [locale, currentYear, minDate, maxDate, shortMonths],
+    () => getMonthListData(locale, currentYear, minDate, maxDate, shortMonths, disabled, disableLimited),
+    [locale, currentYear, minDate, maxDate, shortMonths, disabled, disableLimited],
   );
 
   const handleClick = (i: number) => navigateTo(setMonth(viewDate, i));
@@ -32,10 +36,11 @@ export const CalendarMonthGrid: React.FC<CalendarMonthGridProps> = ({
         <button
           key={i}
           type="button"
-          disabled={n.disabled}
           className={[styles.item, shared.interactive, shared.hoverable, i === currentMonth ? shared.activeItem : ""]
             .filter(Boolean)
             .join(" ")}
+          disabled={n.disabled || (hideLimited && n.limited)}
+          style={hideLimited && n.limited ? { visibility: "hidden" } : undefined}
           onClick={() => handleClick(i)}
         >
           {n.label}

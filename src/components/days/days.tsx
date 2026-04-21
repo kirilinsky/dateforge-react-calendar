@@ -25,7 +25,6 @@ export const CalendarDays: React.FC<{
   highlightToday?: boolean;
   allowSwipeNavigation?: boolean;
   hideLimited?: boolean;
-  hideDisabled?: boolean;
 }> = ({
   offset = 0,
   hideOtherMonths = false,
@@ -38,7 +37,6 @@ export const CalendarDays: React.FC<{
   highlightToday = true,
   allowSwipeNavigation = false,
   hideLimited = false,
-  hideDisabled = false,
 }) => {
   const {
     minDate, maxDate, disabled,
@@ -193,16 +191,12 @@ export const CalendarDays: React.FC<{
   const isDayHidden = useCallback(
     (d: { fullDate: Date; isDisabled: boolean; isCurrentMonth: boolean }) => {
       const t = d.fullDate.getTime();
-      if (
-        hideLimited &&
-        ((startT !== null && t < startT) || (endT !== null && t > endT))
-      )
+      if (hideLimited && (((startT !== null && t < startT) || (endT !== null && t > endT)) || d.isDisabled))
         return true;
-      if (hideDisabled && d.isDisabled) return true;
       if (hideOtherMonths && !d.isCurrentMonth) return true;
       return false;
     },
-    [hideLimited, hideDisabled, hideOtherMonths, startT, endT],
+    [hideLimited, hideOtherMonths, startT, endT],
   );
 
   return (
@@ -236,7 +230,7 @@ export const CalendarDays: React.FC<{
           const isLastRow = wIndex === weeksData.length - 1;
           if (
             isLastRow &&
-            (hideLimited || hideDisabled) &&
+            hideLimited &&
             week.days.every((d) =>
               isDayHidden({
                 fullDate: d.fullDate,

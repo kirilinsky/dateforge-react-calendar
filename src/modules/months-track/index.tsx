@@ -2,20 +2,22 @@ import React, { useEffect, useState } from "react";
 import styles from "./months-track.module.css";
 import { useNavigation, useConfig } from "react-calendar-datetime";
 import { useTrack } from "@/hooks/use-track";
+import { getMonthNames } from "@/utils/month-utils";
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const HALF = 4;
 const OFFSETS = Array.from({ length: HALF * 2 + 1 }, (_, i) => i - HALF);
 
 interface CalendarMonthsTrackProps {
+  shortMonths?: boolean;
   col?: number | string;
 }
 
-export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({ col }) => {
+export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({ shortMonths = true, col }) => {
   const { viewDate, navigateTo } = useNavigation();
-  const { minDate, maxDate } = useConfig();
+  const { minDate, maxDate, locale } = useConfig();
   const year = viewDate.getFullYear();
   const currentIndex = viewDate.getMonth();
+  const MONTHS = getMonthNames(locale, shortMonths);
   const [itemWidth, setItemWidth] = useState(52);
 
   const minIndex = minDate && minDate.getFullYear() === year ? minDate.getMonth() : undefined;

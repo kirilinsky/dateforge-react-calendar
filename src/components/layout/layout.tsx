@@ -1,5 +1,4 @@
 import React from "react";
-import { CalendarDays } from "../days/days";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import { useSelection } from "@/context/selection-context";
@@ -77,7 +76,7 @@ export const CalendarLayout: React.FC<{
           onClose={() => setShowYearPopup(false)}
         />
       )}
-      {modules ?? <CalendarDays />}
+      {modules}
     </div>
   );
 };

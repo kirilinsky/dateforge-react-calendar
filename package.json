@@ -1,6 +1,6 @@
 {
   "name": "react-calendar-datetime",
-  "version": "6.0.0-beta.7",
+  "version": "6.0.0-beta.8",
   "description": "Zero-dependency React datepicker and time picker. Supports date range, multi-select, themes, gestures and responsive layout.",
   "type": "module",
   "types": "./dist/index.d.ts",
@@ -51,6 +51,21 @@
       "types":   "./dist/modules/years-track.d.ts",
       "import":  "./dist/modules/years-track.mjs",
       "require": "./dist/modules/years-track.cjs"
+    },
+    "./modules/months-track": {
+      "types":   "./dist/modules/months-track.d.ts",
+      "import":  "./dist/modules/months-track.mjs",
+      "require": "./dist/modules/months-track.cjs"
+    },
+    "./modules/days-track": {
+      "types":   "./dist/modules/days-track.d.ts",
+      "import":  "./dist/modules/days-track.mjs",
+      "require": "./dist/modules/days-track.cjs"
+    },
+    "./modules/years-grid": {
+      "types":   "./dist/modules/years-grid.d.ts",
+      "import":  "./dist/modules/years-grid.mjs",
+      "require": "./dist/modules/years-grid.cjs"
     },
     "./themes": {
       "import": "./dist/themes/index.mjs",
