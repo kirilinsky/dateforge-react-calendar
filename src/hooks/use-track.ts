@@ -61,11 +61,12 @@ export function useTrack({
   };
 
   const p = useRef({
-    offset: initialIndex * pixelsPerItem, // position in px
-    velocity: 0, // px/frame
+    offset: initialIndex * pixelsPerItem,
+    velocity: 0,
     isDragging: false,
     lastX: 0,
     snapped: initialIndex,
+    syncTarget: null as number | null,
   });
 
   const getBounds = () => {
@@ -98,11 +99,37 @@ export function useTrack({
     }
   };
 
-  // always-running animation loop — reads everything through refs
   useEffect(() => {
     const animate = () => {
       if (!p.current.isDragging) {
         const { lo, hi, isCircular, c, ppi } = getBounds();
+
+        if (p.current.syncTarget !== null) {
+          const range = c * ppi;
+          let target = p.current.syncTarget;
+          if (isCircular) {
+            let diff = target - p.current.offset;
+            if (diff > range / 2) diff -= range;
+            if (diff < -range / 2) diff += range;
+            target = p.current.offset + diff;
+          }
+          const diff = target - p.current.offset;
+          p.current.offset += diff * 0.18;
+          p.current.velocity = 0;
+          if (isCircular) {
+            p.current.offset = ((p.current.offset % range) + range) % range;
+          }
+          if (Math.abs(diff) < SETTLE_PX) {
+            p.current.offset = isCircular
+              ? ((p.current.syncTarget % range) + range) % range
+              : p.current.syncTarget;
+            p.current.syncTarget = null;
+          }
+          p.current.snapped = resolveIdx(p.current.offset);
+          setPosition(p.current.offset / ppi);
+          rafId = requestAnimationFrame(animate);
+          return;
+        }
         const minOffset = lo * ppi;
         const maxOffset = hi * ppi;
 
@@ -111,11 +138,9 @@ export function useTrack({
 
         if (!isCircular) {
           if (p.current.offset < minOffset) {
-            // rubber-band: spring back to lower bound
             p.current.velocity += (minOffset - p.current.offset) * RUBBER_K;
             p.current.velocity *= RUBBER_DAMP;
           } else if (p.current.offset > maxOffset) {
-            // rubber-band: spring back to upper bound
             p.current.velocity += (maxOffset - p.current.offset) * RUBBER_K;
             p.current.velocity *= RUBBER_DAMP;
           } else if (Math.abs(p.current.velocity) < SNAP_THRESHOLD) {
@@ -133,7 +158,6 @@ export function useTrack({
             }
           }
         } else {
-          // circular: keep offset in [0, count * ppi), spring snap when slow
           const range = c * ppi;
           p.current.offset = ((p.current.offset % range) + range) % range;
 
@@ -141,7 +165,6 @@ export function useTrack({
             const rawIdx = p.current.offset / ppi;
             const idx = ((Math.round(rawIdx) % c) + c) % c;
             const target = idx * ppi;
-            // shortest path through wrap
             let diff = target - p.current.offset;
             if (diff > range / 2) diff -= range;
             if (diff < -range / 2) diff += range;
@@ -169,7 +192,6 @@ export function useTrack({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // sync when initialIndex changes externally (e.g. month change, external date selection)
   const prevInit = useRef(initialIndex);
   useEffect(() => {
     if (prevInit.current === initialIndex) return;
@@ -178,9 +200,8 @@ export function useTrack({
     const idx = isCircular
       ? ((initialIndex % c) + c) % c
       : clamp(initialIndex, lo, hi);
-    p.current.offset = idx * ppi;
+    p.current.syncTarget = idx * ppi;
     p.current.velocity = 0;
-    p.current.snapped = idx;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialIndex]);
 
@@ -206,7 +227,7 @@ export function useTrack({
     p.current.lastX = e.clientX;
 
     p.current.offset += delta;
-    p.current.velocity = delta; // hand off momentum on release
+    p.current.velocity = delta;
 
     if (!isCircular) {
       p.current.offset = clamp(
