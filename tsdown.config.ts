@@ -1,4 +1,5 @@
 import { defineConfig } from "tsdown";
+import type { Plugin } from "rolldown";
 import pkg from "./package.json" with { type: "json" };
 
 const peers = Object.keys(pkg.peerDependencies || {});
@@ -17,10 +18,19 @@ const sharedOptions = {
   css: { inject: true, minify: true },
 };
 
+const externalizeContextsPlugin: Plugin = {
+  name: "externalize-contexts",
+  resolveId(id) {
+    if (id.startsWith("@/context/")) {
+      return { id: "react-calendar-datetime/context", external: true };
+    }
+  },
+};
+
 export default defineConfig([
-   {
+  {
     ...sharedOptions,
-    entry: { index: "src/index.ts" },
+    entry: { index: "src/index.ts", context: "src/context/index.ts" },
     outDir: "dist",
     clean: true,
     deps: sharedDeps,
@@ -57,11 +67,12 @@ export default defineConfig([
       "years-grid":     "src/modules/years-grid/index.tsx",
     },
     outDir: "dist/modules",
-    clean: false,
+    plugins: [externalizeContextsPlugin],
     deps: {
       neverBundle: [
         ...sharedDeps.neverBundle,
         "react-calendar-datetime",
+        "react-calendar-datetime/context",
       ],
     },
   },
