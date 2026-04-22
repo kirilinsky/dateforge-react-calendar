@@ -36,7 +36,6 @@ export interface CalendarProps<M extends CalendarMode = "single"> {
   max?: number;
   minDate?: Date;
   maxDate?: Date;
-  startMonth?: Date;
   onChange?: (value: CalendarValue<M>) => void;
   rangeMinDays?: number;
   rangeMaxDays?: number;

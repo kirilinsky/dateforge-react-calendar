@@ -161,6 +161,7 @@ export interface CalendarDaysProps {
   allowSwipeNavigation?: boolean;
   hideLimited?: boolean;
   preventUnselect?: boolean;
+  startMonth?: Date;
 }
 
 export const CalendarDays: React.FC<CalendarDaysProps> = ({
@@ -176,6 +177,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   allowSwipeNavigation = false,
   hideLimited = false,
   preventUnselect = false,
+  startMonth,
 }) => {
   const { daysTrackActive } = useUI();
   const {
@@ -185,6 +187,11 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   } = useConfig();
 
   const { viewDate: rawDate, navigateTo } = useNavigation();
+
+  useEffect(() => {
+    if (startMonth) navigateTo(new Date(startMonth.getFullYear(), startMonth.getMonth(), 1));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [startMonth?.getTime()]);
   const date = offset
     ? new Date(rawDate.getFullYear(), rawDate.getMonth() + offset, 1)
     : rawDate;

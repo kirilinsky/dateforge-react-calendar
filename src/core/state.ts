@@ -182,10 +182,9 @@ export const toValidDate = (d?: Date | null): Date => {
 
 export function buildInitialState(params: {
   externalValue?: Date | Date[] | { from: Date | null; to: Date | null };
-  startMonth?: Date;
   range: boolean;
 }): CalendarState {
-  const { externalValue, startMonth, range } = params;
+  const { externalValue, range } = params;
 
   const isRangeObj =
     externalValue !== null &&
@@ -235,7 +234,7 @@ export function buildInitialState(params: {
       ? [toValidDate(singleDate)]
       : [];
 
-  const viewDate = selectedDates[0] ?? (startMonth ? toValidDate(startMonth) : new Date());
+  const viewDate = selectedDates[0] ?? new Date();
 
   return {
     viewDate,

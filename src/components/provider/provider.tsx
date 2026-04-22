@@ -50,7 +50,6 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   mode = "single" as M,
   max,
   onChange,
-  startMonth,
   rangeMinDays,
   rangeMaxDays,
   containerWidth = 0,
@@ -76,19 +75,11 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   );
 
   const [state, dispatch] = useReducer(calendarReducer, undefined, () =>
-    buildInitialState({ externalValue: externalValue ?? undefined, startMonth, range }),
+    buildInitialState({ externalValue: externalValue ?? undefined, range }),
   );
 
   const onChangeRef = useRef<((v: CalendarValue<M>) => void) | undefined>(onChange);
   useLayoutEffect(() => { onChangeRef.current = onChange; });
-
-  const startMonthKey = startMonth ? startMonth.getTime() : 0;
-  useEffect(() => {
-    if (startMonth) {
-      dispatch({ type: "NAVIGATE", date: toValidDate(startMonth) });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [startMonthKey]);
 
   const externalKey = useMemo(
     () => serializeValue(externalValue as DateRange | Date[] | Date | null | undefined),
