@@ -9,7 +9,7 @@ const mutate = (d: Date, fn: (n: Date) => void): Date => {
   return n;
 };
 
-export const getLimit = (d?: Date | null, isMax?: boolean) =>
+const toLimitTimestamp = (d?: Date | null, isMax?: boolean): number | null =>
   d
     ? new Date(d).setHours(
         isMax ? 23 : 0,
@@ -85,8 +85,8 @@ export const checkIsDateDisabled = (
   }
   if (!startDate && !endDate) return false;
   const t = viewDate.getTime();
-  const minT = getLimit(startDate);
-  const maxT = getLimit(endDate, true);
+  const minT = toLimitTimestamp(startDate);
+  const maxT = toLimitTimestamp(endDate, true);
   return (minT !== null && t < minT) || (maxT !== null && t > maxT);
 };
 

@@ -9,6 +9,6 @@ export const NavigationContext = createContext<CalendarNavigation | undefined>(u
 
 export const useNavigation = (): CalendarNavigation => {
   const ctx = useContext(NavigationContext);
-  if (!ctx) throw new Error("useNavigation must be used within CalendarProvider");
-  return ctx;
+  if (process.env.NODE_ENV !== "production" && !ctx) throw new Error("useNavigation must be used within CalendarProvider");
+  return ctx as CalendarNavigation;
 };

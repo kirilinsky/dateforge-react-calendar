@@ -7,6 +7,7 @@ export interface CalendarState {
   rangeEnd: Date | null;
   hoverDate: Date | null;
   openPopup: "time" | "month" | "year" | null;
+  notifySeq: number;
 }
 
 export interface SelectConfig {
@@ -113,18 +114,20 @@ export function calendarReducer(
 
     case "SELECT": {
       const { date, config } = action;
+      let next: CalendarState;
       if (config.range) {
-        if (!date) {
-          return { ...state, rangeStart: null, rangeEnd: null, hoverDate: null };
-        }
-        return selectRange(state, date, config);
-      }
-      if (config.multiselect && date) {
+        next = !date
+          ? { ...state, rangeStart: null, rangeEnd: null, hoverDate: null }
+          : selectRange(state, date, config);
+      } else if (config.multiselect && date) {
         const maxCount =
           config.multiselect === true ? Infinity : Number(config.multiselect);
-        return selectMultiple(state, date, maxCount);
+        next = selectMultiple(state, date, maxCount);
+      } else {
+        next = selectSingle(state, date);
       }
-      return selectSingle(state, date);
+      if (next === state) return state;
+      return { ...next, notifySeq: state.notifySeq + 1 };
     }
 
     case "HOVER":
@@ -142,10 +145,11 @@ export function calendarReducer(
         viewDate: action.date,
         selectedDates:
           state.selectedDates.length > 0 ? [action.date] : state.selectedDates,
+        notifySeq: state.notifySeq + 1,
       };
 
     case "SET_DATES":
-      return { ...state, selectedDates: action.dates };
+      return { ...state, selectedDates: action.dates, notifySeq: state.notifySeq + 1 };
 
     case "SET_RANGE":
       return {
@@ -153,6 +157,7 @@ export function calendarReducer(
         rangeStart: action.from,
         rangeEnd: action.to,
         viewDate: action.from ?? state.viewDate,
+        notifySeq: state.notifySeq + 1,
       };
 
     case "SYNC_EXTERNAL":
@@ -220,6 +225,7 @@ export function buildInitialState(params: {
       rangeEnd,
       hoverDate: null,
       openPopup: null,
+      notifySeq: 0,
     };
   }
 
@@ -238,5 +244,6 @@ export function buildInitialState(params: {
     rangeEnd: null,
     hoverDate: null,
     openPopup: null,
+    notifySeq: 0,
   };
 }

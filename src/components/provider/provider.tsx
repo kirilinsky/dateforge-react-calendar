@@ -1,13 +1,14 @@
-import React, {
+import {
   ReactNode,
   useReducer,
   useEffect,
+  useLayoutEffect,
   useRef,
   useMemo,
   useCallback,
   useState,
 } from "react";
-import { CalendarMode, CalendarProps, DateRange } from "@/types/calendar";
+import { CalendarMode, CalendarProps, CalendarValue, DateRange } from "@/types/calendar";
 import {
   calendarReducer,
   buildInitialState,
@@ -16,7 +17,11 @@ import {
 } from "@/core/state";
 import { ConfigContext, CalendarConfig } from "@/context/config-context";
 import { NavigationContext } from "@/context/navigation-context";
-import { SelectionContext } from "@/context/selection-context";
+import {
+  SelectionStateContext,
+  SelectionActionsContext,
+  SelectionHoverContext,
+} from "@/context/selection-context";
 import { UIContext } from "@/context/ui-context";
 
 const isDateRange = (v: unknown): v is import("@/types/calendar").DateRange =>
@@ -26,57 +31,69 @@ const isDateRange = (v: unknown): v is import("@/types/calendar").DateRange =>
   !(v instanceof Date) &&
   "from" in (v as object);
 
-export const CalendarProvider: React.FC<
-  CalendarProps<CalendarMode> & {
-    children: ReactNode;
-    containerWidth?: number;
-    toggleTheme?: () => void;
-    isDark?: boolean;
-  }
-> = ({
+function serializeDate(d: Date | null | undefined): number {
+  return d ? d.getTime() : 0;
+}
+
+function serializeValue(v: DateRange | Date[] | Date | null | undefined): string {
+  if (v == null) return "null";
+  if (v instanceof Date) return String(v.getTime());
+  if (Array.isArray(v)) return v.map((d) => d.getTime()).join(",");
+  return `${serializeDate(v.from)},${serializeDate(v.to)}`;
+}
+
+export function CalendarProvider<M extends CalendarMode = "single">({
   children,
   toggleTheme,
   isDark,
   value: externalValue,
-  mode = "single",
+  mode = "single" as M,
   max,
   onChange,
   startMonth,
   rangeMinDays,
   rangeMaxDays,
   containerWidth = 0,
-  locale = "en",
-  hour12 = false,
-  gradient = false,
+  locale,
+  hour12,
+  gradient,
   minDate,
   maxDate,
   disabled,
-}) => {
+}: CalendarProps<M> & {
+  children: ReactNode;
+  containerWidth?: number;
+  toggleTheme?: () => void;
+  isDark?: boolean;
+}) {
   const range = mode === "range";
   const multiselect: number | boolean | undefined =
     mode === "multiple" ? (max ?? true) : undefined;
 
-  const selectConfig: SelectConfig = {
-    range,
-    multiselect,
-    rangeMinDays,
-    rangeMaxDays,
-  };
+  const selectConfig = useMemo<SelectConfig>(
+    () => ({ range, multiselect, rangeMinDays, rangeMaxDays }),
+    [range, multiselect, rangeMinDays, rangeMaxDays],
+  );
 
   const [state, dispatch] = useReducer(calendarReducer, undefined, () =>
     buildInitialState({ externalValue: externalValue ?? undefined, startMonth, range }),
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onChangeRef = useRef<((v: any) => void) | undefined>(onChange as any);
-  onChangeRef.current = onChange as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  const onChangeRef = useRef<((v: CalendarValue<M>) => void) | undefined>(onChange);
+  useLayoutEffect(() => { onChangeRef.current = onChange; });
 
+  const startMonthKey = startMonth ? startMonth.getTime() : 0;
   useEffect(() => {
     if (startMonth) {
       dispatch({ type: "NAVIGATE", date: toValidDate(startMonth) });
     }
-  }, [startMonth]); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [startMonthKey]);
 
+  const externalKey = useMemo(
+    () => serializeValue(externalValue as DateRange | Date[] | Date | null | undefined),
+    [externalValue],
+  );
   useEffect(() => {
     const externalRangeObj = isDateRange(externalValue)
       ? externalValue
@@ -131,48 +148,39 @@ export const CalendarProvider: React.FC<
         rangeEnd: null,
       });
     }
-  }, [externalValue]); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [externalKey]);
 
-  const stateRef = useRef(state);
-  stateRef.current = state;
+  const lastNotifySeqRef = useRef(0);
+  useEffect(() => {
+    if (state.notifySeq === lastNotifySeqRef.current) return;
+    lastNotifySeqRef.current = state.notifySeq;
+    const value: DateRange | Date[] | Date | null = range
+      ? { from: state.rangeStart, to: state.rangeEnd }
+      : multiselect
+        ? state.selectedDates
+        : state.selectedDates[0] ?? null;
+    onChangeRef.current?.(value as CalendarValue<M>);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.notifySeq]);
 
   const handleChangeDate = useCallback(
     (d: Date | null) => {
-      const action = { type: "SELECT" as const, date: d, config: selectConfig };
-      const next = calendarReducer(stateRef.current, action);
-      dispatch(action);
-
-      if (range) {
-        const rangeVal: DateRange = { from: next.rangeStart, to: next.rangeEnd };
-        onChangeRef.current?.(rangeVal);
-        return;
-      }
-      if (multiselect) {
-        if (next.selectedDates !== stateRef.current.selectedDates) {
-          onChangeRef.current?.(next.selectedDates);
-        }
-        return;
-      }
-      onChangeRef.current?.(next.selectedDates[0] ?? null);
+      dispatch({ type: "SELECT", date: d, config: selectConfig });
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [range, multiselect, selectConfig],
+    [selectConfig],
   );
 
   const handleChangeTime = useCallback((d: Date) => {
     dispatch({ type: "CHANGE_TIME", date: d });
-    onChangeRef.current?.(d);
   }, []);
 
   const handleDatesSet = useCallback((dates: Date[]) => {
     dispatch({ type: "SET_DATES", dates });
-    onChangeRef.current?.(dates);
   }, []);
 
   const handleRangeSet = useCallback((from: Date | null, to: Date | null) => {
     dispatch({ type: "SET_RANGE", from, to });
-    const rangeVal: DateRange = { from, to };
-    onChangeRef.current?.(rangeVal);
   }, []);
 
   const navigateTo = useCallback((d: Date) => {
@@ -204,14 +212,21 @@ export const CalendarProvider: React.FC<
   const selectedDate = range
     ? state.rangeStart
     : (state.selectedDates[0] ?? null);
-  const contextSelectedDates = range
-    ? ([state.rangeStart, state.rangeEnd].filter(Boolean) as Date[])
-    : state.selectedDates;
+  const rangeStartT = state.rangeStart?.getTime() ?? null;
+  const rangeEndT = state.rangeEnd?.getTime() ?? null;
+  const contextSelectedDates = useMemo(
+    () =>
+      range
+        ? ([state.rangeStart, state.rangeEnd].filter(Boolean) as Date[])
+        : state.selectedDates,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [range, rangeStartT, rangeEndT, state.selectedDates],
+  );
 
   const config = useMemo<CalendarConfig>(
     () => ({
-      locale,
-      hour12,
+      locale: locale ?? "en",
+      hour12: hour12 ?? false,
       range,
       multiselect,
       rangeMinDays,
@@ -219,7 +234,7 @@ export const CalendarProvider: React.FC<
       minDate,
       maxDate,
       disabled,
-      gradient,
+      gradient: gradient ?? false,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -241,31 +256,31 @@ export const CalendarProvider: React.FC<
     [state.viewDate, navigateTo],
   );
 
-  const selection = useMemo(
+  const selectionState = useMemo(
     () => ({
       selectedDate,
       selectedDates: contextSelectedDates,
       rangeStart: state.rangeStart,
       rangeEnd: state.rangeEnd,
-      hoverDate: state.hoverDate,
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedDate, contextSelectedDates, state.rangeStart, state.rangeEnd],
+  );
+
+  const selectionActions = useMemo(
+    () => ({
       setHoverDate,
       onChangeDate: handleChangeDate,
       onDatesSet: handleDatesSet,
       onRangeSet: handleRangeSet,
       onChangeTime: handleChangeTime,
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      selectedDate,
-      contextSelectedDates,
-      state.rangeStart,
-      state.rangeEnd,
-      state.hoverDate,
-      handleChangeDate,
-      handleDatesSet,
-      handleRangeSet,
-      handleChangeTime,
-    ],
+    [setHoverDate, handleChangeDate, handleDatesSet, handleRangeSet, handleChangeTime],
+  );
+
+  const selectionHover = useMemo(
+    () => ({ hoverDate: state.hoverDate }),
+    [state.hoverDate],
   );
 
   const [daysTrackActive, setDaysTrackActive] = useState(false);
@@ -291,9 +306,13 @@ export const CalendarProvider: React.FC<
   return (
     <ConfigContext.Provider value={config}>
       <NavigationContext.Provider value={navigation}>
-        <SelectionContext.Provider value={selection}>
-          <UIContext.Provider value={ui}>{children}</UIContext.Provider>
-        </SelectionContext.Provider>
+        <SelectionStateContext.Provider value={selectionState}>
+          <SelectionActionsContext.Provider value={selectionActions}>
+            <SelectionHoverContext.Provider value={selectionHover}>
+              <UIContext.Provider value={ui}>{children}</UIContext.Provider>
+            </SelectionHoverContext.Provider>
+          </SelectionActionsContext.Provider>
+        </SelectionStateContext.Provider>
       </NavigationContext.Provider>
     </ConfigContext.Provider>
   );

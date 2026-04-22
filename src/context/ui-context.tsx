@@ -18,6 +18,6 @@ export const UIContext = createContext<CalendarUI | undefined>(undefined);
 
 export const useUI = (): CalendarUI => {
   const ctx = useContext(UIContext);
-  if (!ctx) throw new Error("useUI must be used within CalendarProvider");
-  return ctx;
+  if (process.env.NODE_ENV !== "production" && !ctx) throw new Error("useUI must be used within CalendarProvider");
+  return ctx as CalendarUI;
 };

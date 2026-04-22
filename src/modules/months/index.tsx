@@ -1,10 +1,12 @@
 import React, { useMemo } from "react";
 import styles from "./months.module.css";
-import { useConfig, useNavigation } from "react-calendar-datetime";
+import { useConfig } from "@/context/config-context";
+import { useNavigation } from "@/context/navigation-context";
 import { getMonthListData, setMonth } from "@/utils/date-utils";
+import { useGridSlot } from "@/hooks/use-grid-slot";
 import shared from "@/global/global.module.css";
 
-interface CalendarMonthGridProps {
+export interface CalendarMonthGridProps {
   shortMonths?: boolean;
   disableLimited?: boolean;
   hideLimited?: boolean;
@@ -31,7 +33,7 @@ export const CalendarMonthGrid: React.FC<CalendarMonthGridProps> = ({
   const handleClick = (i: number) => navigateTo(setMonth(viewDate, i));
 
   return (
-    <div className={styles.monthsContainer} data-area="months" style={col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined}>
+    <div className={styles.monthsContainer} data-area="months" style={useGridSlot(col)}>
       {mNames.map((n, i) => (
         <button
           key={i}

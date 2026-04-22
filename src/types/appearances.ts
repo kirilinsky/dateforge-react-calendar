@@ -28,8 +28,10 @@ export const APPEARANCE_TOKEN_TO_VAR: Record<keyof AppearanceTokens, string> = {
   trackHeight:     "--cal-track-height",
 };
 
+export const CUSTOM_APPEARANCE_BRAND = Symbol.for("rcd.appearance.custom");
+
 export type CustomAppearance = {
-  readonly __type: "custom-appearance";
+  readonly [CUSTOM_APPEARANCE_BRAND]: true;
   readonly vars: Record<string, string>;
 };
 

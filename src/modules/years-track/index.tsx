@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import styles from "./years-track.module.css";
-import { useNavigation, useConfig } from "react-calendar-datetime";
+import { useNavigation } from "@/context/navigation-context";
+import { useConfig } from "@/context/config-context";
 import { useTrack } from "@/hooks/use-track";
+import { useGridSlot } from "@/hooks/use-grid-slot";
 
 const MIN_YEAR = 1900;
 const MAX_YEAR = 2100;
@@ -9,7 +11,7 @@ const YEARS = Array.from({ length: MAX_YEAR - MIN_YEAR + 1 }, (_, i) => MIN_YEAR
 const HALF = 6;
 const OFFSETS = Array.from({ length: HALF * 2 + 1 }, (_, i) => i - HALF);
 
-interface CalendarYearsTrackProps {
+export interface CalendarYearsTrackProps {
   col?: number | string;
 }
 
@@ -36,6 +38,7 @@ export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({ col }) =
   });
 
   useEffect(() => {
+    if (typeof ResizeObserver === "undefined") return;
     const container = ref.current;
     if (!container) return;
     const measure = () => {
@@ -61,7 +64,7 @@ export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({ col }) =
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerCancel}
-      style={col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined}
+      style={useGridSlot(col)}
     >
       <div className={styles.highlight} />
       <div className={styles.strip} style={{ transform: `translateX(${stripOffset}px)` }}>

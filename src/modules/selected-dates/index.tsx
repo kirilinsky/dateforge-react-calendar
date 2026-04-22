@@ -1,7 +1,10 @@
 import React from "react";
 import styles from "./selected-dates.module.css";
 import shared from "@/global/global.module.css";
-import { useConfig, useNavigation, useSelection } from "react-calendar-datetime";
+import { useConfig } from "@/context/config-context";
+import { useNavigation } from "@/context/navigation-context";
+import { useSelectionValue, useSelectionActions } from "@/context/selection-context";
+import { useGridSlot } from "@/hooks/use-grid-slot";
 
 const getRangeSep = (fmt: Intl.DateTimeFormat, start: Date, end: Date): string => {
   try {
@@ -25,7 +28,7 @@ const alignToJustify: Record<AlignValue, string> = {
   right: "flex-end",
 };
 
-interface CalendarSelectedDatesProps {
+export interface CalendarSelectedDatesProps {
   allowClean?: boolean;
   allowNavigate?: boolean;
   animated?: boolean;
@@ -42,7 +45,8 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
 }) => {
   const { locale, range } = useConfig();
   const { viewDate: date, navigateTo } = useNavigation();
-  const { selectedDates, rangeStart, rangeEnd, onChangeDate } = useSelection();
+  const { selectedDates, rangeStart, rangeEnd } = useSelectionValue();
+  const { onChangeDate } = useSelectionActions();
 
   const fmt = new Intl.DateTimeFormat(locale, {
     day: "numeric",
@@ -134,7 +138,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
         .filter(Boolean)
         .join(" ")}
       data-area="selected-dates"
-      style={col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined}
+      style={useGridSlot(col)}
     >
       <div className={styles.inner}>
         <div className={styles.chipsGroup} style={{ justifyContent: alignToJustify[align] }}>

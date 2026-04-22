@@ -5,6 +5,7 @@ import { getDrumValue, padTime } from "@/utils/date-utils";
 interface TimeTrackProps {
   date: Date;
   hour12?: boolean;
+  locale?: string;
   onChange: (date: Date) => void;
 }
 
@@ -17,17 +18,20 @@ const Drum = ({
   max,
   onMove,
   label,
+  getValueText,
 }: {
   val: number;
   max: number;
   onMove: (delta: number) => void;
   label: string;
+  getValueText: (v: number) => string;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const moveRef = useRef(onMove);
   const wheelAccum = useRef(0);
   const touchStartY = useRef<number | null>(null);
   const touchAccum = useRef(0);
+  const isHovered = useRef(false);
 
   useEffect(() => {
     moveRef.current = onMove;
@@ -36,7 +40,21 @@ const Drum = ({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    const onEnter = () => { isHovered.current = true; };
+    const onLeave = () => { isHovered.current = false; };
+    el.addEventListener("mouseenter", onEnter);
+    el.addEventListener("mouseleave", onLeave);
+    return () => {
+      el.removeEventListener("mouseenter", onEnter);
+      el.removeEventListener("mouseleave", onLeave);
+    };
+  }, []);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
     const onWheel = (e: WheelEvent) => {
+      if (!isHovered.current) return;
       e.preventDefault();
       wheelAccum.current += e.deltaY;
       if (Math.abs(wheelAccum.current) < SCROLL_THRESHOLD) return;
@@ -94,7 +112,7 @@ const Drum = ({
       aria-valuenow={val}
       aria-valuemin={0}
       aria-valuemax={max - 1}
-      aria-valuetext={padTime(val)}
+      aria-valuetext={getValueText(val)}
       onKeyDown={(e) => {
         if (e.key === "ArrowUp") {
           e.preventDefault();
@@ -136,9 +154,19 @@ const Drum = ({
   );
 };
 
+const makeUnitFormatter = (locale: string, unit: "hour" | "minute") => {
+  try {
+    const fmt = new Intl.NumberFormat(locale, { style: "unit", unit, unitDisplay: "long" });
+    return (v: number) => fmt.format(v);
+  } catch {
+    return (v: number) => String(v);
+  }
+};
+
 export const TimeTrack = ({
   date,
   hour12 = false,
+  locale = "en",
   onChange,
 }: TimeTrackProps) => {
   const raw = date.getHours();
@@ -147,6 +175,8 @@ export const TimeTrack = ({
   const period: "AM" | "PM" = raw >= 12 ? "PM" : "AM";
 
   const hourMax = hour12 ? 12 : 24;
+  const hourText = makeUnitFormatter(locale, "hour");
+  const minuteText = makeUnitFormatter(locale, "minute");
 
   const emit = (h: number, m: number, p: "AM" | "PM") => {
     const next = new Date(date);
@@ -176,11 +206,11 @@ export const TimeTrack = ({
         </div>
       )}
       <div className={styles.drums}>
-        <Drum val={hours} max={hourMax} onMove={moveHours} label="Hours" />
+        <Drum val={hours} max={hourMax} onMove={moveHours} label="Hours" getValueText={hourText} />
         <span className={styles.colon} aria-hidden>
           :
         </span>
-        <Drum val={minutes} max={60} onMove={moveMinutes} label="Minutes" />
+        <Drum val={minutes} max={60} onMove={moveMinutes} label="Minutes" getValueText={minuteText} />
       </div>
     </div>
   );

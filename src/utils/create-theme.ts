@@ -1,4 +1,5 @@
 import { TOKEN_TO_VAR } from "../../themes/themes";
+import { CUSTOM_THEME_BRAND } from "../types/themes";
 import type { ThemeTokens, CustomTheme } from "../types/themes";
 
 /**
@@ -16,7 +17,7 @@ export function createTheme(
   const vars: Record<string, string> = {};
   for (const [key, value] of Object.entries(tokens)) {
     const cssVar = TOKEN_TO_VAR[key as keyof ThemeTokens];
-    if (cssVar && value) vars[cssVar] = value;
+    if (cssVar && value != null) vars[cssVar] = value;
   }
-  return { __type: "custom", base, vars };
+  return { [CUSTOM_THEME_BRAND]: true as const, base, vars };
 }

@@ -2,8 +2,17 @@ import React, { useMemo } from "react";
 import styles from "./nav.module.css";
 import shared from "@/global/global.module.css";
 import { Clear, Down, Home, ThemeToggle } from "@/Icons";
-import { useConfig, useNavigation, useSelection, useUI } from "react-calendar-datetime";
-import { addDate, checkYearNavigation, getTimeString, isYearFixed } from "@/utils/date-utils";
+import { useConfig } from "@/context/config-context";
+import { useNavigation } from "@/context/navigation-context";
+import { useSelectionValue, useSelectionActions } from "@/context/selection-context";
+import { useUI } from "@/context/ui-context";
+import {
+  addDate,
+  checkYearNavigation,
+  getTimeString,
+  isYearFixed,
+} from "@/utils/date-utils";
+import { useGridSlot } from "@/hooks/use-grid-slot";
 
 export interface CalendarNavProps {
   showTime?: boolean;
@@ -14,6 +23,7 @@ export interface CalendarNavProps {
   showHome?: boolean;
   showClear?: boolean;
   showThemeToggle?: boolean;
+  label?: string;
   col?: number | string;
 }
 
@@ -26,12 +36,15 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
   showHome = false,
   showClear = false,
   showThemeToggle = false,
+  label,
   col,
 }) => {
   const { minDate, maxDate, locale, hour12, disabled } = useConfig();
   const { viewDate: date, navigateTo } = useNavigation();
-  const { selectedDates, onChangeDate } = useSelection();
-  const { setShowTimePopup, setShowMonthPopup, setShowYearPopup, toggleTheme } = useUI();
+  const { selectedDates } = useSelectionValue();
+  const { onChangeDate } = useSelectionActions();
+  const { setShowTimePopup, setShowMonthPopup, setShowYearPopup, toggleTheme } =
+    useUI();
 
   const today = new Date();
   const isCurrentMonth =
@@ -55,15 +68,28 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
     [cur, date, minDate, maxDate, disabled],
   );
 
-  const monthNameLong  = new Intl.DateTimeFormat(locale, { month: "long"  }).format(date);
-  const monthNameShort = new Intl.DateTimeFormat(locale, { month: "short" }).format(date);
+  const monthNameLong = new Intl.DateTimeFormat(locale, {
+    month: "long",
+  }).format(date);
+  const monthNameShort = new Intl.DateTimeFormat(locale, {
+    month: "short",
+  }).format(date);
 
-  const ch = (v: number) => navigateTo(addDate(date, v, "year", minDate, maxDate));
-  const cm = (v: number) => navigateTo(addDate(date, v, "month", minDate, maxDate));
+  const ch = (v: number) =>
+    navigateTo(addDate(date, v, "year", minDate, maxDate));
+  const cm = (v: number) =>
+    navigateTo(addDate(date, v, "month", minDate, maxDate));
 
   const visible =
-    showTime || compactMonths || showMonthPicker || showYearPicker ||
-    compactYears || showHome || showClear || showThemeToggle;
+    !!label ||
+    showTime ||
+    compactMonths ||
+    showMonthPicker ||
+    showYearPicker ||
+    compactYears ||
+    showHome ||
+    showClear ||
+    showThemeToggle;
 
   if (!visible) return null;
 
@@ -71,7 +97,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
     <div
       className={styles.headerContainer}
       data-area="header"
-      style={col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined}
+      style={useGridSlot(col)}
     >
       {showTime && (
         <button
@@ -88,14 +114,20 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           className={`${styles.monthButton} ${shared.interactive}`}
           onClick={() => setShowMonthPopup(true)}
         >
-          <Down /> <span className={styles.monthNameLong}>{monthNameLong}</span><span className={styles.monthNameShort}>{monthNameShort}</span>
+          <Down /> <span className={styles.monthNameLong}>{monthNameLong}</span>
+          <span className={styles.monthNameShort}>{monthNameShort}</span>
         </button>
       )}
+
+      {label && <span className={styles.label}>{label}</span>}
 
       {showMonthPicker && (
         <div className={styles.yearsSelector}>
           {canGoPrevMonth && (
-            <button className={`${styles.arrow} ${shared.interactive} ${shared.hoverable}`} onClick={() => cm(-1)}>
+            <button
+              className={`${styles.arrow} ${shared.interactive} ${shared.hoverable}`}
+              onClick={() => cm(-1)}
+            >
               ‹
             </button>
           )}
@@ -103,10 +135,14 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
             onClick={() => !monthFixed && setShowMonthPopup(true)}
             className={`${styles.currentYear} ${shared.interactive} ${shared.hoverable} ${monthFixed ? styles.staticButton : ""}`}
           >
-            <span className={styles.monthNameLong}>{monthNameLong}</span><span className={styles.monthNameShort}>{monthNameShort}</span>
+            <span className={styles.monthNameLong}>{monthNameLong}</span>
+            <span className={styles.monthNameShort}>{monthNameShort}</span>
           </button>
           {canGoNextMonth && (
-            <button className={`${styles.arrow} ${shared.interactive} ${shared.hoverable}`} onClick={() => cm(1)}>
+            <button
+              className={`${styles.arrow} ${shared.interactive} ${shared.hoverable}`}
+              onClick={() => cm(1)}
+            >
               ›
             </button>
           )}
@@ -116,7 +152,10 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
       {showYearPicker && (
         <div className={styles.yearsSelector}>
           {canGoPrev && (
-            <button className={`${styles.arrow} ${shared.interactive} ${shared.hoverable}`} onClick={() => ch(-1)}>
+            <button
+              className={`${styles.arrow} ${shared.interactive} ${shared.hoverable}`}
+              onClick={() => ch(-1)}
+            >
               ‹
             </button>
           )}
@@ -127,7 +166,10 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
             {cur}
           </button>
           {canGoNext && (
-            <button className={`${styles.arrow} ${shared.interactive} ${shared.hoverable}`} onClick={() => ch(1)}>
+            <button
+              className={`${styles.arrow} ${shared.interactive} ${shared.hoverable}`}
+              onClick={() => ch(1)}
+            >
               ›
             </button>
           )}
@@ -145,7 +187,10 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
 
       <div className={styles.flexWrapper}>
         {showThemeToggle && (
-          <button className={`${styles.homeButton} ${shared.interactive} ${shared.hoverable}`} onClick={toggleTheme}>
+          <button
+            className={`${styles.homeButton} ${shared.interactive} ${shared.hoverable}`}
+            onClick={toggleTheme}
+          >
             <ThemeToggle />
           </button>
         )}
@@ -154,10 +199,17 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
             className={`${styles.homeButton} ${shared.interactive} ${shared.hoverable} ${isCurrentMonth ? styles.homeButtonDisabled : ""}`}
             disabled={isCurrentMonth}
             onClick={() =>
-              navigateTo(new Date(
-                today.getFullYear(), today.getMonth(), 1,
-                date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds(),
-              ))
+              navigateTo(
+                new Date(
+                  today.getFullYear(),
+                  today.getMonth(),
+                  1,
+                  date.getHours(),
+                  date.getMinutes(),
+                  date.getSeconds(),
+                  date.getMilliseconds(),
+                ),
+              )
             }
           >
             <Home />

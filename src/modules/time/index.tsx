@@ -1,26 +1,30 @@
 import React from "react";
 import styles from "./time.module.css";
 import shared from "@/global/global.module.css";
-import { useConfig, useNavigation, useSelection, useThrottle } from "react-calendar-datetime";
+import { useConfig } from "@/context/config-context";
+import { useNavigation } from "@/context/navigation-context";
+import { useSelectionActions } from "@/context/selection-context";
+import { useThrottle } from "@/hooks/use-throttle";
+import { useGridSlot } from "@/hooks/use-grid-slot";
 import { TimeTrack } from "@/components/time-track/time-track";
 
-interface CalendarTimeGridProps {
+export interface CalendarTimeGridProps {
   col?: number | string;
 }
 
 export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({ col }) => {
-  const { hour12 } = useConfig();
+  const { hour12, locale } = useConfig();
   const { viewDate: date } = useNavigation();
-  const { onChangeTime } = useSelection();
+  const { onChangeTime } = useSelectionActions();
   const throttled = useThrottle(onChangeTime, 50);
 
   return (
     <div
       data-area="time"
       className={`${styles.timeContainer} ${shared.flexCenter}`}
-      style={col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined}
+      style={useGridSlot(col)}
     >
-      <TimeTrack date={date} hour12={hour12} onChange={throttled} />
+      <TimeTrack date={date} hour12={hour12} locale={locale} onChange={throttled} />
     </div>
   );
 };

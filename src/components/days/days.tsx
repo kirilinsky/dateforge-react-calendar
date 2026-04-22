@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./days.module.css";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
-import { useSelection } from "@/context/selection-context";
+import { useSelectionValue, useSelectionActions, useSelectionHover } from "@/context/selection-context";
 import { useUI } from "@/context/ui-context";
 import {
   getFirstDayOffset,
@@ -13,8 +13,142 @@ import {
 import shared from "@/global/global.module.css";
 import WeekDays from "../week-days/week-days";
 import { StartOfWeek } from "@/types/calendar";
+import { useGridSlot } from "@/hooks/use-grid-slot";
 
-export const CalendarDays: React.FC<{
+interface DayCellProps {
+  day: number;
+  dateTime: number;
+  isDisabled: boolean;
+  isSelected: boolean;
+  isCurrentMonth: boolean;
+  connectLeft: boolean;
+  connectRight: boolean;
+  isRangeStart: boolean;
+  isRangeEnd: boolean;
+  isInRange: boolean;
+  rangeBridgeLeft: boolean;
+  rangeBridgeRight: boolean;
+  isPreviewStart: boolean;
+  isPreviewEnd: boolean;
+  isPreviewMid: boolean;
+  previewBridgeLeft: boolean;
+  previewBridgeRight: boolean;
+  isTodayDate: boolean;
+  highlightToday: boolean;
+  isWeekend: boolean;
+  range: boolean;
+  onSelect: (date: Date, isDisabled: boolean) => void;
+  onMouseEnter: (date: Date) => void;
+}
+
+const DayCell = React.memo(function DayCell({
+  day, dateTime, isDisabled, isSelected, isCurrentMonth,
+  connectLeft, connectRight, isRangeStart, isRangeEnd, isInRange,
+  rangeBridgeLeft, rangeBridgeRight, isPreviewStart, isPreviewEnd, isPreviewMid,
+  previewBridgeLeft, previewBridgeRight, isTodayDate, highlightToday, isWeekend,
+  range, onSelect, onMouseEnter,
+}: DayCellProps) {
+  const fullDate = useMemo(() => new Date(dateTime), [dateTime]);
+
+  const rangeEndpointClass =
+    isRangeStart && rangeBridgeRight
+      ? styles.rStart
+      : isRangeEnd && rangeBridgeLeft
+        ? styles.rEnd
+        : null;
+
+  const rangeBridgeClass =
+    isRangeStart && rangeBridgeRight
+      ? styles.rBridgeRight
+      : isRangeEnd && rangeBridgeLeft
+        ? styles.rBridgeLeft
+        : isInRange && rangeBridgeLeft && rangeBridgeRight
+          ? styles.rBridgeBoth
+          : isInRange && rangeBridgeLeft
+            ? styles.rBridgeLeft
+            : isInRange && rangeBridgeRight
+              ? styles.rBridgeRight
+              : null;
+
+  const previewClass =
+    isPreviewStart && isSelected
+      ? styles.rStart
+      : isPreviewEnd && isSelected
+        ? styles.rEnd
+        : isPreviewStart
+          ? styles.rPreviewStart
+          : isPreviewEnd
+            ? styles.rPreviewEnd
+            : isPreviewMid
+              ? styles.rPreview
+              : null;
+
+  const previewBridgeClass =
+    previewBridgeLeft && previewBridgeRight
+      ? styles.rPreviewBridgeBoth
+      : previewBridgeRight
+        ? styles.rPreviewBridgeRight
+        : previewBridgeLeft
+          ? styles.rPreviewBridgeLeft
+          : null;
+
+  const isToday =
+    !!highlightToday &&
+    isTodayDate &&
+    !isRangeStart &&
+    !isRangeEnd &&
+    !isInRange &&
+    !isPreviewStart &&
+    !isPreviewEnd &&
+    !isPreviewMid;
+
+  const isOtherMonth = !isCurrentMonth;
+  const isHighlighted =
+    isSelected || isRangeStart || isRangeEnd || isInRange ||
+    isPreviewStart || isPreviewEnd || isPreviewMid;
+
+  return (
+    <button
+      type="button"
+      disabled={isDisabled}
+      onClick={() => onSelect(fullDate, isDisabled)}
+      onMouseEnter={() => onMouseEnter(fullDate)}
+      aria-selected={isSelected}
+      data-cell=""
+      data-selected={isSelected || undefined}
+      data-today={isToday || undefined}
+      data-disabled={isDisabled || undefined}
+      data-in-range={isInRange || undefined}
+      data-range-start={isRangeStart || undefined}
+      data-range-end={isRangeEnd || undefined}
+      data-weekend={isWeekend || undefined}
+      data-other-month={isOtherMonth || undefined}
+      className={[
+        styles.dayItem,
+        shared.interactive,
+        shared.hoverable,
+        !range && isSelected && shared.activeItem,
+        !range && connectLeft && connectRight && styles.rangeMid,
+        !range && connectLeft && !connectRight && styles.rangeEnd,
+        !range && !connectLeft && connectRight && styles.rangeStart,
+        range && isSelected && shared.activeItem,
+        range && rangeEndpointClass,
+        range && rangeBridgeClass,
+        range && isInRange && styles.rIn,
+        previewClass,
+        previewBridgeClass,
+        isToday && styles.todayItem,
+        isOtherMonth && (isHighlighted ? shared.selectedOtherItem : shared.otherItem),
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
+      {day}
+    </button>
+  );
+});
+
+export interface CalendarDaysProps {
   offset?: number;
   hideOtherMonths?: boolean;
   col?: number | string;
@@ -27,7 +161,9 @@ export const CalendarDays: React.FC<{
   allowSwipeNavigation?: boolean;
   hideLimited?: boolean;
   preventUnselect?: boolean;
-}> = ({
+}
+
+export const CalendarDays: React.FC<CalendarDaysProps> = ({
   offset = 0,
   hideOtherMonths = false,
   col,
@@ -53,10 +189,9 @@ export const CalendarDays: React.FC<{
     ? new Date(rawDate.getFullYear(), rawDate.getMonth() + offset, 1)
     : rawDate;
   const resolvedArea = dataArea ?? (offset > 0 ? `days-${offset + 1}` : "days");
-  const {
-    selectedDates, onChangeDate,
-    rangeStart, rangeEnd, hoverDate, setHoverDate,
-  } = useSelection();
+  const { selectedDates, rangeStart, rangeEnd } = useSelectionValue();
+  const { onChangeDate, setHoverDate } = useSelectionActions();
+  const { hoverDate } = useSelectionHover();
 
   const today = useMemo(() => new Date(), []);
 
@@ -210,7 +345,7 @@ export const CalendarDays: React.FC<{
       onTouchEnd={handleTouchEnd}
       onTouchStart={handleTouchStart}
       onMouseLeave={handleMouseLeave}
-      style={col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined}
+      style={useGridSlot(col)}
     >
     <div
       aria-label="days"
@@ -278,119 +413,34 @@ export const CalendarDays: React.FC<{
                   if (isDayHidden({ fullDate, isDisabled, isCurrentMonth }))
                     return <span key={i} className={styles.dayItemEmpty} />;
 
-                  const rangeEndpointClass =
-                    isRangeStart && rangeBridgeRight
-                      ? styles.rStart
-                      : isRangeEnd && rangeBridgeLeft
-                        ? styles.rEnd
-                        : null;
-                  const rangeBridgeClass =
-                    isRangeStart && rangeBridgeRight
-                      ? styles.rBridgeRight
-                      : isRangeEnd && rangeBridgeLeft
-                        ? styles.rBridgeLeft
-                        : isInRange && rangeBridgeLeft && rangeBridgeRight
-                          ? styles.rBridgeBoth
-                          : isInRange && rangeBridgeLeft
-                            ? styles.rBridgeLeft
-                            : isInRange && rangeBridgeRight
-                              ? styles.rBridgeRight
-                              : null;
-
-                  const previewClass =
-                    isPreviewStart && isSelected
-                      ? styles.rStart
-                      : isPreviewEnd && isSelected
-                        ? styles.rEnd
-                        : isPreviewStart
-                          ? styles.rPreviewStart
-                          : isPreviewEnd
-                            ? styles.rPreviewEnd
-                            : isPreviewMid
-                              ? styles.rPreview
-                              : null;
-                  const previewBridgeClass =
-                    previewBridgeLeft && previewBridgeRight
-                      ? styles.rPreviewBridgeBoth
-                      : previewBridgeRight
-                        ? styles.rPreviewBridgeRight
-                        : previewBridgeLeft
-                          ? styles.rPreviewBridgeLeft
-                          : null;
-
-                  const isToday =
-                    !!highlightToday &&
-                    isSameDay(fullDate, today) &&
-                    !isRangeStart &&
-                    !isRangeEnd &&
-                    !isInRange &&
-                    !isPreviewStart &&
-                    !isPreviewEnd &&
-                    !isPreviewMid;
-                  const isOtherMonth = !isCurrentMonth;
-                  const isHighlighted =
-                    isSelected ||
-                    isRangeStart ||
-                    isRangeEnd ||
-                    isInRange ||
-                    isPreviewStart ||
-                    isPreviewEnd ||
-                    isPreviewMid;
-
                   const dayOfWeek = fullDate.getDay();
-                  const isWeekend = highlightWeekends && (dayOfWeek === 0 || dayOfWeek === 6);
-
                   return (
-                    <button
+                    <DayCell
                       key={i}
-                      type="button"
-                      disabled={isDisabled}
-                      onClick={() => handleSetDay(fullDate, isDisabled)}
-                      onMouseEnter={() => handleMouseEnter(fullDate)}
-                      aria-selected={isSelected}
-                      data-cell=""
-                      data-selected={isSelected || undefined}
-                      data-today={isToday || undefined}
-                      data-disabled={isDisabled || undefined}
-                      data-in-range={isInRange || undefined}
-                      data-range-start={isRangeStart || undefined}
-                      data-range-end={isRangeEnd || undefined}
-                      data-weekend={isWeekend || undefined}
-                      data-other-month={isOtherMonth || undefined}
-                      className={[
-                        styles.dayItem,
-                        shared.interactive,
-                        shared.hoverable,
-                        !range && isSelected && shared.activeItem,
-                        !range &&
-                          connectLeft &&
-                          connectRight &&
-                          styles.rangeMid,
-                        !range &&
-                          connectLeft &&
-                          !connectRight &&
-                          styles.rangeEnd,
-                        !range &&
-                          !connectLeft &&
-                          connectRight &&
-                          styles.rangeStart,
-                        range && isSelected && shared.activeItem,
-                        range && rangeEndpointClass,
-                        range && rangeBridgeClass,
-                        range && isInRange && styles.rIn,
-                        previewClass,
-                        previewBridgeClass,
-                        isToday && styles.todayItem,
-                        isOtherMonth &&
-                          (isHighlighted
-                            ? shared.selectedOtherItem
-                            : shared.otherItem),
-                      ]
-                        .filter(Boolean)
-                        .join(" ")}
-                    >
-                      {day}
-                    </button>
+                      day={day}
+                      dateTime={fullDate.getTime()}
+                      isDisabled={isDisabled}
+                      isSelected={isSelected}
+                      isCurrentMonth={isCurrentMonth}
+                      connectLeft={connectLeft}
+                      connectRight={connectRight}
+                      isRangeStart={isRangeStart}
+                      isRangeEnd={isRangeEnd}
+                      isInRange={isInRange}
+                      rangeBridgeLeft={rangeBridgeLeft}
+                      rangeBridgeRight={rangeBridgeRight}
+                      isPreviewStart={isPreviewStart}
+                      isPreviewEnd={isPreviewEnd}
+                      isPreviewMid={isPreviewMid}
+                      previewBridgeLeft={previewBridgeLeft}
+                      previewBridgeRight={previewBridgeRight}
+                      isTodayDate={isSameDay(fullDate, today)}
+                      highlightToday={highlightToday}
+                      isWeekend={highlightWeekends && (dayOfWeek === 0 || dayOfWeek === 6)}
+                      range={range}
+                      onSelect={handleSetDay}
+                      onMouseEnter={handleMouseEnter}
+                    />
                   );
                 },
               )}

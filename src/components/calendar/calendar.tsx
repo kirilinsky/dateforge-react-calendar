@@ -1,16 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import "@/styles/layers.css";
 import { CalendarMode, CalendarProps } from "@/types/calendar";
-import { DARK_THEMES, CustomTheme } from "@/types/themes";
-import { CustomAppearance } from "@/types/appearances";
+import { DARK_THEMES, CustomTheme, CUSTOM_THEME_BRAND } from "@/types/themes";
+import { CustomAppearance, CUSTOM_APPEARANCE_BRAND } from "@/types/appearances";
 import { CalendarProvider } from "@/components/provider/provider";
 import { CalendarLayout } from "../layout/layout";
 
 const isCustomTheme = (t: unknown): t is CustomTheme =>
-  typeof t === "object" && t !== null && (t as CustomTheme).__type === "custom";
+  typeof t === "object" && t !== null && CUSTOM_THEME_BRAND in (t as object);
 
 const isCustomAppearance = (a: unknown): a is CustomAppearance =>
-  typeof a === "object" && a !== null && (a as CustomAppearance).__type === "custom-appearance";
+  typeof a === "object" && a !== null && CUSTOM_APPEARANCE_BRAND in (a as object);
 
 export function Calendar<M extends CalendarMode = "single">({
   width = "100%",
@@ -34,6 +34,7 @@ export function Calendar<M extends CalendarMode = "single">({
   });
 
   useEffect(() => {
+    if (typeof ResizeObserver === "undefined") return;
     const el = wrapperRef.current;
     if (!el) return;
     const ro = new ResizeObserver(([entry]) => {
@@ -45,12 +46,19 @@ export function Calendar<M extends CalendarMode = "single">({
 
   const [isToggled, setIsToggled] = useState(false);
 
-  const systemTheme = useState<"light" | "dark">(() =>
+  const [systemTheme, setSystemTheme] = useState<"light" | "dark">(() =>
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"
       : "light",
-  )[0];
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const handler = (e: MediaQueryListEvent) => setSystemTheme(e.matches ? "dark" : "light");
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   const customTheme = isCustomTheme(themeProp) ? themeProp : undefined;
   const themeKey = customTheme

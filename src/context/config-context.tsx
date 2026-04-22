@@ -18,6 +18,6 @@ export const ConfigContext = createContext<CalendarConfig | undefined>(undefined
 
 export const useConfig = (): CalendarConfig => {
   const ctx = useContext(ConfigContext);
-  if (!ctx) throw new Error("useConfig must be used within CalendarProvider");
-  return ctx;
+  if (process.env.NODE_ENV !== "production" && !ctx) throw new Error("useConfig must be used within CalendarProvider");
+  return ctx as CalendarConfig;
 };

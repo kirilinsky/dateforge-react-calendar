@@ -1,13 +1,15 @@
 import React, { useMemo, useState, useEffect } from "react";
 import styles from "./years-grid.module.css";
-import { useConfig, useNavigation } from "react-calendar-datetime";
+import { useConfig } from "@/context/config-context";
+import { useNavigation } from "@/context/navigation-context";
 import { DisabledConfig } from "@/types/calendar";
+import { useGridSlot } from "@/hooks/use-grid-slot";
 import shared from "@/global/global.module.css";
 
 const MIN_YEAR = 1900;
 const MAX_YEAR = 2100;
 
-interface CalendarYearsGridProps {
+export interface CalendarYearsGridProps {
   yearsPerPage?: number;
   disableLimited?: boolean;
   hideLimited?: boolean;
@@ -128,11 +130,7 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
   return (
     <div
       data-area="years-grid"
-      style={
-        col !== undefined
-          ? { gridColumn: typeof col === "number" ? `span ${col}` : col }
-          : undefined
-      }
+      style={useGridSlot(col)}
     >
       <div className={styles.nav}>
         <button

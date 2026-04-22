@@ -1,152 +1,169 @@
 @layer cal-base {
-
-.headerContainer button {
-  height: 2.3em;
-}
-
-.headerContainer {
-  container-type: inline-size;
-  grid-column: 1 / -1;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  gap: 0.4em;
-  font-size: 1.1em;
-  padding: var(--header-padding, 0.45em 0.7em);
-  min-height: var(--header-min-height, 3.2em);
-  height: auto;
-  z-index: 3;
-  box-sizing: border-box;
-  transition: all var(--cal-transition) linear;
-  overflow: hidden;
-  &:hover {
-    box-shadow: 0 0.1em 0.1em var(--c-x);
+  .headerContainer button {
+    height: 2.3em;
   }
-}
 
-.yearsSelector {
-  flex-grow: 1;
-  flex-shrink: 0;
-  flex-basis: 8em;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 0.2em;
-  gap: 0.2em;
-}
-
-.currentYear {
-  font-size: 1.05em;
-  font-weight: 800;
-  line-height: 1;
-  flex-shrink: 0;
-  width: max-content;
-  margin: 0 0.3em;
-  height: 2.3em;
-  white-space: nowrap;
-  flex-grow: 1;
-  &:active {
-    transform: scale(0.96);
-  }
-}
-
-.arrow {
-  width: 2.2em;
-  min-width: 1.4em;
-  height: 2.3em;
-  flex-shrink: 1;
-  padding: 0;
-}
-
-.monthButton {
-  flex: 0 0 auto;
-  min-width: 0;
-  padding: 0 1em;
-  height: 2.3em;
-  font-size: 0.95em;
-  background-color: var(--c-t) !important;
-  color: var(--c-h);
-  font-weight: 700;
-  gap: 0.4em;
-  opacity: 0.9;
-  & svg {
-    width: 1.3em;
-    height: 1.3em;
-    stroke-width: 3;
-  }
-}
-
-.staticButton {
-  cursor: default;
-  pointer-events: none;
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
-.homeButton {
-  width: 2.2em;
-  height: 2.3em;
-  flex-shrink: 0;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  & svg {
-    width: 1.1em;
-    height: 1.1em;
-  }
-}
-
-.flexWrapper {
-  display: flex;
-  align-items: center;
-  margin-left: auto;
-}
-
-.homeButtonDisabled {
-  opacity: 0.25;
-  cursor: default;
-  pointer-events: none;
-}
-
-.timeButton {
-  background: var(--c-h) !important;
-  color: var(--c-a) !important;
-  padding: 0 1em;
-  height: 2.3em;
-  font-size: 0.95em;
-  flex: 0 0 auto;
-  min-width: 0;
-}
-
-/* Month name: long by default, short on narrow containers */
-.monthNameShort { display: none; }
-
-@container (max-width: 16.25em) {
-  .monthNameLong  { display: none; }
-  .monthNameShort { display: inline; }
-}
-
-@container (max-width: 21.25em) {
   .headerContainer {
-    font-size: 1em;
-    padding: 0.5em;
-    gap: 0.6em;
+    container-type: inline-size;
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 0.4em;
+    font-size: 1.1em;
+    padding: var(--header-padding, 0.45em 0.7em);
+    min-height: var(--header-min-height, 3.2em);
+    height: auto;
+    z-index: 3;
+    box-sizing: border-box;
+    transition: all var(--cal-transition) linear;
+    overflow: hidden;
+    &:hover {
+      box-shadow: 0 0.1em 0.1em var(--c-x);
+    }
   }
-  .monthButton,
+
+  .yearsSelector {
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-basis: 8em;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.2em;
+    gap: 0.2em;
+  }
+
+  .currentYear {
+    font-size: 1.05em;
+    font-weight: 800;
+    line-height: 1;
+    flex-shrink: 0;
+    width: max-content;
+    margin: 0 0.3em;
+    height: 2.3em;
+    white-space: nowrap;
+    flex-grow: 1;
+    &:active {
+      transform: scale(0.96);
+    }
+  }
+
+  .arrow {
+    width: 2.2em;
+    min-width: 1.4em;
+    height: 2.3em;
+    flex-shrink: 1;
+    padding: 0;
+  }
+
+  .monthButton {
+    flex: 0 0 auto;
+    min-width: 0;
+    padding: 0 1em;
+    height: 2.3em;
+    font-size: 0.95em;
+    background-color: var(--c-t) !important;
+    color: var(--c-h);
+    font-weight: 700;
+    gap: 0.4em;
+    opacity: 0.9;
+    & svg {
+      width: 1.3em;
+      height: 1.3em;
+      stroke-width: 3;
+    }
+  }
+
+  .staticButton {
+    cursor: default;
+    pointer-events: none;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .homeButton {
+    width: 2.2em;
+    height: 2.3em;
+    flex-shrink: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    & svg {
+      width: 1.1em;
+      height: 1.1em;
+    }
+  }
+
+  .flexWrapper {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+  }
+
+  .homeButtonDisabled {
+    opacity: 0.25;
+    cursor: default;
+    pointer-events: none;
+  }
+
   .timeButton {
-    padding: 0.55em;
+    background: var(--c-h) !important;
+    color: var(--c-a) !important;
+    padding: 0 1em;
+    height: 2.3em;
+    font-size: 0.95em;
+    flex: 0 0 auto;
+    min-width: 0;
   }
-}
 
-@container (max-width: 13.75em) {
-  .headerContainer {
-    font-size: 0.92em;
-    padding: 0.4em;
-    gap: 0.25em;
+  .label {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.95em;
+    font-weight: 600;
+    color: var(--c-h);
+    opacity: 0.72;
+    padding: 0 0.3em;
+    line-height: 2.3em;
   }
-}
 
+  .monthNameShort {
+    display: none;
+  }
+
+  @container (max-width: 16.25em) {
+    .monthNameLong {
+      display: none;
+    }
+    .monthNameShort {
+      display: inline;
+    }
+  }
+
+  @container (max-width: 21.25em) {
+    .headerContainer {
+      font-size: 1em;
+      padding: 0.5em;
+      gap: 0.6em;
+    }
+    .monthButton,
+    .timeButton {
+      padding: 0.55em;
+    }
+  }
+
+  @container (max-width: 13.75em) {
+    .headerContainer {
+      font-size: 0.92em;
+      padding: 0.4em;
+      gap: 0.25em;
+    }
+  }
 }

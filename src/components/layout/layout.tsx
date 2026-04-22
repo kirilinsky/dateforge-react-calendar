@@ -1,7 +1,7 @@
 import React from "react";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
-import { useSelection } from "@/context/selection-context";
+import { useSelectionActions } from "@/context/selection-context";
 import { useUI } from "@/context/ui-context";
 import { TimePopup } from "../time-popup/time-popup";
 import { MonthPopup, YearPopup } from "../month-year-track/month-year-track";
@@ -15,7 +15,7 @@ export const CalendarLayout: React.FC<{
 }> = ({ appearanceKey, customAppearanceVars, cols, modules }) => {
   const { hour12, locale, minDate, maxDate, gradient } = useConfig();
   const { viewDate: date, navigateTo } = useNavigation();
-  const { onChangeTime } = useSelection();
+  const { onChangeTime } = useSelectionActions();
   const {
     dark, showTimePopup, setShowTimePopup,
     showMonthPopup, setShowMonthPopup,

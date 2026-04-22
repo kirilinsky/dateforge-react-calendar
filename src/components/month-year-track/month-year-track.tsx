@@ -6,7 +6,7 @@ import {
   setMonth as applyMonth,
   setYear as applyYear,
 } from "@/utils/date-utils";
-import { Popup } from "../time-popup/time-popup";
+import { Popup } from "../popup/popup";
 
 const OFFSETS = Array.from({ length: 7 }, (_, i) => i - 3);
 const SCROLL_THRESHOLD = 40;

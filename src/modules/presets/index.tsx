@@ -1,11 +1,14 @@
 import React, { useMemo } from "react";
 import styles from "./presets.module.css";
-import { useConfig, useNavigation, useSelection } from "react-calendar-datetime";
+import { useConfig } from "@/context/config-context";
+import { useNavigation } from "@/context/navigation-context";
+import { useSelectionValue, useSelectionActions } from "@/context/selection-context";
 import { isSameDay } from "@/utils/date-core";
 import { getFilteredPresets, getPresetDate, getRelativeLabel } from "./preset-utils";
+import { useGridSlot } from "@/hooks/use-grid-slot";
 import shared from "@/global/global.module.css";
 
-interface CalendarPresetsProps {
+export interface CalendarPresetsProps {
   showYears?: boolean;
   showMonths?: boolean;
   col?: number | string;
@@ -18,7 +21,8 @@ export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
 }) => {
   const { minDate, maxDate, locale, disabled } = useConfig();
   const { viewDate: date } = useNavigation();
-  const { selectedDate, onChangeDate } = useSelection();
+  const { selectedDate } = useSelectionValue();
+  const { onChangeDate } = useSelectionActions();
 
   const presets = useMemo(
     () => getFilteredPresets(showYears, showMonths, minDate, maxDate, disabled),
@@ -30,7 +34,7 @@ export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
       className={styles.presetsContainer}
       data-area="presets"
       data-count={presets.length}
-      style={col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined}
+      style={useGridSlot(col)}
     >
       {presets.map((preset) => {
         const isActive = !!selectedDate && isSameDay(preset.targetDate, selectedDate);

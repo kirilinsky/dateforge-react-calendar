@@ -304,8 +304,12 @@ export const KitchenSink = () => {
     allowNavigate: false,
     animated: false,
   });
-  const [selectedDatesAlign, setSelectedDatesAlign] = useState<"left" | "center" | "right">("left");
-  const [manualSelectAlign, setManualSelectAlign] = useState<"left" | "center" | "right">("left");
+  const [selectedDatesAlign, setSelectedDatesAlign] = useState<
+    "left" | "center" | "right"
+  >("left");
+  const [manualSelectAlign, setManualSelectAlign] = useState<
+    "left" | "center" | "right"
+  >("left");
 
   const toggleModuleProp = (key: keyof typeof moduleProps) =>
     setModuleProps((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -539,7 +543,9 @@ export const KitchenSink = () => {
                 DaysTrack props
               </p>
               <div className="panel-props-grid">
-                {(Object.keys(daysTrackProps) as (keyof typeof daysTrackProps)[]).map((key) => (
+                {(
+                  Object.keys(daysTrackProps) as (keyof typeof daysTrackProps)[]
+                ).map((key) => (
                   <button
                     key={key}
                     onClick={() => toggleDaysTrackProp(key)}
@@ -656,11 +662,14 @@ export const KitchenSink = () => {
               {...calendarProps}
             >
               {modules.days && <CalendarDays {...daysProps} />}
-              {modules.nav && <CalendarNav {...navProps} />}
+              {modules.nav && <CalendarNav {...navProps} label="label" />}
               {modules.monthsGrid && <CalendarMonthGrid {...monthsGridProps} />}
               {modules.timeGrid && <CalendarTimeGrid />}
               {modules.selectedDates && (
-                <CalendarSelectedDates {...selectedDatesProps} align={selectedDatesAlign} />
+                <CalendarSelectedDates
+                  {...selectedDatesProps}
+                  align={selectedDatesAlign}
+                />
               )}
               {modules.manualSelect && (
                 <CalendarManualSelect

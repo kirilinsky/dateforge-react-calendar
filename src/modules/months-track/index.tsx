@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import styles from "./months-track.module.css";
-import { useNavigation, useConfig } from "react-calendar-datetime";
+import { useNavigation } from "@/context/navigation-context";
+import { useConfig } from "@/context/config-context";
 import { useTrack } from "@/hooks/use-track";
+import { useGridSlot } from "@/hooks/use-grid-slot";
 import { getMonthNames } from "@/utils/month-utils";
 
 const HALF = 4;
 const OFFSETS = Array.from({ length: HALF * 2 + 1 }, (_, i) => i - HALF);
 
-interface CalendarMonthsTrackProps {
+export interface CalendarMonthsTrackProps {
   shortMonths?: boolean;
   col?: number | string;
 }
@@ -38,6 +40,7 @@ export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({ shortM
   });
 
   useEffect(() => {
+    if (typeof ResizeObserver === "undefined") return;
     const container = ref.current;
     if (!container) return;
     const measure = () => {
@@ -63,7 +66,7 @@ export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({ shortM
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerCancel}
-      style={col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined}
+      style={useGridSlot(col)}
     >
       <div className={styles.highlight} />
       <div className={styles.strip} style={{ transform: `translateX(${stripOffset}px)` }}>

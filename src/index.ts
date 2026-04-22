@@ -6,7 +6,7 @@ export { createDisabled } from "./utils/create-disabled";
 
 export { useConfig } from "./context/config-context";
 export { useNavigation } from "./context/navigation-context";
-export { useSelection } from "./context/selection-context";
+export { useSelection, useSelectionValue, useSelectionActions, useSelectionHover } from "./context/selection-context";
 export { useUI } from "./context/ui-context";
 export { useThrottle } from "./hooks/use-throttle";
 
@@ -17,5 +17,19 @@ export type {
   CalendarMode,
   DateRange,
   DisabledConfig,
+  DisabledRule,
 } from "./types/calendar";
-export type { CalendarTheme, ThemeTokens, CustomTheme } from "./types/themes";
+export type { CalendarTheme, ThemeTokens, CustomTheme, BuiltInTheme } from "./types/themes";
+export type { CalendarAppearance, CustomAppearance, BuiltInAppearance, AppearanceTokens } from "./types/appearances";
+
+export type { CalendarDaysProps } from "./components/days/days";
+export type { CalendarNavProps } from "./modules/nav/index";
+export type { CalendarDaysTrackProps } from "./modules/days-track/index";
+export type { CalendarMonthGridProps } from "./modules/months/index";
+export type { CalendarMonthsTrackProps } from "./modules/months-track/index";
+export type { CalendarYearsGridProps } from "./modules/years-grid/index";
+export type { CalendarYearsTrackProps } from "./modules/years-track/index";
+export type { CalendarTimeGridProps } from "./modules/time/index";
+export type { CalendarPresetsProps } from "./modules/presets/index";
+export type { CalendarSelectedDatesProps } from "./modules/selected-dates/index";
+export type { CalendarManualSelectProps } from "./modules/manual-select/index";

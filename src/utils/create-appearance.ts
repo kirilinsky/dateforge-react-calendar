@@ -1,4 +1,4 @@
-import { APPEARANCE_TOKEN_TO_VAR } from "../types/appearances";
+import { APPEARANCE_TOKEN_TO_VAR, CUSTOM_APPEARANCE_BRAND } from "../types/appearances";
 import type { AppearanceTokens, CustomAppearance } from "../types/appearances";
 
 /**
@@ -13,7 +13,7 @@ export function createAppearance(tokens: Partial<AppearanceTokens>): CustomAppea
   const vars: Record<string, string> = {};
   for (const [key, value] of Object.entries(tokens)) {
     const cssVar = APPEARANCE_TOKEN_TO_VAR[key as keyof AppearanceTokens];
-    if (cssVar && value) vars[cssVar] = value;
+    if (cssVar && value != null) vars[cssVar] = value;
   }
-  return { __type: "custom-appearance", vars };
+  return { [CUSTOM_APPEARANCE_BRAND]: true as const, vars };
 }

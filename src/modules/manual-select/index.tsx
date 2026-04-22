@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import styles from "./manual-select.module.css";
 import shared from "@/global/global.module.css";
 import { Check, Clear } from "@/Icons";
-import { useConfig, useNavigation, useSelection } from "react-calendar-datetime";
+import { useConfig } from "@/context/config-context";
+import { useNavigation } from "@/context/navigation-context";
+import { useSelectionValue, useSelectionActions } from "@/context/selection-context";
 import { checkIsDateDisabled, isSameDay } from "@/utils/date-core";
+import { useGridSlot } from "@/hooks/use-grid-slot";
 
 const dateToMask = (d: Date | null): string => {
   if (!d) return "";
@@ -275,7 +278,7 @@ const alignToJustify: Record<AlignValue, string> = {
   right: "flex-end",
 };
 
-interface CalendarManualSelectProps {
+export interface CalendarManualSelectProps {
   allowClean?: boolean;
   align?: AlignValue;
   col?: number | string;
@@ -288,7 +291,8 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
 }) => {
   const { range, multiselect, disabled, minDate, maxDate } = useConfig();
   const { viewDate: date } = useNavigation();
-  const { rangeStart, rangeEnd, selectedDates, onChangeDate, onRangeSet, onDatesSet } = useSelection();
+  const { rangeStart, rangeEnd, selectedDates } = useSelectionValue();
+  const { onChangeDate, onRangeSet, onDatesSet } = useSelectionActions();
 
   const withTime = (d: Date, ref?: Date): Date => {
     const src = ref ?? date;
@@ -310,7 +314,7 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
 
   const containerStyle: React.CSSProperties = {
     justifyContent: alignToJustify[align],
-    ...(col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined),
+    ...useGridSlot(col),
   };
 
   const clearBtn = (

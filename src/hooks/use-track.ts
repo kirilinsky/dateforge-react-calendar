@@ -67,6 +67,7 @@ export function useTrack({
     lastX: 0,
     snapped: initialIndex,
     syncTarget: null as number | null,
+    fromGesture: false,
   });
 
   const getBounds = () => {
@@ -94,7 +95,7 @@ export function useTrack({
     const idx = resolveIdx(offset);
     if (p.current.snapped !== idx) {
       p.current.snapped = idx;
-      navigator.vibrate?.(8);
+      if (p.current.fromGesture) navigator.vibrate?.(8);
       opts.current.onChange(idx);
     }
   };
@@ -202,6 +203,7 @@ export function useTrack({
       : clamp(initialIndex, lo, hi);
     p.current.syncTarget = idx * ppi;
     p.current.velocity = 0;
+    p.current.fromGesture = false;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialIndex]);
 
@@ -216,6 +218,7 @@ export function useTrack({
 
   const onPointerDown = (e: React.PointerEvent) => {
     p.current.isDragging = true;
+    p.current.fromGesture = true;
     p.current.lastX = e.clientX;
     p.current.velocity = 0;
   };
@@ -262,10 +265,10 @@ export function useTrack({
     const el = ref.current;
     if (!el) return;
     const handler = (e: WheelEvent) => {
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
       e.preventDefault();
-      const raw = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
       const delta =
-        e.deltaMode === 1 ? raw * 20 : e.deltaMode === 2 ? raw * 300 : raw;
+        e.deltaMode === 1 ? e.deltaX * 20 : e.deltaMode === 2 ? e.deltaX * 300 : e.deltaX;
       p.current.velocity += delta * 0.08;
     };
     el.addEventListener("wheel", handler, { passive: false });

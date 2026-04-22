@@ -145,8 +145,7 @@
     "node": ">=18.0.0"
   },
   "sideEffects": [
-    "dist/**/*.mjs",
-    "dist/**/*.cjs"
+    "**/*.css"
   ],
   "author": "Kirilinsky (https://github.com/kirilinsky)",
   "license": "MIT"

@@ -9,29 +9,39 @@ export interface RangeOptions {
   rangeMaxDays?: number;
 }
 
-const i18nCache: Record<string, string[]> = {};
+const I18N_CACHE_MAX = 32;
+const i18nCache = new Map<string, string[]>();
+
+const cacheSet = (key: string, value: string[]): string[] => {
+  if (i18nCache.size >= I18N_CACHE_MAX) {
+    i18nCache.delete(i18nCache.keys().next().value as string);
+  }
+  i18nCache.set(key, value);
+  return value;
+};
 
 export const getWeekdaysNames = (
   locale: string,
   startOfWeek: StartOfWeek,
 ): string[] => {
   const key = `${locale}W${startOfWeek}`;
-  if (!i18nCache[key]) {
-    const baseKey = `${locale}W`;
-    if (!i18nCache[baseKey]) {
-      const fmt = new Intl.DateTimeFormat(locale, { weekday: "short" }).format;
-      const base = new Date(2024, 0, 1);
-      i18nCache[baseKey] = Array.from({ length: 7 }, (_, i) => {
-        const d = new Date(base);
-        d.setDate(base.getDate() + i);
-        return fmt(d);
-      });
-    }
-    const days = i18nCache[baseKey];
-    const shift = startOfWeek === 0 ? 6 : startOfWeek - 1;
-    i18nCache[key] = shift === 0 ? days : [...days.slice(shift), ...days.slice(0, shift)];
+  const cached = i18nCache.get(key);
+  if (cached) return cached;
+
+  const baseKey = `${locale}W`;
+  let days = i18nCache.get(baseKey);
+  if (!days) {
+    const fmt = new Intl.DateTimeFormat(locale, { weekday: "short" }).format;
+    const base = new Date(2024, 0, 1);
+    days = cacheSet(baseKey, Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(base);
+      d.setDate(base.getDate() + i);
+      return fmt(d);
+    }));
   }
-  return i18nCache[key];
+
+  const shift = startOfWeek === 0 ? 6 : startOfWeek - 1;
+  return cacheSet(key, shift === 0 ? days : [...days.slice(shift), ...days.slice(0, shift)]);
 };
 
 export const getFirstDayOffset = (
