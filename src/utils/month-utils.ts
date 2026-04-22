@@ -1,7 +1,16 @@
 import { DisabledConfig } from "../types/calendar";
-import { getLimit } from "./date-core";
+import { toLimitTimestamp } from "./date-core";
 
-const i18nCache: Record<string, string[]> = {};
+const MONTH_CACHE_MAX = 32;
+const i18nCache = new Map<string, string[]>();
+
+const cacheSet = (key: string, value: string[]): string[] => {
+  if (i18nCache.size >= MONTH_CACHE_MAX) {
+    i18nCache.delete(i18nCache.keys().next().value as string);
+  }
+  i18nCache.set(key, value);
+  return value;
+};
 
 export const isMonthFullyDisabled = (
   year: number,
@@ -22,16 +31,13 @@ export const isMonthFullyDisabled = (
 
 export const getMonthNames = (locale: string, short?: boolean): string[] => {
   const key = `${locale}M${short ? "s" : "l"}`;
-  if (!i18nCache[key]) {
-    const fmt = new Intl.DateTimeFormat(locale, {
-      month: short ? "short" : "long",
-    }).format;
-    const y = new Date().getFullYear();
-    i18nCache[key] = Array.from({ length: 12 }, (_, i) =>
-      fmt(new Date(y, i, 1)),
-    );
-  }
-  return i18nCache[key];
+  const cached = i18nCache.get(key);
+  if (cached) return cached;
+  const fmt = new Intl.DateTimeFormat(locale, {
+    month: short ? "short" : "long",
+  }).format;
+  const y = new Date().getFullYear();
+  return cacheSet(key, Array.from({ length: 12 }, (_, i) => fmt(new Date(y, i, 1))));
 };
 
 export const getMonthListData = (
@@ -44,8 +50,8 @@ export const getMonthListData = (
   disableLimited = true,
 ) => {
   const names = getMonthNames(locale, short);
-  const minT = getLimit(startDate);
-  const maxT = getLimit(endDate, true);
+  const minT = toLimitTimestamp(startDate);
+  const maxT = toLimitTimestamp(endDate, true);
   return names.map((label, i) => {
     const firstDay = new Date(year, i, 1);
     const lastDay = new Date(year, i + 1, 0);

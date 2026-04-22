@@ -9,7 +9,7 @@ const mutate = (d: Date, fn: (n: Date) => void): Date => {
   return n;
 };
 
-const toLimitTimestamp = (d?: Date | null, isMax?: boolean): number | null =>
+export const toLimitTimestamp = (d?: Date | null, isMax?: boolean): number | null =>
   d
     ? new Date(d).setHours(
         isMax ? 23 : 0,
