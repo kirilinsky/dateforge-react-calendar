@@ -10,6 +10,8 @@ export interface CalendarUI {
   setShowMonthPopup: (v: boolean) => void;
   showYearPopup: boolean;
   setShowYearPopup: (v: boolean) => void;
+  daysTrackActive: boolean;
+  setDaysTrackActive: (v: boolean) => void;
 }
 
 export const UIContext = createContext<CalendarUI | undefined>(undefined);

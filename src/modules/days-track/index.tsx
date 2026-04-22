@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import styles from "./days-track.module.css";
-import { useNavigation, useSelection, useConfig } from "react-calendar-datetime";
+import { useNavigation, useSelection, useConfig, useUI } from "react-calendar-datetime";
 import { useTrack } from "@/hooks/use-track";
 
 const HALF = 5;
@@ -18,6 +18,12 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({ col }) => 
   const { viewDate, navigateTo } = useNavigation();
   const { selectedDate, onChangeDate } = useSelection();
   const { minDate, maxDate } = useConfig();
+  const { setDaysTrackActive } = useUI();
+
+  useEffect(() => {
+    setDaysTrackActive(true);
+    return () => setDaysTrackActive(false);
+  }, [setDaysTrackActive]);
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
   const days = useMemo(() => daysInMonth(year, month), [year, month]);
@@ -27,7 +33,7 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({ col }) => 
     selectedDate.getFullYear() === year &&
     selectedDate.getMonth() === month
       ? selectedDate.getDate() - 1
-      : 0;
+      : viewDate.getDate() - 1;
 
   const [itemWidth, setItemWidth] = useState(44);
 

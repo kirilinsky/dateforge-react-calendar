@@ -5,6 +5,7 @@ import React, {
   useRef,
   useMemo,
   useCallback,
+  useState,
 } from "react";
 import { CalendarMode, CalendarProps, DateRange } from "@/types/calendar";
 import {
@@ -267,6 +268,8 @@ export const CalendarProvider: React.FC<
     ],
   );
 
+  const [daysTrackActive, setDaysTrackActive] = useState(false);
+
   const ui = useMemo(
     () => ({
       dark: isDark ?? false,
@@ -278,9 +281,11 @@ export const CalendarProvider: React.FC<
       setShowMonthPopup,
       showYearPopup: state.openPopup === "year",
       setShowYearPopup,
+      daysTrackActive,
+      setDaysTrackActive,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isDark, toggleTheme, containerWidth, state.openPopup],
+    [isDark, toggleTheme, containerWidth, state.openPopup, daysTrackActive],
   );
 
   return (

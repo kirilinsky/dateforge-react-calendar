@@ -3,6 +3,7 @@ import styles from "./days.module.css";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import { useSelection } from "@/context/selection-context";
+import { useUI } from "@/context/ui-context";
 import {
   getFirstDayOffset,
   getNextMonthFromSwipe,
@@ -25,6 +26,7 @@ export const CalendarDays: React.FC<{
   highlightToday?: boolean;
   allowSwipeNavigation?: boolean;
   hideLimited?: boolean;
+  preventUnselect?: boolean;
 }> = ({
   offset = 0,
   hideOtherMonths = false,
@@ -37,7 +39,9 @@ export const CalendarDays: React.FC<{
   highlightToday = true,
   allowSwipeNavigation = false,
   hideLimited = false,
+  preventUnselect = false,
 }) => {
+  const { daysTrackActive } = useUI();
   const {
     minDate, maxDate, disabled,
     range, rangeMinDays, rangeMaxDays,
@@ -148,6 +152,7 @@ export const CalendarDays: React.FC<{
   const handleSetDay = useCallback(
     (targetDate: Date, isDisabled: boolean) => {
       if (isDisabled) return;
+      if ((preventUnselect || daysTrackActive) && selectedDates.some((d) => isSameDay(d, targetDate))) return;
       const next = new Date(targetDate);
       next.setHours(
         date.getHours(),
@@ -163,7 +168,7 @@ export const CalendarDays: React.FC<{
       }
       onChangeDate(next);
     },
-    [onChangeDate, date, minDate, maxDate],
+    [onChangeDate, date, minDate, maxDate, preventUnselect, daysTrackActive, selectedDates],
   );
 
   const isPickingRange = range && rangeStart && !rangeEnd;

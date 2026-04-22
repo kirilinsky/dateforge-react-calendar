@@ -238,7 +238,7 @@ export const KitchenSink = () => {
     hideWeekdays: false,
     hideOtherMonths: false,
     hideLimited: false,
-
+    preventUnselect: false,
     highlightToday: true,
     allowSwipeNavigation: false,
   });
@@ -434,6 +434,7 @@ export const KitchenSink = () => {
                 "hideWeekdays",
                 "hideLimited",
                 "highlightToday",
+                "preventUnselect",
                 "allowSwipeNavigation",
               ] as const
             ).map((key) => (
@@ -464,22 +465,30 @@ export const KitchenSink = () => {
             Module props
           </p>
           <div className="panel-props-grid">
-            {(Object.keys(moduleProps) as (keyof typeof moduleProps)[]).map((key) => (
-              <button
-                key={key}
-                onClick={() => toggleModuleProp(key)}
-                className={`panel-button-compact ${moduleProps[key] ? "active" : ""}`}
-              >
-                {key}
-              </button>
-            ))}
+            {(Object.keys(moduleProps) as (keyof typeof moduleProps)[]).map(
+              (key) => (
+                <button
+                  key={key}
+                  onClick={() => toggleModuleProp(key)}
+                  className={`panel-button-compact ${moduleProps[key] ? "active" : ""}`}
+                >
+                  {key}
+                </button>
+              ),
+            )}
           </div>
 
           {modules.monthsGrid && (
             <>
-              <p className="panel-label" style={{ marginTop: 8 }}>MonthsGrid props</p>
+              <p className="panel-label" style={{ marginTop: 8 }}>
+                MonthsGrid props
+              </p>
               <div className="panel-props-grid">
-                {(Object.keys(monthsGridProps) as (keyof typeof monthsGridProps)[]).map((key) => (
+                {(
+                  Object.keys(
+                    monthsGridProps,
+                  ) as (keyof typeof monthsGridProps)[]
+                ).map((key) => (
                   <button
                     key={key}
                     onClick={() => toggleMonthsGridProp(key)}
@@ -494,9 +503,15 @@ export const KitchenSink = () => {
 
           {modules.monthsTrack && (
             <>
-              <p className="panel-label" style={{ marginTop: 8 }}>MonthsTrack props</p>
+              <p className="panel-label" style={{ marginTop: 8 }}>
+                MonthsTrack props
+              </p>
               <div className="panel-props-grid">
-                {(Object.keys(monthsTrackProps) as (keyof typeof monthsTrackProps)[]).map((key) => (
+                {(
+                  Object.keys(
+                    monthsTrackProps,
+                  ) as (keyof typeof monthsTrackProps)[]
+                ).map((key) => (
                   <button
                     key={key}
                     onClick={() => toggleMonthsTrackProp(key)}
@@ -511,9 +526,13 @@ export const KitchenSink = () => {
 
           {modules.yearsGrid && (
             <>
-              <p className="panel-label" style={{ marginTop: 8 }}>YearsGrid props</p>
+              <p className="panel-label" style={{ marginTop: 8 }}>
+                YearsGrid props
+              </p>
               <div className="panel-props-grid">
-                {(Object.keys(yearsGridProps) as (keyof typeof yearsGridProps)[]).map((key) => (
+                {(
+                  Object.keys(yearsGridProps) as (keyof typeof yearsGridProps)[]
+                ).map((key) => (
                   <button
                     key={key}
                     onClick={() => toggleYearsGridProp(key)}
@@ -530,7 +549,11 @@ export const KitchenSink = () => {
                   min="1"
                   max="40"
                   value={yearsPerPage}
-                  onChange={(e) => setYearsPerPage(Math.min(40, Math.max(1, Number(e.target.value))))}
+                  onChange={(e) =>
+                    setYearsPerPage(
+                      Math.min(40, Math.max(1, Number(e.target.value))),
+                    )
+                  }
                 />
               </div>
             </>
@@ -588,9 +611,16 @@ export const KitchenSink = () => {
                 />
               )}
               {modules.yearsTrack && <CalendarYearsTrack />}
-              {modules.monthsTrack && <CalendarMonthsTrack {...monthsTrackProps} />}
+              {modules.monthsTrack && (
+                <CalendarMonthsTrack {...monthsTrackProps} />
+              )}
               {modules.daysTrack && <CalendarDaysTrack />}
-              {modules.yearsGrid && <CalendarYearsGrid {...yearsGridProps} yearsPerPage={yearsPerPage} />}
+              {modules.yearsGrid && (
+                <CalendarYearsGrid
+                  {...yearsGridProps}
+                  yearsPerPage={yearsPerPage}
+                />
+              )}
               {modules.presets && <CalendarPresets />}
 
               {calendarProps.twoMonthsLayout && (

@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 
-const FRICTION = 0.95;        // inertia decay — high = long glide
-const SNAP_THRESHOLD = 3.5;  // px/frame — catch earlier for visible overshoot
-const SPRING_K = 0.08;       // spring stiffness
-const SPRING_DAMP = 0.82;    // underdamped (< critical) → bouncy overshoot
-const RUBBER_K = 0.12;       // boundary spring stiffness
-const RUBBER_DAMP = 0.75;    // boundary damping
-const SETTLE_PX = 0.4;       // close enough to consider settled
+const FRICTION = 0.95; // inertia decay — high = long glide
+const SNAP_THRESHOLD = 3.5; // px/frame — catch earlier for visible overshoot
+const SPRING_K = 0.08; // spring stiffness
+const SPRING_DAMP = 0.82; // underdamped (< critical) → bouncy overshoot
+const RUBBER_K = 0.12; // boundary spring stiffness
+const RUBBER_DAMP = 0.75; // boundary damping
+const SETTLE_PX = 0.4; // close enough to consider settled
 
 interface UseTrackOptions {
   count: number;
@@ -20,7 +20,7 @@ interface UseTrackOptions {
 
 export interface UseTrackReturn {
   ref: React.RefObject<HTMLDivElement | null>;
-  position: number;   // float index (offset / pixelsPerItem)
+  position: number; // float index (offset / pixelsPerItem)
   scrollTo: (targetIndex: number) => void;
   onPointerDown: (e: React.PointerEvent) => void;
   onPointerMove: (e: React.PointerEvent) => void;
@@ -28,7 +28,8 @@ export interface UseTrackReturn {
   onPointerCancel: () => void;
 }
 
-const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), hi);
+const clamp = (v: number, lo: number, hi: number) =>
+  Math.min(Math.max(v, lo), hi);
 
 export function useTrack({
   count,
@@ -42,19 +43,39 @@ export function useTrack({
   const ref = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState(initialIndex);
 
-  const opts = useRef({ count, pixelsPerItem, circular, minIndex, maxIndex, onChange });
-  opts.current = { count, pixelsPerItem, circular, minIndex, maxIndex, onChange };
+  const opts = useRef({
+    count,
+    pixelsPerItem,
+    circular,
+    minIndex,
+    maxIndex,
+    onChange,
+  });
+  opts.current = {
+    count,
+    pixelsPerItem,
+    circular,
+    minIndex,
+    maxIndex,
+    onChange,
+  };
 
   const p = useRef({
-    offset: initialIndex * pixelsPerItem,   // position in px
-    velocity: 0,                            // px/frame
+    offset: initialIndex * pixelsPerItem, // position in px
+    velocity: 0, // px/frame
     isDragging: false,
     lastX: 0,
     snapped: initialIndex,
   });
 
   const getBounds = () => {
-    const { count: c, pixelsPerItem: ppi, circular: circ, minIndex: mn, maxIndex: mx } = opts.current;
+    const {
+      count: c,
+      pixelsPerItem: ppi,
+      circular: circ,
+      minIndex: mn,
+      maxIndex: mx,
+    } = opts.current;
     const lo = mn ?? 0;
     const hi = mx ?? c - 1;
     const bounded = mn !== undefined || mx !== undefined;
@@ -103,7 +124,10 @@ export function useTrack({
             const diff = target - p.current.offset;
             p.current.velocity += diff * SPRING_K;
             p.current.velocity *= SPRING_DAMP;
-            if (Math.abs(diff) < SETTLE_PX && Math.abs(p.current.velocity) < SETTLE_PX) {
+            if (
+              Math.abs(diff) < SETTLE_PX &&
+              Math.abs(p.current.velocity) < SETTLE_PX
+            ) {
               p.current.offset = target;
               p.current.velocity = 0;
             }
@@ -123,7 +147,10 @@ export function useTrack({
             if (diff < -range / 2) diff += range;
             p.current.velocity += diff * SPRING_K;
             p.current.velocity *= SPRING_DAMP;
-            if (Math.abs(diff) < SETTLE_PX && Math.abs(p.current.velocity) < SETTLE_PX) {
+            if (
+              Math.abs(diff) < SETTLE_PX &&
+              Math.abs(p.current.velocity) < SETTLE_PX
+            ) {
               p.current.offset = target;
               p.current.velocity = 0;
             }
@@ -139,30 +166,29 @@ export function useTrack({
 
     let rafId = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(rafId);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // sync when initialIndex changes externally (e.g. month change → new day count)
+  // sync when initialIndex changes externally (e.g. month change, external date selection)
   const prevInit = useRef(initialIndex);
   useEffect(() => {
     if (prevInit.current === initialIndex) return;
     prevInit.current = initialIndex;
     const { lo, hi, isCircular, c, ppi } = getBounds();
-    const idx = isCircular ? ((initialIndex % c) + c) % c : clamp(initialIndex, lo, hi);
-    // animate: give velocity a kick toward the new target, physics finishes the journey
-    const targetOffset = idx * ppi;
-    const diff = targetOffset - p.current.offset;
-    p.current.velocity = clamp(diff * 0.25, -40, 40);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    const idx = isCircular
+      ? ((initialIndex % c) + c) % c
+      : clamp(initialIndex, lo, hi);
+    p.current.offset = idx * ppi;
+    p.current.velocity = 0;
+    p.current.snapped = idx;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialIndex]);
 
-  // sync pixelsPerItem changes (measured from DOM after mount)
   const prevPpi = useRef(pixelsPerItem);
   useEffect(() => {
     if (prevPpi.current === pixelsPerItem) return;
     const oldPpi = prevPpi.current;
     prevPpi.current = pixelsPerItem;
-    // rescale offset to new item width
     p.current.offset = (p.current.offset / oldPpi) * pixelsPerItem;
     p.current.velocity = (p.current.velocity / oldPpi) * pixelsPerItem;
   }, [pixelsPerItem]);
@@ -183,8 +209,11 @@ export function useTrack({
     p.current.velocity = delta; // hand off momentum on release
 
     if (!isCircular) {
-      // allow slight rubber-band overshoot while dragging
-      p.current.offset = clamp(p.current.offset, lo * ppi - ppi, hi * ppi + ppi);
+      p.current.offset = clamp(
+        p.current.offset,
+        lo * ppi - ppi,
+        hi * ppi + ppi,
+      );
     } else {
       const range = c * ppi;
       p.current.offset = ((p.current.offset % range) + range) % range;
@@ -196,14 +225,14 @@ export function useTrack({
 
   const onPointerUp = () => {
     p.current.isDragging = false;
-    // velocity is already set from last onPointerMove delta — physics takes over
   };
 
   const scrollTo = (targetIndex: number) => {
     const { lo, hi, isCircular, c, ppi } = getBounds();
-    const idx = isCircular ? ((targetIndex % c) + c) % c : clamp(targetIndex, lo, hi);
+    const idx = isCircular
+      ? ((targetIndex % c) + c) % c
+      : clamp(targetIndex, lo, hi);
     const targetOffset = idx * ppi;
-    // spring impulse proportional to distance, capped to avoid overshoot
     const diff = targetOffset - p.current.offset;
     p.current.velocity += clamp(diff * 0.15, -30, 30);
   };
@@ -214,14 +243,22 @@ export function useTrack({
     const handler = (e: WheelEvent) => {
       e.preventDefault();
       const raw = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-      const delta = e.deltaMode === 1 ? raw * 20 : e.deltaMode === 2 ? raw * 300 : raw;
-      // add velocity impulse; scale so 1 mouse notch ≈ 1–2 items
+      const delta =
+        e.deltaMode === 1 ? raw * 20 : e.deltaMode === 2 ? raw * 300 : raw;
       p.current.velocity += delta * 0.08;
     };
     el.addEventListener("wheel", handler, { passive: false });
     return () => el.removeEventListener("wheel", handler);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { ref, position, scrollTo, onPointerDown, onPointerMove, onPointerUp, onPointerCancel: onPointerUp };
+  return {
+    ref,
+    position,
+    scrollTo,
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
+    onPointerCancel: onPointerUp,
+  };
 }
