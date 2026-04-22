@@ -18,10 +18,18 @@ const getRangeSep = (fmt: Intl.DateTimeFormat, start: Date, end: Date): string =
   }
 };
 
+type AlignValue = "left" | "center" | "right";
+const alignToJustify: Record<AlignValue, string> = {
+  left: "flex-start",
+  center: "center",
+  right: "flex-end",
+};
+
 interface CalendarSelectedDatesProps {
   allowClean?: boolean;
   allowNavigate?: boolean;
   animated?: boolean;
+  align?: AlignValue;
   col?: number | string;
 }
 
@@ -29,6 +37,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
   allowClean = false,
   allowNavigate = false,
   animated = false,
+  align = "left",
   col,
 }) => {
   const { locale, range } = useConfig();
@@ -58,18 +67,15 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
       .filter(Boolean)
       .join(" ");
 
-  const clearBtn = (
+  const clearBtn = allowClean ? (
     <button
       type="button"
       className={`${styles.clearBtn} ${shared.interactive} ${shared.hoverable}`}
       onClick={() => onChangeDate(null)}
-      style={allowClean ? undefined : { visibility: "hidden", pointerEvents: "none" }}
-      tabIndex={allowClean ? undefined : -1}
-      aria-hidden={!allowClean}
     >
       ×
     </button>
-  );
+  ) : null;
 
   const content = range ? (
     rangeStart ? (
@@ -130,9 +136,12 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
         .filter(Boolean)
         .join(" ")}
       data-area="selected-dates"
-      style={col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined}
+      style={{
+        ...(col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined),
+        ...(!animated ? { justifyContent: alignToJustify[align] } : undefined),
+      }}
     >
-      <div className={styles.inner}>{content}</div>
+      <div className={styles.inner} style={{ justifyContent: alignToJustify[align] }}>{content}</div>
     </div>
   );
 };

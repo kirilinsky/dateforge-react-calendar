@@ -297,6 +297,8 @@ export const KitchenSink = () => {
     allowNavigate: false,
     animated: false,
   });
+  const [selectedDatesAlign, setSelectedDatesAlign] = useState<"left" | "center" | "right">("left");
+  const [manualSelectAlign, setManualSelectAlign] = useState<"left" | "center" | "right">("left");
 
   const toggleModuleProp = (key: keyof typeof moduleProps) =>
     setModuleProps((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -576,6 +578,35 @@ export const KitchenSink = () => {
               </button>
             ))}
           </div>
+          <div className="panel-weekdays">
+            {(["left", "center", "right"] as const).map((a) => (
+              <button
+                key={a}
+                onClick={() => setSelectedDatesAlign(a)}
+                className={`panel-weekday-btn ${selectedDatesAlign === a ? "active" : ""}`}
+              >
+                {a}
+              </button>
+            ))}
+          </div>
+          {modules.manualSelect && (
+            <>
+              <p className="panel-label" style={{ marginTop: 8 }}>
+                ManualSelect align
+              </p>
+              <div className="panel-weekdays">
+                {(["left", "center", "right"] as const).map((a) => (
+                  <button
+                    key={a}
+                    onClick={() => setManualSelectAlign(a)}
+                    className={`panel-weekday-btn ${manualSelectAlign === a ? "active" : ""}`}
+                  >
+                    {a}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </aside>
 
         <div className="kitchen-center">
@@ -603,11 +634,12 @@ export const KitchenSink = () => {
               {modules.monthsGrid && <CalendarMonthGrid {...monthsGridProps} />}
               {modules.timeGrid && <CalendarTimeGrid />}
               {modules.selectedDates && (
-                <CalendarSelectedDates {...selectedDatesProps} />
+                <CalendarSelectedDates {...selectedDatesProps} align={selectedDatesAlign} />
               )}
               {modules.manualSelect && (
                 <CalendarManualSelect
                   allowClean={moduleProps.manualSelectAllowClean}
+                  align={manualSelectAlign}
                 />
               )}
               {modules.yearsTrack && <CalendarYearsTrack />}

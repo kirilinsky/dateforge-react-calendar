@@ -1,72 +1,70 @@
 @layer cal-base {
+  .selectedContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35em;
+    padding: var(--cal-spacing);
+    z-index: 3;
+  }
 
-.selectedContainer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35em;
-  padding: var(--cal-spacing);
-  z-index: 3;
-}
+  .animated {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0;
+  }
 
- .animated {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.32s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 0;
-}
+  .animated.visible {
+    grid-template-rows: 1fr;
+  }
 
-.animated.visible {
-  grid-template-rows: 1fr;
-}
+  .inner {
+    overflow: hidden;
+    min-height: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0.35em;
+    padding: 0 var(--cal-spacing);
+    padding-top: 0;
+    padding-bottom: 0;
+    transition: padding 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
- .inner {
-  overflow: hidden;
-  min-height: 0;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.35em;
-  padding: 0 var(--cal-spacing);
-  padding-top: 0;
-  padding-bottom: 0;
-  transition: padding 0.32s cubic-bezier(0.4, 0, 0.2, 1);
-}
+  .visible .inner {
+    padding: var(--cal-spacing);
+  }
 
-.visible .inner {
-  padding: var(--cal-spacing);
-}
+  .chip {
+    height: 2.1em;
+    flex-shrink: 0;
+    padding: 0 0.75em !important;
+    font-size: 0.78em !important;
+    white-space: nowrap;
+  }
 
-.chip {
-  height: 2.1em;
-  flex-shrink: 0;
-  padding: 0 0.75em !important;
-  font-size: 0.78em !important;
-  white-space: nowrap;
-}
+  .inactiveChip {
+    background: var(--c-t);
+  }
 
-.inactiveChip {
-  background: var(--c-t);
-}
+  .clearBtn {
+    height: 2.1em;
+    margin-left: auto;
+    padding: 0 0.6em !important;
+    font-size: 0.9em !important;
+    opacity: 0.5;
+    flex-shrink: 0;
+  }
 
-.clearBtn {
-  height: 2.1em;
-  margin-left: auto;
-  padding: 0 0.6em !important;
-  font-size: 0.9em !important;
-  opacity: 0.5;
-  flex-shrink: 0;
-}
+  .clearBtn:hover {
+    opacity: 1;
+  }
 
-.clearBtn:hover {
-  opacity: 1;
-}
-
-.rangeSep {
-  font-size: 0.8em;
-  color: var(--c-s);
-  align-self: center;
-  user-select: none;
-  white-space: pre;
-}
-
+  .rangeSep {
+    font-size: 0.8em;
+    color: var(--c-s);
+    align-self: center;
+    user-select: none;
+    white-space: pre;
+  }
 }

@@ -268,13 +268,22 @@ const DateSlot: React.FC<DateSlotProps> = ({
   );
 };
 
+type AlignValue = "left" | "center" | "right";
+const alignToJustify: Record<AlignValue, string> = {
+  left: "flex-start",
+  center: "center",
+  right: "flex-end",
+};
+
 interface CalendarManualSelectProps {
   allowClean?: boolean;
+  align?: AlignValue;
   col?: number | string;
 }
 
 export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
   allowClean = true,
+  align = "left",
   col,
 }) => {
   const { range, multiselect, disabled, minDate, maxDate } = useConfig();
@@ -298,6 +307,11 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
     !checkIsDateDisabled(d, minDate, maxDate, disabled);
 
   const hasValue = range ? !!rangeStart : !!selectedDates.length;
+
+  const containerStyle: React.CSSProperties = {
+    justifyContent: alignToJustify[align],
+    ...(col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined),
+  };
 
   const clearBtn = (
     <button
@@ -337,7 +351,7 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
     const addSaveAllowed = !!addTypedDate && isAllowed(addTypedDate);
 
     return (
-      <div className={`${styles.container} ${styles.containerMulti}`} data-area="manual-select" style={col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined}>
+      <div className={`${styles.container} ${styles.containerMulti}`} data-area="manual-select" style={containerStyle}>
         <div className={styles.datesArea}>
           {canAddMore && (
             <div
@@ -392,7 +406,7 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
 
   if (range) {
     return (
-      <div className={styles.container} data-area="manual-select" style={col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined}>
+      <div className={styles.container} data-area="manual-select" style={containerStyle}>
         <DateSlot
           date={rangeStart}
           isAllowed={isAllowed}
@@ -414,7 +428,7 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
   }
 
   return (
-    <div className={styles.container} data-area="manual-select">
+    <div className={styles.container} data-area="manual-select" style={containerStyle}>
       <DateSlot
         date={selectedDates[0] ?? null}
         isAllowed={isAllowed}
