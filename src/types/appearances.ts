@@ -6,6 +6,11 @@ export type AppearanceTokens = {
   shadowSm: string;
   shadowMd: string;
   shadowLg: string;
+  transition: string;
+  font: string;
+  fontSize: string;
+  daysSpacing: string;
+  trackHeight: string;
 };
 
 export const APPEARANCE_TOKEN_TO_VAR: Record<keyof AppearanceTokens, string> = {
@@ -16,6 +21,11 @@ export const APPEARANCE_TOKEN_TO_VAR: Record<keyof AppearanceTokens, string> = {
   shadowSm:        "--cal-shadow-sm",
   shadowMd:        "--cal-shadow-md",
   shadowLg:        "--cal-shadow-lg",
+  transition:      "--cal-transition",
+  font:            "--cal-font",
+  fontSize:        "--cal-font-size",
+  daysSpacing:     "--cal-days-padding",
+  trackHeight:     "--cal-track-height",
 };
 
 export type CustomAppearance = {

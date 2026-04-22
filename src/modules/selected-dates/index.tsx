@@ -77,7 +77,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
     </button>
   ) : null;
 
-  const content = range ? (
+  const chipsContent = range ? (
     rangeStart ? (
       <>
         <button
@@ -97,7 +97,6 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
             {fmt.format(rangeEnd)}
           </button>
         )}
-        {clearBtn}
       </>
     ) : null
   ) : (
@@ -122,7 +121,6 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
           </button>
         );
       })}
-      {clearBtn}
     </>
   );
 
@@ -136,12 +134,14 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
         .filter(Boolean)
         .join(" ")}
       data-area="selected-dates"
-      style={{
-        ...(col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined),
-        ...(!animated ? { justifyContent: alignToJustify[align] } : undefined),
-      }}
+      style={col !== undefined ? { gridColumn: typeof col === "number" ? `span ${col}` : col } : undefined}
     >
-      <div className={styles.inner} style={{ justifyContent: alignToJustify[align] }}>{content}</div>
+      <div className={styles.inner}>
+        <div className={styles.chipsGroup} style={{ justifyContent: alignToJustify[align] }}>
+          {chipsContent}
+        </div>
+        {clearBtn}
+      </div>
     </div>
   );
 };

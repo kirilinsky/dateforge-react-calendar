@@ -3,7 +3,7 @@
 .container {
   position: relative;
   overflow: hidden;
-  height: var(--years-track-height, 4em);
+  height: var(--cal-track-height, 4em);
   cursor: grab;
   touch-action: pan-y;
   z-index: 3;

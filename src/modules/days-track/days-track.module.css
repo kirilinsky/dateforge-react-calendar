@@ -3,7 +3,7 @@
 .container {
   position: relative;
   overflow: hidden;
-  height: var(--days-track-height, 4em);
+  height: var(--cal-track-height, 4em);
   cursor: grab;
   touch-action: pan-y;
   z-index: 3;
@@ -76,6 +76,21 @@
   color: var(--c-a);
   text-shadow: none;
   cursor: default;
+}
+
+.activeLabel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+  gap: 0.1em;
+}
+
+.monthLabel {
+  font-size: 0.72em;
+  font-weight: 400;
+  opacity: 0.75;
+  text-transform: lowercase;
 }
 
 }

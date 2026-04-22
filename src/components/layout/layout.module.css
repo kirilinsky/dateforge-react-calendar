@@ -56,7 +56,7 @@
     box-sizing: border-box;
     width: 100%;
     max-width: 864px;
-    font-size: clamp(11px, 2.7cqw, 18px);
+    font-size: var(--cal-font-size, clamp(11px, 2.7cqw, 18px));
     background: var(--c-s);
     color: var(--c-c);
     font-family: var(--cal-font);

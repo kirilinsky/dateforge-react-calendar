@@ -6,5 +6,9 @@
     --cal-shadow-sm: 0 0.05em 0.15em var(--c-x);
     --cal-shadow-md: 0 0.1em 0.3em var(--c-x);
     --cal-shadow-lg: 0 0.1em 0.4em var(--c-x);
+    --cal-font-size: clamp(10px, 2.2cqw, 15px);
+    --cal-transition: 0.15s;
+    --cal-days-padding: 0.45em;
+    --cal-track-height: 3.2em;
   }
 }

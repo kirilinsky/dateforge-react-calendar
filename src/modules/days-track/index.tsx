@@ -11,13 +11,14 @@ function daysInMonth(year: number, month: number): number {
 }
 
 interface CalendarDaysTrackProps {
+  showMonthLabel?: boolean;
   col?: number | string;
 }
 
-export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({ col }) => {
+export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({ showMonthLabel = false, col }) => {
   const { viewDate, navigateTo } = useNavigation();
   const { selectedDate, onChangeDate } = useSelection();
-  const { minDate, maxDate } = useConfig();
+  const { minDate, maxDate, locale } = useConfig();
   const { setDaysTrackActive } = useUI();
 
   useEffect(() => {
@@ -64,9 +65,24 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({ col }) => 
   });
 
   useEffect(() => {
-    const el = ref.current?.querySelector("[data-item]") as HTMLElement | null;
-    if (el) setItemWidth(el.offsetWidth);
+    const container = ref.current;
+    if (!container) return;
+    const measure = () => {
+      const el = container.querySelector("[data-item]") as HTMLElement | null;
+      if (el) setItemWidth(el.offsetWidth);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(container);
+    return () => ro.disconnect();
   }, [ref]);
+
+  const shortMonth = useMemo(
+    () => showMonthLabel
+      ? new Intl.DateTimeFormat(locale, { month: "short" }).format(new Date(year, month, 1))
+      : null,
+    [showMonthLabel, locale, year, month],
+  );
 
   const containerWidth = ref.current?.offsetWidth ?? 0;
   const frac = position - Math.round(position);
@@ -101,7 +117,12 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({ col }) => 
               style={{ opacity, transform: `scale(${scale})` }}
               onClick={!isActive ? () => scrollTo(Math.round(position) + o) : undefined}
             >
-              {idx + 1}
+              {isActive && shortMonth ? (
+                <span className={styles.activeLabel}>
+                  <span>{idx + 1}</span>
+                  <span className={styles.monthLabel}>{shortMonth}</span>
+                </span>
+              ) : idx + 1}
             </div>
           );
         })}

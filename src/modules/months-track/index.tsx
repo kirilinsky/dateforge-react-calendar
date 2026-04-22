@@ -38,8 +38,16 @@ export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({ shortM
   });
 
   useEffect(() => {
-    const el = ref.current?.querySelector("[data-item]") as HTMLElement | null;
-    if (el) setItemWidth(el.offsetWidth);
+    const container = ref.current;
+    if (!container) return;
+    const measure = () => {
+      const el = container.querySelector("[data-item]") as HTMLElement | null;
+      if (el) setItemWidth(el.offsetWidth);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(container);
+    return () => ro.disconnect();
   }, [ref]);
 
   const containerWidth = ref.current?.offsetWidth ?? 0;
