@@ -159,13 +159,14 @@ Full-page year picker grid with pagination.
 Time picker — hours, minutes, optional seconds, AM/PM toggle when `hour12` is enabled.
 
 ```tsx
-<CalendarTimeGrid />
+<CalendarTimeGrid showSeconds />
 ```
 
 ### Props
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
+| `showSeconds` | `boolean` | `false` | Show a third drum for seconds (0–59) |
 | `col` | `number \| string` | — | CSS grid `grid-column` value |
 
 ---

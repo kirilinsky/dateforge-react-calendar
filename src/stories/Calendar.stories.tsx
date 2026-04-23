@@ -231,6 +231,10 @@ export const KitchenSink = () => {
     monthsColumn: false,
   });
 
+  const [timeGridProps, setTimeGridProps] = useState({
+    showSeconds: false,
+  });
+
   const [daysProps, setDaysProps] = useState({
     startOfWeek: 1 as StartOfWeek,
     highlightWeekends: true,
@@ -316,6 +320,9 @@ export const KitchenSink = () => {
 
   const toggleMonthsGridProp = (key: keyof typeof monthsGridProps) =>
     setMonthsGridProps((prev) => ({ ...prev, [key]: !prev[key] }));
+
+  const toggleTimeGridProp = (key: keyof typeof timeGridProps) =>
+    setTimeGridProps((prev) => ({ ...prev, [key]: !prev[key] }));
 
   const toggleMonthsTrackProp = (key: keyof typeof monthsTrackProps) =>
     setMonthsTrackProps((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -490,6 +497,26 @@ export const KitchenSink = () => {
               ),
             )}
           </div>
+          {modules.timeGrid && (
+            <>
+              <p className="panel-label" style={{ marginTop: 8 }}>
+                TimeGrid props
+              </p>
+              <div className="panel-props-grid">
+                {(
+                  Object.keys(timeGridProps) as (keyof typeof timeGridProps)[]
+                ).map((key) => (
+                  <button
+                    key={key}
+                    onClick={() => toggleTimeGridProp(key)}
+                    className={`panel-button-compact ${timeGridProps[key] ? "active" : ""}`}
+                  >
+                    {key}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
 
           {modules.monthsGrid && (
             <>
@@ -664,7 +691,7 @@ export const KitchenSink = () => {
               {modules.days && <CalendarDays {...daysProps} />}
               {modules.nav && <CalendarNav {...navProps} label="label" />}
               {modules.monthsGrid && <CalendarMonthGrid {...monthsGridProps} />}
-              {modules.timeGrid && <CalendarTimeGrid />}
+              {modules.timeGrid && <CalendarTimeGrid {...timeGridProps} />}
               {modules.selectedDates && (
                 <CalendarSelectedDates
                   {...selectedDatesProps}
