@@ -35,27 +35,27 @@ import { Calendar } from "react-calendar-datetime";
 
 ### Props
 
-| Prop           | Type                                | Default     | Description                                                                                   |
-| -------------- | ----------------------------------- | ----------- | --------------------------------------------------------------------------------------------- |
-| `mode`         | `"single" \| "multiple" \| "range"` | `"single"`  | Selection mode                                                                                |
-| `value`        | `CalendarValue<M>`                  | —           | Controlled value. `Date \| null` for single, `Date[]` for multiple, `DateRange` for range     |
-| `onChange`     | `(value: CalendarValue<M>) => void` | —           | Fires when the selection changes                                                              |
-| `cols`         | `number`                            | —           | Number of columns in the internal CSS grid                                                    |
-| `locale`       | `string`                            | `"en"`      | BCP 47 language tag used for all labels and formatting                                        |
+| Prop           | Type                                | Default     | Description                                                                                                                                           |
+| -------------- | ----------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mode`         | `"single" \| "multiple" \| "range"` | `"single"`  | Selection mode                                                                                                                                        |
+| `value`        | `CalendarValue<M>`                  | —           | Controlled value. `Date \| null` for single, `Date[]` for multiple, `DateRange` for range                                                             |
+| `onChange`     | `(value: CalendarValue<M>) => void` | —           | Fires when the selection changes                                                                                                                      |
+| `cols`         | `number`                            | —           | Number of columns in the internal CSS grid                                                                                                            |
+| `locale`       | `string`                            | `"en"`      | BCP 47 language tag used for all labels and formatting                                                                                                |
 | `timeZone`     | `string`                            | —           | IANA timezone (`"Europe/Paris"`, `"UTC"`) or fixed offset (`"UTC+2"`, `"UTC-5"`). Affects today detection, emitted date midnight, and chip formatting |
-| `readonly`     | `boolean`                           | `false`     | Disables all state-changing interactions (date/time selection). Navigation still works. Adds `data-readonly` and `aria-readonly` on the root |
-| `hour12`       | `boolean`                           | `false`     | Use 12-hour time format instead of 24-hour                                                    |
-| `theme`        | `CalendarTheme`                     | `"auto"`    | Built-in theme name, `"auto"` / `"light"` / `"dark"`, or a `CustomTheme` from `createTheme()` |
-| `appearance`   | `CalendarAppearance`                | `"default"` | Built-in appearance preset name or a `CustomAppearance` from `createAppearance()`             |
-| `gradient`     | `boolean`                           | `false`     | Enable gradient backgrounds on selected cells                                                 |
-| `width`        | `string \| number`                  | `"100%"`    | Container width                                                                               |
-| `minDate`      | `Date`                              | —           | Earliest selectable date                                                                      |
-| `maxDate`      | `Date`                              | —           | Latest selectable date                                                                        |
-| `max`          | `number`                            | —           | Maximum number of selectable dates (multiple mode only)                                       |
-| `rangeMinDays` | `number`                            | —           | Minimum number of days in a range selection                                                   |
-| `rangeMaxDays` | `number`                            | —           | Maximum number of days in a range selection                                                   |
-| `disabled`     | `DisabledConfig`                    | —           | Rules for disabling specific dates. Build with `createDisabled()`                             |
-| `children`     | `React.ReactNode`                   | —           | Module components that compose the calendar UI                                                |
+| `readonly`     | `boolean`                           | `false`     | Disables all state-changing interactions (date/time selection). Navigation still works. Adds `data-readonly` and `aria-readonly` on the root          |
+| `hour12`       | `boolean`                           | `false`     | Use 12-hour time format instead of 24-hour                                                                                                            |
+| `theme`        | `CalendarTheme`                     | `"auto"`    | Built-in theme name, `"auto"` / `"light"` / `"dark"`, or a `CustomTheme` from `createTheme()`                                                         |
+| `appearance`   | `CalendarAppearance`                | `"default"` | Built-in appearance preset name or a `CustomAppearance` from `createAppearance()`                                                                     |
+| `gradient`     | `boolean`                           | `false`     | Enable gradient backgrounds on selected cells                                                                                                         |
+| `width`        | `string \| number`                  | `"100%"`    | Container width                                                                                                                                       |
+| `minDate`      | `Date`                              | —           | Earliest selectable date                                                                                                                              |
+| `maxDate`      | `Date`                              | —           | Latest selectable date                                                                                                                                |
+| `max`          | `number`                            | —           | Maximum number of selectable dates (multiple mode only)                                                                                               |
+| `rangeMinDays` | `number`                            | —           | Minimum number of days in a range selection                                                                                                           |
+| `rangeMaxDays` | `number`                            | —           | Maximum number of days in a range selection                                                                                                           |
+| `disabled`     | `DisabledConfig`                    | —           | Rules for disabling specific dates. Build with `createDisabled()`                                                                                     |
+| `children`     | `React.ReactNode`                   | —           | Module components that compose the calendar UI                                                                                                        |
 
 ---
 
@@ -103,20 +103,20 @@ Navigation header with configurable controls.
 
 ### Props
 
-| Prop              | Type               | Default | Description                                     |
-| ----------------- | ------------------ | ------- | ----------------------------------------------- |
-| `label`           | `string`           | —       | Custom text shown as the header label           |
-| `showMonthPicker` | `boolean`          | `false` | Show previous/next month arrow buttons          |
-| `compactMonths`   | `boolean`          | `false` | Show a compact month dropdown instead of arrows |
-| `showYearPicker`  | `boolean`          | `false` | Show previous/next year arrow buttons           |
-| `compactYears`    | `boolean`          | `false` | Show a compact year dropdown instead of arrows  |
-| `showSelectedMonthLabel` | `boolean`   | `false` | Show the current month name as plain text (no controls, no popup) |
-| `showSelectedYearLabel`  | `boolean`   | `false` | Show the current year as plain text (no controls, no popup)       |
-| `showTime`        | `boolean`          | `false` | Show a button that opens the time picker popup  |
-| `showHome`        | `boolean`          | `false` | Show a button that navigates back to today      |
-| `showClear`       | `boolean`          | `false` | Show a button that clears the current selection |
-| `showThemeToggle` | `boolean`          | `false` | Show a light/dark theme toggle button           |
-| `col`             | `number \| string` | —       | CSS grid `grid-column` value                    |
+| Prop                     | Type               | Default | Description                                                       |
+| ------------------------ | ------------------ | ------- | ----------------------------------------------------------------- |
+| `label`                  | `string`           | —       | Custom text shown as the header label, max 180 length.            |
+| `showMonthPicker`        | `boolean`          | `false` | Show previous/next month arrow buttons                            |
+| `compactMonths`          | `boolean`          | `false` | Show a compact month dropdown instead of arrows                   |
+| `showYearPicker`         | `boolean`          | `false` | Show previous/next year arrow buttons                             |
+| `compactYears`           | `boolean`          | `false` | Show a compact year dropdown instead of arrows                    |
+| `showSelectedMonthLabel` | `boolean`          | `false` | Show the current month name as plain text (no controls, no popup) |
+| `showSelectedYearLabel`  | `boolean`          | `false` | Show the current year as plain text (no controls, no popup)       |
+| `showTime`               | `boolean`          | `false` | Show a button that opens the time picker popup                    |
+| `showHome`               | `boolean`          | `false` | Show a button that navigates back to today                        |
+| `showClear`              | `boolean`          | `false` | Show a button that clears the current selection                   |
+| `showThemeToggle`        | `boolean`          | `false` | Show a light/dark theme toggle button                             |
+| `col`                    | `number \| string` | —       | CSS grid `grid-column` value                                      |
 
 ---
 
@@ -203,14 +203,14 @@ Displays the currently selected dates as removable chips.
 
 ### Props
 
-| Prop            | Type                            | Default  | Description                                         |
-| --------------- | ------------------------------- | -------- | --------------------------------------------------- |
-| `allowClean`    | `boolean`                       | `true`   | Show a clear-all button next to the chips           |
-| `allowNavigate` | `boolean`                       | `true`   | Clicking a chip navigates the calendar to that date |
-| `animated`      | `boolean`                       | `true`   | Animate chips appearing and disappearing            |
-| `align`         | `"left" \| "center" \| "right"` | `"left"` | Horizontal alignment of the chip list               |
+| Prop            | Type                            | Default  | Description                                                                                         |
+| --------------- | ------------------------------- | -------- | --------------------------------------------------------------------------------------------------- |
+| `allowClean`    | `boolean`                       | `true`   | Show a clear-all button next to the chips                                                           |
+| `allowNavigate` | `boolean`                       | `true`   | Clicking a chip navigates the calendar to that date                                                 |
+| `animated`      | `boolean`                       | `true`   | Animate chips appearing and disappearing                                                            |
+| `align`         | `"left" \| "center" \| "right"` | `"left"` | Horizontal alignment of the chip list                                                               |
 | `showTime`      | `boolean`                       | `false`  | Include time (hours and minutes) in the chip label. Respects the `hour12` setting from `<Calendar>` |
-| `col`           | `number \| string`              | —        | CSS grid `grid-column` value                        |
+| `col`           | `number \| string`              | —        | CSS grid `grid-column` value                                                                        |
 
 ---
 
