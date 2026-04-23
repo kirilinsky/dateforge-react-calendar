@@ -42,6 +42,7 @@ import { Calendar } from "react-calendar-datetime";
 | `onChange`     | `(value: CalendarValue<M>) => void` | —           | Fires when the selection changes                                                              |
 | `cols`         | `number`                            | —           | Number of columns in the internal CSS grid                                                    |
 | `locale`       | `string`                            | `"en"`      | BCP 47 language tag used for all labels and formatting                                        |
+| `timeZone`     | `string`                            | —           | IANA timezone (`"Europe/Paris"`, `"UTC"`) or fixed offset (`"UTC+2"`, `"UTC-5"`). Affects today detection, emitted date midnight, and chip formatting |
 | `hour12`       | `boolean`                           | `false`     | Use 12-hour time format instead of 24-hour                                                    |
 | `theme`        | `CalendarTheme`                     | `"auto"`    | Built-in theme name, `"auto"` / `"light"` / `"dark"`, or a `CustomTheme` from `createTheme()` |
 | `appearance`   | `CalendarAppearance`                | `"default"` | Built-in appearance preset name or a `CustomAppearance` from `createAppearance()`             |

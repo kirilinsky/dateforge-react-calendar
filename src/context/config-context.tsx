@@ -12,6 +12,7 @@ export interface CalendarConfig {
   maxDate?: Date;
   disabled?: DisabledConfig;
   gradient: boolean;
+  timeZone?: string;
 }
 
 export const ConfigContext = createContext<CalendarConfig | undefined>(undefined);

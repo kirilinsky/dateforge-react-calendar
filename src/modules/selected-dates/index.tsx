@@ -55,7 +55,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
   showTime = false,
   col,
 }) => {
-  const { locale, range, hour12 } = useConfig();
+  const { locale, range, hour12, timeZone } = useConfig();
   const { viewDate: date, navigateTo } = useNavigation();
   const { selectedDates, rangeStart, rangeEnd } = useSelectionValue();
   const { onChangeDate } = useSelectionActions();
@@ -65,6 +65,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
     month: "short",
     year: "numeric",
     ...(showTime && { hour: "numeric", minute: "2-digit", hour12 }),
+    ...(timeZone && { timeZone }),
   });
 
   const hasContent = range ? !!rangeStart : selectedDates.length > 0;

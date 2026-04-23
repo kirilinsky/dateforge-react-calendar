@@ -59,6 +59,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   minDate,
   maxDate,
   disabled,
+  timeZone,
 }: CalendarProps<M> & {
   children: ReactNode;
   containerWidth?: number;
@@ -226,6 +227,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       maxDate,
       disabled,
       gradient: gradient ?? false,
+      timeZone,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -239,6 +241,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       maxDate,
       disabled,
       gradient,
+      timeZone,
     ],
   );
 

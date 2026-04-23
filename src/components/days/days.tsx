@@ -10,6 +10,7 @@ import {
   getCalendarData,
   isSameDay,
 } from "@/utils/date-utils";
+import { getTodayInTimezone, toTZMidnight } from "@/utils/tz-utils";
 import shared from "@/global/global.module.css";
 import WeekDays from "../week-days/week-days";
 import { StartOfWeek } from "@/types/calendar";
@@ -183,7 +184,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   const {
     minDate, maxDate, disabled,
     range, rangeMinDays, rangeMaxDays,
-    locale,
+    locale, timeZone,
   } = useConfig();
 
   const { viewDate: rawDate, navigateTo } = useNavigation();
@@ -200,7 +201,10 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   const { onChangeDate, setHoverDate } = useSelectionActions();
   const { hoverDate } = useSelectionHover();
 
-  const today = useMemo(() => new Date(), []);
+  const today = useMemo(
+    () => timeZone ? getTodayInTimezone(timeZone) : new Date(),
+    [timeZone],
+  );
 
   const startT = useMemo(
     () =>
@@ -295,13 +299,16 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
     (targetDate: Date, isDisabled: boolean) => {
       if (isDisabled) return;
       if ((preventUnselect || daysTrackActive) && selectedDates.some((d) => isSameDay(d, targetDate))) return;
-      const next = new Date(targetDate);
-      next.setHours(
-        date.getHours(),
-        date.getMinutes(),
-        date.getSeconds(),
-        date.getMilliseconds(),
-      );
+      const next = timeZone
+        ? new Date(
+            toTZMidnight(targetDate, timeZone).getTime() +
+              date.getHours() * 3600000 +
+              date.getMinutes() * 60000 +
+              date.getSeconds() * 1000 +
+              date.getMilliseconds(),
+          )
+        : new Date(targetDate);
+      if (!timeZone) next.setHours(date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds());
       if (minDate && next.getTime() < minDate.getTime()) {
         next.setHours(minDate.getHours(), minDate.getMinutes(), 0, 0);
       }
