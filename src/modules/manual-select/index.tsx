@@ -312,10 +312,9 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
 
   const hasValue = range ? !!rangeStart : !!selectedDates.length;
 
-  const containerStyle: React.CSSProperties = {
-    justifyContent: alignToJustify[align],
-    ...useGridSlot(col),
-  };
+  const gridSlot = useGridSlot(col);
+  const containerStyle: React.CSSProperties = { ...gridSlot };
+  const contentStyle: React.CSSProperties = { justifyContent: alignToJustify[align] };
 
   const clearBtn = (
     <button
@@ -356,7 +355,7 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
 
     return (
       <div className={`${styles.container} ${styles.containerMulti}`} data-area="manual-select" style={containerStyle}>
-        <div className={styles.datesArea}>
+        <div className={styles.datesArea} style={contentStyle}>
           {canAddMore && (
             <div
               className={[styles.inputWrapper, addWrapperInvalid && styles.inputWrapperInvalid]
@@ -411,21 +410,23 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
   if (range) {
     return (
       <div className={styles.container} data-area="manual-select" style={containerStyle}>
-        <DateSlot
-          date={rangeStart}
-          isAllowed={isAllowed}
-          onSave={(d) => onRangeSet(withTime(d), rangeEnd)}
-          onClear={() => onRangeSet(null, rangeEnd)}
-          placeholder="DD.MM.YYYY"
-        />
-        <span className={styles.sep}>—</span>
-        <DateSlot
-          date={rangeEnd}
-          isAllowed={isAllowed}
-          onSave={(d) => onRangeSet(rangeStart, withTime(d))}
-          onClear={() => onRangeSet(rangeStart, null)}
-          placeholder="DD.MM.YYYY"
-        />
+        <div className={styles.contentArea} style={contentStyle}>
+          <DateSlot
+            date={rangeStart}
+            isAllowed={isAllowed}
+            onSave={(d) => onRangeSet(withTime(d), rangeEnd)}
+            onClear={() => onRangeSet(null, rangeEnd)}
+            placeholder="DD.MM.YYYY"
+          />
+          <span className={styles.sep}>—</span>
+          <DateSlot
+            date={rangeEnd}
+            isAllowed={isAllowed}
+            onSave={(d) => onRangeSet(rangeStart, withTime(d))}
+            onClear={() => onRangeSet(rangeStart, null)}
+            placeholder="DD.MM.YYYY"
+          />
+        </div>
         {clearBtn}
       </div>
     );
@@ -433,12 +434,14 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
 
   return (
     <div className={styles.container} data-area="manual-select" style={containerStyle}>
-      <DateSlot
-        date={selectedDates[0] ?? null}
-        isAllowed={isAllowed}
-        onSave={(d) => onChangeDate(withTime(d))}
-        onClear={() => onChangeDate(null)}
-      />
+      <div className={styles.contentArea} style={contentStyle}>
+        <DateSlot
+          date={selectedDates[0] ?? null}
+          isAllowed={isAllowed}
+          onSave={(d) => onChangeDate(withTime(d))}
+          onClear={() => onChangeDate(null)}
+        />
+      </div>
       {clearBtn}
     </div>
   );

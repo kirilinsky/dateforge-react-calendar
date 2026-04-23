@@ -1,4 +1,4 @@
-export { CalendarDays } from "@/components/days/days";
+export { CalendarDays } from "./days";
 export { CalendarNav } from "./nav";
 export { CalendarMonthGrid } from "./months";
 export { CalendarTimeGrid } from "./time";

@@ -149,6 +149,15 @@
     }
   }
 
+  .contentArea {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4em;
+    flex: 1;
+    min-width: 0;
+  }
+
   .clearBtn {
     margin-left: auto;
     padding: 0.35em 0.6em;

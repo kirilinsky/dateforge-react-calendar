@@ -1,7 +1,7 @@
 /// <reference path="../../global.d.ts" />
 import { useState } from "react";
 import { Calendar } from "../components/calendar/calendar";
-import { CalendarDays } from "../components/days/days";
+import { CalendarDays } from "../modules/days";
 import { CalendarNav } from "../modules/nav";
 import { CalendarPresets } from "../modules/presets";
 import { CalendarMonthGrid } from "../modules/months";
@@ -94,7 +94,7 @@ export const TwoMonthsLayout = () => {
       <div style={{ width: 640 }}>
         <Calendar
           value={date}
-          onChange={(d) => {
+          onChange={(d: Date | null) => {
             if (d) setDate(d);
           }}
           twoMonthsLayout
@@ -244,6 +244,7 @@ export const KitchenSink = () => {
   const [daysProps, setDaysProps] = useState({
     startOfWeek: 1 as StartOfWeek,
     highlightWeekends: true,
+    boldWeekends: false,
     showWeekNumber: false,
     hideWeekdays: false,
     hideOtherMonths: false,
@@ -252,6 +253,8 @@ export const KitchenSink = () => {
     highlightToday: true,
     allowSwipeNavigation: false,
   });
+
+  const [navLabel, setNavLabel] = useState("");
 
   const [navProps, setNavProps] = useState({
     showTime: true,
@@ -438,6 +441,15 @@ export const KitchenSink = () => {
           <p className="panel-label" style={{ marginTop: 8 }}>
             Nav props
           </p>
+          <div className="panel-date">
+            <label>label</label>
+            <input
+              type="text"
+              value={navLabel}
+              placeholder="nav label…"
+              onChange={(e) => setNavLabel(e.target.value)}
+            />
+          </div>
           <div className="panel-props-grid">
             {(Object.keys(navProps) as (keyof typeof navProps)[]).map((key) => (
               <button
@@ -458,6 +470,7 @@ export const KitchenSink = () => {
               [
                 "highlightWeekends",
                 "showWeekNumber",
+                "boldWeekends",
                 "hideOtherMonths",
                 "hideWeekdays",
                 "hideLimited",
@@ -696,7 +709,9 @@ export const KitchenSink = () => {
               rangeMaxDays={mode === "range" ? rangeMaxDays : undefined}
               {...calendarProps}
             >
-              {modules.nav && <CalendarNav {...navProps} label="label" />}
+              {modules.nav && (
+                <CalendarNav {...navProps} label={navLabel || undefined} />
+              )}
               {modules.days && <CalendarDays {...daysProps} />}
               {modules.monthsGrid && <CalendarMonthGrid {...monthsGridProps} />}
               {modules.timeGrid && <CalendarTimeGrid {...timeGridProps} />}

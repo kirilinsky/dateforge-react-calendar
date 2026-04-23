@@ -27,7 +27,8 @@
   align-items: center;
   justify-content: center;
   font-size: 0.7em;
-  color: var(--c-s);
+  color: var(--c-h);
+  opacity: 0.35;
   font-weight: 600;
   padding: 0.5em 0.25em !important;
 }
@@ -38,6 +39,14 @@
   --hover-outline: var(--cal-today-outline-width, 1px) solid color-mix(in srgb, var(--c-h) 50%, transparent);
 }
 
+.boldWeekend {
+  font-weight: 700;
+}
+
+.boldWeekend[data-weekend] {
+  color: var(--c-we) !important;
+}
+
 .dayItemEmpty {
   width: 100%;
   aspect-ratio: var(--cal-day-ratio, 1 / 0.85);
@@ -45,6 +54,7 @@
 
 .dayItem {
   width: 100%;
+  min-width: 0;
   height: auto !important;
   aspect-ratio: var(--cal-day-ratio, 1 / 0.85);
   padding: 0;
@@ -129,6 +139,15 @@
       var(--rng-prev),
     calc(-1 * var(--day-gap) / 2) 0 0 0
       var(--rng-prev) !important;
+}
+
+@container (max-width: 14em) {
+  .dayGridContainer {
+    padding: min(var(--cal-days-padding, 0.85em), 0.5em);
+  }
+  .dayGridContainer.withWeekNumbers {
+    padding: min(var(--days-wn-padding, 0.5em), 0.3em);
+  }
 }
 
 @keyframes slideInRight {

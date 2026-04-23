@@ -75,6 +75,7 @@ Renders the month grid — weekday headers, week numbers (optional), and the day
 | `startOfWeek`          | `0–6`              | `1`     | First day of the week. `0` = Sunday, `1` = Monday, … `6` = Saturday                  |
 | `hideOtherMonths`      | `boolean`          | `false` | Hide day cells that belong to the previous or next month                             |
 | `highlightWeekends`    | `boolean`          | `true`  | Apply a distinct style to Saturday and Sunday                                        |
+| `boldWeekends`         | `boolean`          | `false` | Render Saturday and Sunday in bold with the weekend accent color (`--c-we`)          |
 | `highlightToday`       | `boolean`          | `true`  | Highlight today's date                                                               |
 | `showWeekNumber`       | `boolean`          | `false` | Show ISO week numbers in the leftmost column                                         |
 | `hideWeekdays`         | `boolean`          | `false` | Hide the row of weekday name headers                                                 |

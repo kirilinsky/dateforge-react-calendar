@@ -76,7 +76,14 @@ export const CalendarLayout: React.FC<{
           onClose={() => setShowYearPopup(false)}
         />
       )}
-      {modules}
+      {modules ?? (
+        <div className={styles.emptyState}>
+          <span className={styles.emptyStateTitle}>No modules</span>
+          <span className={styles.emptyStateHint}>
+            Add modules like <code>&lt;CalendarDays /&gt;</code> or <code>&lt;CalendarNav /&gt;</code> as children of <code>&lt;Calendar /&gt;</code>
+          </span>
+        </div>
+      )}
     </div>
   );
 };

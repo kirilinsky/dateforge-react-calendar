@@ -12,7 +12,7 @@ import {
 } from "@/utils/date-utils";
 import { getTodayInTimezone, toTZMidnight } from "@/utils/tz-utils";
 import shared from "@/global/global.module.css";
-import WeekDays from "../week-days/week-days";
+import WeekDays from "./week-days";
 import { StartOfWeek } from "@/types/calendar";
 import { useGridSlot } from "@/hooks/use-grid-slot";
 
@@ -37,6 +37,7 @@ interface DayCellProps {
   isTodayDate: boolean;
   highlightToday: boolean;
   isWeekend: boolean;
+  boldWeekends: boolean;
   range: boolean;
   onSelect: (date: Date, isDisabled: boolean) => void;
   onMouseEnter: (date: Date) => void;
@@ -47,7 +48,7 @@ const DayCell = React.memo(function DayCell({
   connectLeft, connectRight, isRangeStart, isRangeEnd, isInRange,
   rangeBridgeLeft, rangeBridgeRight, isPreviewStart, isPreviewEnd, isPreviewMid,
   previewBridgeLeft, previewBridgeRight, isTodayDate, highlightToday, isWeekend,
-  range, onSelect, onMouseEnter,
+  boldWeekends, range, onSelect, onMouseEnter,
 }: DayCellProps) {
   const fullDate = useMemo(() => new Date(dateTime), [dateTime]);
 
@@ -139,6 +140,7 @@ const DayCell = React.memo(function DayCell({
         previewClass,
         previewBridgeClass,
         isToday && styles.todayItem,
+        boldWeekends && styles.boldWeekend,
         isOtherMonth && (isHighlighted ? shared.selectedOtherItem : shared.otherItem),
       ]
         .filter(Boolean)
@@ -156,6 +158,7 @@ export interface CalendarDaysProps {
   dataArea?: string;
   startOfWeek?: StartOfWeek;
   highlightWeekends?: boolean;
+  boldWeekends?: boolean;
   showWeekNumber?: boolean;
   hideWeekdays?: boolean;
   highlightToday?: boolean;
@@ -172,6 +175,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   dataArea,
   startOfWeek = 1,
   highlightWeekends = true,
+  boldWeekends = false,
   showWeekNumber = false,
   hideWeekdays = false,
   highlightToday = true,
@@ -451,6 +455,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
                       isTodayDate={isSameDay(fullDate, today)}
                       highlightToday={highlightToday}
                       isWeekend={highlightWeekends && (dayOfWeek === 0 || dayOfWeek === 6)}
+                      boldWeekends={boldWeekends && (dayOfWeek === 0 || dayOfWeek === 6)}
                       range={range}
                       onSelect={handleSetDay}
                       onMouseEnter={handleMouseEnter}

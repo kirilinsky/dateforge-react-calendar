@@ -118,6 +118,40 @@
     outline: 1px solid var(--c-s);
   }
 
+  .emptyState {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55em;
+    padding: 2.5em 2em;
+    text-align: center;
+    background: var(--c-b);
+  }
+
+  .emptyStateTitle {
+    font-size: 1em;
+    font-weight: 700;
+    color: var(--c-h);
+    opacity: 0.25;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .emptyStateHint {
+    font-size: 0.78em;
+    color: var(--c-h);
+    opacity: 0.18;
+    line-height: 1.6;
+    max-width: 22em;
+
+    & code {
+      font-family: ui-monospace, monospace;
+      opacity: 0.9;
+    }
+  }
+
   .secondMonthLabel {
     display: flex;
     align-items: center;
