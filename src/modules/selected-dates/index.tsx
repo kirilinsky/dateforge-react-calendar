@@ -3,17 +3,27 @@ import styles from "./selected-dates.module.css";
 import shared from "@/global/global.module.css";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
-import { useSelectionValue, useSelectionActions } from "@/context/selection-context";
+import {
+  useSelectionValue,
+  useSelectionActions,
+} from "@/context/selection-context";
 import { useGridSlot } from "@/hooks/use-grid-slot";
 
-const getRangeSep = (fmt: Intl.DateTimeFormat, start: Date, end: Date): string => {
+const getRangeSep = (
+  fmt: Intl.DateTimeFormat,
+  start: Date,
+  end: Date,
+): string => {
   try {
     const parts = fmt.formatRangeToParts(start, end);
     const sources = parts.map((p) => (p as any).source as string);
     const afterStart = sources.lastIndexOf("startRange") + 1;
     const beforeEnd = sources.indexOf("endRange");
     if (afterStart > 0 && beforeEnd > afterStart) {
-      return parts.slice(afterStart, beforeEnd).map((p) => p.value).join("");
+      return parts
+        .slice(afterStart, beforeEnd)
+        .map((p) => p.value)
+        .join("");
     }
     return " – ";
   } catch {
@@ -33,17 +43,19 @@ export interface CalendarSelectedDatesProps {
   allowNavigate?: boolean;
   animated?: boolean;
   align?: AlignValue;
+  showTime?: boolean;
   col?: number | string;
 }
 
 export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
-  allowClean = false,
-  allowNavigate = false,
-  animated = false,
+  allowClean = true,
+  allowNavigate = true,
+  animated = true,
   align = "left",
+  showTime = false,
   col,
 }) => {
-  const { locale, range } = useConfig();
+  const { locale, range, hour12 } = useConfig();
   const { viewDate: date, navigateTo } = useNavigation();
   const { selectedDates, rangeStart, rangeEnd } = useSelectionValue();
   const { onChangeDate } = useSelectionActions();
@@ -52,6 +64,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
     day: "numeric",
     month: "short",
     year: "numeric",
+    ...(showTime && { hour: "numeric", minute: "2-digit", hour12 }),
   });
 
   const hasContent = range ? !!rangeStart : selectedDates.length > 0;
@@ -66,7 +79,9 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
       styles.chip,
       shared.interactive,
       shared.hoverable,
-      isCurrentMonth(d) && allowNavigate ? shared.activeItem : styles.inactiveChip,
+      isCurrentMonth(d) && allowNavigate
+        ? shared.activeItem
+        : styles.inactiveChip,
     ]
       .filter(Boolean)
       .join(" ");
@@ -91,7 +106,9 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
         >
           {fmt.format(rangeStart)}
         </button>
-        <span className={styles.rangeSep}>{rangeEnd ? getRangeSep(fmt, rangeStart, rangeEnd) : "…"}</span>
+        <span className={styles.rangeSep}>
+          {rangeEnd ? getRangeSep(fmt, rangeStart, rangeEnd) : "…"}
+        </span>
         {rangeEnd && (
           <button
             type="button"
@@ -141,7 +158,10 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
       style={useGridSlot(col)}
     >
       <div className={styles.inner}>
-        <div className={styles.chipsGroup} style={{ justifyContent: alignToJustify[align] }}>
+        <div
+          className={styles.chipsGroup}
+          style={{ justifyContent: alignToJustify[align] }}
+        >
           {chipsContent}
         </div>
         {clearBtn}

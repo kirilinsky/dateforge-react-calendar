@@ -304,9 +304,10 @@ export const KitchenSink = () => {
   const [yearsPerPage, setYearsPerPage] = useState(10);
 
   const [selectedDatesProps, setSelectedDatesProps] = useState({
-    allowClean: false,
-    allowNavigate: false,
-    animated: false,
+    allowClean: true,
+    allowNavigate: true,
+    showTime: false,
+    animated: true,
   });
   const [selectedDatesAlign, setSelectedDatesAlign] = useState<
     "left" | "center" | "right"
