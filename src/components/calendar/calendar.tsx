@@ -23,6 +23,7 @@ export function Calendar<M extends CalendarMode = "single">({
   max,
   cols,
   children,
+  readonly = false,
   ...restProps
 }: CalendarProps<M>) {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -96,6 +97,7 @@ export function Calendar<M extends CalendarMode = "single">({
       width={width}
       mode={mode}
       max={max}
+      readonly={readonly}
       containerWidth={containerWidth}
       toggleTheme={toggleTheme}
       {...(restProps as import("@/types/calendar").CalendarProps<CalendarMode>)}
@@ -103,6 +105,8 @@ export function Calendar<M extends CalendarMode = "single">({
       <div
         ref={wrapperRef}
         data-theme={activeTheme}
+        data-readonly={readonly || undefined}
+        aria-readonly={readonly || undefined}
         style={{ containerType: "inline-size", width, ...customThemeVars }}
       >
         <CalendarLayout

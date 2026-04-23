@@ -60,6 +60,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   maxDate,
   disabled,
   timeZone,
+  readonly = false,
 }: CalendarProps<M> & {
   children: ReactNode;
   containerWidth?: number;
@@ -158,22 +159,26 @@ export function CalendarProvider<M extends CalendarMode = "single">({
 
   const handleChangeDate = useCallback(
     (d: Date | null) => {
+      if (readonly) return;
       dispatch({ type: "SELECT", date: d, config: selectConfig });
     },
-    [selectConfig],
+    [selectConfig, readonly],
   );
 
   const handleChangeTime = useCallback((d: Date) => {
+    if (readonly) return;
     dispatch({ type: "CHANGE_TIME", date: d });
-  }, []);
+  }, [readonly]);
 
   const handleDatesSet = useCallback((dates: Date[]) => {
+    if (readonly) return;
     dispatch({ type: "SET_DATES", dates });
-  }, []);
+  }, [readonly]);
 
   const handleRangeSet = useCallback((from: Date | null, to: Date | null) => {
+    if (readonly) return;
     dispatch({ type: "SET_RANGE", from, to });
-  }, []);
+  }, [readonly]);
 
   const navigateTo = useCallback((d: Date) => {
     dispatch({ type: "NAVIGATE", date: d });
@@ -228,6 +233,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       disabled,
       gradient: gradient ?? false,
       timeZone,
+      readonly,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -242,6 +248,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       disabled,
       gradient,
       timeZone,
+      readonly,
     ],
   );
 

@@ -20,6 +20,8 @@ export interface CalendarNavProps {
   compactMonths?: boolean;
   showYearPicker?: boolean;
   compactYears?: boolean;
+  showSelectedMonthLabel?: boolean;
+  showSelectedYearLabel?: boolean;
   showHome?: boolean;
   showClear?: boolean;
   showThemeToggle?: boolean;
@@ -33,6 +35,8 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
   compactMonths = false,
   showYearPicker = false,
   compactYears = false,
+  showSelectedMonthLabel = false,
+  showSelectedYearLabel = false,
   showHome = false,
   showClear = false,
   showThemeToggle = false,
@@ -87,6 +91,8 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
     showMonthPicker ||
     showYearPicker ||
     compactYears ||
+    showSelectedMonthLabel ||
+    showSelectedYearLabel ||
     showHome ||
     showClear ||
     showThemeToggle;
@@ -184,6 +190,15 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           {cur} <Down />
         </button>
       )}
+
+      {showSelectedMonthLabel && (
+        <span className={styles.label}>
+          <span className={styles.monthNameLong}>{monthNameLong}</span>
+          <span className={styles.monthNameShort}>{monthNameShort}</span>
+        </span>
+      )}
+
+      {showSelectedYearLabel && <span className={styles.label}>{cur}</span>}
 
       <div className={styles.flexWrapper}>
         {showThemeToggle && (

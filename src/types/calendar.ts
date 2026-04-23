@@ -41,6 +41,7 @@ export interface CalendarProps<M extends CalendarMode = "single"> {
   rangeMaxDays?: number;
   locale?: string;
   timeZone?: string;
+  readonly?: boolean;
   theme?: CalendarTheme;
   width?: string | number;
   hour12?: boolean;

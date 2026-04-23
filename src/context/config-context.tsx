@@ -13,6 +13,7 @@ export interface CalendarConfig {
   disabled?: DisabledConfig;
   gradient: boolean;
   timeZone?: string;
+  readonly: boolean;
 }
 
 export const ConfigContext = createContext<CalendarConfig | undefined>(undefined);

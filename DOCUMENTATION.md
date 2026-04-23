@@ -43,6 +43,7 @@ import { Calendar } from "react-calendar-datetime";
 | `cols`         | `number`                            | —           | Number of columns in the internal CSS grid                                                    |
 | `locale`       | `string`                            | `"en"`      | BCP 47 language tag used for all labels and formatting                                        |
 | `timeZone`     | `string`                            | —           | IANA timezone (`"Europe/Paris"`, `"UTC"`) or fixed offset (`"UTC+2"`, `"UTC-5"`). Affects today detection, emitted date midnight, and chip formatting |
+| `readonly`     | `boolean`                           | `false`     | Disables all state-changing interactions (date/time selection). Navigation still works. Adds `data-readonly` and `aria-readonly` on the root |
 | `hour12`       | `boolean`                           | `false`     | Use 12-hour time format instead of 24-hour                                                    |
 | `theme`        | `CalendarTheme`                     | `"auto"`    | Built-in theme name, `"auto"` / `"light"` / `"dark"`, or a `CustomTheme` from `createTheme()` |
 | `appearance`   | `CalendarAppearance`                | `"default"` | Built-in appearance preset name or a `CustomAppearance` from `createAppearance()`             |
@@ -109,6 +110,8 @@ Navigation header with configurable controls.
 | `compactMonths`   | `boolean`          | `false` | Show a compact month dropdown instead of arrows |
 | `showYearPicker`  | `boolean`          | `false` | Show previous/next year arrow buttons           |
 | `compactYears`    | `boolean`          | `false` | Show a compact year dropdown instead of arrows  |
+| `showSelectedMonthLabel` | `boolean`   | `false` | Show the current month name as plain text (no controls, no popup) |
+| `showSelectedYearLabel`  | `boolean`   | `false` | Show the current year as plain text (no controls, no popup)       |
 | `showTime`        | `boolean`          | `false` | Show a button that opens the time picker popup  |
 | `showHome`        | `boolean`          | `false` | Show a button that navigates back to today      |
 | `showClear`       | `boolean`          | `false` | Show a button that clears the current selection |
