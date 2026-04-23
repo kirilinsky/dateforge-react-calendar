@@ -4,5 +4,6 @@
     --cal-border: 1px;
     --cal-spacing: 0.5em;
     --cal-transition: 0.12s;
+    --cal-day-ratio: 1 / 1;
   }
 }

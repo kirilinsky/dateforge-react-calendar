@@ -39,6 +39,8 @@ const THEME_LABELS: Record<string, string> = {
   rosa: "Rosa",
   snow: "Snow",
   solar: "Solar",
+  riso: "Riso",
+  split: "Split",
   graphite: "Graphite",
   amethyst: "Amethyst",
   latte: "Latte",
@@ -47,13 +49,17 @@ const THEME_LABELS: Record<string, string> = {
   industrial: "Industrial",
   midnight: "Midnight",
   sandstone: "Sandstone",
+  pearl: "Pearl",
+  chalk: "Chalk",
   phosphor: "Phosphor",
   dracula: "Dracula",
   cyber: "Cyber",
+  flare: "Flare",
   temporal: "Temporal",
   crimson: "Crimson",
   forest: "Forest",
   nebula: "Nebula",
+  monsoon: "Monsoon",
   aurora: "Aurora",
   espresso: "Espresso",
   ember: "Ember",
@@ -251,6 +257,7 @@ export const KitchenSink = () => {
     showTime: true,
     showMonthPicker: true,
     compactMonths: false,
+    showNowTime: false,
     showYearPicker: false,
     compactYears: true,
     showHome: false,
@@ -689,8 +696,8 @@ export const KitchenSink = () => {
               rangeMaxDays={mode === "range" ? rangeMaxDays : undefined}
               {...calendarProps}
             >
-              {modules.days && <CalendarDays {...daysProps} />}
               {modules.nav && <CalendarNav {...navProps} label="label" />}
+              {modules.days && <CalendarDays {...daysProps} />}
               {modules.monthsGrid && <CalendarMonthGrid {...monthsGridProps} />}
               {modules.timeGrid && <CalendarTimeGrid {...timeGridProps} />}
               {modules.selectedDates && (
@@ -717,7 +724,6 @@ export const KitchenSink = () => {
                 />
               )}
               {modules.presets && <CalendarPresets />}
-
               {calendarProps.twoMonthsLayout && (
                 <CalendarDays {...daysProps} offset={1} hideOtherMonths />
               )}
@@ -732,11 +738,13 @@ export const KitchenSink = () => {
             value={activeAppearance}
             onChange={(e) => setActiveAppearance(e.target.value)}
           >
-            {["default", "soft", "bubble", "compact", "square"].map((a) => (
-              <option key={a} value={a}>
-                {a}
-              </option>
-            ))}
+            {["default", "soft", "bubble", "compact", "square", "loft"].map(
+              (a) => (
+                <option key={a} value={a}>
+                  {a}
+                </option>
+              ),
+            )}
           </select>
 
           <p className="panel-label" style={{ marginTop: 12 }}>

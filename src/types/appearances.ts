@@ -11,6 +11,7 @@ export type AppearanceTokens = {
   fontSize: string;
   daysSpacing: string;
   trackHeight: string;
+  dayRatio: string;
 };
 
 export const APPEARANCE_TOKEN_TO_VAR: Record<keyof AppearanceTokens, string> = {
@@ -26,6 +27,7 @@ export const APPEARANCE_TOKEN_TO_VAR: Record<keyof AppearanceTokens, string> = {
   fontSize:        "--cal-font-size",
   daysSpacing:     "--cal-days-padding",
   trackHeight:     "--cal-track-height",
+  dayRatio:        "--cal-day-ratio",
 };
 
 export const CUSTOM_APPEARANCE_BRAND = Symbol.for("rcd.appearance.custom");
@@ -35,7 +37,7 @@ export type CustomAppearance = {
   readonly vars: Record<string, string>;
 };
 
-export type BuiltInAppearance = "default" | "soft" | "compact" | "square" | "bubble";
+export type BuiltInAppearance = "default" | "soft" | "compact" | "square" | "bubble" | "loft";
 
 export type CalendarAppearance =
   | BuiltInAppearance

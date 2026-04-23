@@ -113,6 +113,7 @@ Navigation header with configurable controls.
 | `showSelectedMonthLabel` | `boolean`          | `false` | Show the current month name as plain text (no controls, no popup) |
 | `showSelectedYearLabel`  | `boolean`          | `false` | Show the current year as plain text (no controls, no popup)       |
 | `showTime`               | `boolean`          | `false` | Show a button that opens the time picker popup                    |
+| `showNowTime`            | `boolean`          | `false` | Show the current system time as a live read-only display (updates every second). A pulsing dot indicates it is live. Respects the `hour12` setting from `<Calendar>` |
 | `showHome`               | `boolean`          | `false` | Show a button that navigates back to today                        |
 | `showClear`              | `boolean`          | `false` | Show a button that clears the current selection                   |
 | `showThemeToggle`        | `boolean`          | `false` | Show a light/dark theme toggle button                             |
@@ -331,6 +332,7 @@ const myAppearance = createAppearance({ radius: "2px", fontSize: "13px" });
 | `font`            | Font family                                              |
 | `fontSize`        | Base font size                                           |
 | `daysSpacing`     | Gap between individual day cells                         |
+| `dayRatio`        | Aspect ratio of each day cell (e.g. `"1 / 1"`)          |
 | `trackHeight`     | Height of Track module items                             |
 | `shadowSm`        | Small shadow value                                       |
 | `shadowMd`        | Medium shadow value                                      |
@@ -401,12 +403,12 @@ type StartOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 ### Built-in themes
 
-**Light:** `mint` `comfy` `neon` `rosa` `snow` `solar` `graphite` `amethyst` `latte` `slate` `scarlet` `prism` `meadow`
+**Light:** `mint` `comfy` `neon` `rosa` `snow` `solar` `graphite` `amethyst` `latte` `slate` `scarlet` `prism` `meadow` `monsoon` `pearl` `chalk` `split` `riso`
 
-**Dark:** `industrial` `midnight` `sandstone` `phosphor` `dracula` `cyber` `temporal` `crimson` `forest` `nebula` `aurora` `espresso` `ember`
+**Dark:** `industrial` `midnight` `sandstone` `phosphor` `dracula` `cyber` `temporal` `crimson` `forest` `nebula` `aurora` `espresso` `ember` `flare`
 
 **Base:** `light` `dark` `auto`
 
 ### Built-in appearances
 
-`default` `soft` `compact` `square` `bubble`
+`default` `soft` `compact` `square` `bubble` `loft`

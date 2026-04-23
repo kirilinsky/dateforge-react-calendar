@@ -58,4 +58,10 @@ export const THEMES_DATA: Record<string, ThemeTokens> = {
   aurora:     { accent: "#07091a", backdrop: "#0b0e24", highlight: "#3de0a0", tone: "#131838",  text: "#e0f9f0", stroke: "#2a1f5a", shadow: "#3de0a028", disabled: "#2d3560", weekend: "#ff5fa2", range: "#00d4f5" },
   slate:      { accent: W,         backdrop: "#f1f5f9", highlight: "#475569", tone: "#e2e8f0",  text: "#0f172a", stroke: "#cbd5e1", shadow: "#47556920", disabled: "#94a3b8", weekend: RE,        range: "#0ea5e9" },
   scarlet:    { accent: W,         backdrop: "#fff5f5", highlight: "#d92121", tone: "#ffe4e4",  text: "#1c0808", stroke: "#f4b4b4", shadow: "#d9212124", disabled: "#c89898", weekend: "#ff6b6b", range: "#ff9800" },
+  monsoon:    { accent: W,         backdrop: "#d5ded9", highlight: "#244a3d", tone: "#bfcdc5",  text: "#0a1a14", stroke: "#9aaea3", shadow: "#244a3d28", disabled: "#6a8078", weekend: "#c45e38", range: "#3c7e95" },
+  pearl:      { accent: W,         backdrop: "#ecebed", highlight: "#3a2a42", tone: "#dedce0",  text: "#1f1624", stroke: "#c6c3ca", shadow: "#3a2a4226", disabled: "#9994a0", weekend: "#b14464", range: "#7b6d88" },
+  chalk:      { accent: W,         backdrop: "#f0f0f3", highlight: "#2a2e5c", tone: "#e2e2e8",  text: "#0e1028", stroke: "#cbcbd4", shadow: "#2a2e5c22", disabled: "#999cab", weekend: "#c03554", range: "#5866a8" },
+  split:      { accent: W,         backdrop: "#fafaf6", highlight: "#e8c43d", tone: "#f2f0ea",  text: "#1a1f2a", stroke: "#d4d0c4", shadow: "#e8c43d28", disabled: "#b5b0a4", weekend: "#3d9ee8", range: "#e83d9e" },
+  riso:       { accent: "#fef7e8", backdrop: "#fef7e8", highlight: "#2b3fe0", tone: "#fdebf3",  text: "#1a1205", stroke: "#e5dcc8", shadow: "#2b3fe028", disabled: "#b8ab8c", weekend: "#ff3e8e", range: "#2bce8b" },
+  flare:      { accent: "#0e0e10", backdrop: "#141417", highlight: "#8a8a92", tone: "#1e1e22",  text: "#e8e8ec", stroke: "#2a2a30", shadow: "#8a8a9220", disabled: "#4a4a52", weekend: "#ff6028", range: "#3a3a40" },
 };

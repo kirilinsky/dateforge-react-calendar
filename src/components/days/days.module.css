@@ -33,20 +33,20 @@
 }
 
 .todayItem {
-  outline: var(--cal-border, 1px) solid color-mix(in srgb, var(--c-h) 50%, transparent);
+  outline: var(--cal-today-outline-width, 1px) solid color-mix(in srgb, var(--c-h) 50%, transparent);
   outline-offset: -1px;
-  --hover-outline: var(--cal-border, 1px) solid color-mix(in srgb, var(--c-h) 50%, transparent);
+  --hover-outline: var(--cal-today-outline-width, 1px) solid color-mix(in srgb, var(--c-h) 50%, transparent);
 }
 
 .dayItemEmpty {
   width: 100%;
-  aspect-ratio: 1 / 0.85;
+  aspect-ratio: var(--cal-day-ratio, 1 / 0.85);
 }
 
 .dayItem {
   width: 100%;
   height: auto !important;
-  aspect-ratio: 1 / 0.85;
+  aspect-ratio: var(--cal-day-ratio, 1 / 0.85);
   padding: 0;
   position: relative;
   z-index: 1;

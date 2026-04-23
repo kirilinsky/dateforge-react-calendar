@@ -1,5 +1,5 @@
 import { THEMES_DATA, TOKEN_TO_VAR, type ThemeTokens } from "./themes";
-import { LIGHT_THEMES } from "../src/types/themes";
+import { LIGHT_THEMES, CUSTOM_THEME_BRAND } from "../src/types/themes";
 import type { CustomTheme } from "../src/types/themes";
 
 const LIGHT_SET: ReadonlySet<string> = new Set(LIGHT_THEMES);
@@ -11,7 +11,7 @@ function buildTheme(name: string): CustomTheme {
     const cssVar = TOKEN_TO_VAR[key as keyof ThemeTokens];
     if (cssVar) vars[cssVar] = value;
   }
-  return { __type: "custom", base: LIGHT_SET.has(name) ? "light" : "dark", vars };
+  return { [CUSTOM_THEME_BRAND]: true, base: LIGHT_SET.has(name) ? "light" : "dark", vars };
 }
 
 export const industrial = buildTheme("industrial");
@@ -40,3 +40,9 @@ export const nebula     = buildTheme("nebula");
 export const aurora     = buildTheme("aurora");
 export const slate      = buildTheme("slate");
 export const scarlet    = buildTheme("scarlet");
+export const monsoon    = buildTheme("monsoon");
+export const pearl      = buildTheme("pearl");
+export const chalk      = buildTheme("chalk");
+export const split      = buildTheme("split");
+export const riso       = buildTheme("riso");
+export const flare      = buildTheme("flare");

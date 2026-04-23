@@ -110,6 +110,35 @@
     pointer-events: none;
   }
 
+  @keyframes nowPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.3; transform: scale(0.6); }
+  }
+
+  .nowTimeDisplay {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    padding: 0 0.9em;
+    height: 2.3em;
+    font-size: 0.95em;
+    flex: 0 0 auto;
+    color: var(--c-h);
+    opacity: 0.8;
+    user-select: none;
+    pointer-events: none;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .nowTimeDot {
+    width: 0.5em;
+    height: 0.5em;
+    border-radius: 50%;
+    background: var(--c-h);
+    flex-shrink: 0;
+    animation: nowPulse 2s ease-in-out infinite;
+  }
+
   .timeButton {
     background: var(--c-h) !important;
     color: var(--c-a) !important;

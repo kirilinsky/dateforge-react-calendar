@@ -12,5 +12,6 @@
     --cal-transition: 0.28s;
     --cal-days-padding: 1em;
     --cal-track-height: 4.5em;
+    --cal-day-ratio: 1 / 1;
   }
 }
