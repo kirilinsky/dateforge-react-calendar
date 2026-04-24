@@ -8,6 +8,7 @@ import {
   useSelectionActions,
 } from "@/context/selection-context";
 import { useGridSlot } from "@/hooks/use-grid-slot";
+import { isSameDay } from "@/utils/date-core";
 
 const getRangeSep = (
   fmt: Intl.DateTimeFormat,
@@ -124,17 +125,19 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
   ) : (
     <>
       {selectedDates.map((d, i) => {
-        const isActive = isCurrentMonth(d) && d.getDate() === date.getDate();
+        const isActive = isSameDay(d, date);
         return (
           <button
             key={i}
             type="button"
+            data-active={isActive || undefined}
             onClick={() => allowNavigate && navigateTo(d)}
             className={[
               styles.chip,
               shared.interactive,
               shared.hoverable,
               isActive ? shared.activeItem : styles.inactiveChip,
+              isActive ? styles.activeChip : "",
             ]
               .filter(Boolean)
               .join(" ")}

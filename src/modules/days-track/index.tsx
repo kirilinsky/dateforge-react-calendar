@@ -90,6 +90,32 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({ showMonthL
     [showMonthLabel, locale, year, month],
   );
 
+  const currentIdx = ((Math.round(position) % days) + days) % days;
+  const minIdx = minIndex ?? 0;
+  const maxIdx = maxIndex ?? days - 1;
+  const fullDateLabel = useMemo(
+    () =>
+      new Intl.DateTimeFormat(locale, {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }).format(new Date(year, month, currentIdx + 1)),
+    [locale, year, month, currentIdx],
+  );
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    let delta = 0;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") delta = 1;
+    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") delta = -1;
+    else if (e.key === "PageDown") delta = 7;
+    else if (e.key === "PageUp") delta = -7;
+    else if (e.key === "Home") { e.preventDefault(); scrollTo(minIdx); return; }
+    else if (e.key === "End") { e.preventDefault(); scrollTo(maxIdx); return; }
+    else return;
+    e.preventDefault();
+    scrollTo(Math.round(position) + delta);
+  };
+
   const containerWidth = ref.current?.offsetWidth ?? 0;
   const frac = position - Math.round(position);
   const stripOffset = containerWidth / 2 - (HALF + frac) * itemWidth - itemWidth / 2;
@@ -99,13 +125,21 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({ showMonthL
       data-area="days-track"
       ref={ref}
       className={styles.container}
+      role="spinbutton"
+      tabIndex={0}
+      aria-label="Day"
+      aria-valuenow={currentIdx + 1}
+      aria-valuemin={minIdx + 1}
+      aria-valuemax={maxIdx + 1}
+      aria-valuetext={fullDateLabel}
+      onKeyDown={onKeyDown}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerCancel}
       style={useGridSlot(col)}
     >
-      <div className={styles.highlight} />
+      <div className={styles.highlight} aria-hidden />
       <div className={styles.strip} style={{ transform: `translateX(${stripOffset}px)` }}>
         {OFFSETS.map((o) => {
           const raw = Math.round(position) + o;
@@ -121,6 +155,7 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({ showMonthL
               data-item
               className={`${styles.item} ${isActive ? styles.active : ""}`}
               style={{ opacity, transform: `scale(${scale})` }}
+              aria-hidden={!isActive}
               onClick={!isActive ? () => scrollTo(Math.round(position) + o) : undefined}
             >
               {isActive && shortMonth ? (

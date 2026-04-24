@@ -55,6 +55,11 @@
     background: var(--c-t);
   }
 
+  .activeChip {
+    outline: 2px solid var(--c-a);
+    outline-offset: 1px;
+  }
+
   .clearBtn {
     height: 2.1em;
     padding: 0 0.6em !important;

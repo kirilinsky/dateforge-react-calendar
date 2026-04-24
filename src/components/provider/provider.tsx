@@ -15,6 +15,7 @@ import {
   toValidDate,
   SelectConfig,
 } from "@/core/state";
+import { isSameDay } from "@/utils/date-core";
 import { ConfigContext, CalendarConfig } from "@/context/config-context";
 import { NavigationContext } from "@/context/navigation-context";
 import {
@@ -122,12 +123,14 @@ export function CalendarProvider<M extends CalendarMode = "single">({
         rangeEnd: to,
       });
     } else if (externalDates) {
+      const nextDates = externalDates.map(toValidDate);
+      const keepView = nextDates.some((d) => isSameDay(d, state.viewDate));
       dispatch({
         type: "SYNC_EXTERNAL",
-        viewDate: externalDates[0]
-          ? toValidDate(externalDates[0])
-          : state.viewDate,
-        selectedDates: externalDates.map(toValidDate),
+        viewDate: keepView
+          ? state.viewDate
+          : nextDates[nextDates.length - 1] ?? state.viewDate,
+        selectedDates: nextDates,
         rangeStart: null,
         rangeEnd: null,
       });

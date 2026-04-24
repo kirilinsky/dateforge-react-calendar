@@ -67,14 +67,11 @@
     grid-column: 1 / -1;
   }
 
-  .calendarContainer > [data-area]:last-child {
-    padding-bottom: max(0.75em, calc(var(--cal-container-radius, 0em) * 0.6));
-  }
   .calendarContainer.gradient {
     background:
       radial-gradient(
         ellipse 50% 45% at 5% 5%,
-        color-mix(in srgb, var(--c-b) 88%, var(--c-h)) 0%,
+        color-mix(in srgb, var(--c-b) 89%, var(--c-h)) 0%,
         transparent 100%
       ),
       radial-gradient(

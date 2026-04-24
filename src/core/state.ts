@@ -139,14 +139,25 @@ export function calendarReducer(
     case "CLOSE_POPUP":
       return { ...state, openPopup: null };
 
-    case "CHANGE_TIME":
+    case "CHANGE_TIME": {
+      const { date } = action;
+      let nextDates = state.selectedDates;
+      if (state.selectedDates.length > 0) {
+        const idx = state.selectedDates.findIndex((d) =>
+          isSameDay(d, state.viewDate),
+        );
+        nextDates =
+          idx >= 0
+            ? state.selectedDates.map((d, i) => (i === idx ? date : d))
+            : [date];
+      }
       return {
         ...state,
-        viewDate: action.date,
-        selectedDates:
-          state.selectedDates.length > 0 ? [action.date] : state.selectedDates,
+        viewDate: date,
+        selectedDates: nextDates,
         notifySeq: state.notifySeq + 1,
       };
+    }
 
     case "SET_DATES":
       return { ...state, selectedDates: action.dates, notifySeq: state.notifySeq + 1 };
