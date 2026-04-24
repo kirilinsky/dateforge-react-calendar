@@ -203,8 +203,7 @@
     min-width: 0;
   }
 
-  .label {
-    flex: 1 1 auto;
+  .label { 
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -213,7 +212,7 @@
     font-weight: 600;
     color: var(--c-h);
     opacity: 0.72;
-    padding: 0 0.3em;
+    padding: 0 0.32em;
     line-height: 2.3em;
   }
 
