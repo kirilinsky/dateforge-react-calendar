@@ -110,6 +110,60 @@
     pointer-events: none;
   }
 
+  .ticker {
+    display: inline-flex;
+    align-items: center;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  .tickerSep {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .drumSlot {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    height: 1.1em;
+    vertical-align: middle;
+  }
+
+  .drumSizer {
+    display: inline-block;
+    visibility: hidden;
+    line-height: 1.1em;
+  }
+
+  .drumCurr,
+  .drumPrev {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.1em;
+  }
+
+  .drumCurr {
+    animation: drumIn 0.18s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .drumPrev {
+    animation: drumOut 0.18s cubic-bezier(0.55, 0, 0.78, 0) forwards;
+  }
+
+  @keyframes drumIn {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+
+  @keyframes drumOut {
+    from { transform: translateY(0); }
+    to   { transform: translateY(-100%); }
+  }
+
   @keyframes nowPulse {
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.3; transform: scale(0.6); }

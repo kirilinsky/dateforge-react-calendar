@@ -104,21 +104,23 @@ Navigation header with configurable controls.
 
 ### Props
 
-| Prop                     | Type               | Default | Description                                                       |
-| ------------------------ | ------------------ | ------- | ----------------------------------------------------------------- |
-| `label`                  | `string`           | —       | Custom text shown as the header label, max 180 length.            |
-| `showMonthPicker`        | `boolean`          | `false` | Show previous/next month arrow buttons                            |
-| `compactMonths`          | `boolean`          | `false` | Show a compact month dropdown instead of arrows                   |
-| `showYearPicker`         | `boolean`          | `false` | Show previous/next year arrow buttons                             |
-| `compactYears`           | `boolean`          | `false` | Show a compact year dropdown instead of arrows                    |
-| `showSelectedMonthLabel` | `boolean`          | `false` | Show the current month name as plain text (no controls, no popup) |
-| `showSelectedYearLabel`  | `boolean`          | `false` | Show the current year as plain text (no controls, no popup)       |
-| `showTime`               | `boolean`          | `false` | Show a button that opens the time picker popup                    |
+| Prop                     | Type               | Default | Description                                                                                                                                                          |
+| ------------------------ | ------------------ | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `label`                  | `string`           | —       | Custom text shown as the header label, max 180 length.                                                                                                               |
+| `showMonthPicker`        | `boolean`          | `false` | Show previous/next month arrow buttons                                                                                                                               |
+| `compactMonths`          | `boolean`          | `false` | Show a compact month dropdown instead of arrows                                                                                                                      |
+| `showYearPicker`         | `boolean`          | `false` | Show previous/next year arrow buttons                                                                                                                                |
+| `compactYears`           | `boolean`          | `false` | Show a compact year dropdown instead of arrows                                                                                                                       |
+| `animatedTime`           | `boolean`          | `true`  | Show flip animation for in `showTime` and `showNowTime`                                                                                                              |
+| `showSelectedMonthLabel` | `boolean`          | `false` | Show the current month name as plain text (no controls, no popup)                                                                                                    |
+| `showSelectedYearLabel`  | `boolean`          | `false` | Show the current year as plain text (no controls, no popup)                                                                                                          |
+| `showTime`               | `boolean`          | `false` | Show a button that opens the time picker popup                                                                                                                       |
 | `showNowTime`            | `boolean`          | `false` | Show the current system time as a live read-only display (updates every second). A pulsing dot indicates it is live. Respects the `hour12` setting from `<Calendar>` |
-| `showHome`               | `boolean`          | `false` | Show a button that navigates back to today                        |
-| `showClear`              | `boolean`          | `false` | Show a button that clears the current selection                   |
-| `showThemeToggle`        | `boolean`          | `false` | Show a light/dark theme toggle button                             |
-| `col`                    | `number \| string` | —       | CSS grid `grid-column` value                                      |
+| `showSeconds`            | `boolean`          | `false` | Include seconds in `showTime` and `showNowTime` displays, and in the time picker popup                                                                               |
+| `showHome`               | `boolean`          | `false` | Show a button that navigates back to today                                                                                                                           |
+| `showClear`              | `boolean`          | `false` | Show a button that clears the current selection                                                                                                                      |
+| `showThemeToggle`        | `boolean`          | `false` | Show a light/dark theme toggle button                                                                                                                                |
+| `col`                    | `number \| string` | —       | CSS grid `grid-column` value                                                                                                                                         |
 
 ---
 
@@ -333,7 +335,7 @@ const myAppearance = createAppearance({ radius: "2px", fontSize: "13px" });
 | `font`            | Font family                                              |
 | `fontSize`        | Base font size                                           |
 | `daysSpacing`     | Gap between individual day cells                         |
-| `dayRatio`        | Aspect ratio of each day cell (e.g. `"1 / 1"`)          |
+| `dayRatio`        | Aspect ratio of each day cell (e.g. `"1 / 1"`)           |
 | `trackHeight`     | Height of Track module items                             |
 | `shadowSm`        | Small shadow value                                       |
 | `shadowMd`        | Medium shadow value                                      |

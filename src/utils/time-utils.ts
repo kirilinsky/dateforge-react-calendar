@@ -16,9 +16,10 @@ export const addTime = (date: Date, amount: number, unit: "h" | "m") => {
   return n;
 };
 
-export const getTimeString = (date: Date, hour12 = false): string =>
+export const getTimeString = (date: Date, hour12 = false, showSeconds = false): string =>
   new Intl.DateTimeFormat("en", {
     hour: "numeric",
     minute: "2-digit",
+    ...(showSeconds ? { second: "2-digit" } : {}),
     hour12,
   }).format(date);

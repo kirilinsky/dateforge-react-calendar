@@ -1,7 +1,8 @@
-import { useRef } from "react";
-import type { ReactNode } from "react";
+import { useRef, useLayoutEffect, useState } from "react";
+import type { ReactNode, CSSProperties } from "react";
 import { Check } from "@/Icons";
 import { useFocusTrap } from "@/hooks/use-focus-trap";
+import { useUI } from "@/context/ui-context";
 import styles from "./popup.module.css";
 
 export interface PopupProps {
@@ -12,17 +13,68 @@ export interface PopupProps {
 }
 
 export const Popup = ({ children, onConfirm, onClose, label = "Dialog" }: PopupProps) => {
+  const { popupAnchorEl, setPopupAnchorEl } = useUI();
+  const backdropRef = useRef<HTMLDivElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
-  useFocusTrap(popupRef, { onEscape: onClose });
+
+  const [panelStyle, setPanelStyle] = useState<CSSProperties>({ opacity: 0 });
+  const [direction, setDirection] = useState<"down" | "up">("down");
+
+  useLayoutEffect(() => {
+    const backdrop = backdropRef.current;
+    const panel = popupRef.current;
+    if (!backdrop || !panel) return;
+
+    const bRect = backdrop.getBoundingClientRect();
+    const panelH = panel.offsetHeight;
+    const panelW = panel.offsetWidth;
+    const GAP = 4;
+
+    let top: number | undefined;
+    let bottom: number | undefined;
+    let left: number;
+
+    if (popupAnchorEl) {
+      const aRect = popupAnchorEl.getBoundingClientRect();
+      const spaceBelow = bRect.bottom - aRect.bottom - GAP;
+      const spaceAbove = aRect.top - bRect.top - GAP;
+      const goUp = spaceBelow < panelH && spaceAbove > spaceBelow;
+
+      left = Math.max(GAP, Math.min(aRect.left - bRect.left, bRect.width - panelW - GAP));
+
+      if (goUp) {
+        bottom = bRect.bottom - aRect.top + GAP;
+        setDirection("up");
+      } else {
+        top = aRect.bottom - bRect.top + GAP;
+        setDirection("down");
+      }
+    } else {
+      top = GAP;
+      left = GAP;
+      setDirection("down");
+    }
+
+    setPanelStyle({ top, bottom, left, opacity: 1 });
+  }, [popupAnchorEl]);
+
+  useFocusTrap(popupRef, { onEscape: handleClose });
+
+  function handleClose() {
+    setPopupAnchorEl(null);
+    onClose();
+  }
 
   return (
-    <div className={styles.backdrop} onClick={onClose}>
+    <div ref={backdropRef} className={styles.backdrop} onClick={handleClose}>
       <div
         ref={popupRef}
         className={styles.popup}
+        data-direction={direction}
         role="dialog"
         aria-modal="true"
         aria-label={label}
+        style={panelStyle}
         onClick={(e) => e.stopPropagation()}
       >
         {children}

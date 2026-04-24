@@ -258,10 +258,14 @@ export const KitchenSink = () => {
 
   const [navProps, setNavProps] = useState({
     showTime: true,
-    showMonthPicker: true,
-    compactMonths: false,
     showNowTime: false,
+    showSeconds: false,
+    showMonthPicker: true,
+    animatedTime: false,
+    compactMonths: false,
     showYearPicker: false,
+    showSelectedMonthLabel: false,
+    showSelectedYearLabel: false,
     compactYears: true,
     showHome: false,
     showClear: false,
@@ -273,6 +277,7 @@ export const KitchenSink = () => {
 
   const [modules, setModules] = useState({
     nav: true,
+    nav2: false,
     days: true,
     monthsGrid: false,
     timeGrid: false,
@@ -713,6 +718,9 @@ export const KitchenSink = () => {
                 <CalendarNav {...navProps} label={navLabel || undefined} />
               )}
               {modules.days && <CalendarDays {...daysProps} />}
+              {modules.nav2 && (
+                <CalendarNav {...navProps} label={navLabel || undefined} />
+              )}
               {modules.monthsGrid && <CalendarMonthGrid {...monthsGridProps} />}
               {modules.timeGrid && <CalendarTimeGrid {...timeGridProps} />}
               {modules.selectedDates && (

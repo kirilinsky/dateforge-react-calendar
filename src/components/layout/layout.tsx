@@ -20,6 +20,7 @@ export const CalendarLayout: React.FC<{
     dark, showTimePopup, setShowTimePopup,
     showMonthPopup, setShowMonthPopup,
     showYearPopup, setShowYearPopup,
+    navShowSeconds,
   } = useUI();
 
   const containerStyle: React.CSSProperties = {
@@ -44,6 +45,7 @@ export const CalendarLayout: React.FC<{
         <TimePopup
           date={date}
           hour12={hour12}
+          showSeconds={navShowSeconds}
           onConfirm={(newDate) => {
             onChangeTime(newDate);
             setShowTimePopup(false);

@@ -285,6 +285,8 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   );
 
   const [daysTrackActive, setDaysTrackActive] = useState(false);
+  const [popupAnchorEl, setPopupAnchorEl] = useState<HTMLElement | null>(null);
+  const [navShowSeconds, setNavShowSeconds] = useState(false);
 
   const ui = useMemo(
     () => ({
@@ -299,9 +301,13 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       setShowYearPopup,
       daysTrackActive,
       setDaysTrackActive,
+      popupAnchorEl,
+      setPopupAnchorEl,
+      navShowSeconds,
+      setNavShowSeconds,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isDark, toggleTheme, containerWidth, state.openPopup, daysTrackActive],
+    [isDark, toggleTheme, containerWidth, state.openPopup, daysTrackActive, popupAnchorEl, navShowSeconds],
   );
 
   return (

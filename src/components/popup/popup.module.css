@@ -1,53 +1,66 @@
 @layer cal-base {
 
-.backdrop {
-  position: absolute;
-  inset: 0;
-  background: var(--c-b);
-  z-index: 10;
-  border-radius: inherit;
-  display: flex;
-  align-items: flex-start;
-  padding: var(--cal-spacing, 0.6em);
-  box-sizing: border-box;
-}
+  @keyframes popupSlideDown {
+    from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0)    scale(1); }
+  }
 
-.popup {
-  position: relative;
-  background: var(--c-b);
-  border-radius: calc(var(--cal-radius, 0.5em) * 1.5);
-  padding: 0.8em;
-  width: 55%;
-  max-width: 13.9em;
-  min-width: 9.2em;
-  max-height: 370px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6em;
-  border: var(--cal-border, 1px) solid var(--c-s);
-  box-shadow: 0 0.4em 2em var(--c-x);
-  user-select: none;
-  box-sizing: border-box;
-}
+  @keyframes popupSlideUp {
+    from { opacity: 0; transform: translateY(6px)  scale(0.97); }
+    to   { opacity: 1; transform: translateY(0)    scale(1); }
+  }
 
-.confirm {
-  background: var(--c-h);
-  color: var(--c-a);
-  border: none;
-  border-radius: calc(var(--cal-radius, 0.5em) * 99);
-  padding: 0.6em;
-  width: 100%;
-  font-size: 1em;
-  font-weight: 700;
-  cursor: pointer;
-  transition: opacity var(--cal-transition, 0.2s);
-  box-shadow: var(--cal-shadow-md, 0 0.2em 0.6em var(--c-x));
-  flex-shrink: 0;
-}
+  .backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    border-radius: inherit;
+  }
 
-.confirm:hover {
-  opacity: 0.85;
-}
+  .popup {
+    position: absolute;
+    background: var(--c-b);
+    border-radius: calc(var(--cal-radius, 0.5em) * 1.5);
+    padding: 0.8em;
+    width: 55%;
+    max-width: 13.9em;
+    min-width: 9.2em;
+    height: 21em;
+    max-height: min(370px, 80cqb);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6em;
+    border: var(--cal-border, 1px) solid var(--c-s);
+    box-shadow: 0 0.4em 2em var(--c-x);
+    user-select: none;
+    box-sizing: border-box;
+  }
+
+  .popup[data-direction="down"] {
+    animation: popupSlideDown var(--cal-transition, 0.2s) cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+  }
+
+  .popup[data-direction="up"] {
+    animation: popupSlideUp var(--cal-transition, 0.2s) cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+  }
+
+  .confirm {
+    background: var(--c-h);
+    color: var(--c-a);
+    border: none;
+    border-radius: calc(var(--cal-radius, 0.5em) * 99);
+    padding: 0.45em;
+    width: 100%;
+    font-size: 1em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity var(--cal-transition, 0.2s);
+    box-shadow: var(--cal-shadow-md, 0 0.2em 0.6em var(--c-x));
+    flex-shrink: 0;
+  }
+
+  .confirm:hover {
+    opacity: 0.85;
+  }
 
 }
