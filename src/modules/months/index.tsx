@@ -30,24 +30,50 @@ export const CalendarMonthGrid: React.FC<CalendarMonthGridProps> = ({
     [locale, currentYear, minDate, maxDate, shortMonths, disabled, disableLimited],
   );
 
+  const longFmt = useMemo(
+    () => new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }),
+    [locale],
+  );
+  const gridLabel = useMemo(
+    () => new Intl.DateTimeFormat(locale, { year: "numeric" }).format(viewDate),
+    [locale, viewDate],
+  );
+
   const handleClick = (i: number) => navigateTo(setMonth(viewDate, i));
 
   return (
-    <div className={styles.monthsContainer} data-area="months" style={useGridSlot(col)}>
-      {mNames.map((n, i) => (
-        <button
-          key={i}
-          type="button"
-          className={[styles.item, shared.interactive, shared.hoverable, i === currentMonth ? shared.activeItem : ""]
-            .filter(Boolean)
-            .join(" ")}
-          disabled={n.disabled || (hideLimited && n.limited)}
-          style={hideLimited && n.limited ? { visibility: "hidden" } : undefined}
-          onClick={() => handleClick(i)}
-        >
-          {n.label}
-        </button>
-      ))}
+    <div
+      className={styles.monthsContainer}
+      data-area="months"
+      role="group"
+      aria-label={`Select month, ${gridLabel}`}
+      style={useGridSlot(col)}
+    >
+      {mNames.map((n, i) => {
+        const isCurrent = i === currentMonth;
+        const isHidden = hideLimited && n.limited;
+        const isDisabled = n.disabled || isHidden;
+        const fullLabel =
+          longFmt.format(new Date(currentYear, i, 1)) +
+          (isDisabled && !isHidden ? ", limited" : "");
+        return (
+          <button
+            key={i}
+            type="button"
+            className={[styles.item, shared.interactive, shared.hoverable, isCurrent ? shared.activeItem : ""]
+              .filter(Boolean)
+              .join(" ")}
+            aria-label={fullLabel}
+            aria-current={isCurrent ? "true" : undefined}
+            aria-disabled={isDisabled || undefined}
+            aria-hidden={isHidden || undefined}
+            style={isHidden ? { visibility: "hidden" } : undefined}
+            onClick={() => !isDisabled && handleClick(i)}
+          >
+            {n.label}
+          </button>
+        );
+      })}
     </div>
   );
 };

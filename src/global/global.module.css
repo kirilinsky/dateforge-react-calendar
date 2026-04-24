@@ -20,14 +20,15 @@
   border-radius: var(--cal-radius, 0.5em);
 }
 
-.hoverable:hover:not([disabled]) {
+.hoverable:hover:not([disabled]):not([aria-disabled="true"]) {
   background: var(--hover-bg, var(--c-t));
   color: var(--hover-color, inherit);
   box-shadow: var(--hover-shadow, 0 0.1em 0.3em var(--c-x));
   outline: var(--hover-outline, none);
 }
 
-.interactive[disabled] {
+.interactive[disabled],
+.interactive[aria-disabled="true"] {
   cursor: not-allowed;
   opacity: 0.9;
   color: var(--c-d);

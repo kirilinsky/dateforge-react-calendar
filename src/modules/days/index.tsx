@@ -138,9 +138,7 @@ const DayCell = React.memo(function DayCell({
   return (
     <button
       type="button"
-      role="gridcell"
-      disabled={isDisabled}
-      onClick={() => onSelect(fullDate, isDisabled)}
+      onClick={() => !isDisabled && onSelect(fullDate, isDisabled)}
       onMouseEnter={() => onMouseEnter(fullDate)}
       aria-label={ariaLabel}
       aria-selected={isSelected}
@@ -490,7 +488,6 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
                     return (
                       <span
                         key={i}
-                        role="gridcell"
                         aria-hidden="true"
                         className={styles.dayItemEmpty}
                       />

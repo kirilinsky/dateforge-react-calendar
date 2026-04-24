@@ -130,24 +130,28 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
   return (
     <div
       data-area="years-grid"
+      role="group"
+      aria-label={`Select year, showing ${startYear} to ${endYear}`}
       style={useGridSlot(col)}
     >
-      <div className={styles.nav}>
+      <div className={styles.nav} role="group" aria-label="Year page navigation">
         <button
           type="button"
           className={[shared.interactive, shared.hoverable].join(" ")}
           disabled={page <= 0}
+          aria-label="Previous years"
           onClick={() => navigate(-1)}
         >
           <ChevronLeft />
         </button>
-        <span className={styles.range}>
+        <span className={styles.range} aria-live="polite">
           {startYear}–{endYear}
         </span>
         <button
           type="button"
           className={[shared.interactive, shared.hoverable].join(" ")}
           disabled={page >= totalPages - 1}
+          aria-label="Next years"
           onClick={() => navigate(1)}
         >
           <ChevronRight />
@@ -160,27 +164,33 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
           .join(" ")}
         onAnimationEnd={() => setDirection("none")}
       >
-        {years.map(({ year, disabled, limited }) => (
-          <button
-            key={year}
-            type="button"
-            disabled={disabled || (hideLimited && limited)}
-            className={[
-              styles.item,
-              shared.interactive,
-              shared.hoverable,
-              year === currentYear ? shared.activeItem : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-            style={
-              hideLimited && limited ? { visibility: "hidden" } : undefined
-            }
-            onClick={() => handleClick(year)}
-          >
-            {year}
-          </button>
-        ))}
+        {years.map(({ year, disabled, limited }) => {
+          const isHidden = hideLimited && limited;
+          const isDisabled = disabled || isHidden;
+          const isCurrent = year === currentYear;
+          return (
+            <button
+              key={year}
+              type="button"
+              aria-label={`${year}${isDisabled && !isHidden ? ", limited" : ""}`}
+              aria-current={isCurrent ? "true" : undefined}
+              aria-disabled={isDisabled || undefined}
+              aria-hidden={isHidden || undefined}
+              className={[
+                styles.item,
+                shared.interactive,
+                shared.hoverable,
+                isCurrent ? shared.activeItem : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              style={isHidden ? { visibility: "hidden" } : undefined}
+              onClick={() => !isDisabled && handleClick(year)}
+            >
+              {year}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

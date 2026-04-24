@@ -61,7 +61,8 @@
   position: relative;
   z-index: 1;
   font-size: clamp(0.7em, 4.4cqi, 1.15em);
-  &:disabled {
+  &:disabled,
+  &[aria-disabled="true"] {
     text-decoration: line-through;
     color: var(--c-h);
   }
