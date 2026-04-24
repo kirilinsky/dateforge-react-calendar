@@ -26,18 +26,6 @@
   }
 }
 
-/*
-  Container query breakpoint scale (em-based, relative to each module's font-size):
-    10em    — months: 2-col → 3-col grid
-    16em    — months: 3-col → 4-col grid
-    25em    — months: 4-col → 6-col grid
-    13.75em — nav: micro compact (font-size 0.92em)
-    15em    — time: min-height 10em → 8em, centered
-    16.25em — nav: month name long → short
-    20em    — presets: 4-col → 3-col grid
-    21.25em — nav: compact spacing (font-size 1em)
-*/
-
 @layer cal-base {
   .calendarContainer {
     --cal-radius: 0.5em;
@@ -79,10 +67,9 @@
     grid-column: 1 / -1;
   }
 
-  /* Gradient: container holds the unified gradient, modules are transparent.
-     The gap would normally show the same gradient (invisible border), so we
-     use outline — which is NOT clipped by overflow:hidden — to paint var(--c-s)
-     into the 1px gap area, restoring visible borders. */
+  .calendarContainer > [data-area]:last-child {
+    padding-bottom: max(0.75em, calc(var(--cal-container-radius, 0em) * 0.6));
+  }
   .calendarContainer.gradient {
     background:
       radial-gradient(
