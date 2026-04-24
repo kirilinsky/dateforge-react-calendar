@@ -79,6 +79,7 @@ export const Popup = ({ children, onConfirm, onClose, label = "Dialog" }: PopupP
       >
         {children}
         <button
+          type="button"
           className={styles.confirm}
           aria-label="Confirm"
           onClick={onConfirm}
