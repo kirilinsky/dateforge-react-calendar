@@ -181,19 +181,45 @@ Time picker — hours, minutes, optional seconds, AM/PM toggle when `hour12` is 
 
 ### CalendarPresets
 
-Quick-select preset buttons (e.g. "Last 7 days", "This month").
+Quick-select preset buttons. Renders **nothing** by default — pass `presets` with the entries you want.
+
+Two entry forms are supported:
+
+- **Simple** — `{ label, value, range? }` (declarative: day offsets, fixed dates, fixed-length ranges)
+- **Advanced** — `{ id, label, getValue }` (function form with `PresetContext`)
+
+Import `basicPresets` for the classic pack.
 
 ```tsx
-<CalendarPresets showYears={false} />
+import { CalendarPresets, basicPresets } from "react-calendar-datetime";
+
+// empty — renders nothing
+<CalendarPresets />
+
+// basic pack
+<CalendarPresets presets={basicPresets} />
+
+// inline, no imports needed
+<CalendarPresets presets={[
+  { label: "Today",       value: 0 },
+  { label: "In 3 days",   value: 3 },
+  { label: "Last 7 days", value: -6, range: 6 },
+  { label: "New Year",    value: new Date(2026, 0, 1) },
+]} />
+
+// mix pack + your own
+<CalendarPresets presets={[
+  ...basicPresets,
+  { label: "Start of month", getValue: ({ now }) => new Date(now.getFullYear(), now.getMonth(), 1) },
+]} />
 ```
 
 ### Props
 
-| Prop         | Type               | Default | Description                     |
-| ------------ | ------------------ | ------- | ------------------------------- |
-| `showYears`  | `boolean`          | `true`  | Show year-based preset buttons  |
-| `showMonths` | `boolean`          | `true`  | Show month-based preset buttons |
-| `col`        | `number \| string` | —       | CSS grid `grid-column` value    |
+| Prop      | Type               | Default | Description                                                                   |
+| --------- | ------------------ | ------- | ----------------------------------------------------------------------------- |
+| `presets` | `PresetEntry[]`    | `[]`    | Entries to render. Empty / omitted → module renders nothing                   |
+| `col`     | `number \| string` | —       | CSS grid `grid-column` value                                                  |
 
 ---
 
@@ -367,6 +393,106 @@ const disabled = createDisabled({
 | `after`    | `Date`                       | Disable all dates after this date                     |
 | `dates`    | `Date[]`                     | Disable specific individual dates                     |
 | `ranges`   | `{ from: Date; to: Date }[]` | Disable one or more date ranges                       |
+
+---
+
+### Presets
+
+Presets are plain objects. Pass an array of them to `<CalendarPresets presets={[...]} />`. Two forms are supported.
+
+#### Simple form — `SimplePresetDef`
+
+Declarative. Covers day offsets, fixed dates, fixed-length ranges. Zero imports needed.
+
+| Field   | Type                                   | Description                                                                                         |
+| ------- | -------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `id`    | `string` (optional)                    | Stable React key. Auto-derived from `label` / index if omitted                                      |
+| `label` | `string \| (locale: string) => string` | Button text. Function form for locale-aware labels                                                  |
+| `value` | `number \| Date`                       | `number` — day offset from today (neg = past, pos = future). `Date` — absolute fixed date           |
+| `range` | `number` (optional)                    | Length of range in days after `value`. Absent → single date. Any number → range                     |
+
+`range` examples:
+
+| `value`                 | `range` | Result                                      |
+| ----------------------- | ------- | ------------------------------------------- |
+| `0`                     | —       | Today (single)                              |
+| `7`                     | —       | Today + 7 (single)                          |
+| `-6`                    | `6`     | `{ from: today-6, to: today }` (7-day span) |
+| `0`                     | `13`    | `{ from: today, to: today+13 }` (next 2 weeks) |
+| `new Date(2026, 0, 1)`  | —       | Jan 1 2026 (fixed single)                   |
+| `new Date(2026, 0, 1)`  | `89`    | `{ from: Jan 1, to: Apr 1 }` (fixed Q1)     |
+
+```tsx
+<CalendarPresets presets={[
+  { label: "Today",       value: 0 },
+  { label: "In 3 days",   value: 3 },
+  { label: "Last 7 days", value: -6, range: 6 },
+  { label: "New Year",    value: new Date(2026, 0, 1) },
+]} />
+```
+
+#### Advanced form — `AdvancedPresetDef`
+
+Function form. Use when offsets are not enough (calendar-accurate month shifts, weekday-relative dates, conditional visibility, `isValid` loops).
+
+| Field      | Type                                                                  | Description                                                                                                     |
+| ---------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `id`       | `string`                                                              | Stable React key. Required                                                                                      |
+| `label`    | `string \| (locale: string) => string`                                | Button text                                                                                                     |
+| `getValue` | `(ctx: PresetContext) => Date \| { from: Date; to: Date } \| null`    | Computes target. Return type decides kind (single / range); `null` hides the button                             |
+
+`PresetContext`:
+
+| Field     | Type                      | Description                                                                                 |
+| --------- | ------------------------- | ------------------------------------------------------------------------------------------- |
+| `now`     | `Date`                    | Real `new Date()` with time-of-day from the calendar's `viewDate`. Stable across clicks     |
+| `isValid` | `(date: Date) => boolean` | True if `date` passes `minDate`, `maxDate`, `disabled`                                      |
+| `locale`  | `string`                  | BCP-47 locale string from calendar config                                                   |
+
+Return-type semantics:
+
+- `Date` → single-date preset; click fires `onChangeDate`
+- `{ from, to }` → range preset; click fires `onRangeSet`. Hidden unless `<Calendar mode="range" />`
+- `null` → unavailable this render; button hidden
+
+All preset targets are auto-filtered through `isValid` — a target that is disabled / out of range is not rendered.
+
+```tsx
+<CalendarPresets presets={[
+  { id: "som", label: "Start of month", getValue: ({ now }) => new Date(now.getFullYear(), now.getMonth(), 1) },
+  {
+    id: "next-weekend",
+    label: "Next available weekend",
+    getValue: ({ now, isValid }) => {
+      const d = new Date(now);
+      const delta = (6 - d.getDay() + 7) % 7 || 7;
+      d.setDate(d.getDate() + delta);
+      for (let i = 0; i < 52; i++) {
+        const sun = new Date(d);
+        sun.setDate(sun.getDate() + 1);
+        if (isValid(d) && isValid(sun)) return { from: d, to: sun };
+        d.setDate(d.getDate() + 7);
+      }
+      return null;
+    },
+  },
+]} />
+```
+
+#### `basicPresets`
+
+A ready-made pack (classic "yesterday / today / tomorrow / last week / next month / …" set) with localized labels.
+
+```ts
+import { basicPresets } from "react-calendar-datetime";
+
+<CalendarPresets presets={basicPresets} />;
+
+// Or mix
+<CalendarPresets presets={[...basicPresets, { label: "In 3 days", value: 3 }]} />;
+```
+
+Toggle behavior: clicking an active preset deselects (fires `onChangeDate(null)` / `onRangeSet(null, null)`).
 
 ---
 

@@ -4,43 +4,60 @@ import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import { useSelectionValue, useSelectionActions } from "@/context/selection-context";
 import { isSameDay } from "@/utils/date-core";
-import { getFilteredPresets, getPresetDate, getRelativeLabel } from "./preset-utils";
+import { getResolvedPresets } from "./preset-utils";
 import { useGridSlot } from "@/hooks/use-grid-slot";
 import shared from "@/global/global.module.css";
+import { PresetEntry } from "@/types/presets";
 
 export interface CalendarPresetsProps {
-  showYears?: boolean;
-  showMonths?: boolean;
+  /**
+   * Array of preset entries to render. Empty / omitted = nothing.
+   *
+   * Each entry is either a `SimplePresetDef` (`{ label, value, range? }`) or
+   * an `AdvancedPresetDef` (`{ id, label, getValue }`).
+   *
+   * Import `basicPresets` from the package to get the classic preset set.
+   */
+  presets?: PresetEntry[];
   col?: number | string;
 }
 
+const EMPTY: PresetEntry[] = [];
+
 export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
-  showYears = true,
-  showMonths = true,
+  presets = EMPTY,
   col,
 }) => {
-  const { minDate, maxDate, locale, disabled } = useConfig();
-  const { viewDate: date } = useNavigation();
-  const { selectedDate } = useSelectionValue();
-  const { onChangeDate } = useSelectionActions();
+  const { minDate, maxDate, locale, disabled, range } = useConfig();
+  const { viewDate } = useNavigation();
+  const { selectedDate, rangeStart, rangeEnd } = useSelectionValue();
+  const { onChangeDate, onRangeSet } = useSelectionActions();
 
-  const presets = useMemo(
-    () => getFilteredPresets(showYears, showMonths, minDate, maxDate, disabled),
-    [showYears, showMonths, minDate, maxDate, disabled],
+  const resolved = useMemo(
+    () => getResolvedPresets(presets, viewDate, locale, range, minDate, maxDate, disabled),
+    [presets, viewDate, locale, range, minDate, maxDate, disabled],
   );
+
+  if (!resolved.length) return null;
 
   return (
     <div
       className={styles.presetsContainer}
       data-area="presets"
-      data-count={presets.length}
+      data-count={resolved.length}
       style={useGridSlot(col)}
     >
-      {presets.map((preset) => {
-        const isActive = !!selectedDate && isSameDay(preset.targetDate, selectedDate);
+      {resolved.map((p) => {
+        const isActive = p.isRange
+          ? !!rangeStart &&
+            !!rangeEnd &&
+            isSameDay((p.value as { from: Date; to: Date }).from, rangeStart) &&
+            isSameDay((p.value as { from: Date; to: Date }).to, rangeEnd)
+          : !!selectedDate && isSameDay(p.value as Date, selectedDate);
+
         return (
           <button
-            key={preset.id}
+            key={p.id}
             type="button"
             className={[
               styles.presetItem,
@@ -50,11 +67,20 @@ export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
             ]
               .filter(Boolean)
               .join(" ")}
-            onClick={() =>
-              onChangeDate(getPresetDate(preset, date, minDate, maxDate))
-            }
+            onClick={() => {
+              if (p.isRange) {
+                if (isActive) {
+                  onRangeSet(null, null);
+                } else {
+                  const r = p.value as { from: Date; to: Date };
+                  onRangeSet(r.from, r.to);
+                }
+              } else {
+                onChangeDate(isActive ? null : (p.value as Date));
+              }
+            }}
           >
-            {getRelativeLabel(locale, preset.amount, preset.unit)}
+            {p.label}
           </button>
         );
       })}

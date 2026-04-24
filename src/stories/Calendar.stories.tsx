@@ -1,5 +1,5 @@
 /// <reference path="../../global.d.ts" />
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Calendar } from "../components/calendar/calendar";
 import { CalendarDays } from "../modules/days";
 import { CalendarNav } from "../modules/nav";
@@ -13,6 +13,8 @@ import { CalendarDaysTrack } from "../modules/days-track";
 import { CalendarMonthsTrack } from "../modules/months-track";
 import { CalendarYearsGrid } from "../modules/years-grid";
 import { createDisabled } from "../utils/create-disabled";
+import { basicPresets } from "../modules/presets/presets-pack";
+import type { PresetEntry } from "../types/presets";
 import "./calendar.css";
 import "../themes.gen.css";
 import "../appearances.gen.css";
@@ -318,6 +320,97 @@ export const KitchenSink = () => {
 
   const [yearsPerPage, setYearsPerPage] = useState(10);
 
+  const BASIC_PRESET_IDS = basicPresets.map((p) => p.id!);
+
+  const SIMPLE_PRESET_DEFS: Record<string, PresetEntry> = {
+    in3days:    { label: "In 3 days",    value: 3 },
+    in2weeks:   { label: "In 2 weeks",   value: 14 },
+    last7days:  { label: "Last 7 days",  value: -6, range: 6 },
+    nextSprint: { label: "Next sprint",  value: 1,  range: 13 },
+    newYear:    { label: "New Year 2026",value: new Date(2026, 0, 1) },
+    q1_2026:    { label: "Q1 2026",      value: new Date(2026, 0, 1), range: 89 },
+  };
+
+  const ADVANCED_PRESET_DEFS: Record<string, PresetEntry> = {
+    startOfMonth: {
+      id: "som",
+      label: "Start of month",
+      getValue: ({ now }) => new Date(now.getFullYear(), now.getMonth(), 1),
+    },
+    endOfMonth: {
+      id: "eom",
+      label: "End of month",
+      getValue: ({ now }) => new Date(now.getFullYear(), now.getMonth() + 1, 0),
+    },
+    nextMonday: {
+      id: "nmon",
+      label: "Next Monday",
+      getValue: ({ now }) => {
+        const d = new Date(now);
+        const delta = (8 - d.getDay()) % 7 || 7;
+        d.setDate(d.getDate() + delta);
+        return d;
+      },
+    },
+    thisWeek: {
+      id: "tw",
+      label: "This week (range)",
+      getValue: ({ now }) => {
+        const d = new Date(now);
+        const dayOfWeek = d.getDay() || 7;
+        const from = new Date(d);
+        from.setDate(d.getDate() - dayOfWeek + 1);
+        const to = new Date(from);
+        to.setDate(from.getDate() + 6);
+        return { from, to };
+      },
+    },
+    nextWeekend: {
+      id: "nwe",
+      label: "Next weekend (range)",
+      getValue: ({ now, isValid }) => {
+        const d = new Date(now);
+        const delta = (6 - d.getDay() + 7) % 7 || 7;
+        d.setDate(d.getDate() + delta);
+        for (let i = 0; i < 52; i++) {
+          const sun = new Date(d);
+          sun.setDate(sun.getDate() + 1);
+          if (isValid(d) && isValid(sun)) return { from: d, to: sun };
+          d.setDate(d.getDate() + 7);
+        }
+        return null;
+      },
+    },
+  };
+
+  const [selectedBasic, setSelectedBasic] = useState<string[]>([
+    "yesterday", "today", "tomorrow", "nextWeek",
+  ]);
+  const [selectedSimple, setSelectedSimple] = useState<string[]>([]);
+  const [selectedAdvanced, setSelectedAdvanced] = useState<string[]>([]);
+
+  const toggleBasic = (id: string) =>
+    setSelectedBasic((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  const toggleSimple = (k: string) =>
+    setSelectedSimple((prev) =>
+      prev.includes(k) ? prev.filter((x) => x !== k) : [...prev, k],
+    );
+  const toggleAdvanced = (k: string) =>
+    setSelectedAdvanced((prev) =>
+      prev.includes(k) ? prev.filter((x) => x !== k) : [...prev, k],
+    );
+
+  const composedPresets = useMemo<PresetEntry[]>(
+    () => [
+      ...basicPresets.filter((p) => selectedBasic.includes(p.id!)),
+      ...selectedSimple.map((k) => SIMPLE_PRESET_DEFS[k]).filter(Boolean),
+      ...selectedAdvanced.map((k) => ADVANCED_PRESET_DEFS[k]).filter(Boolean),
+    ],
+    [selectedBasic, selectedSimple, selectedAdvanced],
+  );
+
   const [selectedDatesProps, setSelectedDatesProps] = useState({
     allowClean: true,
     allowNavigate: true,
@@ -399,32 +492,31 @@ export const KitchenSink = () => {
     >
       <div className="kitchen-layout">
         <aside className="kitchen-panel">
-          <p className="panel-label" style={{ marginTop: 12 }}>
-            Width: {containerWidth}px
-          </p>
-          <input
-            type="range"
-            min="200"
-            max="900"
-            value={containerWidth}
-            className="width-slider"
-            onChange={(e) => setContainerWidth(Number(e.target.value))}
-          />
           <p className="panel-label">Mode</p>
-          {modeOptions.map((opt) => (
-            <button
-              key={opt.label}
-              onClick={() => {
+          <select
+            value={
+              modeOptions.find((opt) => opt.mode === mode && opt.max === max)
+                ?.label
+            }
+            onChange={(e) => {
+              const selectedLabel = e.target.value;
+              const opt = modeOptions.find((o) => o.label === selectedLabel);
+
+              if (opt) {
                 setMode(opt.mode);
                 setMax(opt.max);
                 setDates([]);
                 setRange({ from: null, to: null });
-              }}
-              className={`panel-button ${mode === opt.mode && max === opt.max ? "active" : ""}`}
-            >
-              <span className="panel-button-key">{opt.label}</span>
-            </button>
-          ))}
+              }
+            }}
+            className="panel-select"
+          >
+            {modeOptions.map((opt) => (
+              <option key={opt.label} value={opt.label}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
 
           <p className="panel-label" style={{ marginTop: 12 }}>
             Props
@@ -468,32 +560,6 @@ export const KitchenSink = () => {
           </div>
 
           <p className="panel-label" style={{ marginTop: 8 }}>
-            Days props
-          </p>
-          <div className="panel-props-grid">
-            {(
-              [
-                "highlightWeekends",
-                "showWeekNumber",
-                "boldWeekends",
-                "hideOtherMonths",
-                "hideWeekdays",
-                "hideLimited",
-                "highlightToday",
-                "preventUnselect",
-                "allowSwipeNavigation",
-              ] as const
-            ).map((key) => (
-              <button
-                key={key}
-                onClick={() => toggleDaysProp(key)}
-                className={`panel-button-compact ${daysProps[key] ? "active" : ""}`}
-              >
-                {key}
-              </button>
-            ))}
-          </div>
-          <p className="panel-label" style={{ marginTop: 8 }}>
             Modules
           </p>
           <div className="panel-props-grid">
@@ -507,22 +573,38 @@ export const KitchenSink = () => {
               </button>
             ))}
           </div>
-          <p className="panel-label" style={{ marginTop: 8 }}>
-            Module props
-          </p>
-          <div className="panel-props-grid">
-            {(Object.keys(moduleProps) as (keyof typeof moduleProps)[]).map(
-              (key) => (
-                <button
-                  key={key}
-                  onClick={() => toggleModuleProp(key)}
-                  className={`panel-button-compact ${moduleProps[key] ? "active" : ""}`}
-                >
-                  {key}
-                </button>
-              ),
-            )}
-          </div>
+
+          {modules.days && (
+            <>
+              <p className="panel-label" style={{ marginTop: 8 }}>
+                Days props
+              </p>
+              <div className="panel-props-grid">
+                {(
+                  [
+                    "highlightWeekends",
+                    "showWeekNumber",
+                    "boldWeekends",
+                    "hideOtherMonths",
+                    "hideWeekdays",
+                    "hideLimited",
+                    "highlightToday",
+                    "preventUnselect",
+                    "allowSwipeNavigation",
+                  ] as const
+                ).map((key) => (
+                  <button
+                    key={key}
+                    onClick={() => toggleDaysProp(key)}
+                    className={`panel-button-compact ${daysProps[key] ? "active" : ""}`}
+                  >
+                    {key}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+
           {modules.timeGrid && (
             <>
               <p className="panel-label" style={{ marginTop: 8 }}>
@@ -611,6 +693,53 @@ export const KitchenSink = () => {
             </>
           )}
 
+          {modules.presets && (
+            <>
+              <p className="panel-label" style={{ marginTop: 8 }}>
+                basicPresets (pack)
+              </p>
+              <div className="panel-props-grid">
+                {BASIC_PRESET_IDS.map((id) => (
+                  <button
+                    key={id}
+                    onClick={() => toggleBasic(id)}
+                    className={`panel-button-compact ${selectedBasic.includes(id) ? "active" : ""}`}
+                  >
+                    {id}
+                  </button>
+                ))}
+              </div>
+              <p className="panel-label" style={{ marginTop: 8 }}>
+                Simple {"{ label, value, range? }"}
+              </p>
+              <div className="panel-props-grid">
+                {Object.keys(SIMPLE_PRESET_DEFS).map((k) => (
+                  <button
+                    key={k}
+                    onClick={() => toggleSimple(k)}
+                    className={`panel-button-compact ${selectedSimple.includes(k) ? "active" : ""}`}
+                  >
+                    {k}
+                  </button>
+                ))}
+              </div>
+              <p className="panel-label" style={{ marginTop: 8 }}>
+                Advanced {"{ getValue }"}
+              </p>
+              <div className="panel-props-grid">
+                {Object.keys(ADVANCED_PRESET_DEFS).map((k) => (
+                  <button
+                    key={k}
+                    onClick={() => toggleAdvanced(k)}
+                    className={`panel-button-compact ${selectedAdvanced.includes(k) ? "active" : ""}`}
+                  >
+                    {k}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+
           {modules.yearsGrid && (
             <>
               <p className="panel-label" style={{ marginTop: 8 }}>
@@ -645,24 +774,28 @@ export const KitchenSink = () => {
               </div>
             </>
           )}
-          <p className="panel-label" style={{ marginTop: 8 }}>
-            Selected dates
-          </p>
-          <div className="panel-props-grid">
-            {(
-              Object.keys(
-                selectedDatesProps,
-              ) as (keyof typeof selectedDatesProps)[]
-            ).map((key) => (
-              <button
-                key={key}
-                onClick={() => toggleSelectedDatesProp(key)}
-                className={`panel-button-compact ${selectedDatesProps[key] ? "active" : ""}`}
-              >
-                {key}
-              </button>
-            ))}
-          </div>
+          {modules.selectedDates && (
+            <>
+              <p className="panel-label" style={{ marginTop: 8 }}>
+                Selected dates
+              </p>
+              <div className="panel-props-grid">
+                {(
+                  Object.keys(
+                    selectedDatesProps,
+                  ) as (keyof typeof selectedDatesProps)[]
+                ).map((key) => (
+                  <button
+                    key={key}
+                    onClick={() => toggleSelectedDatesProp(key)}
+                    className={`panel-button-compact ${selectedDatesProps[key] ? "active" : ""}`}
+                  >
+                    {key}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
           <div className="panel-weekdays">
             {(["left", "center", "right"] as const).map((a) => (
               <button
@@ -679,6 +812,19 @@ export const KitchenSink = () => {
               <p className="panel-label" style={{ marginTop: 8 }}>
                 ManualSelect align
               </p>
+              <div className="panel-props-grid">
+                {(Object.keys(moduleProps) as (keyof typeof moduleProps)[]).map(
+                  (key) => (
+                    <button
+                      key={key}
+                      onClick={() => toggleModuleProp(key)}
+                      className={`panel-button-compact ${moduleProps[key] ? "active" : ""}`}
+                    >
+                      {key}
+                    </button>
+                  ),
+                )}
+              </div>
               <div className="panel-weekdays">
                 {(["left", "center", "right"] as const).map((a) => (
                   <button
@@ -746,7 +892,7 @@ export const KitchenSink = () => {
                   yearsPerPage={yearsPerPage}
                 />
               )}
-              {modules.presets && <CalendarPresets />}
+              {modules.presets && <CalendarPresets presets={composedPresets} />}
               {calendarProps.twoMonthsLayout && (
                 <CalendarDays {...daysProps} offset={1} hideOtherMonths />
               )}
@@ -755,6 +901,17 @@ export const KitchenSink = () => {
         </div>
 
         <aside className="kitchen-panel">
+          <p className="panel-label" style={{ marginTop: 12 }}>
+            Width: {containerWidth}px
+          </p>
+          <input
+            type="range"
+            min="200"
+            max="900"
+            value={containerWidth}
+            className="width-slider"
+            onChange={(e) => setContainerWidth(Number(e.target.value))}
+          />
           <p className="panel-label">Appearance</p>
           <select
             className="panel-select"
