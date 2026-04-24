@@ -16,6 +16,31 @@ import WeekDays from "./week-days";
 import { StartOfWeek } from "@/types/calendar";
 import { useGridSlot } from "@/hooks/use-grid-slot";
 
+function buildCellLabel(args: {
+  fullDate: Date;
+  cellFmt: Intl.DateTimeFormat;
+  isDisabled: boolean;
+  isSelected: boolean;
+  isTodayDate: boolean;
+  highlightToday: boolean;
+  isRangeStart: boolean;
+  isRangeEnd: boolean;
+  isInRange: boolean;
+  range: boolean;
+}): string {
+  const parts = [args.cellFmt.format(args.fullDate)];
+  if (args.highlightToday && args.isTodayDate) parts.push("today");
+  if (args.range) {
+    if (args.isRangeStart) parts.push("range start");
+    else if (args.isRangeEnd) parts.push("range end");
+    else if (args.isInRange) parts.push("in range");
+  } else if (args.isSelected) {
+    parts.push("selected");
+  }
+  if (args.isDisabled) parts.push("disabled");
+  return parts.join(", ");
+}
+
 interface DayCellProps {
   day: number;
   dateTime: number;
@@ -39,6 +64,7 @@ interface DayCellProps {
   isWeekend: boolean;
   boldWeekends: boolean;
   range: boolean;
+  ariaLabel: string;
   onSelect: (date: Date, isDisabled: boolean) => void;
   onMouseEnter: (date: Date) => void;
 }
@@ -48,7 +74,7 @@ const DayCell = React.memo(function DayCell({
   connectLeft, connectRight, isRangeStart, isRangeEnd, isInRange,
   rangeBridgeLeft, rangeBridgeRight, isPreviewStart, isPreviewEnd, isPreviewMid,
   previewBridgeLeft, previewBridgeRight, isTodayDate, highlightToday, isWeekend,
-  boldWeekends, range, onSelect, onMouseEnter,
+  boldWeekends, range, ariaLabel, onSelect, onMouseEnter,
 }: DayCellProps) {
   const fullDate = useMemo(() => new Date(dateTime), [dateTime]);
 
@@ -112,10 +138,14 @@ const DayCell = React.memo(function DayCell({
   return (
     <button
       type="button"
+      role="gridcell"
       disabled={isDisabled}
       onClick={() => onSelect(fullDate, isDisabled)}
       onMouseEnter={() => onMouseEnter(fullDate)}
+      aria-label={ariaLabel}
       aria-selected={isSelected}
+      aria-current={isTodayDate ? "date" : undefined}
+      aria-disabled={isDisabled || undefined}
       data-cell=""
       data-selected={isSelected || undefined}
       data-today={isToday || undefined}
@@ -346,6 +376,23 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
 
   const animationKey = `${currentMonth}-${currentYear}`;
 
+  const gridLabel = useMemo(
+    () =>
+      new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(date),
+    [locale, date],
+  );
+
+  const cellFmt = useMemo(
+    () =>
+      new Intl.DateTimeFormat(locale, {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }),
+    [locale],
+  );
+
   const isDayHidden = useCallback(
     (d: { fullDate: Date; isDisabled: boolean; isCurrentMonth: boolean }) => {
       const t = d.fullDate.getTime();
@@ -366,7 +413,8 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
       style={useGridSlot(col)}
     >
     <div
-      aria-label="days"
+      role="grid"
+      aria-label={gridLabel}
       key={animationKey}
       className={[
         styles.dayGridContainer,
@@ -383,8 +431,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
         showWeekNumber={showWeekNumber}
         hideWeekdays={hideWeekdays}
       />
-      <div role="row" style={{ display: "contents" }}>
-        {weeksData.map((week, wIndex) => {
+      {weeksData.map((week, wIndex) => {
           const isLastRow = wIndex === weeksData.length - 1;
           if (
             isLastRow &&
@@ -401,9 +448,20 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
           }
 
           return (
-            <React.Fragment key={wIndex}>
+            <div
+              key={wIndex}
+              role="row"
+              aria-label={`Week ${week.weekNumber}`}
+              style={{ display: "contents" }}
+            >
               {showWeekNumber && (
-                <div className={styles.weekNumberItem}>{week.weekNumber}</div>
+                <div
+                  role="rowheader"
+                  aria-label={`Week ${week.weekNumber}`}
+                  className={styles.weekNumberItem}
+                >
+                  {week.weekNumber}
+                </div>
               )}
               {week.days.map(
                 (
@@ -429,7 +487,14 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
                   i,
                 ) => {
                   if (isDayHidden({ fullDate, isDisabled, isCurrentMonth }))
-                    return <span key={i} className={styles.dayItemEmpty} />;
+                    return (
+                      <span
+                        key={i}
+                        role="gridcell"
+                        aria-hidden="true"
+                        className={styles.dayItemEmpty}
+                      />
+                    );
 
                   const dayOfWeek = fullDate.getDay();
                   return (
@@ -457,16 +522,27 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
                       isWeekend={highlightWeekends && (dayOfWeek === 0 || dayOfWeek === 6)}
                       boldWeekends={boldWeekends && (dayOfWeek === 0 || dayOfWeek === 6)}
                       range={range}
+                      ariaLabel={buildCellLabel({
+                        fullDate,
+                        cellFmt,
+                        isDisabled,
+                        isSelected,
+                        isTodayDate: isSameDay(fullDate, today),
+                        highlightToday,
+                        isRangeStart,
+                        isRangeEnd,
+                        isInRange,
+                        range,
+                      })}
                       onSelect={handleSetDay}
                       onMouseEnter={handleMouseEnter}
                     />
                   );
                 },
               )}
-            </React.Fragment>
+            </div>
           );
         })}
-      </div>
     </div>
     </div>
   );
