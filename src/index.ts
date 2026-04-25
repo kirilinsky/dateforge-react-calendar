@@ -1,5 +1,4 @@
 export { Calendar } from "./components/calendar/calendar";
-export { CalendarDays } from "./modules/days/index";
 export { createTheme } from "./utils/create-theme";
 export { createAppearance } from "./utils/create-appearance";
 export { createDisabled } from "./utils/create-disabled";
@@ -16,7 +15,6 @@ export type {
 export type { CalendarTheme, ThemeTokens, CustomTheme, BuiltInTheme } from "./types/themes";
 export type { CalendarAppearance, CustomAppearance, BuiltInAppearance, AppearanceTokens } from "./types/appearances";
 
-export type { CalendarDaysProps } from "./modules/days/index";
 export type { CalendarNavProps } from "./modules/nav/index";
 export type { CalendarDaysTrackProps } from "./modules/days-track/index";
 export type { CalendarMonthGridProps } from "./modules/months/index";
