@@ -55,6 +55,7 @@ export default defineConfig([
     ...sharedOptions,
     entry: {
       "index":          "src/modules/index.ts",
+      "days":           "src/modules/days/index.tsx",
       "nav":            "src/modules/nav/index.tsx",
       "months":         "src/modules/months/index.tsx",
       "time":           "src/modules/time/index.tsx",

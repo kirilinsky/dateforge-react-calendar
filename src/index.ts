@@ -3,13 +3,6 @@ export { CalendarDays } from "./modules/days/index";
 export { createTheme } from "./utils/create-theme";
 export { createAppearance } from "./utils/create-appearance";
 export { createDisabled } from "./utils/create-disabled";
-export { basicPresets } from "./modules/presets/presets-pack";
-
-export { useConfig } from "./context/config-context";
-export { useNavigation } from "./context/navigation-context";
-export { useSelection, useSelectionValue, useSelectionActions, useSelectionHover } from "./context/selection-context";
-export { useUI } from "./context/ui-context";
-export { useThrottle } from "./hooks/use-throttle";
 
 export type {
   CalendarProps,

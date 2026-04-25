@@ -22,6 +22,11 @@
       "import":  "./dist/modules/index.mjs",
       "require": "./dist/modules/index.cjs"
     },
+    "./modules/days": {
+      "types":   "./dist/modules/days.d.ts",
+      "import":  "./dist/modules/days.mjs",
+      "require": "./dist/modules/days.cjs"
+    },
     "./modules/nav": {
       "types":   "./dist/modules/nav.d.ts",
       "import":  "./dist/modules/nav.mjs",
