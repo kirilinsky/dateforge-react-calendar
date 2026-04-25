@@ -170,50 +170,50 @@ const DayCell = React.memo(function DayCell({
     isPreviewMid;
 
   return (
-    <button
-      type="button"
-      tabIndex={tabIndex}
-      onClick={() => !isDisabled && onSelect(fullDate, isDisabled)}
-      onMouseEnter={() => onMouseEnter(fullDate)}
-      onKeyDown={(e) => onKeyDown(e, fullDate)}
-      aria-label={ariaLabel}
-      aria-selected={isSelected}
-      aria-current={isTodayDate ? "date" : undefined}
-      aria-disabled={isDisabled || undefined}
-      data-cell=""
-      data-selected={isSelected || undefined}
-      data-today={isToday || undefined}
-      data-disabled={isDisabled || undefined}
-      data-in-range={isInRange || undefined}
-      data-range-start={isRangeStart || undefined}
-      data-range-end={isRangeEnd || undefined}
-      data-weekend={isWeekend || undefined}
-      data-other-month={isOtherMonth || undefined}
-      className={[
-        styles.dayItem,
-        shared.interactive,
-        shared.hoverable,
-        !range && isSelected && shared.activeItem,
-        !range && connectLeft && connectRight && styles.rangeMid,
-        !range && connectLeft && !connectRight && styles.rangeEnd,
-        !range && !connectLeft && connectRight && styles.rangeStart,
-        range && isSelected && shared.activeItem,
-        range && rangeEndpointClass,
-        range && rangeBridgeClass,
-        range && isInRange && !isDisabled && styles.rIn,
-        range && (isInRange || isPreviewMid) && isDisabled && styles.rInDisabled,
-        previewClass,
-        previewBridgeClass,
-        isToday && styles.todayItem,
-        boldWeekends && styles.boldWeekend,
-        isOtherMonth &&
-          (isHighlighted ? shared.selectedOtherItem : shared.otherItem),
-      ]
-        .filter(Boolean)
-        .join(" ")}
-    >
-      {day}
-    </button>
+    <div role="gridcell" aria-selected={isSelected} aria-disabled={isDisabled || undefined}>
+      <button
+        type="button"
+        tabIndex={tabIndex}
+        onClick={() => !isDisabled && onSelect(fullDate, isDisabled)}
+        onMouseEnter={() => onMouseEnter(fullDate)}
+        onKeyDown={(e) => onKeyDown(e, fullDate)}
+        aria-label={ariaLabel}
+        aria-current={isTodayDate ? "date" : undefined}
+        data-cell=""
+        data-selected={isSelected || undefined}
+        data-today={isToday || undefined}
+        data-disabled={isDisabled || undefined}
+        data-in-range={isInRange || undefined}
+        data-range-start={isRangeStart || undefined}
+        data-range-end={isRangeEnd || undefined}
+        data-weekend={isWeekend || undefined}
+        data-other-month={isOtherMonth || undefined}
+        className={[
+          styles.dayItem,
+          shared.interactive,
+          shared.hoverable,
+          !range && isSelected && shared.activeItem,
+          !range && connectLeft && connectRight && styles.rangeMid,
+          !range && connectLeft && !connectRight && styles.rangeEnd,
+          !range && !connectLeft && connectRight && styles.rangeStart,
+          range && isSelected && shared.activeItem,
+          range && rangeEndpointClass,
+          range && rangeBridgeClass,
+          range && isInRange && !isDisabled && styles.rIn,
+          range && (isInRange || isPreviewMid) && isDisabled && styles.rInDisabled,
+          previewClass,
+          previewBridgeClass,
+          isToday && styles.todayItem,
+          boldWeekends && styles.boldWeekend,
+          isOtherMonth &&
+            (isHighlighted ? shared.selectedOtherItem : shared.otherItem),
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
+        {day}
+      </button>
+    </div>
   );
 });
 
@@ -540,33 +540,26 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
         />
         {weeksData.map((week, wIndex) => {
           const isLastRow = wIndex === weeksData.length - 1;
-          if (
-            isLastRow &&
-            hideOutOfRange &&
-            week.days.every((d) =>
-              isDayHidden({
-                fullDate: d.fullDate,
-                isDisabled: d.isDisabled,
-                isCurrentMonth: d.isCurrentMonth,
-              }),
-            )
-          ) {
-            return null;
-          }
-          if (
-            !fixedRows &&
-            isLastRow &&
-            week.days.every((d) => !d.isCurrentMonth)
-          ) {
-            return null;
-          }
+          const allHidden = week.days.every((d) =>
+            isDayHidden({
+              fullDate: d.fullDate,
+              isDisabled: d.isDisabled,
+              isCurrentMonth: d.isCurrentMonth,
+            }),
+          );
+          const allOutOfMonth = week.days.every((d) => !d.isCurrentMonth);
+          if (allHidden && !fixedRows) return null;
+          if (!fixedRows && isLastRow && allOutOfMonth) return null;
+
+          const isVisuallyEmpty = allHidden || (!fixedRows && allOutOfMonth);
 
           return (
             <div
               key={wIndex}
-              role="row"
-              aria-label={`Week ${week.weekNumber}`}
-              style={{ display: "contents" }}
+              role={isVisuallyEmpty ? "presentation" : "row"}
+              aria-label={isVisuallyEmpty ? undefined : `Week ${week.weekNumber}`}
+              aria-hidden={isVisuallyEmpty ? true : undefined}
+              className={styles.weekRow}
             >
               {weekNumbers && (
                 <div
@@ -602,8 +595,9 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
                 ) => {
                   if (isDayHidden({ fullDate, isDisabled, isCurrentMonth }))
                     return (
-                      <span
+                      <div
                         key={i}
+                        role="gridcell"
                         aria-hidden="true"
                         className={styles.dayItemEmpty}
                       />

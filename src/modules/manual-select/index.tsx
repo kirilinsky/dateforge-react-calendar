@@ -222,6 +222,7 @@ const DateSlot: React.FC<DateSlotProps> = ({
       {hasText && (
         <button
           type="button"
+          aria-label="Clear"
           className={`${styles.saveBtn} ${styles.saveBtnMuted} ${styles.saveBtnLeft}`}
           onClick={handleClearInput}
         >
@@ -243,6 +244,7 @@ const DateSlot: React.FC<DateSlotProps> = ({
       {hasText && (
         <button
           type="button"
+          aria-label="Apply"
           className={[styles.saveBtn, !saveAllowed && styles.saveBtnInvalid]
             .filter(Boolean)
             .join(" ")}
@@ -304,6 +306,7 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
   const clearBtn = (
     <button
       type="button"
+      aria-label="Clear"
       className={`${styles.clearBtn} ${shared.interactive} ${shared.hoverable}`}
       onClick={() => {
         if (range) {
@@ -370,6 +373,7 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
               {addHasText && (
                 <button
                   type="button"
+                  aria-label="Apply"
                   className={[
                     styles.saveBtn,
                     !addSaveAllowed && styles.saveBtnInvalid,

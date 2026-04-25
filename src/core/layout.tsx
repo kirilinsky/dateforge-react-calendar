@@ -29,21 +29,27 @@ const CalendarAnnouncer: React.FC = () => {
     [locale],
   );
   const dateFmt = useMemo(
-    () => new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", year: "numeric" }),
+    () =>
+      new Intl.DateTimeFormat(locale, {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }),
     [locale],
   );
 
   useEffect(() => {
     if (!mountedRef.current) return;
     setAnnouncement(monthFmt.format(viewDate));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewDate.getFullYear(), viewDate.getMonth(), monthFmt]);
 
   const lastSelectedT = selectedDates[selectedDates.length - 1]?.getTime();
   useEffect(() => {
     if (!mountedRef.current || !lastSelectedT) return;
     setAnnouncement(dateFmt.format(new Date(lastSelectedT)));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastSelectedT, dateFmt]);
 
   useEffect(() => {
@@ -63,7 +69,7 @@ export const CalendarLayout: React.FC<{
   modules?: React.ReactNode;
 }> = ({ customAppearanceVars, cols, modules }) => {
   const { gradient } = useConfig();
-  const { dark, containerRef } = useUI();
+  const { containerRef } = useUI();
 
   const containerStyle: React.CSSProperties = {
     ...customAppearanceVars,
@@ -74,11 +80,7 @@ export const CalendarLayout: React.FC<{
   return (
     <div
       ref={containerRef}
-      className={[
-        styles.calendarContainer,
-        gradient ? styles.gradient : "",
-        dark ? styles.dark : "",
-      ]
+      className={[styles.calendarContainer, gradient ? styles.gradient : ""]
         .filter(Boolean)
         .join(" ")}
       style={containerStyle}
@@ -88,7 +90,9 @@ export const CalendarLayout: React.FC<{
         <div className={styles.emptyState}>
           <span className={styles.emptyStateTitle}>No modules</span>
           <span className={styles.emptyStateHint}>
-            Add modules like <code>&lt;CalendarDays /&gt;</code> or <code>&lt;CalendarNav /&gt;</code> as children of <code>&lt;Calendar /&gt;</code>
+            Add modules like <code>&lt;CalendarDays /&gt;</code> or{" "}
+            <code>&lt;CalendarNav /&gt;</code> as children of{" "}
+            <code>&lt;Calendar /&gt;</code>
           </span>
         </div>
       )}

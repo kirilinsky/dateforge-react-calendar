@@ -86,6 +86,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
   const clearBtn = allowClear ? (
     <button
       type="button"
+      aria-label="Clear"
       className={`${styles.clearBtn} ${shared.interactive} ${shared.hoverable}`}
       onClick={() => onChangeDate(null)}
     >

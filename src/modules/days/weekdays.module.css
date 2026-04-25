@@ -6,7 +6,7 @@
   justify-content: center;
   min-width: 0;
   overflow: hidden;
-  opacity: 0.3;
+  opacity: 0.5;
   text-transform: uppercase;
   user-select: none;
   color: var(--c-c);
@@ -17,7 +17,7 @@
 .weekendDark,
 .weekendLight {
   color: var(--c-we);
-  opacity: 0.6;
+  opacity: .7;
 }
 
 }

@@ -8,7 +8,7 @@
     --c-s: #e8e8e8;
     --c-x: #1a1a1c14;
     --c-d: #a0a0a2;
-    --c-we: #e53935;
+    --c-we: #e32825;
     --c-r: #4a90d9;
   }
 
@@ -21,7 +21,7 @@
     --c-s: #333333;
     --c-x: #ffffff16;
     --c-d: #555558;
-    --c-we: #e53935;
+    --c-we: #e32825;
     --c-r: #4a90d9;
   }
 }
@@ -77,21 +77,6 @@
       radial-gradient(
         ellipse 40% 38% at 95% 95%,
         color-mix(in srgb, var(--c-b) 90%, var(--c-h)) 0%,
-        transparent 100%
-      ),
-      var(--c-b);
-  }
-
-  .calendarContainer.gradient.dark {
-    background:
-      radial-gradient(
-        ellipse 48% 42% at 4% 4%,
-        color-mix(in srgb, var(--c-b) 74%, var(--c-h)) 0%,
-        transparent 100%
-      ),
-      radial-gradient(
-        ellipse 38% 35% at 96% 96%,
-        color-mix(in srgb, var(--c-b) 78%, var(--c-h)) 0%,
         transparent 100%
       ),
       var(--c-b);

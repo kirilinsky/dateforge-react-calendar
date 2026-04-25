@@ -2,9 +2,8 @@
 
 .dayGridContainer {
   container-type: inline-size;
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  grid-template-rows: auto repeat(6, auto);
+  display: flex;
+  flex-direction: column;
   gap: 0.15em;
   --day-gap: 0.15em;
   --rng-bg: color-mix(in srgb, var(--c-r) 28%, var(--c-b));
@@ -16,10 +15,20 @@
   min-width: 0;
 }
 
+.weekRow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--day-gap);
+}
+
 .dayGridContainer.withWeekNumbers {
-  grid-template-columns: 2.2em repeat(7, 1fr);
   padding: var(--days-wn-padding, 0.85em);
   gap: var(--days-wn-gap, 0.15em);
+  --day-gap: var(--days-wn-gap, 0.15em);
+}
+
+.dayGridContainer.withWeekNumbers .weekRow {
+  grid-template-columns: 2.2em repeat(7, 1fr);
 }
 
 .weekNumberItem {

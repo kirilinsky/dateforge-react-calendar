@@ -29,7 +29,7 @@ export const TOKEN_TO_VAR: Record<keyof ThemeTokens, string> = {
 };
 
 const W = "#ffffff";
-const RE = "#e53935";
+const RE = "#e32825";
 
 export const THEMES_DATA: Record<string, ThemeTokens> = {
   industrial: { accent: W,         backdrop: "#111111", highlight: "#e85d00", tone: "#1c1c1c",  text: "#d4d4d4", stroke: "#2a2a2a", shadow: "#e85d0030", disabled: "#505050", weekend: "#ff7043", range: "#f1c40f" },

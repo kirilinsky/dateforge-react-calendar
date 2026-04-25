@@ -9,6 +9,10 @@
 [![bundle size](https://img.shields.io/bundlephobia/minzip/react-calendar-datetime?style=flat-square)](https://bundlephobia.com/package/react-calendar-datetime)
 &nbsp;&nbsp;
 [![license](https://img.shields.io/npm/l/react-calendar-datetime.svg?style=flat-square)](https://github.com/kirilinsky/react-calendar-datetime/blob/main/LICENSE)
+&nbsp;&nbsp;
+![axe](https://img.shields.io/badge/axe-0%20critical%20violations-brightgreen)
+&nbsp;&nbsp;
+![lighthouse](https://img.shields.io/badge/a11y-98%20Lighthouse-brightgreen)
 
 </div>
 
