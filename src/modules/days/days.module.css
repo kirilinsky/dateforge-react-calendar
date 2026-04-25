@@ -114,6 +114,12 @@
   border-radius: 0 !important;
 }
 
+.rInDisabled {
+  background: color-mix(in srgb, var(--c-we) 32%, var(--rng-bg)) !important;
+  color: var(--c-c) !important;
+  border-radius: 0 !important;
+}
+
 .rPreviewStart {
   background: var(--rng-prev) !important;
   border-radius: var(--cal-radius, 0.5em) 0 0 var(--cal-radius, 0.5em) !important;

@@ -1,4 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useRef } from "react";
+import { useItemWidth } from "@/hooks/use-item-width";
+import { useBoundDateView } from "@/hooks/use-bound-date-view";
 import styles from "./months-track.module.css";
 import { useNavigation } from "@/context/navigation-context";
 import { useSelectionValue, useSelectionActions } from "@/context/selection-context";
@@ -21,20 +23,15 @@ export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({ short 
   const { minDate, maxDate, locale, range } = useConfig();
   const { rangeStart, rangeEnd } = useSelectionValue();
   const { onRangeBoundSet } = useSelectionActions();
-  const isBound = !!(range && bound);
-  const boundDate = isBound ? (bound === "from" ? rangeStart : rangeEnd) : null;
-  const [localView, setLocalView] = useState<Date>(() => boundDate ?? viewDate);
-  useEffect(() => {
-    if (isBound && boundDate) setLocalView(boundDate);
-  }, [isBound, boundDate?.getTime()]);  // eslint-disable-line react-hooks/exhaustive-deps
-  const refDate = isBound ? localView : (boundDate ?? viewDate);
+  const { isBound, setLocalView, refDate } = useBoundDateView({ bound, range, rangeStart, rangeEnd, viewDate });
   const year = refDate.getFullYear();
   const currentIndex = refDate.getMonth();
   const MONTHS = getMonthNames(locale, short);
-  const [itemWidth, setItemWidth] = useState(52);
-
   const minIndex = minDate && minDate.getFullYear() === year ? minDate.getMonth() : undefined;
   const maxIndex = maxDate && maxDate.getFullYear() === year ? maxDate.getMonth() : undefined;
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const itemWidth = useItemWidth(containerRef, 52);
 
   const { ref, position, scrollTo, onPointerDown, onPointerMove, onPointerUp, onPointerCancel } = useTrack({
     count: MONTHS.length,
@@ -43,6 +40,7 @@ export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({ short 
     circular: true,
     minIndex,
     maxIndex,
+    ref: containerRef,
     onChange: (index) => {
       const next = new Date(refDate);
       next.setMonth(index);
@@ -54,20 +52,6 @@ export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({ short 
       }
     },
   });
-
-  useEffect(() => {
-    if (typeof ResizeObserver === "undefined") return;
-    const container = ref.current;
-    if (!container) return;
-    const measure = () => {
-      const el = container.querySelector("[data-item]") as HTMLElement | null;
-      if (el) setItemWidth(el.offsetWidth);
-    };
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(container);
-    return () => ro.disconnect();
-  }, [ref]);
 
   const containerWidth = ref.current?.offsetWidth ?? 0;
   const frac = position - Math.round(position);

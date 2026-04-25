@@ -16,6 +16,7 @@ interface UseTrackOptions {
   minIndex?: number;
   maxIndex?: number;
   onChange: (index: number) => void;
+  ref?: React.RefObject<HTMLDivElement | null>;
 }
 
 interface UseTrackReturn {
@@ -39,8 +40,10 @@ export function useTrack({
   minIndex,
   maxIndex,
   onChange,
+  ref: externalRef,
 }: UseTrackOptions): UseTrackReturn {
-  const ref = useRef<HTMLDivElement>(null);
+  const internalRef = useRef<HTMLDivElement>(null);
+  const ref = externalRef ?? internalRef;
   const [position, setPosition] = useState(initialIndex);
 
   const opts = useRef({

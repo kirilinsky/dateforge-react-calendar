@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useRef } from "react";
+import { useItemWidth } from "@/hooks/use-item-width";
+import { useBoundDateView } from "@/hooks/use-bound-date-view";
 import styles from "./years-track.module.css";
 import { useNavigation } from "@/context/navigation-context";
 import { useConfig } from "@/context/config-context";
@@ -22,18 +24,13 @@ export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({ bound, c
   const { minDate, maxDate, range } = useConfig();
   const { rangeStart, rangeEnd } = useSelectionValue();
   const { onRangeBoundSet } = useSelectionActions();
-  const isBound = !!(range && bound);
-  const boundDate = isBound ? (bound === "from" ? rangeStart : rangeEnd) : null;
-  const [localView, setLocalView] = useState<Date>(() => boundDate ?? viewDate);
-  useEffect(() => {
-    if (isBound && boundDate) setLocalView(boundDate);
-  }, [isBound, boundDate?.getTime()]);  // eslint-disable-line react-hooks/exhaustive-deps
-  const refDate = isBound ? localView : (boundDate ?? viewDate);
+  const { isBound, setLocalView, refDate } = useBoundDateView({ bound, range, rangeStart, rangeEnd, viewDate });
   const currentIndex = Math.max(0, Math.min(YEARS.length - 1, refDate.getFullYear() - MIN_YEAR));
-  const [itemWidth, setItemWidth] = useState(52);
-
   const minIndex = minDate ? Math.max(0, minDate.getFullYear() - MIN_YEAR) : undefined;
   const maxIndex = maxDate ? Math.min(YEARS.length - 1, maxDate.getFullYear() - MIN_YEAR) : undefined;
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const itemWidth = useItemWidth(containerRef, 52);
 
   const { ref, position, scrollTo, onPointerDown, onPointerMove, onPointerUp, onPointerCancel } = useTrack({
     count: YEARS.length,
@@ -41,6 +38,7 @@ export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({ bound, c
     pixelsPerItem: itemWidth,
     minIndex,
     maxIndex,
+    ref: containerRef,
     onChange: (index) => {
       const next = new Date(refDate);
       next.setFullYear(YEARS[index]);
@@ -52,20 +50,6 @@ export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({ bound, c
       }
     },
   });
-
-  useEffect(() => {
-    if (typeof ResizeObserver === "undefined") return;
-    const container = ref.current;
-    if (!container) return;
-    const measure = () => {
-      const el = container.querySelector("[data-item]") as HTMLElement | null;
-      if (el) setItemWidth(el.offsetWidth);
-    };
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(container);
-    return () => ro.disconnect();
-  }, [ref]);
 
   const containerWidth = ref.current?.offsetWidth ?? 0;
   const frac = position - Math.round(position);

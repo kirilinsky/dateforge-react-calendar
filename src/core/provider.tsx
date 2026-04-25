@@ -78,8 +78,8 @@ export function CalendarProvider<M extends CalendarMode = "single">({
     mode === "multiple" ? (maxDates ?? true) : undefined;
 
   const selectConfig = useMemo<SelectConfig>(
-    () => ({ range, multiselect, minRangeDays, maxRangeDays }),
-    [range, multiselect, minRangeDays, maxRangeDays],
+    () => ({ range, multiselect, minRangeDays, maxRangeDays, minDate, maxDate, disabled }),
+    [range, multiselect, minRangeDays, maxRangeDays, minDate, maxDate, disabled],
   );
 
   const [state, dispatch] = useReducer(calendarReducer, undefined, () =>

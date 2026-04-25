@@ -1,4 +1,5 @@
-import { isSameDay } from "@/utils/date-utils";
+import { isSameDay, hasDisabledInRange } from "@/utils/date-utils";
+import { DisabledConfig } from "@/types/calendar";
 
 interface CalendarState {
   viewDate: Date;
@@ -15,6 +16,9 @@ export interface SelectConfig {
   multiselect: number | boolean | undefined;
   minRangeDays?: number;
   maxRangeDays?: number;
+  minDate?: Date | null;
+  maxDate?: Date | null;
+  disabled?: DisabledConfig;
 }
 
 type CalendarAction =
@@ -93,6 +97,9 @@ function selectRange(
     return state;
   }
   if (config.maxRangeDays !== undefined && diffDays > config.maxRangeDays) {
+    return state;
+  }
+  if (hasDisabledInRange(s, e, config.minDate, config.maxDate, config.disabled)) {
     return state;
   }
 

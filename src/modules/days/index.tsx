@@ -136,16 +136,16 @@ const DayCell = React.memo(function DayCell({
           ? styles.rPreviewStart
           : isPreviewEnd
             ? styles.rPreviewEnd
-            : isPreviewMid
+            : isPreviewMid && !isDisabled
               ? styles.rPreview
               : null;
 
   const previewBridgeClass =
-    previewBridgeLeft && previewBridgeRight
+    !isDisabled && previewBridgeLeft && previewBridgeRight
       ? styles.rPreviewBridgeBoth
-      : previewBridgeRight
+      : !isDisabled && previewBridgeRight
         ? styles.rPreviewBridgeRight
-        : previewBridgeLeft
+        : !isDisabled && previewBridgeLeft
           ? styles.rPreviewBridgeLeft
           : null;
 
@@ -200,7 +200,8 @@ const DayCell = React.memo(function DayCell({
         range && isSelected && shared.activeItem,
         range && rangeEndpointClass,
         range && rangeBridgeClass,
-        range && isInRange && styles.rIn,
+        range && isInRange && !isDisabled && styles.rIn,
+        range && (isInRange || isPreviewMid) && isDisabled && styles.rInDisabled,
         previewClass,
         previewBridgeClass,
         isToday && styles.todayItem,

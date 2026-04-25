@@ -1,4 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
+import { useItemWidth } from "@/hooks/use-item-width";
+import { useBoundDateView } from "@/hooks/use-bound-date-view";
 import styles from "./days-track.module.css";
 import { useNavigation } from "@/context/navigation-context";
 import {
@@ -44,32 +46,26 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
     return () => setDaysTrackActive(false);
   }, [setDaysTrackActive]);
 
-  const isBound = !!(range && bound);
-  const boundDate = isBound
-    ? bound === "from"
-      ? rangeStart
-      : rangeEnd
+  const { isBound, boundDate, setLocalView, refDate } = useBoundDateView({ bound, range, rangeStart, rangeEnd, viewDate });
+
+  const refDate_year = refDate.getFullYear();
+  const refDate_month = refDate.getMonth();
+  const year = refDate_year;
+  const month = refDate_month;
+  const days = useMemo(() => daysInMonth(year, month), [year, month]);
+
+  const selectionDate = isBound
+    ? boundDate
     : isMulti
       ? (selectedDates.find((d) => isSameDay(d, viewDate)) ?? null)
       : selectedDate;
-  const [localView, setLocalView] = useState<Date>(() => boundDate ?? viewDate);
-  useEffect(() => {
-    if (isBound && boundDate) setLocalView(boundDate);
-  }, [isBound, boundDate?.getTime()]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const refDate = isBound ? localView : viewDate;
-  const year = refDate.getFullYear();
-  const month = refDate.getMonth();
-  const days = useMemo(() => daysInMonth(year, month), [year, month]);
 
   const selectedDay =
-    boundDate &&
-    boundDate.getFullYear() === year &&
-    boundDate.getMonth() === month
-      ? boundDate.getDate() - 1
+    selectionDate &&
+    selectionDate.getFullYear() === year &&
+    selectionDate.getMonth() === month
+      ? selectionDate.getDate() - 1
       : refDate.getDate() - 1;
-
-  const [itemWidth, setItemWidth] = useState(44);
 
   const minIndex =
     minDate && minDate.getFullYear() === year && minDate.getMonth() === month
@@ -79,6 +75,9 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
     maxDate && maxDate.getFullYear() === year && maxDate.getMonth() === month
       ? maxDate.getDate() - 1
       : undefined;
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const itemWidth = useItemWidth(containerRef, 44);
 
   const {
     ref,
@@ -95,6 +94,7 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
     circular: true,
     minIndex,
     maxIndex,
+    ref: containerRef,
     onChange: (index) => {
       const next = new Date(refDate);
       next.setFullYear(year);
@@ -111,20 +111,6 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
       }
     },
   });
-
-  useEffect(() => {
-    if (typeof ResizeObserver === "undefined") return;
-    const container = ref.current;
-    if (!container) return;
-    const measure = () => {
-      const el = container.querySelector("[data-item]") as HTMLElement | null;
-      if (el) setItemWidth(el.offsetWidth);
-    };
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(container);
-    return () => ro.disconnect();
-  }, [ref]);
 
   const shortMonth = useMemo(
     () =>

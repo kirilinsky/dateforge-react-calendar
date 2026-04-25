@@ -90,6 +90,24 @@ export const checkIsDateDisabled = (
   return (minT !== null && t < minT) || (maxT !== null && t > maxT);
 };
 
+export const hasDisabledInRange = (
+  start: Date,
+  end: Date,
+  startDate?: Date | null,
+  endDate?: Date | null,
+  disabled?: DisabledConfig,
+): boolean => {
+  const cursor = new Date(start);
+  cursor.setHours(12, 0, 0, 0);
+  const endNoon = new Date(end);
+  endNoon.setHours(12, 0, 0, 0);
+  while (cursor <= endNoon) {
+    if (checkIsDateDisabled(cursor, startDate, endDate, disabled)) return true;
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return false;
+};
+
 export const navBoundsFromDisabled = (
   disabled?: DisabledConfig,
 ): { min?: Date; max?: Date } => {

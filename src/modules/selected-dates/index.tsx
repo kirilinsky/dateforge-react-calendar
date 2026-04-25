@@ -8,6 +8,7 @@ import {
   useSelectionActions,
 } from "@/context/selection-context";
 import { useGridSlot } from "@/hooks/use-grid-slot";
+import { alignToJustify, AlignValue } from "@/utils/layout-utils";
 import { isSameDay } from "@/utils/date-core";
 
 const getRangeSep = (
@@ -32,12 +33,6 @@ const getRangeSep = (
   }
 };
 
-type AlignValue = "left" | "center" | "right";
-const alignToJustify: Record<AlignValue, string> = {
-  left: "flex-start",
-  center: "center",
-  right: "flex-end",
-};
 
 export interface CalendarSelectedDatesProps {
   allowClear?: boolean;

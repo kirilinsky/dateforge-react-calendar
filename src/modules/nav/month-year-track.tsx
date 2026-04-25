@@ -1,4 +1,5 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useState } from "react";
+import { useScrollAccumulator } from "@/hooks/use-scroll-accumulator";
 import styles from "./month-year-track.module.css";
 import {
   getDrumValue,
@@ -9,8 +10,6 @@ import {
 import { Popup } from "@/components/popup/popup";
 
 const OFFSETS = Array.from({ length: 7 }, (_, i) => i - 3);
-const SCROLL_THRESHOLD = 40;
-const TOUCH_THRESHOLD = 28;
 
 function SelectDrum({
   val,
@@ -30,61 +29,8 @@ function SelectDrum({
   label: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const stepRef = useRef(onStep);
-  const wheelAccum = useRef(0);
-  const touchStartY = useRef<number | null>(null);
-  const touchAccum = useRef(0);
 
-  useEffect(() => {
-    stepRef.current = onStep;
-  }, [onStep]);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const onWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      wheelAccum.current += e.deltaY;
-      if (Math.abs(wheelAccum.current) < SCROLL_THRESHOLD) return;
-      const dir = wheelAccum.current > 0 ? 1 : -1;
-      wheelAccum.current = 0;
-      stepRef.current(dir);
-    };
-    el.addEventListener("wheel", onWheel, { passive: false });
-    return () => el.removeEventListener("wheel", onWheel);
-  }, []);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const onTouchStart = (e: TouchEvent) => {
-      touchStartY.current = e.touches[0].clientY;
-      touchAccum.current = 0;
-    };
-    const onTouchMove = (e: TouchEvent) => {
-      if (touchStartY.current === null) return;
-      e.preventDefault();
-      const delta = e.touches[0].clientY - touchStartY.current;
-      touchAccum.current -= delta;
-      touchStartY.current = e.touches[0].clientY;
-      if (Math.abs(touchAccum.current) < TOUCH_THRESHOLD) return;
-      const dir = touchAccum.current > 0 ? 1 : -1;
-      touchAccum.current = 0;
-      stepRef.current(dir);
-    };
-    const onTouchEnd = () => {
-      touchStartY.current = null;
-      touchAccum.current = 0;
-    };
-    el.addEventListener("touchstart", onTouchStart, { passive: true });
-    el.addEventListener("touchmove", onTouchMove, { passive: false });
-    el.addEventListener("touchend", onTouchEnd, { passive: true });
-    return () => {
-      el.removeEventListener("touchstart", onTouchStart);
-      el.removeEventListener("touchmove", onTouchMove);
-      el.removeEventListener("touchend", onTouchEnd);
-    };
-  }, []);
+  useScrollAccumulator(ref, onStep);
 
   return (
     <div
