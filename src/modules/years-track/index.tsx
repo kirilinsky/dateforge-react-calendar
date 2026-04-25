@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./years-track.module.css";
 import { useNavigation } from "@/context/navigation-context";
 import { useConfig } from "@/context/config-context";
+import { useSelectionValue, useSelectionActions } from "@/context/selection-context";
 import { useTrack } from "@/hooks/use-track";
 import { useGridSlot } from "@/hooks/use-grid-slot";
 
@@ -12,13 +13,23 @@ const HALF = 6;
 const OFFSETS = Array.from({ length: HALF * 2 + 1 }, (_, i) => i - HALF);
 
 export interface CalendarYearsTrackProps {
+  bound?: "from" | "to";
   col?: number | string;
 }
 
-export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({ col }) => {
+export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({ bound, col }) => {
   const { viewDate, navigateTo } = useNavigation();
-  const { minDate, maxDate } = useConfig();
-  const currentIndex = Math.max(0, Math.min(YEARS.length - 1, viewDate.getFullYear() - MIN_YEAR));
+  const { minDate, maxDate, range } = useConfig();
+  const { rangeStart, rangeEnd } = useSelectionValue();
+  const { onRangeBoundSet } = useSelectionActions();
+  const isBound = !!(range && bound);
+  const boundDate = isBound ? (bound === "from" ? rangeStart : rangeEnd) : null;
+  const [localView, setLocalView] = useState<Date>(() => boundDate ?? viewDate);
+  useEffect(() => {
+    if (isBound && boundDate) setLocalView(boundDate);
+  }, [isBound, boundDate?.getTime()]);  // eslint-disable-line react-hooks/exhaustive-deps
+  const refDate = isBound ? localView : (boundDate ?? viewDate);
+  const currentIndex = Math.max(0, Math.min(YEARS.length - 1, refDate.getFullYear() - MIN_YEAR));
   const [itemWidth, setItemWidth] = useState(52);
 
   const minIndex = minDate ? Math.max(0, minDate.getFullYear() - MIN_YEAR) : undefined;
@@ -31,9 +42,14 @@ export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({ col }) =
     minIndex,
     maxIndex,
     onChange: (index) => {
-      const next = new Date(viewDate);
+      const next = new Date(refDate);
       next.setFullYear(YEARS[index]);
-      navigateTo(next);
+      if (isBound) {
+        setLocalView(next);
+        onRangeBoundSet(bound!, next);
+      } else {
+        navigateTo(next);
+      }
     },
   });
 

@@ -95,12 +95,17 @@ export const FourMonthsLayout = () => {
     <StoryWrapper title="Four Months Layout" subtitle={formatSubtitle(date)}>
       <div style={{ width: 650 }}>
         <Calendar value={date} cols={4} appearance={"bubble"}>
-          <CalendarNav showMonthPicker compactYears col={2} hideBorder={'right'} />
-          <CalendarNav monthLabel offset={1} col={2} hideBorder={'left'} />
+          <CalendarNav
+            showMonthPicker
+            compactYears
+            col={2}
+            hideBorder={"right"}
+          />
+          <CalendarNav monthLabel offset={1} col={2} hideBorder={"left"} />
           <CalendarDays currentMonthOnly col={2} fixedRows={false} />
           <CalendarDays offset={1} currentMonthOnly col={2} fixedRows={false} />
           <CalendarNav monthLabel col={2} offset={2} />
-          <CalendarNav monthLabel offset={3} col={2} yearLabel/>
+          <CalendarNav monthLabel offset={3} col={2} yearLabel />
           <CalendarDays currentMonthOnly col={2} offset={2} fixedRows={false} />
           <CalendarDays offset={3} currentMonthOnly col={2} fixedRows={false} />
         </Calendar>
@@ -133,6 +138,87 @@ export const RangePicker = () => {
           <CalendarNav showMonthPicker />
           <CalendarDays />
           <CalendarSelectedDates />
+        </Calendar>
+      </div>
+    </StoryWrapper>
+  );
+};
+
+export const RangeTracks = () => {
+  const [range, setRange] = useState<DateRange>({ from: null, to: null });
+
+  const fmt = (d: Date) =>
+    new Intl.DateTimeFormat("en", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }).format(d);
+
+  const subtitle =
+    range.from && range.to
+      ? `${fmt(range.from)} → ${fmt(range.to)}`
+      : range.from
+        ? `${fmt(range.from)} → pick end…`
+        : "Pick start date";
+
+  return (
+    <StoryWrapper title="Range Picker — bound tracks" subtitle={subtitle}>
+      <div className="calendar-fixed-container" style={{ width: 640 }}>
+        <Calendar
+          mode="range"
+          value={range}
+          onChange={setRange}
+          theme="light"
+          cols={4}
+        >
+          <CalendarNav monthLabel hideBorder="right" col={2} />
+          <CalendarNav offset={1} monthLabel hideBorder="left" col={2} />
+          <CalendarDays currentMonthOnly col={2} />
+          <CalendarDays offset={1} currentMonthOnly col={2} />
+          <CalendarDaysTrack bound="from" col={2} />
+          <CalendarDaysTrack bound="to" col={2} />
+          <CalendarMonthsTrack bound="from" col={2} />
+          <CalendarMonthsTrack bound="to" col={2} />
+          <CalendarYearsTrack bound="from" col={2} />
+          <CalendarYearsTrack bound="to" col={2} />
+          <CalendarSelectedDates />
+        </Calendar>
+      </div>
+    </StoryWrapper>
+  );
+};
+
+export const MultiselectTracks = () => {
+  const [dates, setDates] = useState<Date[]>([]);
+
+  const fmt = (d: Date) =>
+    new Intl.DateTimeFormat("en", {
+      day: "2-digit",
+      month: "short",
+    }).format(d);
+
+  const subtitle = dates.length
+    ? dates.map(fmt).join(" · ")
+    : "Pick multiple dates";
+
+  return (
+    <StoryWrapper
+      title="Multiselect — tracks follow active"
+      subtitle={subtitle}
+    >
+      <div className="calendar-fixed-container" style={{ width: 480 }}>
+        <Calendar
+          mode="multiple"
+          value={dates}
+          onChange={setDates}
+          theme="light"
+        >
+          <CalendarNav showMonthPicker />
+          <CalendarDays />
+          <CalendarSelectedDates />
+          <CalendarMonthsTrack />
+          <CalendarYearsTrack />
+          <CalendarDaysTrack showMonthLabel />
         </Calendar>
       </div>
     </StoryWrapper>

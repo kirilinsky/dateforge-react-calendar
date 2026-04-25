@@ -183,6 +183,11 @@ export function CalendarProvider<M extends CalendarMode = "single">({
     dispatch({ type: "SET_RANGE", from, to });
   }, [readOnly]);
 
+  const handleRangeBoundSet = useCallback((bound: "from" | "to", date: Date | null) => {
+    if (readOnly) return;
+    dispatch({ type: "SET_RANGE_BOUND", bound, date });
+  }, [readOnly]);
+
   const navigateTo = useCallback((d: Date) => {
     dispatch({ type: "NAVIGATE", date: d });
   }, []);
@@ -277,9 +282,10 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       onChangeDate: handleChangeDate,
       onDatesSet: handleDatesSet,
       onRangeSet: handleRangeSet,
+      onRangeBoundSet: handleRangeBoundSet,
       onChangeTime: handleChangeTime,
     }),
-    [setHoverDate, handleChangeDate, handleDatesSet, handleRangeSet, handleChangeTime],
+    [setHoverDate, handleChangeDate, handleDatesSet, handleRangeSet, handleRangeBoundSet, handleChangeTime],
   );
 
   const selectionHover = useMemo(

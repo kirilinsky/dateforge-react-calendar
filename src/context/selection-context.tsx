@@ -12,6 +12,7 @@ export interface SelectionActions {
   onChangeDate: (date: Date | null) => void;
   onDatesSet: (dates: Date[]) => void;
   onRangeSet: (from: Date | null, to: Date | null) => void;
+  onRangeBoundSet: (bound: "from" | "to", date: Date | null) => void;
   onChangeTime: (date: Date) => void;
 }
 

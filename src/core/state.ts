@@ -26,6 +26,7 @@ export type CalendarAction =
   | { type: "CHANGE_TIME"; date: Date }
   | { type: "SET_DATES"; dates: Date[] }
   | { type: "SET_RANGE"; from: Date | null; to: Date | null }
+  | { type: "SET_RANGE_BOUND"; bound: "from" | "to"; date: Date | null }
   | {
       type: "SYNC_EXTERNAL";
       viewDate: Date;
@@ -170,6 +171,26 @@ export function calendarReducer(
         viewDate: action.from ?? state.viewDate,
         notifySeq: state.notifySeq + 1,
       };
+
+    case "SET_RANGE_BOUND": {
+      const { bound, date } = action;
+      let nextStart = state.rangeStart;
+      let nextEnd = state.rangeEnd;
+      if (bound === "from") nextStart = date;
+      else nextEnd = date;
+      if (nextStart && nextEnd && nextStart.getTime() > nextEnd.getTime()) {
+        const swap = nextStart;
+        nextStart = nextEnd;
+        nextEnd = swap;
+      }
+      return {
+        ...state,
+        rangeStart: nextStart,
+        rangeEnd: nextEnd,
+        viewDate: date ?? state.viewDate,
+        notifySeq: state.notifySeq + 1,
+      };
+    }
 
     case "SYNC_EXTERNAL":
       return {

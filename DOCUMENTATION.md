@@ -282,10 +282,20 @@ A horizontal scrollable strip of day numbers for the current month.
 
 ### Props
 
-| Prop             | Type               | Default | Description                                               |
-| ---------------- | ------------------ | ------- | --------------------------------------------------------- |
-| `showMonthLabel` | `boolean`          | `false` | Show the abbreviated month name above the active day item |
-| `col`            | `number \| string` | —       | CSS grid `grid-column` value                              |
+| Prop             | Type                  | Default | Description                                                                               |
+| ---------------- | --------------------- | ------- | ----------------------------------------------------------------------------------------- |
+| `showMonthLabel` | `boolean`             | `false` | Show the abbreviated month name above the active day item                                 |
+| `bound`          | `"from" \| "to"`      | —       | In range mode binds the track to a range boundary. Without it tracks single-mode behavior |
+| `col`            | `number \| string`    | —       | CSS grid `grid-column` value                                                              |
+
+In `mode="multiple"` the track automatically renders a save / remove button. Item click only previews; the button commits the date (toggles in/out of `selectedDates`). The button shows `Check` when the previewed date is not selected, `Clear` (×) when it is.
+
+```tsx
+<Calendar mode="range">
+  <CalendarDaysTrack bound="from" />
+  <CalendarDaysTrack bound="to" />
+</Calendar>
+```
 
 ---
 
@@ -299,10 +309,11 @@ A horizontal scrollable strip of month names for the current year.
 
 ### Props
 
-| Prop    | Type               | Default | Description                  |
-| ------- | ------------------ | ------- | ---------------------------- |
-| `short` | `boolean`          | `true`  | Use abbreviated month names  |
-| `col`   | `number \| string` | —       | CSS grid `grid-column` value |
+| Prop    | Type                  | Default | Description                                                                               |
+| ------- | --------------------- | ------- | ----------------------------------------------------------------------------------------- |
+| `short`       | `boolean`             | `true`  | Use abbreviated month names                                                               |
+| `bound`       | `"from" \| "to"`      | —       | In range mode binds the track to a range boundary                                         |
+| `col`         | `number \| string`    | —       | CSS grid `grid-column` value                                                              |
 
 ---
 
@@ -316,9 +327,32 @@ A horizontal scrollable strip of years.
 
 ### Props
 
-| Prop  | Type               | Default | Description                  |
-| ----- | ------------------ | ------- | ---------------------------- |
-| `col` | `number \| string` | —       | CSS grid `grid-column` value |
+| Prop    | Type                  | Default | Description                                                                               |
+| ------- | --------------------- | ------- | ----------------------------------------------------------------------------------------- |
+| `bound` | `"from" \| "to"`      | —       | In range mode binds the track to a range boundary                                         |
+| `col`   | `number \| string`    | —       | CSS grid `grid-column` value                                                              |
+
+### Track behavior matrix
+
+`MonthsTrack` / `YearsTrack`:
+
+| mode       | `bound`        | Click does                            |
+| ---------- | -------------- | ------------------------------------- |
+| `single`   | —              | `navigateTo` (changes view month/year) |
+| `range`    | `"from"`/`"to"`| `setLocalView` + `onRangeBoundSet`    |
+| `range`    | —              | `navigateTo`                          |
+| `multiple` | —              | `navigateTo`                          |
+
+`DaysTrack`:
+
+| mode       | `bound`         | Click item         | Auto button (multi only) |
+| ---------- | --------------- | ------------------ | ------------------------ |
+| `single`   | —               | `onChangeDate`     | —                        |
+| `range`    | `"from"`/`"to"` | `onRangeBoundSet`  | —                        |
+| `range`    | —               | `setLocalView`     | —                        |
+| `multiple` | —               | preview only       | toggles in/out of selection (Check ↔ Clear icon) |
+
+In multiselect mode the active item follows the date in `selectedDates[]` whose day matches the current `viewDate`. Without a match the track centers on `viewDate` without active highlight.
 
 ---
 

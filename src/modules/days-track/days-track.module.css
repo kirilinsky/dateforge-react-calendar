@@ -98,4 +98,28 @@
   text-transform: lowercase;
 }
 
+.confirmBtn {
+  position: absolute;
+  top: 50%;
+  right: 0.5em;
+  transform: translateY(-50%);
+  width: 2.2em;
+  height: 2.2em;
+  padding: 0;
+  background: var(--c-h);
+  color: var(--c-a);
+  border-radius: calc(var(--cal-radius, 0.5em) * 99);
+  z-index: 4;
+  box-shadow: var(--cal-shadow-md, 0 0.2em 0.6em var(--c-x));
+  & svg {
+    width: 1.1em;
+    height: 1.1em;
+  }
+}
+
+.removeBtn {
+  background: var(--c-d);
+  color: var(--c-b);
+}
+
 }

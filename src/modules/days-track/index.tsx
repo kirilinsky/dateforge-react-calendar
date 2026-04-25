@@ -6,6 +6,9 @@ import { useConfig } from "@/context/config-context";
 import { useUI } from "@/context/ui-context";
 import { useTrack } from "@/hooks/use-track";
 import { useGridSlot } from "@/hooks/use-grid-slot";
+import { isSameDay } from "@/utils/date-core";
+import shared from "@/global/global.module.css";
+import { Check, Clear } from "@/Icons";
 
 const HALF = 5;
 const OFFSETS = Array.from({ length: HALF * 2 + 1 }, (_, i) => i - HALF);
@@ -16,30 +19,47 @@ function daysInMonth(year: number, month: number): number {
 
 export interface CalendarDaysTrackProps {
   showMonthLabel?: boolean;
+  bound?: "from" | "to";
   col?: number | string;
 }
 
-export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({ showMonthLabel = false, col }) => {
+export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({ showMonthLabel = false, bound, col }) => {
   const { viewDate, navigateTo } = useNavigation();
-  const { selectedDate } = useSelectionValue();
-  const { onChangeDate } = useSelectionActions();
-  const { minDate, maxDate, locale } = useConfig();
+  const { selectedDate, selectedDates, rangeStart, rangeEnd } = useSelectionValue();
+  const { onChangeDate, onRangeBoundSet } = useSelectionActions();
+  const { minDate, maxDate, locale, range, multiselect } = useConfig();
   const { setDaysTrackActive } = useUI();
+  const isMulti = !!multiselect;
 
   useEffect(() => {
     setDaysTrackActive(true);
     return () => setDaysTrackActive(false);
   }, [setDaysTrackActive]);
-  const year = viewDate.getFullYear();
-  const month = viewDate.getMonth();
+
+  const isBound = !!(range && bound);
+  const boundDate = isBound
+    ? bound === "from"
+      ? rangeStart
+      : rangeEnd
+    : isMulti
+      ? selectedDates.find((d) => isSameDay(d, viewDate)) ?? null
+      : selectedDate;
+  const [localView, setLocalView] = useState<Date>(() => boundDate ?? viewDate);
+  useEffect(() => {
+    if (isBound && boundDate) setLocalView(boundDate);
+  }, [isBound, boundDate?.getTime()]);  // eslint-disable-line react-hooks/exhaustive-deps
+
+  const refDate = isBound ? localView : viewDate;
+  const year = refDate.getFullYear();
+  const month = refDate.getMonth();
   const days = useMemo(() => daysInMonth(year, month), [year, month]);
 
   const selectedDay =
-    selectedDate &&
-    selectedDate.getFullYear() === year &&
-    selectedDate.getMonth() === month
-      ? selectedDate.getDate() - 1
-      : viewDate.getDate() - 1;
+    boundDate &&
+    boundDate.getFullYear() === year &&
+    boundDate.getMonth() === month
+      ? boundDate.getDate() - 1
+      : refDate.getDate() - 1;
 
   const [itemWidth, setItemWidth] = useState(44);
 
@@ -60,12 +80,19 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({ showMonthL
     minIndex,
     maxIndex,
     onChange: (index) => {
-      const next = new Date(viewDate);
+      const next = new Date(refDate);
       next.setFullYear(year);
       next.setMonth(month);
       next.setDate(index + 1);
-      navigateTo(next);
-      onChangeDate(next);
+      if (isMulti) {
+        setLocalView(next); // multi: preview only, commit via button
+      } else if (isBound) {
+        setLocalView(next);
+        onRangeBoundSet(bound!, next);
+      } else {
+        navigateTo(next);
+        if (!range) onChangeDate(next);
+      }
     },
   });
 
@@ -120,6 +147,22 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({ showMonthL
   const frac = position - Math.round(position);
   const stripOffset = containerWidth / 2 - (HALF + frac) * itemWidth - itemWidth / 2;
 
+  const previewDate = useMemo(() => {
+    const day = ((Math.round(position) % days) + days) % days;
+    const d = new Date(refDate);
+    d.setFullYear(year);
+    d.setMonth(month);
+    d.setDate(day + 1);
+    return d;
+  }, [position, days, refDate, year, month]);
+
+  const matchesExisting =
+    isMulti && selectedDates.some((d) => isSameDay(d, previewDate));
+
+  const handleConfirm = () => {
+    onChangeDate(previewDate); // SELECT toggles in multi
+  };
+
   return (
     <div
       data-area="days-track"
@@ -140,6 +183,17 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({ showMonthL
       style={useGridSlot(col)}
     >
       <div className={styles.highlight} aria-hidden />
+      {isMulti && (
+        <button
+          type="button"
+          className={`${styles.confirmBtn} ${shared.interactive} ${shared.hoverable} ${matchesExisting ? styles.removeBtn : ""}`}
+          aria-label={matchesExisting ? "Remove selected date" : "Save selected date"}
+          onClick={handleConfirm}
+          onPointerDown={(e) => e.stopPropagation()}
+        >
+          {matchesExisting ? <Clear /> : <Check />}
+        </button>
+      )}
       <div className={styles.strip} style={{ transform: `translateX(${stripOffset}px)` }}>
         {OFFSETS.map((o) => {
           const raw = Math.round(position) + o;

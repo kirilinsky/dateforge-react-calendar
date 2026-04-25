@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import styles from "./months-track.module.css";
 import { useNavigation } from "@/context/navigation-context";
+import { useSelectionValue, useSelectionActions } from "@/context/selection-context";
 import { useConfig } from "@/context/config-context";
 import { useTrack } from "@/hooks/use-track";
 import { useGridSlot } from "@/hooks/use-grid-slot";
@@ -11,14 +12,24 @@ const OFFSETS = Array.from({ length: HALF * 2 + 1 }, (_, i) => i - HALF);
 
 export interface CalendarMonthsTrackProps {
   short?: boolean;
+  bound?: "from" | "to";
   col?: number | string;
 }
 
-export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({ short = true, col }) => {
+export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({ short = true, bound, col }) => {
   const { viewDate, navigateTo } = useNavigation();
-  const { minDate, maxDate, locale } = useConfig();
-  const year = viewDate.getFullYear();
-  const currentIndex = viewDate.getMonth();
+  const { minDate, maxDate, locale, range } = useConfig();
+  const { rangeStart, rangeEnd } = useSelectionValue();
+  const { onRangeBoundSet } = useSelectionActions();
+  const isBound = !!(range && bound);
+  const boundDate = isBound ? (bound === "from" ? rangeStart : rangeEnd) : null;
+  const [localView, setLocalView] = useState<Date>(() => boundDate ?? viewDate);
+  useEffect(() => {
+    if (isBound && boundDate) setLocalView(boundDate);
+  }, [isBound, boundDate?.getTime()]);  // eslint-disable-line react-hooks/exhaustive-deps
+  const refDate = isBound ? localView : (boundDate ?? viewDate);
+  const year = refDate.getFullYear();
+  const currentIndex = refDate.getMonth();
   const MONTHS = getMonthNames(locale, short);
   const [itemWidth, setItemWidth] = useState(52);
 
@@ -33,9 +44,14 @@ export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({ short 
     minIndex,
     maxIndex,
     onChange: (index) => {
-      const next = new Date(viewDate);
+      const next = new Date(refDate);
       next.setMonth(index);
-      navigateTo(next);
+      if (isBound) {
+        setLocalView(next);
+        onRangeBoundSet(bound!, next);
+      } else {
+        navigateTo(next);
+      }
     },
   });
 
