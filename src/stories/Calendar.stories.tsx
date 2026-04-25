@@ -89,25 +89,65 @@ const StoryWrapper = ({ children, title, subtitle, light = true }: any) => (
   </div>
 );
 
-export const FourMonthsLayout = () => {
+export const SixMonthsLayout = () => {
   const [date, setDate] = useState<Date>(new Date());
   return (
-    <StoryWrapper title="Four Months Layout" subtitle={formatSubtitle(date)}>
-      <div style={{ width: 650 }}>
-        <Calendar value={date} cols={4} appearance={"bubble"}>
-          <CalendarNav
-            showMonthPicker
-            compactYears
+    <StoryWrapper title="Six Months Layout" subtitle={formatSubtitle(date)}>
+      <div style={{ width: 820 }}>
+        <Calendar
+          value={date}
+          mode={"range"}
+          cols={6}
+          appearance={"bubble"}
+          theme={"scarlet"}
+        >
+          <CalendarNav showMonthPicker compactYears col={2} />
+          <CalendarNav monthLabel offset={1} col={2} />
+          <CalendarNav monthLabel offset={2} col={2} />
+          <CalendarDays
+            currentMonthOnly
             col={2}
-            hideBorder={"right"}
+            fixedRows={false}
+            boldWeekends
           />
-          <CalendarNav monthLabel offset={1} col={2} hideBorder={"left"} />
-          <CalendarDays currentMonthOnly col={2} fixedRows={false} />
-          <CalendarDays offset={1} currentMonthOnly col={2} fixedRows={false} />
-          <CalendarNav monthLabel col={2} offset={2} />
-          <CalendarNav monthLabel offset={3} col={2} yearLabel />
-          <CalendarDays currentMonthOnly col={2} offset={2} fixedRows={false} />
-          <CalendarDays offset={3} currentMonthOnly col={2} fixedRows={false} />
+          <CalendarDays
+            offset={1}
+            currentMonthOnly
+            col={2}
+            fixedRows={false}
+            boldWeekends
+          />
+          <CalendarDays
+            offset={2}
+            currentMonthOnly
+            col={2}
+            fixedRows={false}
+            boldWeekends
+          />
+          <CalendarNav monthLabel col={2} offset={3} />
+          <CalendarNav monthLabel offset={4} col={2} />
+          <CalendarNav monthLabel offset={5} col={2} />
+          <CalendarDays
+            currentMonthOnly
+            col={2}
+            offset={3}
+            fixedRows={false}
+            boldWeekends
+          />
+          <CalendarDays
+            offset={4}
+            currentMonthOnly
+            col={2}
+            fixedRows={false}
+            boldWeekends
+          />
+          <CalendarDays
+            offset={5}
+            currentMonthOnly
+            col={2}
+            fixedRows={false}
+            boldWeekends
+          />
         </Calendar>
       </div>
     </StoryWrapper>
@@ -171,8 +211,8 @@ export const RangeTracks = () => {
           theme="light"
           cols={4}
         >
-          <CalendarNav monthLabel hideBorder="right" col={2} />
-          <CalendarNav offset={1} monthLabel hideBorder="left" col={2} />
+          <CalendarNav monthLabel col={2} />
+          <CalendarNav offset={1} monthLabel col={2} />
           <CalendarDays currentMonthOnly col={2} />
           <CalendarDays offset={1} currentMonthOnly col={2} />
           <CalendarDaysTrack bound="from" col={2} />
@@ -327,6 +367,7 @@ export const KitchenSink = () => {
   const [daysProps, setDaysProps] = useState({
     startOfWeek: 1 as StartOfWeek,
     highlightWeekends: true,
+    blockNavigation: false,
     boldWeekends: false,
     weekNumbers: false,
     hideWeekdays: false,
@@ -677,6 +718,7 @@ export const KitchenSink = () => {
                     "lockSelection",
                     "swipe",
                     "fixedRows",
+                    "blockNavigation",
                   ] as const
                 ).map((key) => (
                   <button

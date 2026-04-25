@@ -19,6 +19,7 @@ import shared from "@/global/global.module.css";
 import WeekDays from "./week-days";
 import { StartOfWeek } from "@/types/calendar";
 import { useGridSlot } from "@/hooks/use-grid-slot";
+import { useCalendarKeyboard } from "@/hooks/use-calendar-keyboard";
 
 function buildCellLabel(args: {
   fullDate: Date;
@@ -69,8 +70,10 @@ interface DayCellProps {
   boldWeekends: boolean;
   range: boolean;
   ariaLabel: string;
+  tabIndex: number;
   onSelect: (date: Date, isDisabled: boolean) => void;
   onMouseEnter: (date: Date) => void;
+  onKeyDown: (e: React.KeyboardEvent, date: Date) => void;
 }
 
 const DayCell = React.memo(function DayCell({
@@ -97,8 +100,10 @@ const DayCell = React.memo(function DayCell({
   boldWeekends,
   range,
   ariaLabel,
+  tabIndex,
   onSelect,
   onMouseEnter,
+  onKeyDown,
 }: DayCellProps) {
   const fullDate = useMemo(() => new Date(dateTime), [dateTime]);
 
@@ -167,8 +172,10 @@ const DayCell = React.memo(function DayCell({
   return (
     <button
       type="button"
+      tabIndex={tabIndex}
       onClick={() => !isDisabled && onSelect(fullDate, isDisabled)}
       onMouseEnter={() => onMouseEnter(fullDate)}
+      onKeyDown={(e) => onKeyDown(e, fullDate)}
       aria-label={ariaLabel}
       aria-selected={isSelected}
       aria-current={isTodayDate ? "date" : undefined}
@@ -224,6 +231,7 @@ export interface CalendarDaysProps {
   lockSelection?: boolean;
   defaultMonth?: Date;
   fixedRows?: boolean;
+  blockNavigation?: boolean;
 }
 
 export const CalendarDays: React.FC<CalendarDaysProps> = ({
@@ -241,6 +249,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   lockSelection = false,
   defaultMonth,
   fixedRows = true,
+  blockNavigation = false,
 }) => {
   const { daysTrackActive } = useUI();
   const {
@@ -475,6 +484,31 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
     [hideOutOfRange, currentMonthOnly, startT, endT],
   );
 
+  const initialFocusDate = useMemo(() => {
+    const inMonth = selectedDates.find(
+      (d) =>
+        d.getMonth() === currentMonth && d.getFullYear() === currentYear,
+    );
+    if (inMonth) return inMonth;
+    if (
+      today.getMonth() === currentMonth &&
+      today.getFullYear() === currentYear
+    )
+      return today;
+    return new Date(currentYear, currentMonth, 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const { gridRef, focusedDate, handleKeyDown } = useCalendarKeyboard({
+    viewDate: date,
+    initialFocusDate,
+    syncDate: selectedDates[0] ?? null,
+    startOfWeek,
+    blockNavigation,
+    navigateTo,
+    onSelect: (d) => handleSetDay(d, false),
+  });
+
   return (
     <div
       data-area={resolvedArea}
@@ -484,6 +518,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
       style={useGridSlot(col)}
     >
       <div
+        ref={gridRef}
         role="grid"
         aria-label={gridLabel}
         key={animationKey}
@@ -616,8 +651,10 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
                         isInRange,
                         range,
                       })}
+                      tabIndex={isSameDay(fullDate, focusedDate) ? 0 : -1}
                       onSelect={handleSetDay}
                       onMouseEnter={handleMouseEnter}
+                      onKeyDown={handleKeyDown}
                     />
                   );
                 },

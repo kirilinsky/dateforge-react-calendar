@@ -25,11 +25,6 @@
     }
   }
 
-  .headerContainer[data-hide-border~="top"]    { margin-top:    calc(var(--cal-border) * -1); }
-  .headerContainer[data-hide-border~="bottom"] { margin-bottom: calc(var(--cal-border) * -1); }
-  .headerContainer[data-hide-border~="left"]   { margin-left:   calc(var(--cal-border) * -1); }
-  .headerContainer[data-hide-border~="right"]  { margin-right:  calc(var(--cal-border) * -1); }
-
   .yearsSelector {
     flex-grow: 1;
     flex-shrink: 0;

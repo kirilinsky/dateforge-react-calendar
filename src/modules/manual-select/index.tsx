@@ -4,7 +4,10 @@ import shared from "@/global/global.module.css";
 import { Check, Clear } from "@/Icons";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
-import { useSelectionValue, useSelectionActions } from "@/context/selection-context";
+import {
+  useSelectionValue,
+  useSelectionActions,
+} from "@/context/selection-context";
 import { checkIsDateDisabled, isSameDay } from "@/utils/date-core";
 import { useGridSlot } from "@/hooks/use-grid-slot";
 
@@ -111,7 +114,9 @@ const MaskedDateInput: React.FC<MaskedDateInputProps> = ({
     <input
       type="text"
       inputMode="numeric"
-      className={[className, invalid && classNameInvalid].filter(Boolean).join(" ")}
+      className={[className, invalid && classNameInvalid]
+        .filter(Boolean)
+        .join(" ")}
       value={text}
       placeholder={placeholder}
       onChange={handleChange}
@@ -231,7 +236,10 @@ const DateSlot: React.FC<DateSlotProps> = ({
 
   return (
     <div
-      className={[styles.inputWrapper, wrapperInvalid && styles.inputWrapperInvalid]
+      className={[
+        styles.inputWrapper,
+        wrapperInvalid && styles.inputWrapperInvalid,
+      ]
         .filter(Boolean)
         .join(" ")}
     >
@@ -297,7 +305,12 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
   const withTime = (d: Date, ref?: Date): Date => {
     const src = ref ?? date;
     const result = new Date(d);
-    result.setHours(src.getHours(), src.getMinutes(), src.getSeconds(), src.getMilliseconds());
+    result.setHours(
+      src.getHours(),
+      src.getMinutes(),
+      src.getSeconds(),
+      src.getMilliseconds(),
+    );
     return result;
   };
 
@@ -314,7 +327,9 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
 
   const gridSlot = useGridSlot(col);
   const containerStyle: React.CSSProperties = { ...gridSlot };
-  const contentStyle: React.CSSProperties = { justifyContent: alignToJustify[align] };
+  const contentStyle: React.CSSProperties = {
+    justifyContent: alignToJustify[align],
+  };
 
   const clearBtn = (
     <button
@@ -330,12 +345,14 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
           setAddInputKey((k) => k + 1);
         }
       }}
-      style={allowClear ? undefined : { visibility: "hidden", pointerEvents: "none" }}
+      style={
+        allowClear ? undefined : { visibility: "hidden", pointerEvents: "none" }
+      }
       tabIndex={allowClear ? undefined : -1}
       aria-hidden={!allowClear}
       disabled={!hasValue}
     >
-      ×
+      <Clear />
     </button>
   );
 
@@ -354,11 +371,18 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
     const addSaveAllowed = !!addTypedDate && isAllowed(addTypedDate);
 
     return (
-      <div className={`${styles.container} ${styles.containerMulti}`} data-area="manual-select" style={containerStyle}>
+      <div
+        className={`${styles.container} ${styles.containerMulti}`}
+        data-area="manual-select"
+        style={containerStyle}
+      >
         <div className={styles.datesArea} style={contentStyle}>
           {canAddMore && (
             <div
-              className={[styles.inputWrapper, addWrapperInvalid && styles.inputWrapperInvalid]
+              className={[
+                styles.inputWrapper,
+                addWrapperInvalid && styles.inputWrapperInvalid,
+              ]
                 .filter(Boolean)
                 .join(" ")}
             >
@@ -376,7 +400,10 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
               {addHasText && (
                 <button
                   type="button"
-                  className={[styles.saveBtn, !addSaveAllowed && styles.saveBtnInvalid]
+                  className={[
+                    styles.saveBtn,
+                    !addSaveAllowed && styles.saveBtnInvalid,
+                  ]
                     .filter(Boolean)
                     .join(" ")}
                   onClick={handleAddSave}
@@ -393,10 +420,16 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
               isAllowed={isAllowed}
               onSave={(newDate) => {
                 const orig = selectedDates[i];
-                onDatesSet(selectedDates.map((s, j) => j === i ? withTime(newDate, orig) : s));
+                onDatesSet(
+                  selectedDates.map((s, j) =>
+                    j === i ? withTime(newDate, orig) : s,
+                  ),
+                );
                 setEditingKey(null);
               }}
-              onClear={() => onDatesSet(selectedDates.filter((_, j) => j !== i))}
+              onClear={() =>
+                onDatesSet(selectedDates.filter((_, j) => j !== i))
+              }
               isEditing={editingKey === d.getTime()}
               onEditStart={() => setEditingKey(d.getTime())}
             />
@@ -409,7 +442,11 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
 
   if (range) {
     return (
-      <div className={styles.container} data-area="manual-select" style={containerStyle}>
+      <div
+        className={styles.container}
+        data-area="manual-select"
+        style={containerStyle}
+      >
         <div className={styles.contentArea} style={contentStyle}>
           <DateSlot
             date={rangeStart}
@@ -433,7 +470,11 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
   }
 
   return (
-    <div className={styles.container} data-area="manual-select" style={containerStyle}>
+    <div
+      className={styles.container}
+      data-area="manual-select"
+      style={containerStyle}
+    >
       <div className={styles.contentArea} style={contentStyle}>
         <DateSlot
           date={selectedDates[0] ?? null}
