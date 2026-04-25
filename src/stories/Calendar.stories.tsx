@@ -334,7 +334,8 @@ export const KitchenSink = () => {
     hideOutOfRange: false,
     lockSelection: false,
     highlightToday: true,
-    swipe: false,
+    fixedRows: true,
+    swipe: true,
   });
 
   const [navLabel, setNavLabel] = useState("");
@@ -675,6 +676,7 @@ export const KitchenSink = () => {
                     "highlightToday",
                     "lockSelection",
                     "swipe",
+                    "fixedRows",
                   ] as const
                 ).map((key) => (
                   <button

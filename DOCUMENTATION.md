@@ -82,7 +82,7 @@ Renders the month grid — weekday headers, week numbers (optional), and the day
 | `hideWeekdays`      | `boolean`          | `false` | Hide the row of weekday name headers                                                 |
 | `hideOutOfRange`    | `boolean`          | `false` | Completely hide dates that fall outside `minDate`/`maxDate` or match disabled rules  |
 | `lockSelection`     | `boolean`          | `false` | Prevent the user from deselecting the currently selected date                        |
-| `swipe`             | `boolean`          | `false` | Enable swipe gestures to navigate between months                                     |
+| `swipe`             | `boolean`          | `swipe` | Enable swipe gestures to navigate between months                                     |
 | `defaultMonth`      | `Date`             | —       | Initial month displayed on mount. Navigates whenever the value changes               |
 | `col`               | `number \| string` | —       | CSS grid `grid-column` value for layout positioning                                  |
 
@@ -104,25 +104,25 @@ Navigation header with configurable controls.
 
 ### Props
 
-| Prop              | Type               | Default | Description                                                                                                                                                          |
-| ----------------- | ------------------ | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `label`           | `string`           | —       | Custom text shown as the header label, max 180 length.                                                                                                               |
-| `showMonthPicker` | `boolean`          | `false` | Show previous/next month arrow buttons                                                                                                                               |
-| `compactMonths`   | `boolean`          | `false` | Show a compact month dropdown instead of arrows                                                                                                                      |
-| `showYearPicker`  | `boolean`          | `false` | Show previous/next year arrow buttons                                                                                                                                |
-| `compactYears`    | `boolean`          | `false` | Show a compact year dropdown instead of arrows                                                                                                                       |
-| `animateTime`     | `boolean`          | `true`  | Show flip animation for in `showTime` and `showNowTime`                                                                                                              |
-| `monthLabel`      | `boolean`          | `false` | Show the current month name as plain text (no controls, no popup)                                                                                                    |
-| `yearLabel`       | `boolean`          | `false` | Show the current year as plain text (no controls, no popup)                                                                                                          |
-| `showTime`        | `boolean`          | `false` | Show a button that opens the time picker popup                                                                                                                       |
-| `showNowTime`     | `boolean`          | `false` | Show the current system time as a live read-only display (updates every second). A pulsing dot indicates it is live. Respects the `hour12` setting from `<Calendar>` |
-| `seconds`         | `boolean`          | `false` | Include seconds in `showTime` and `showNowTime` displays, and in the time picker popup                                                                               |
-| `home`            | `boolean`          | `false` | Show a button that navigates back to today                                                                                                                           |
-| `clear`           | `boolean`          | `false` | Show a button that clears the current selection                                                                                                                      |
-| `themeToggle`     | `boolean`          | `false` | Show a light/dark theme toggle button                                                                                                                                |
-| `offset`          | `number`           | `0`     | Month offset relative to `viewDate`. Use to render two synced nav headers in `cols={2}` layouts (`<CalendarNav offset={1} />`)                                       |
-| `hideBorder`      | `true \| Side \| Side[]` | —      | Hide auto-border on specified sides (`"top"`, `"right"`, `"bottom"`, `"left"`). `true` hides all four. Useful when stacking custom layouts                    |
-| `col`             | `number \| string` | —       | CSS grid `grid-column` value                                                                                                                                         |
+| Prop              | Type                     | Default | Description                                                                                                                                                          |
+| ----------------- | ------------------------ | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `label`           | `string`                 | —       | Custom text shown as the header label, max 180 length.                                                                                                               |
+| `showMonthPicker` | `boolean`                | `false` | Show previous/next month arrow buttons                                                                                                                               |
+| `compactMonths`   | `boolean`                | `false` | Show a compact month dropdown instead of arrows                                                                                                                      |
+| `showYearPicker`  | `boolean`                | `false` | Show previous/next year arrow buttons                                                                                                                                |
+| `compactYears`    | `boolean`                | `false` | Show a compact year dropdown instead of arrows                                                                                                                       |
+| `animateTime`     | `boolean`                | `true`  | Show flip animation for in `showTime` and `showNowTime`                                                                                                              |
+| `monthLabel`      | `boolean`                | `false` | Show the current month name as plain text (no controls, no popup)                                                                                                    |
+| `yearLabel`       | `boolean`                | `false` | Show the current year as plain text (no controls, no popup)                                                                                                          |
+| `showTime`        | `boolean`                | `false` | Show a button that opens the time picker popup                                                                                                                       |
+| `showNowTime`     | `boolean`                | `false` | Show the current system time as a live read-only display (updates every second). A pulsing dot indicates it is live. Respects the `hour12` setting from `<Calendar>` |
+| `seconds`         | `boolean`                | `false` | Include seconds in `showTime` and `showNowTime` displays, and in the time picker popup                                                                               |
+| `home`            | `boolean`                | `false` | Show a button that navigates back to today                                                                                                                           |
+| `clear`           | `boolean`                | `false` | Show a button that clears the current selection                                                                                                                      |
+| `themeToggle`     | `boolean`                | `false` | Show a light/dark theme toggle button                                                                                                                                |
+| `offset`          | `number`                 | `0`     | Month offset relative to `viewDate`. Use to render two synced nav headers in `cols={2}` layouts (`<CalendarNav offset={1} />`)                                       |
+| `hideBorder`      | `true \| Side \| Side[]` | —       | Hide auto-border on specified sides (`"top"`, `"right"`, `"bottom"`, `"left"`). `true` hides all four. Useful when stacking custom layouts                           |
+| `col`             | `number \| string`       | —       | CSS grid `grid-column` value                                                                                                                                         |
 
 **Examples — `hideBorder`:**
 
@@ -282,11 +282,11 @@ A horizontal scrollable strip of day numbers for the current month.
 
 ### Props
 
-| Prop             | Type                  | Default | Description                                                                               |
-| ---------------- | --------------------- | ------- | ----------------------------------------------------------------------------------------- |
-| `showMonthLabel` | `boolean`             | `false` | Show the abbreviated month name above the active day item                                 |
-| `bound`          | `"from" \| "to"`      | —       | In range mode binds the track to a range boundary. Without it tracks single-mode behavior |
-| `col`            | `number \| string`    | —       | CSS grid `grid-column` value                                                              |
+| Prop             | Type               | Default | Description                                                                               |
+| ---------------- | ------------------ | ------- | ----------------------------------------------------------------------------------------- |
+| `showMonthLabel` | `boolean`          | `false` | Show the abbreviated month name above the active day item                                 |
+| `bound`          | `"from" \| "to"`   | —       | In range mode binds the track to a range boundary. Without it tracks single-mode behavior |
+| `col`            | `number \| string` | —       | CSS grid `grid-column` value                                                              |
 
 In `mode="multiple"` the track automatically renders a save / remove button. Item click only previews; the button commits the date (toggles in/out of `selectedDates`). The button shows `Check` when the previewed date is not selected, `Clear` (×) when it is.
 
@@ -309,11 +309,11 @@ A horizontal scrollable strip of month names for the current year.
 
 ### Props
 
-| Prop    | Type                  | Default | Description                                                                               |
-| ------- | --------------------- | ------- | ----------------------------------------------------------------------------------------- |
-| `short`       | `boolean`             | `true`  | Use abbreviated month names                                                               |
-| `bound`       | `"from" \| "to"`      | —       | In range mode binds the track to a range boundary                                         |
-| `col`         | `number \| string`    | —       | CSS grid `grid-column` value                                                              |
+| Prop    | Type               | Default | Description                                       |
+| ------- | ------------------ | ------- | ------------------------------------------------- |
+| `short` | `boolean`          | `true`  | Use abbreviated month names                       |
+| `bound` | `"from" \| "to"`   | —       | In range mode binds the track to a range boundary |
+| `col`   | `number \| string` | —       | CSS grid `grid-column` value                      |
 
 ---
 
@@ -327,30 +327,30 @@ A horizontal scrollable strip of years.
 
 ### Props
 
-| Prop    | Type                  | Default | Description                                                                               |
-| ------- | --------------------- | ------- | ----------------------------------------------------------------------------------------- |
-| `bound` | `"from" \| "to"`      | —       | In range mode binds the track to a range boundary                                         |
-| `col`   | `number \| string`    | —       | CSS grid `grid-column` value                                                              |
+| Prop    | Type               | Default | Description                                       |
+| ------- | ------------------ | ------- | ------------------------------------------------- |
+| `bound` | `"from" \| "to"`   | —       | In range mode binds the track to a range boundary |
+| `col`   | `number \| string` | —       | CSS grid `grid-column` value                      |
 
 ### Track behavior matrix
 
 `MonthsTrack` / `YearsTrack`:
 
-| mode       | `bound`        | Click does                            |
-| ---------- | -------------- | ------------------------------------- |
-| `single`   | —              | `navigateTo` (changes view month/year) |
-| `range`    | `"from"`/`"to"`| `setLocalView` + `onRangeBoundSet`    |
-| `range`    | —              | `navigateTo`                          |
-| `multiple` | —              | `navigateTo`                          |
+| mode       | `bound`         | Click does                             |
+| ---------- | --------------- | -------------------------------------- |
+| `single`   | —               | `navigateTo` (changes view month/year) |
+| `range`    | `"from"`/`"to"` | `setLocalView` + `onRangeBoundSet`     |
+| `range`    | —               | `navigateTo`                           |
+| `multiple` | —               | `navigateTo`                           |
 
 `DaysTrack`:
 
-| mode       | `bound`         | Click item         | Auto button (multi only) |
-| ---------- | --------------- | ------------------ | ------------------------ |
-| `single`   | —               | `onChangeDate`     | —                        |
-| `range`    | `"from"`/`"to"` | `onRangeBoundSet`  | —                        |
-| `range`    | —               | `setLocalView`     | —                        |
-| `multiple` | —               | preview only       | toggles in/out of selection (Check ↔ Clear icon) |
+| mode       | `bound`         | Click item        | Auto button (multi only)                         |
+| ---------- | --------------- | ----------------- | ------------------------------------------------ |
+| `single`   | —               | `onChangeDate`    | —                                                |
+| `range`    | `"from"`/`"to"` | `onRangeBoundSet` | —                                                |
+| `range`    | —               | `setLocalView`    | —                                                |
+| `multiple` | —               | preview only      | toggles in/out of selection (Check ↔ Clear icon) |
 
 In multiselect mode the active item follows the date in `selectedDates[]` whose day matches the current `viewDate`. Without a match the track centers on `viewDate` without active highlight.
 
