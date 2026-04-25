@@ -66,6 +66,7 @@ const THEME_LABELS: Record<string, string> = {
   espresso: "Espresso",
   ember: "Ember",
   prism: "Prism",
+  void: "Void",
   meadow: "Meadow",
 };
 

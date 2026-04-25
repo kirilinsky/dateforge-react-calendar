@@ -578,7 +578,7 @@ type StartOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 **Light:** `mint` `comfy` `neon` `rosa` `snow` `solar` `graphite` `amethyst` `latte` `slate` `scarlet` `prism` `meadow` `monsoon` `pearl` `chalk` `split` `riso`
 
-**Dark:** `industrial` `midnight` `sandstone` `phosphor` `dracula` `cyber` `temporal` `crimson` `forest` `nebula` `aurora` `espresso` `ember` `flare`
+**Dark:** `industrial` `midnight` `sandstone` `phosphor` `dracula` `cyber` `void` `temporal` `crimson` `forest` `nebula` `aurora` `espresso` `ember` `flare`
 
 **Base:** `light` `dark` `auto`
 

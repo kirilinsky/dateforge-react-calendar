@@ -64,4 +64,5 @@ export const THEMES_DATA: Record<string, ThemeTokens> = {
   split:      { accent: W,         backdrop: "#fafaf6", highlight: "#e8c43d", tone: "#f2f0ea",  text: "#1a1f2a", stroke: "#d4d0c4", shadow: "#e8c43d28", disabled: "#b5b0a4", weekend: "#3d9ee8", range: "#e83d9e" },
   riso:       { accent: "#fef7e8", backdrop: "#fef7e8", highlight: "#2b3fe0", tone: "#fdebf3",  text: "#1a1205", stroke: "#e5dcc8", shadow: "#2b3fe028", disabled: "#b8ab8c", weekend: "#ff3e8e", range: "#2bce8b" },
   flare:      { accent: "#0e0e10", backdrop: "#141417", highlight: "#8a8a92", tone: "#1e1e22",  text: "#e8e8ec", stroke: "#2a2a30", shadow: "#8a8a9220", disabled: "#4a4a52", weekend: "#ff6028", range: "#3a3a40" },
+  void:       { accent: "#09010e", backdrop: "#060009", highlight: "#d400f0", tone: "#1c0030",  text: "#f0d0ff", stroke: "#2e0050", shadow: "#d400f028", disabled: "#2a0040", weekend: "#00ffee", range: "#ff6b35" },
 };

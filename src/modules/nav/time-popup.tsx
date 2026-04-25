@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
-import { TimeTrack } from "../time-track/time-track";
-import { Popup } from "../popup/popup";
+import { TimeTrack } from "@/components/time-track/time-track";
+import { Popup } from "@/components/popup/popup";
 
 interface TimePopupProps {
   date: Date;

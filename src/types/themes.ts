@@ -45,6 +45,7 @@ export const DARK_THEMES = [
   "espresso",
   "ember",
   "flare",
+  "void",
 ] as const;
 
 export type BuiltInTheme = "auto" | "light" | "dark";

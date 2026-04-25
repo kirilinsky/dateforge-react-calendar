@@ -3,8 +3,8 @@ import "@/styles/layers.css";
 import { CalendarMode, CalendarProps } from "@/types/calendar";
 import { DARK_THEMES, CustomTheme, CUSTOM_THEME_BRAND } from "@/types/themes";
 import { CustomAppearance, CUSTOM_APPEARANCE_BRAND } from "@/types/appearances";
-import { CalendarProvider } from "@/components/provider/provider";
-import { CalendarLayout } from "../layout/layout";
+import { CalendarProvider } from "@/core/provider";
+import { CalendarLayout } from "@/core/layout";
 
 const isCustomTheme = (t: unknown): t is CustomTheme =>
   typeof t === "object" && t !== null && CUSTOM_THEME_BRAND in (t as object);
