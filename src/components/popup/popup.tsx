@@ -1,4 +1,5 @@
 import { useRef, useLayoutEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import type { ReactNode, CSSProperties } from "react";
 import { Check } from "@/Icons";
 import { useFocusTrap } from "@/hooks/use-focus-trap";
@@ -13,7 +14,7 @@ export interface PopupProps {
 }
 
 export const Popup = ({ children, onConfirm, onClose, label = "Dialog" }: PopupProps) => {
-  const { popupAnchorEl, setPopupAnchorEl } = useUI();
+  const { popupAnchorEl, setPopupAnchorEl, containerRef } = useUI();
   const backdropRef = useRef<HTMLDivElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
 
@@ -69,7 +70,7 @@ export const Popup = ({ children, onConfirm, onClose, label = "Dialog" }: PopupP
     onClose();
   }
 
-  return (
+  const content = (
     <div ref={backdropRef} className={styles.backdrop} onClick={handleClose}>
       <div
         ref={popupRef}
@@ -93,4 +94,8 @@ export const Popup = ({ children, onConfirm, onClose, label = "Dialog" }: PopupP
       </div>
     </div>
   );
+
+  return containerRef.current
+    ? createPortal(content, containerRef.current)
+    : content;
 };

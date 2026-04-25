@@ -1,10 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
-import { useSelectionActions, useSelectionValue } from "@/context/selection-context";
+import { useSelectionValue } from "@/context/selection-context";
 import { useUI } from "@/context/ui-context";
-import { TimePopup } from "../time-popup/time-popup";
-import { MonthPopup, YearPopup } from "../month-year-track/month-year-track";
 import styles from "./layout.module.css";
 
 const SR_ONLY: React.CSSProperties = {
@@ -65,15 +63,8 @@ export const CalendarLayout: React.FC<{
   cols?: number;
   modules?: React.ReactNode;
 }> = ({ appearanceKey, customAppearanceVars, cols, modules }) => {
-  const { hour12, locale, minDate, maxDate, gradient } = useConfig();
-  const { viewDate: date, navigateTo } = useNavigation();
-  const { onChangeTime } = useSelectionActions();
-  const {
-    dark, showTimePopup, setShowTimePopup,
-    showMonthPopup, setShowMonthPopup,
-    showYearPopup, setShowYearPopup,
-    navShowSeconds,
-  } = useUI();
+  const { gradient } = useConfig();
+  const { dark, containerRef } = useUI();
 
   const containerStyle: React.CSSProperties = {
     ...customAppearanceVars,
@@ -83,6 +74,7 @@ export const CalendarLayout: React.FC<{
 
   return (
     <div
+      ref={containerRef}
       className={[
         styles.calendarContainer,
         gradient ? styles.gradient : "",
@@ -93,43 +85,6 @@ export const CalendarLayout: React.FC<{
       data-appearance={appearanceKey}
       style={containerStyle}
     >
-      {showTimePopup && (
-        <TimePopup
-          date={date}
-          hour12={hour12}
-          showSeconds={navShowSeconds}
-          onConfirm={(newDate) => {
-            onChangeTime(newDate);
-            setShowTimePopup(false);
-          }}
-          onClose={() => setShowTimePopup(false)}
-        />
-      )}
-      {showMonthPopup && (
-        <MonthPopup
-          date={date}
-          locale={locale}
-          minDate={minDate}
-          maxDate={maxDate}
-          onConfirm={(newDate) => {
-            navigateTo(newDate);
-            setShowMonthPopup(false);
-          }}
-          onClose={() => setShowMonthPopup(false)}
-        />
-      )}
-      {showYearPopup && (
-        <YearPopup
-          date={date}
-          minDate={minDate}
-          maxDate={maxDate}
-          onConfirm={(newDate) => {
-            navigateTo(newDate);
-            setShowYearPopup(false);
-          }}
-          onClose={() => setShowYearPopup(false)}
-        />
-      )}
       <CalendarAnnouncer />
       {modules ?? (
         <div className={styles.emptyState}>

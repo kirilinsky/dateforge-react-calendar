@@ -296,12 +296,14 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   const [daysTrackActive, setDaysTrackActive] = useState(false);
   const [popupAnchorEl, setPopupAnchorEl] = useState<HTMLElement | null>(null);
   const [navShowSeconds, setNavShowSeconds] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const ui = useMemo(
     () => ({
       dark: isDark ?? false,
       toggleTheme: toggleTheme ?? (() => {}),
       containerWidth,
+      containerRef,
       showTimePopup: state.openPopup === "time",
       setShowTimePopup,
       showMonthPopup: state.openPopup === "month",
