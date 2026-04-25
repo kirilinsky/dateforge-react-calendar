@@ -20,10 +20,10 @@ export function Calendar<M extends CalendarMode = "single">({
   locale = "en",
   gradient = false,
   mode,
-  max,
+  maxDates,
   cols,
   children,
-  readonly = false,
+  readOnly = false,
   ...restProps
 }: CalendarProps<M>) {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -96,8 +96,8 @@ export function Calendar<M extends CalendarMode = "single">({
       }
       width={width}
       mode={mode}
-      max={max}
-      readonly={readonly}
+      maxDates={maxDates}
+      readOnly={readOnly}
       containerWidth={containerWidth}
       toggleTheme={toggleTheme}
       {...(restProps as import("@/types/calendar").CalendarProps<CalendarMode>)}
@@ -105,8 +105,8 @@ export function Calendar<M extends CalendarMode = "single">({
       <div
         ref={wrapperRef}
         data-theme={activeTheme}
-        data-readonly={readonly || undefined}
-        aria-readonly={readonly || undefined}
+        data-readonly={readOnly || undefined}
+        aria-readonly={readOnly || undefined}
         style={{ containerType: "inline-size", width, ...customThemeVars }}
       >
         <CalendarLayout

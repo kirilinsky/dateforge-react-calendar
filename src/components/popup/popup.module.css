@@ -25,10 +25,11 @@
     width: 55%;
     max-width: 13.9em;
     min-width: 9.2em;
+    min-height: 9em;
     height: 21em;
-    max-height: min(370px, 80cqb);
     display: flex;
     flex-direction: column;
+    overflow: hidden;
     gap: 0.6em;
     border: var(--cal-border, 1px) solid var(--c-s);
     box-shadow: 0 0.4em 2em var(--c-x);

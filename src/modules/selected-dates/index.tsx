@@ -40,7 +40,7 @@ const alignToJustify: Record<AlignValue, string> = {
 };
 
 export interface CalendarSelectedDatesProps {
-  allowClean?: boolean;
+  allowClear?: boolean;
   allowNavigate?: boolean;
   animated?: boolean;
   align?: AlignValue;
@@ -49,7 +49,7 @@ export interface CalendarSelectedDatesProps {
 }
 
 export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
-  allowClean = true,
+  allowClear = true,
   allowNavigate = true,
   animated = true,
   align = "left",
@@ -88,7 +88,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
       .filter(Boolean)
       .join(" ");
 
-  const clearBtn = allowClean ? (
+  const clearBtn = allowClear ? (
     <button
       type="button"
       className={`${styles.clearBtn} ${shared.interactive} ${shared.hoverable}`}

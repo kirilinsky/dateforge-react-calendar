@@ -10,16 +10,16 @@ const HALF = 4;
 const OFFSETS = Array.from({ length: HALF * 2 + 1 }, (_, i) => i - HALF);
 
 export interface CalendarMonthsTrackProps {
-  shortMonths?: boolean;
+  short?: boolean;
   col?: number | string;
 }
 
-export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({ shortMonths = true, col }) => {
+export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({ short = true, col }) => {
   const { viewDate, navigateTo } = useNavigation();
   const { minDate, maxDate, locale } = useConfig();
   const year = viewDate.getFullYear();
   const currentIndex = viewDate.getMonth();
-  const MONTHS = getMonthNames(locale, shortMonths);
+  const MONTHS = getMonthNames(locale, short);
   const [itemWidth, setItemWidth] = useState(52);
 
   const minIndex = minDate && minDate.getFullYear() === year ? minDate.getMonth() : undefined;

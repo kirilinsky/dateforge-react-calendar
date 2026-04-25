@@ -49,10 +49,10 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   isDark,
   value: externalValue,
   mode = "single" as M,
-  max,
+  maxDates,
   onChange,
-  rangeMinDays,
-  rangeMaxDays,
+  minRangeDays,
+  maxRangeDays,
   containerWidth = 0,
   locale,
   hour12,
@@ -61,7 +61,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   maxDate,
   disabled,
   timeZone,
-  readonly = false,
+  readOnly = false,
 }: CalendarProps<M> & {
   children: ReactNode;
   containerWidth?: number;
@@ -70,11 +70,11 @@ export function CalendarProvider<M extends CalendarMode = "single">({
 }) {
   const range = mode === "range";
   const multiselect: number | boolean | undefined =
-    mode === "multiple" ? (max ?? true) : undefined;
+    mode === "multiple" ? (maxDates ?? true) : undefined;
 
   const selectConfig = useMemo<SelectConfig>(
-    () => ({ range, multiselect, rangeMinDays, rangeMaxDays }),
-    [range, multiselect, rangeMinDays, rangeMaxDays],
+    () => ({ range, multiselect, minRangeDays, maxRangeDays }),
+    [range, multiselect, minRangeDays, maxRangeDays],
   );
 
   const [state, dispatch] = useReducer(calendarReducer, undefined, () =>
@@ -162,26 +162,26 @@ export function CalendarProvider<M extends CalendarMode = "single">({
 
   const handleChangeDate = useCallback(
     (d: Date | null) => {
-      if (readonly) return;
+      if (readOnly) return;
       dispatch({ type: "SELECT", date: d, config: selectConfig });
     },
-    [selectConfig, readonly],
+    [selectConfig, readOnly],
   );
 
   const handleChangeTime = useCallback((d: Date) => {
-    if (readonly) return;
+    if (readOnly) return;
     dispatch({ type: "CHANGE_TIME", date: d });
-  }, [readonly]);
+  }, [readOnly]);
 
   const handleDatesSet = useCallback((dates: Date[]) => {
-    if (readonly) return;
+    if (readOnly) return;
     dispatch({ type: "SET_DATES", dates });
-  }, [readonly]);
+  }, [readOnly]);
 
   const handleRangeSet = useCallback((from: Date | null, to: Date | null) => {
-    if (readonly) return;
+    if (readOnly) return;
     dispatch({ type: "SET_RANGE", from, to });
-  }, [readonly]);
+  }, [readOnly]);
 
   const navigateTo = useCallback((d: Date) => {
     dispatch({ type: "NAVIGATE", date: d });
@@ -229,14 +229,14 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       hour12: hour12 ?? false,
       range,
       multiselect,
-      rangeMinDays,
-      rangeMaxDays,
+      minRangeDays,
+      maxRangeDays,
       minDate,
       maxDate,
       disabled,
       gradient: gradient ?? false,
       timeZone,
-      readonly,
+      readOnly,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -244,14 +244,14 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       hour12,
       range,
       multiselect,
-      rangeMinDays,
-      rangeMaxDays,
+      minRangeDays,
+      maxRangeDays,
       minDate,
       maxDate,
       disabled,
       gradient,
       timeZone,
-      readonly,
+      readOnly,
     ],
   );
 

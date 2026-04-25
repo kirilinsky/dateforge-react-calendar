@@ -279,13 +279,13 @@ const alignToJustify: Record<AlignValue, string> = {
 };
 
 export interface CalendarManualSelectProps {
-  allowClean?: boolean;
+  allowClear?: boolean;
   align?: AlignValue;
   col?: number | string;
 }
 
 export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
-  allowClean = true,
+  allowClear = true,
   align = "left",
   col,
 }) => {
@@ -330,9 +330,9 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
           setAddInputKey((k) => k + 1);
         }
       }}
-      style={allowClean ? undefined : { visibility: "hidden", pointerEvents: "none" }}
-      tabIndex={allowClean ? undefined : -1}
-      aria-hidden={!allowClean}
+      style={allowClear ? undefined : { visibility: "hidden", pointerEvents: "none" }}
+      tabIndex={allowClear ? undefined : -1}
+      aria-hidden={!allowClear}
       disabled={!hasValue}
     >
       ×

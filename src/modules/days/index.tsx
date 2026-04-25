@@ -181,54 +181,54 @@ const DayCell = React.memo(function DayCell({
 
 export interface CalendarDaysProps {
   offset?: number;
-  hideOtherMonths?: boolean;
+  currentMonthOnly?: boolean;
   col?: number | string;
-  dataArea?: string;
   startOfWeek?: StartOfWeek;
   highlightWeekends?: boolean;
   boldWeekends?: boolean;
-  showWeekNumber?: boolean;
+  weekNumbers?: boolean;
   hideWeekdays?: boolean;
   highlightToday?: boolean;
-  allowSwipeNavigation?: boolean;
-  hideLimited?: boolean;
-  preventUnselect?: boolean;
-  startMonth?: Date;
+  swipe?: boolean;
+  hideOutOfRange?: boolean;
+  lockSelection?: boolean;
+  defaultMonth?: Date;
+  fixedRows?: boolean;
 }
 
 export const CalendarDays: React.FC<CalendarDaysProps> = ({
   offset = 0,
-  hideOtherMonths = false,
+  currentMonthOnly = false,
   col,
-  dataArea,
   startOfWeek = 1,
   highlightWeekends = true,
   boldWeekends = false,
-  showWeekNumber = false,
+  weekNumbers = false,
   hideWeekdays = false,
   highlightToday = true,
-  allowSwipeNavigation = false,
-  hideLimited = false,
-  preventUnselect = false,
-  startMonth,
+  swipe = false,
+  hideOutOfRange = false,
+  lockSelection = false,
+  defaultMonth,
+  fixedRows = true,
 }) => {
   const { daysTrackActive } = useUI();
   const {
     minDate, maxDate, disabled,
-    range, rangeMinDays, rangeMaxDays,
+    range, minRangeDays, maxRangeDays,
     locale, timeZone,
   } = useConfig();
 
   const { viewDate: rawDate, navigateTo } = useNavigation();
 
   useEffect(() => {
-    if (startMonth) navigateTo(new Date(startMonth.getFullYear(), startMonth.getMonth(), 1));
+    if (defaultMonth) navigateTo(new Date(defaultMonth.getFullYear(), defaultMonth.getMonth(), 1));
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [startMonth?.getTime()]);
+  }, [defaultMonth?.getTime()]);
   const date = offset
     ? new Date(rawDate.getFullYear(), rawDate.getMonth() + offset, 1)
     : rawDate;
-  const resolvedArea = dataArea ?? (offset > 0 ? `days-${offset + 1}` : "days");
+  const resolvedArea = offset > 0 ? `days-${offset + 1}` : "days";
   const { selectedDates, rangeStart, rangeEnd } = useSelectionValue();
   const { onChangeDate, setHoverDate } = useSelectionActions();
   const { hoverDate } = useSelectionHover();
@@ -284,7 +284,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
     }
   }, [date, prevDate]);
 
-  const handleTouchEnd = allowSwipeNavigation
+  const handleTouchEnd = swipe
     ? (e: React.TouchEvent) => {
         if (touchStartX === null) return;
         const deltaX = touchStartX - e.changedTouches[0].clientX;
@@ -294,7 +294,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
       }
     : undefined;
 
-  const handleTouchStart = allowSwipeNavigation
+  const handleTouchStart = swipe
     ? (e: React.TouchEvent) => { setTouchStartX(e.changedTouches[0].clientX); }
     : undefined;
 
@@ -308,7 +308,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
       maxDate,
       disabled,
       range
-        ? { rangeStart, rangeEnd, hoverDate, rangeMinDays, rangeMaxDays }
+        ? { rangeStart, rangeEnd, hoverDate, minRangeDays, maxRangeDays }
         : undefined,
     );
   }, [
@@ -323,14 +323,14 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
     rangeStart,
     rangeEnd,
     hoverDate,
-    rangeMinDays,
-    rangeMaxDays,
+    minRangeDays,
+    maxRangeDays,
   ]);
 
   const handleSetDay = useCallback(
     (targetDate: Date, isDisabled: boolean) => {
       if (isDisabled) return;
-      if ((preventUnselect || daysTrackActive) && selectedDates.some((d) => isSameDay(d, targetDate))) return;
+      if ((lockSelection || daysTrackActive) && selectedDates.some((d) => isSameDay(d, targetDate))) return;
       const next = timeZone
         ? new Date(
             toTZMidnight(targetDate, timeZone).getTime() +
@@ -349,7 +349,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
       }
       onChangeDate(next);
     },
-    [onChangeDate, date, minDate, maxDate, preventUnselect, daysTrackActive, selectedDates],
+    [onChangeDate, date, minDate, maxDate, lockSelection, daysTrackActive, selectedDates],
   );
 
   const isPickingRange = range && rangeStart && !rangeEnd;
@@ -361,11 +361,11 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
         Math.round(
           Math.abs(fullDate.getTime() - rangeStart.getTime()) / 86400000,
         ) + 1;
-      if (rangeMinDays !== undefined && diffDays < rangeMinDays) return;
-      if (rangeMaxDays !== undefined && diffDays > rangeMaxDays) return;
+      if (minRangeDays !== undefined && diffDays < minRangeDays) return;
+      if (maxRangeDays !== undefined && diffDays > maxRangeDays) return;
       setHoverDate(fullDate);
     },
-    [isPickingRange, setHoverDate, rangeStart, rangeMinDays, rangeMaxDays],
+    [isPickingRange, setHoverDate, rangeStart, minRangeDays, maxRangeDays],
   );
 
   const handleMouseLeave = useCallback(() => {
@@ -394,12 +394,12 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   const isDayHidden = useCallback(
     (d: { fullDate: Date; isDisabled: boolean; isCurrentMonth: boolean }) => {
       const t = d.fullDate.getTime();
-      if (hideLimited && (((startT !== null && t < startT) || (endT !== null && t > endT)) || d.isDisabled))
+      if (hideOutOfRange && (((startT !== null && t < startT) || (endT !== null && t > endT)) || d.isDisabled))
         return true;
-      if (hideOtherMonths && !d.isCurrentMonth) return true;
+      if (currentMonthOnly && !d.isCurrentMonth) return true;
       return false;
     },
-    [hideLimited, hideOtherMonths, startT, endT],
+    [hideOutOfRange, currentMonthOnly, startT, endT],
   );
 
   return (
@@ -417,7 +417,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
       className={[
         styles.dayGridContainer,
         direction !== "none" ? styles[direction] : "",
-        showWeekNumber ? styles.withWeekNumbers : "",
+        weekNumbers ? styles.withWeekNumbers : "",
       ]
         .filter(Boolean)
         .join(" ")}
@@ -426,14 +426,14 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
         locale={locale}
         startOfWeek={startOfWeek}
         highlightWeekends={highlightWeekends}
-        showWeekNumber={showWeekNumber}
+        weekNumbers={weekNumbers}
         hideWeekdays={hideWeekdays}
       />
       {weeksData.map((week, wIndex) => {
           const isLastRow = wIndex === weeksData.length - 1;
           if (
             isLastRow &&
-            hideLimited &&
+            hideOutOfRange &&
             week.days.every((d) =>
               isDayHidden({
                 fullDate: d.fullDate,
@@ -441,6 +441,13 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
                 isCurrentMonth: d.isCurrentMonth,
               }),
             )
+          ) {
+            return null;
+          }
+          if (
+            !fixedRows &&
+            isLastRow &&
+            week.days.every((d) => !d.isCurrentMonth)
           ) {
             return null;
           }
@@ -452,7 +459,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
               aria-label={`Week ${week.weekNumber}`}
               style={{ display: "contents" }}
             >
-              {showWeekNumber && (
+              {weekNumbers && (
                 <div
                   role="rowheader"
                   aria-label={`Week ${week.weekNumber}`}

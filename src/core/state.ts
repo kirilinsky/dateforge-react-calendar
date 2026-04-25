@@ -13,8 +13,8 @@ export interface CalendarState {
 export interface SelectConfig {
   range: boolean;
   multiselect: number | boolean | undefined;
-  rangeMinDays?: number;
-  rangeMaxDays?: number;
+  minRangeDays?: number;
+  maxRangeDays?: number;
 }
 
 export type CalendarAction =
@@ -88,10 +88,10 @@ function selectRange(
 
   const [s, e] = date < rangeStart ? [date, rangeStart] : [rangeStart, date];
   const diffDays = Math.round((e.getTime() - s.getTime()) / 86400000) + 1;
-  if (config.rangeMinDays !== undefined && diffDays < config.rangeMinDays) {
+  if (config.minRangeDays !== undefined && diffDays < config.minRangeDays) {
     return state;
   }
-  if (config.rangeMaxDays !== undefined && diffDays > config.rangeMaxDays) {
+  if (config.maxRangeDays !== undefined && diffDays > config.maxRangeDays) {
     return state;
   }
 

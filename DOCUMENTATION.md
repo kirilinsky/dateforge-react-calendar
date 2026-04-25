@@ -43,7 +43,7 @@ import { Calendar } from "react-calendar-datetime";
 | `cols`         | `number`                            | —           | Number of columns in the internal CSS grid                                                                                                            |
 | `locale`       | `string`                            | `"en"`      | BCP 47 language tag used for all labels and formatting                                                                                                |
 | `timeZone`     | `string`                            | —           | IANA timezone (`"Europe/Paris"`, `"UTC"`) or fixed offset (`"UTC+2"`, `"UTC-5"`). Affects today detection, emitted date midnight, and chip formatting |
-| `readonly`     | `boolean`                           | `false`     | Disables all state-changing interactions (date/time selection). Navigation still works. Adds `data-readonly` and `aria-readonly` on the root          |
+| `readOnly`     | `boolean`                           | `false`     | Disables all state-changing interactions (date/time selection). Navigation still works. Adds `data-readonly` and `aria-readonly` on the root          |
 | `hour12`       | `boolean`                           | `false`     | Use 12-hour time format instead of 24-hour                                                                                                            |
 | `theme`        | `CalendarTheme`                     | `"auto"`    | Built-in theme name, `"auto"` / `"light"` / `"dark"`, or a `CustomTheme` from `createTheme()`                                                         |
 | `appearance`   | `CalendarAppearance`                | `"default"` | Built-in appearance preset name or a `CustomAppearance` from `createAppearance()`                                                                     |
@@ -51,9 +51,9 @@ import { Calendar } from "react-calendar-datetime";
 | `width`        | `string \| number`                  | `"100%"`    | Container width                                                                                                                                       |
 | `minDate`      | `Date`                              | —           | Earliest selectable date                                                                                                                              |
 | `maxDate`      | `Date`                              | —           | Latest selectable date                                                                                                                                |
-| `max`          | `number`                            | —           | Maximum number of selectable dates (multiple mode only)                                                                                               |
-| `rangeMinDays` | `number`                            | —           | Minimum number of days in a range selection                                                                                                           |
-| `rangeMaxDays` | `number`                            | —           | Maximum number of days in a range selection                                                                                                           |
+| `maxDates`     | `number`                            | —           | Maximum number of selectable dates (multiple mode only)                                                                                               |
+| `minRangeDays` | `number`                            | —           | Minimum number of days in a range selection                                                                                                           |
+| `maxRangeDays` | `number`                            | —           | Maximum number of days in a range selection                                                                                                           |
 | `disabled`     | `DisabledConfig`                    | —           | Rules for disabling specific dates. Build with `createDisabled()`                                                                                     |
 | `children`     | `React.ReactNode`                   | —           | Module components that compose the calendar UI                                                                                                        |
 
@@ -69,22 +69,22 @@ Renders the month grid — weekday headers, week numbers (optional), and the day
 
 ### Props
 
-| Prop                   | Type               | Default | Description                                                                          |
-| ---------------------- | ------------------ | ------- | ------------------------------------------------------------------------------------ |
-| `offset`               | `number`           | `0`     | Month offset relative to the current view. Use `1` or `-1` to render adjacent months |
-| `startOfWeek`          | `0–6`              | `1`     | First day of the week. `0` = Sunday, `1` = Monday, … `6` = Saturday                  |
-| `hideOtherMonths`      | `boolean`          | `false` | Hide day cells that belong to the previous or next month                             |
-| `highlightWeekends`    | `boolean`          | `true`  | Apply a distinct style to Saturday and Sunday                                        |
-| `boldWeekends`         | `boolean`          | `false` | Render Saturday and Sunday in bold with the weekend accent color (`--c-we`)          |
-| `highlightToday`       | `boolean`          | `true`  | Highlight today's date                                                               |
-| `showWeekNumber`       | `boolean`          | `false` | Show ISO week numbers in the leftmost column                                         |
-| `hideWeekdays`         | `boolean`          | `false` | Hide the row of weekday name headers                                                 |
-| `hideLimited`          | `boolean`          | `false` | Completely hide dates that fall outside `minDate`/`maxDate` or match disabled rules  |
-| `preventUnselect`      | `boolean`          | `false` | Prevent the user from deselecting the currently selected date                        |
-| `allowSwipeNavigation` | `boolean`          | `false` | Enable swipe gestures to navigate between months                                     |
-| `startMonth`           | `Date`             | —       | Initial month displayed on mount. Navigates whenever the value changes               |
-| `col`                  | `number \| string` | —       | CSS grid `grid-column` value for layout positioning                                  |
-| `dataArea`             | `string`           | —       | Value for the `data-area` attribute (useful for testing)                             |
+| Prop                | Type               | Default | Description                                                                          |
+| ------------------- | ------------------ | ------- | ------------------------------------------------------------------------------------ |
+| `offset`            | `number`           | `0`     | Month offset relative to the current view. Use `1` or `-1` to render adjacent months |
+| `startOfWeek`       | `0–6`              | `1`     | First day of the week. `0` = Sunday, `1` = Monday, … `6` = Saturday                  |
+| `currentMonthOnly`  | `boolean`          | `false` | Hide day cells that belong to the previous or next month                             |
+| `highlightWeekends` | `boolean`          | `true`  | Apply a distinct style to Saturday and Sunday                                        |
+| `boldWeekends`      | `boolean`          | `false` | Render Saturday and Sunday in bold with the weekend accent color (`--c-we`)          |
+| `highlightToday`    | `boolean`          | `true`  | Highlight today's date                                                               |
+| `fixedRows`         | `boolean`          | `true`  | Always render 6 rows of day cells                                                    |
+| `weekNumbers`       | `boolean`          | `false` | Show ISO week numbers in the leftmost column                                         |
+| `hideWeekdays`      | `boolean`          | `false` | Hide the row of weekday name headers                                                 |
+| `hideOutOfRange`    | `boolean`          | `false` | Completely hide dates that fall outside `minDate`/`maxDate` or match disabled rules  |
+| `lockSelection`     | `boolean`          | `false` | Prevent the user from deselecting the currently selected date                        |
+| `swipe`             | `boolean`          | `false` | Enable swipe gestures to navigate between months                                     |
+| `defaultMonth`      | `Date`             | —       | Initial month displayed on mount. Navigates whenever the value changes               |
+| `col`               | `number \| string` | —       | CSS grid `grid-column` value for layout positioning                                  |
 
 ---
 
@@ -99,28 +99,38 @@ Module components are optional building blocks placed as children of `<Calendar>
 Navigation header with configurable controls.
 
 ```tsx
-<CalendarNav showMonthPicker showYearPicker showClear />
+<CalendarNav showMonthPicker showYearPicker clear />
 ```
 
 ### Props
 
-| Prop                     | Type               | Default | Description                                                                                                                                                          |
-| ------------------------ | ------------------ | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `label`                  | `string`           | —       | Custom text shown as the header label, max 180 length.                                                                                                               |
-| `showMonthPicker`        | `boolean`          | `false` | Show previous/next month arrow buttons                                                                                                                               |
-| `compactMonths`          | `boolean`          | `false` | Show a compact month dropdown instead of arrows                                                                                                                      |
-| `showYearPicker`         | `boolean`          | `false` | Show previous/next year arrow buttons                                                                                                                                |
-| `compactYears`           | `boolean`          | `false` | Show a compact year dropdown instead of arrows                                                                                                                       |
-| `animatedTime`           | `boolean`          | `true`  | Show flip animation for in `showTime` and `showNowTime`                                                                                                              |
-| `showSelectedMonthLabel` | `boolean`          | `false` | Show the current month name as plain text (no controls, no popup)                                                                                                    |
-| `showSelectedYearLabel`  | `boolean`          | `false` | Show the current year as plain text (no controls, no popup)                                                                                                          |
-| `showTime`               | `boolean`          | `false` | Show a button that opens the time picker popup                                                                                                                       |
-| `showNowTime`            | `boolean`          | `false` | Show the current system time as a live read-only display (updates every second). A pulsing dot indicates it is live. Respects the `hour12` setting from `<Calendar>` |
-| `showSeconds`            | `boolean`          | `false` | Include seconds in `showTime` and `showNowTime` displays, and in the time picker popup                                                                               |
-| `showHome`               | `boolean`          | `false` | Show a button that navigates back to today                                                                                                                           |
-| `showClear`              | `boolean`          | `false` | Show a button that clears the current selection                                                                                                                      |
-| `showThemeToggle`        | `boolean`          | `false` | Show a light/dark theme toggle button                                                                                                                                |
-| `col`                    | `number \| string` | —       | CSS grid `grid-column` value                                                                                                                                         |
+| Prop              | Type               | Default | Description                                                                                                                                                          |
+| ----------------- | ------------------ | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `label`           | `string`           | —       | Custom text shown as the header label, max 180 length.                                                                                                               |
+| `showMonthPicker` | `boolean`          | `false` | Show previous/next month arrow buttons                                                                                                                               |
+| `compactMonths`   | `boolean`          | `false` | Show a compact month dropdown instead of arrows                                                                                                                      |
+| `showYearPicker`  | `boolean`          | `false` | Show previous/next year arrow buttons                                                                                                                                |
+| `compactYears`    | `boolean`          | `false` | Show a compact year dropdown instead of arrows                                                                                                                       |
+| `animateTime`     | `boolean`          | `true`  | Show flip animation for in `showTime` and `showNowTime`                                                                                                              |
+| `monthLabel`      | `boolean`          | `false` | Show the current month name as plain text (no controls, no popup)                                                                                                    |
+| `yearLabel`       | `boolean`          | `false` | Show the current year as plain text (no controls, no popup)                                                                                                          |
+| `showTime`        | `boolean`          | `false` | Show a button that opens the time picker popup                                                                                                                       |
+| `showNowTime`     | `boolean`          | `false` | Show the current system time as a live read-only display (updates every second). A pulsing dot indicates it is live. Respects the `hour12` setting from `<Calendar>` |
+| `seconds`         | `boolean`          | `false` | Include seconds in `showTime` and `showNowTime` displays, and in the time picker popup                                                                               |
+| `home`            | `boolean`          | `false` | Show a button that navigates back to today                                                                                                                           |
+| `clear`           | `boolean`          | `false` | Show a button that clears the current selection                                                                                                                      |
+| `themeToggle`     | `boolean`          | `false` | Show a light/dark theme toggle button                                                                                                                                |
+| `offset`          | `number`           | `0`     | Month offset relative to `viewDate`. Use to render two synced nav headers in `cols={2}` layouts (`<CalendarNav offset={1} />`)                                       |
+| `hideBorder`      | `true \| Side \| Side[]` | —      | Hide auto-border on specified sides (`"top"`, `"right"`, `"bottom"`, `"left"`). `true` hides all four. Useful when stacking custom layouts                    |
+| `col`             | `number \| string` | —       | CSS grid `grid-column` value                                                                                                                                         |
+
+**Examples — `hideBorder`:**
+
+```tsx
+<CalendarNav hideBorder />                       // hide all four
+<CalendarNav hideBorder="bottom" />              // hide one side
+<CalendarNav hideBorder={["top", "bottom"]} />   // hide multiple
+```
 
 ---
 
@@ -134,12 +144,12 @@ Full-page month picker grid (12 cells).
 
 ### Props
 
-| Prop             | Type               | Default | Description                                                   |
-| ---------------- | ------------------ | ------- | ------------------------------------------------------------- |
-| `shortMonths`    | `boolean`          | `true`  | Use abbreviated month names (e.g. "Jan" instead of "January") |
-| `disableLimited` | `boolean`          | `true`  | Disable months outside `minDate`/`maxDate` range              |
-| `hideLimited`    | `boolean`          | `false` | Completely hide months outside the allowed range              |
-| `col`            | `number \| string` | —       | CSS grid `grid-column` value                                  |
+| Prop                | Type               | Default | Description                                                   |
+| ------------------- | ------------------ | ------- | ------------------------------------------------------------- |
+| `short`             | `boolean`          | `true`  | Use abbreviated month names (e.g. "Jan" instead of "January") |
+| `disableOutOfRange` | `boolean`          | `true`  | Disable months outside `minDate`/`maxDate` range              |
+| `hideOutOfRange`    | `boolean`          | `false` | Completely hide months outside the allowed range              |
+| `col`               | `number \| string` | —       | CSS grid `grid-column` value                                  |
 
 ---
 
@@ -153,12 +163,12 @@ Full-page year picker grid with pagination.
 
 ### Props
 
-| Prop             | Type               | Default | Description                                     |
-| ---------------- | ------------------ | ------- | ----------------------------------------------- |
-| `yearsPerPage`   | `number`           | `10`    | Number of years shown per page. Clamped to 1–40 |
-| `disableLimited` | `boolean`          | `true`  | Disable years outside `minDate`/`maxDate` range |
-| `hideLimited`    | `boolean`          | `false` | Completely hide years outside the allowed range |
-| `col`            | `number \| string` | —       | CSS grid `grid-column` value                    |
+| Prop                | Type               | Default | Description                                     |
+| ------------------- | ------------------ | ------- | ----------------------------------------------- |
+| `yearsPerPage`      | `number`           | `10`    | Number of years shown per page. Clamped to 1–40 |
+| `disableOutOfRange` | `boolean`          | `true`  | Disable years outside `minDate`/`maxDate` range |
+| `hideOutOfRange`    | `boolean`          | `false` | Completely hide years outside the allowed range |
+| `col`               | `number \| string` | —       | CSS grid `grid-column` value                    |
 
 ---
 
@@ -167,15 +177,15 @@ Full-page year picker grid with pagination.
 Time picker — hours, minutes, optional seconds, AM/PM toggle when `hour12` is enabled.
 
 ```tsx
-<CalendarTimeGrid showSeconds />
+<CalendarTimeGrid seconds />
 ```
 
 ### Props
 
-| Prop          | Type               | Default | Description                          |
-| ------------- | ------------------ | ------- | ------------------------------------ |
-| `showSeconds` | `boolean`          | `false` | Show a third drum for seconds (0–59) |
-| `col`         | `number \| string` | —       | CSS grid `grid-column` value         |
+| Prop      | Type               | Default | Description                          |
+| --------- | ------------------ | ------- | ------------------------------------ |
+| `seconds` | `boolean`          | `false` | Show a third drum for seconds (0–59) |
+| `col`     | `number \| string` | —       | CSS grid `grid-column` value         |
 
 ---
 
@@ -216,10 +226,10 @@ import { CalendarPresets, basicPresets } from "react-calendar-datetime";
 
 ### Props
 
-| Prop      | Type               | Default | Description                                                                   |
-| --------- | ------------------ | ------- | ----------------------------------------------------------------------------- |
-| `presets` | `PresetEntry[]`    | `[]`    | Entries to render. Empty / omitted → module renders nothing                   |
-| `col`     | `number \| string` | —       | CSS grid `grid-column` value                                                  |
+| Prop      | Type               | Default | Description                                                 |
+| --------- | ------------------ | ------- | ----------------------------------------------------------- |
+| `presets` | `PresetEntry[]`    | `[]`    | Entries to render. Empty / omitted → module renders nothing |
+| `col`     | `number \| string` | —       | CSS grid `grid-column` value                                |
 
 ---
 
@@ -228,14 +238,14 @@ import { CalendarPresets, basicPresets } from "react-calendar-datetime";
 Displays the currently selected dates as removable chips.
 
 ```tsx
-<CalendarSelectedDates allowClean animated align="center" />
+<CalendarSelectedDates allowClear animated align="center" />
 ```
 
 ### Props
 
 | Prop            | Type                            | Default  | Description                                                                                         |
 | --------------- | ------------------------------- | -------- | --------------------------------------------------------------------------------------------------- |
-| `allowClean`    | `boolean`                       | `true`   | Show a clear-all button next to the chips                                                           |
+| `allowClear`    | `boolean`                       | `true`   | Show a clear-all button next to the chips                                                           |
 | `allowNavigate` | `boolean`                       | `true`   | Clicking a chip navigates the calendar to that date                                                 |
 | `animated`      | `boolean`                       | `true`   | Animate chips appearing and disappearing                                                            |
 | `align`         | `"left" \| "center" \| "right"` | `"left"` | Horizontal alignment of the chip list                                                               |
@@ -249,14 +259,14 @@ Displays the currently selected dates as removable chips.
 Text input that lets the user type a date directly.
 
 ```tsx
-<CalendarManualSelect allowClean={false} />
+<CalendarManualSelect allowClear={false} />
 ```
 
 ### Props
 
 | Prop         | Type                            | Default  | Description                               |
 | ------------ | ------------------------------- | -------- | ----------------------------------------- |
-| `allowClean` | `boolean`                       | `true`   | Show a clear button inside the input      |
+| `allowClear` | `boolean`                       | `true`   | Show a clear button inside the input      |
 | `align`      | `"left" \| "center" \| "right"` | `"left"` | Horizontal alignment of the input content |
 | `col`        | `number \| string`              | —        | CSS grid `grid-column` value              |
 
@@ -284,15 +294,15 @@ A horizontal scrollable strip of day numbers for the current month.
 A horizontal scrollable strip of month names for the current year.
 
 ```tsx
-<CalendarMonthsTrack shortMonths={false} />
+<CalendarMonthsTrack short={false} />
 ```
 
 ### Props
 
-| Prop          | Type               | Default | Description                  |
-| ------------- | ------------------ | ------- | ---------------------------- |
-| `shortMonths` | `boolean`          | `true`  | Use abbreviated month names  |
-| `col`         | `number \| string` | —       | CSS grid `grid-column` value |
+| Prop    | Type               | Default | Description                  |
+| ------- | ------------------ | ------- | ---------------------------- |
+| `short` | `boolean`          | `true`  | Use abbreviated month names  |
+| `col`   | `number \| string` | —       | CSS grid `grid-column` value |
 
 ---
 
@@ -404,50 +414,52 @@ Presets are plain objects. Pass an array of them to `<CalendarPresets presets={[
 
 Declarative. Covers day offsets, fixed dates, fixed-length ranges. Zero imports needed.
 
-| Field   | Type                                   | Description                                                                                         |
-| ------- | -------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `id`    | `string` (optional)                    | Stable React key. Auto-derived from `label` / index if omitted                                      |
-| `label` | `string \| (locale: string) => string` | Button text. Function form for locale-aware labels                                                  |
-| `value` | `number \| Date`                       | `number` — day offset from today (neg = past, pos = future). `Date` — absolute fixed date           |
-| `range` | `number` (optional)                    | Length of range in days after `value`. Absent → single date. Any number → range                     |
+| Field   | Type                                   | Description                                                                               |
+| ------- | -------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `id`    | `string` (optional)                    | Stable React key. Auto-derived from `label` / index if omitted                            |
+| `label` | `string \| (locale: string) => string` | Button text. Function form for locale-aware labels                                        |
+| `value` | `number \| Date`                       | `number` — day offset from today (neg = past, pos = future). `Date` — absolute fixed date |
+| `range` | `number` (optional)                    | Length of range in days after `value`. Absent → single date. Any number → range           |
 
 `range` examples:
 
-| `value`                 | `range` | Result                                      |
-| ----------------------- | ------- | ------------------------------------------- |
-| `0`                     | —       | Today (single)                              |
-| `7`                     | —       | Today + 7 (single)                          |
-| `-6`                    | `6`     | `{ from: today-6, to: today }` (7-day span) |
-| `0`                     | `13`    | `{ from: today, to: today+13 }` (next 2 weeks) |
-| `new Date(2026, 0, 1)`  | —       | Jan 1 2026 (fixed single)                   |
-| `new Date(2026, 0, 1)`  | `89`    | `{ from: Jan 1, to: Apr 1 }` (fixed Q1)     |
+| `value`                | `range` | Result                                         |
+| ---------------------- | ------- | ---------------------------------------------- |
+| `0`                    | —       | Today (single)                                 |
+| `7`                    | —       | Today + 7 (single)                             |
+| `-6`                   | `6`     | `{ from: today-6, to: today }` (7-day span)    |
+| `0`                    | `13`    | `{ from: today, to: today+13 }` (next 2 weeks) |
+| `new Date(2026, 0, 1)` | —       | Jan 1 2026 (fixed single)                      |
+| `new Date(2026, 0, 1)` | `89`    | `{ from: Jan 1, to: Apr 1 }` (fixed Q1)        |
 
 ```tsx
-<CalendarPresets presets={[
-  { label: "Today",       value: 0 },
-  { label: "In 3 days",   value: 3 },
-  { label: "Last 7 days", value: -6, range: 6 },
-  { label: "New Year",    value: new Date(2026, 0, 1) },
-]} />
+<CalendarPresets
+  presets={[
+    { label: "Today", value: 0 },
+    { label: "In 3 days", value: 3 },
+    { label: "Last 7 days", value: -6, range: 6 },
+    { label: "New Year", value: new Date(2026, 0, 1) },
+  ]}
+/>
 ```
 
 #### Advanced form — `AdvancedPresetDef`
 
 Function form. Use when offsets are not enough (calendar-accurate month shifts, weekday-relative dates, conditional visibility, `isValid` loops).
 
-| Field      | Type                                                                  | Description                                                                                                     |
-| ---------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `id`       | `string`                                                              | Stable React key. Required                                                                                      |
-| `label`    | `string \| (locale: string) => string`                                | Button text                                                                                                     |
-| `getValue` | `(ctx: PresetContext) => Date \| { from: Date; to: Date } \| null`    | Computes target. Return type decides kind (single / range); `null` hides the button                             |
+| Field      | Type                                                               | Description                                                                         |
+| ---------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| `id`       | `string`                                                           | Stable React key. Required                                                          |
+| `label`    | `string \| (locale: string) => string`                             | Button text                                                                         |
+| `getValue` | `(ctx: PresetContext) => Date \| { from: Date; to: Date } \| null` | Computes target. Return type decides kind (single / range); `null` hides the button |
 
 `PresetContext`:
 
-| Field     | Type                      | Description                                                                                 |
-| --------- | ------------------------- | ------------------------------------------------------------------------------------------- |
-| `now`     | `Date`                    | Real `new Date()` with time-of-day from the calendar's `viewDate`. Stable across clicks     |
-| `isValid` | `(date: Date) => boolean` | True if `date` passes `minDate`, `maxDate`, `disabled`                                      |
-| `locale`  | `string`                  | BCP-47 locale string from calendar config                                                   |
+| Field     | Type                      | Description                                                                             |
+| --------- | ------------------------- | --------------------------------------------------------------------------------------- |
+| `now`     | `Date`                    | Real `new Date()` with time-of-day from the calendar's `viewDate`. Stable across clicks |
+| `isValid` | `(date: Date) => boolean` | True if `date` passes `minDate`, `maxDate`, `disabled`                                  |
+| `locale`  | `string`                  | BCP-47 locale string from calendar config                                               |
 
 Return-type semantics:
 
@@ -458,25 +470,31 @@ Return-type semantics:
 All preset targets are auto-filtered through `isValid` — a target that is disabled / out of range is not rendered.
 
 ```tsx
-<CalendarPresets presets={[
-  { id: "som", label: "Start of month", getValue: ({ now }) => new Date(now.getFullYear(), now.getMonth(), 1) },
-  {
-    id: "next-weekend",
-    label: "Next available weekend",
-    getValue: ({ now, isValid }) => {
-      const d = new Date(now);
-      const delta = (6 - d.getDay() + 7) % 7 || 7;
-      d.setDate(d.getDate() + delta);
-      for (let i = 0; i < 52; i++) {
-        const sun = new Date(d);
-        sun.setDate(sun.getDate() + 1);
-        if (isValid(d) && isValid(sun)) return { from: d, to: sun };
-        d.setDate(d.getDate() + 7);
-      }
-      return null;
+<CalendarPresets
+  presets={[
+    {
+      id: "som",
+      label: "Start of month",
+      getValue: ({ now }) => new Date(now.getFullYear(), now.getMonth(), 1),
     },
-  },
-]} />
+    {
+      id: "next-weekend",
+      label: "Next available weekend",
+      getValue: ({ now, isValid }) => {
+        const d = new Date(now);
+        const delta = (6 - d.getDay() + 7) % 7 || 7;
+        d.setDate(d.getDate() + delta);
+        for (let i = 0; i < 52; i++) {
+          const sun = new Date(d);
+          sun.setDate(sun.getDate() + 1);
+          if (isValid(d) && isValid(sun)) return { from: d, to: sun };
+          d.setDate(d.getDate() + 7);
+        }
+        return null;
+      },
+    },
+  ]}
+/>
 ```
 
 #### `basicPresets`

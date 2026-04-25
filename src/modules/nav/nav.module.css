@@ -16,6 +16,7 @@
     min-height: var(--header-min-height, 3.2em);
     height: auto;
     z-index: 3;
+    position: relative;
     box-sizing: border-box;
     transition: all var(--cal-transition) linear;
     overflow: hidden;
@@ -23,6 +24,11 @@
       box-shadow: 0 0.1em 0.1em var(--c-x);
     }
   }
+
+  .headerContainer[data-hide-border~="top"]    { margin-top:    calc(var(--cal-border) * -1); }
+  .headerContainer[data-hide-border~="bottom"] { margin-bottom: calc(var(--cal-border) * -1); }
+  .headerContainer[data-hide-border~="left"]   { margin-left:   calc(var(--cal-border) * -1); }
+  .headerContainer[data-hide-border~="right"]  { margin-right:  calc(var(--cal-border) * -1); }
 
   .yearsSelector {
     flex-grow: 1;

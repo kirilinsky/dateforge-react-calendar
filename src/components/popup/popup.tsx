@@ -33,6 +33,7 @@ export const Popup = ({ children, onConfirm, onClose, label = "Dialog" }: PopupP
     let top: number | undefined;
     let bottom: number | undefined;
     let left: number;
+    let maxHeight: number;
 
     if (popupAnchorEl) {
       const aRect = popupAnchorEl.getBoundingClientRect();
@@ -44,18 +45,21 @@ export const Popup = ({ children, onConfirm, onClose, label = "Dialog" }: PopupP
 
       if (goUp) {
         bottom = bRect.bottom - aRect.top + GAP;
+        maxHeight = Math.max(0, spaceAbove);
         setDirection("up");
       } else {
         top = aRect.bottom - bRect.top + GAP;
+        maxHeight = Math.max(0, spaceBelow);
         setDirection("down");
       }
     } else {
       top = GAP;
       left = GAP;
+      maxHeight = Math.max(0, bRect.height - GAP * 2);
       setDirection("down");
     }
 
-    setPanelStyle({ top, bottom, left, opacity: 1 });
+    setPanelStyle({ top, bottom, left, maxHeight, opacity: 1 });
   }, [popupAnchorEl]);
 
   useFocusTrap(popupRef, { onEscape: handleClose });

@@ -6,14 +6,14 @@ export interface CalendarConfig {
   hour12: boolean;
   range: boolean;
   multiselect: number | boolean | undefined;
-  rangeMinDays?: number;
-  rangeMaxDays?: number;
+  minRangeDays?: number;
+  maxRangeDays?: number;
   minDate?: Date;
   maxDate?: Date;
   disabled?: DisabledConfig;
   gradient: boolean;
   timeZone?: string;
-  readonly: boolean;
+  readOnly: boolean;
 }
 
 export const ConfigContext = createContext<CalendarConfig | undefined>(undefined);

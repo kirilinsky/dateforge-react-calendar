@@ -5,8 +5,8 @@ export interface RangeOptions {
   rangeStart?: Date | null;
   rangeEnd?: Date | null;
   hoverDate?: Date | null;
-  rangeMinDays?: number;
-  rangeMaxDays?: number;
+  minRangeDays?: number;
+  maxRangeDays?: number;
 }
 
 const I18N_CACHE_MAX = 32;
@@ -82,8 +82,8 @@ export const getCalendarData = (
   const rS = rangeOpts?.rangeStart;
   const rE = rangeOpts?.rangeEnd;
   const hD = rangeOpts?.hoverDate;
-  const rangeMinDays = rangeOpts?.rangeMinDays;
-  const rangeMaxDays = rangeOpts?.rangeMaxDays;
+  const minRangeDays = rangeOpts?.minRangeDays;
+  const maxRangeDays = rangeOpts?.maxRangeDays;
 
   const rStartT = rS
     ? new Date(rS.getFullYear(), rS.getMonth(), rS.getDate()).getTime()
@@ -157,9 +157,9 @@ export const getCalendarData = (
       let isRangeLimitDisabled = false;
       if (!isDisabled && rStartT !== null && rEndT === null && t !== rStartT) {
         const diffDays = Math.round(Math.abs(t - rStartT) / DAY_MS) + 1;
-        if (rangeMinDays !== undefined && diffDays < rangeMinDays)
+        if (minRangeDays !== undefined && diffDays < minRangeDays)
           isRangeLimitDisabled = true;
-        if (rangeMaxDays !== undefined && diffDays > rangeMaxDays)
+        if (maxRangeDays !== undefined && diffDays > maxRangeDays)
           isRangeLimitDisabled = true;
       }
 

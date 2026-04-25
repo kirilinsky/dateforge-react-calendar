@@ -7,16 +7,16 @@ import { useGridSlot } from "@/hooks/use-grid-slot";
 import shared from "@/global/global.module.css";
 
 export interface CalendarMonthGridProps {
-  shortMonths?: boolean;
-  disableLimited?: boolean;
-  hideLimited?: boolean;
+  short?: boolean;
+  disableOutOfRange?: boolean;
+  hideOutOfRange?: boolean;
   col?: number | string;
 }
 
 export const CalendarMonthGrid: React.FC<CalendarMonthGridProps> = ({
-  shortMonths = true,
-  disableLimited = true,
-  hideLimited = false,
+  short = true,
+  disableOutOfRange = true,
+  hideOutOfRange = false,
   col,
 }) => {
   const { locale, minDate, maxDate, disabled } = useConfig();
@@ -26,8 +26,8 @@ export const CalendarMonthGrid: React.FC<CalendarMonthGridProps> = ({
   const currentYear = viewDate.getFullYear();
 
   const mNames = useMemo(
-    () => getMonthListData(locale, currentYear, minDate, maxDate, shortMonths, disabled, disableLimited),
-    [locale, currentYear, minDate, maxDate, shortMonths, disabled, disableLimited],
+    () => getMonthListData(locale, currentYear, minDate, maxDate, short, disabled, disableOutOfRange),
+    [locale, currentYear, minDate, maxDate, short, disabled, disableOutOfRange],
   );
 
   const longFmt = useMemo(
@@ -51,7 +51,7 @@ export const CalendarMonthGrid: React.FC<CalendarMonthGridProps> = ({
     >
       {mNames.map((n, i) => {
         const isCurrent = i === currentMonth;
-        const isHidden = hideLimited && n.limited;
+        const isHidden = hideOutOfRange && n.limited;
         const isDisabled = n.disabled || isHidden;
         const fullLabel =
           longFmt.format(new Date(currentYear, i, 1)) +

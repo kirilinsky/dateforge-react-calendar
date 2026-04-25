@@ -11,8 +11,8 @@ const MAX_YEAR = 2100;
 
 export interface CalendarYearsGridProps {
   yearsPerPage?: number;
-  disableLimited?: boolean;
-  hideLimited?: boolean;
+  disableOutOfRange?: boolean;
+  hideOutOfRange?: boolean;
   col?: number | string;
 }
 
@@ -66,8 +66,8 @@ const isYearFullyDisabled = (
 
 export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
   yearsPerPage = 10,
-  disableLimited = true,
-  hideLimited = false,
+  disableOutOfRange = true,
+  hideOutOfRange = false,
   col,
 }) => {
   const pageSize = Math.min(40, Math.max(1, yearsPerPage));
@@ -105,7 +105,7 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
       const fullyDisabled =
         !outOfRange && isYearFullyDisabled(year, disabled, minDate, maxDate);
       const limited = outOfRange || fullyDisabled;
-      return { year, limited, disabled: disableLimited && limited };
+      return { year, limited, disabled: disableOutOfRange && limited };
     }).filter(({ year }) => year >= MIN_YEAR && year <= MAX_YEAR);
   }, [
     loYear,
@@ -115,7 +115,7 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
     disabled,
     minDate,
     maxDate,
-    disableLimited,
+    disableOutOfRange,
   ]);
 
   const handleClick = (year: number) => {
@@ -165,7 +165,7 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
         onAnimationEnd={() => setDirection("none")}
       >
         {years.map(({ year, disabled, limited }) => {
-          const isHidden = hideLimited && limited;
+          const isHidden = hideOutOfRange && limited;
           const isDisabled = disabled || isHidden;
           const isCurrent = year === currentYear;
           return (

@@ -10,10 +10,10 @@ import { TimeTrack } from "@/components/time-track/time-track";
 
 export interface CalendarTimeGridProps {
   col?: number | string;
-  showSeconds?: boolean;
+  seconds?: boolean;
 }
 
-export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({ col, showSeconds = false }) => {
+export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({ col, seconds = false }) => {
   const { hour12, locale } = useConfig();
   const { viewDate: date } = useNavigation();
   const { onChangeTime } = useSelectionActions();
@@ -25,7 +25,7 @@ export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({ col, showSec
       className={`${styles.timeContainer} ${shared.flexCenter}`}
       style={useGridSlot(col)}
     >
-      <TimeTrack date={date} hour12={hour12} locale={locale} showSeconds={showSeconds} onChange={throttled} />
+      <TimeTrack date={date} hour12={hour12} locale={locale} showSeconds={seconds} onChange={throttled} />
     </div>
   );
 };

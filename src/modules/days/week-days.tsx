@@ -8,11 +8,11 @@ interface WeekDaysProps {
   locale: string;
   startOfWeek: StartOfWeek;
   highlightWeekends: boolean;
-  showWeekNumber: boolean;
+  weekNumbers: boolean;
   hideWeekdays: boolean;
 }
 
-const WeekDays = ({ locale, startOfWeek, highlightWeekends, showWeekNumber, hideWeekdays }: WeekDaysProps) => {
+const WeekDays = ({ locale, startOfWeek, highlightWeekends, weekNumbers, hideWeekdays }: WeekDaysProps) => {
   const { dark } = useUI();
 
   const wDays = useMemo(
@@ -24,7 +24,7 @@ const WeekDays = ({ locale, startOfWeek, highlightWeekends, showWeekNumber, hide
 
   return (
     <div role="row" style={{ display: "contents" }}>
-      {showWeekNumber && <div aria-hidden />}
+      {weekNumbers && <div aria-hidden />}
       {wDays.map((day, i) => {
         const actualDay = (startOfWeek + i) % 7;
         const isWeekend =
