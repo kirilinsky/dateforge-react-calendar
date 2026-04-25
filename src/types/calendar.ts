@@ -42,9 +42,19 @@ export interface CalendarProps<M extends CalendarMode = "single"> {
   locale?: string;
   timeZone?: string;
   readOnly?: boolean;
+  /**
+   * @example theme="midnight"
+   * @example import { midnight } from "react-calendar-datetime/themes"; <Calendar theme={midnight} />
+   * @example import { abyss } from "react-calendar-datetime/themes/abyss"; <Calendar theme={abyss} />
+   */
   theme?: CalendarTheme;
   width?: string | number;
   hour12?: boolean;
+  /**
+   * @example // default — no import needed, just omit the prop
+   * @example import { loft } from "react-calendar-datetime/appearances"; <Calendar appearance={loft} />
+   * @example import { compact } from "react-calendar-datetime/appearances/compact"; <Calendar appearance={compact} />
+   */
   appearance?: CalendarAppearance;
   gradient?: boolean;
   disabled?: DisabledConfig;

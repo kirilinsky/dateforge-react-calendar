@@ -9,7 +9,7 @@ export const getDrumValue = (
   return val < 0 ? val + max : val;
 };
 
-export const addTime = (date: Date, amount: number, unit: "h" | "m") => {
+const addTime = (date: Date, amount: number, unit: "h" | "m") => {
   const n = new Date(date.getTime());
   if (unit === "h") n.setHours(getDrumValue(n.getHours(), amount, 24));
   else n.setMinutes(getDrumValue(n.getMinutes(), amount, 60));

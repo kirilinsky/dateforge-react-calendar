@@ -6,7 +6,7 @@ import { useFocusTrap } from "@/hooks/use-focus-trap";
 import { useUI } from "@/context/ui-context";
 import styles from "./popup.module.css";
 
-export interface PopupProps {
+interface PopupProps {
   children: ReactNode;
   onConfirm: () => void;
   onClose: () => void;

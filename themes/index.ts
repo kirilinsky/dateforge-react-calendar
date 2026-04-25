@@ -1,48 +1,37 @@
-import { THEMES_DATA, TOKEN_TO_VAR, type ThemeTokens } from "./themes";
-import { LIGHT_THEMES, CUSTOM_THEME_BRAND } from "../src/types/themes";
+// generated — do not edit manually, run: npm run build
+import { CUSTOM_THEME_BRAND } from "../src/types/themes";
 import type { CustomTheme } from "../src/types/themes";
 
-const LIGHT_SET: ReadonlySet<string> = new Set(LIGHT_THEMES);
-
-function buildTheme(name: string): CustomTheme {
-  const tokens = THEMES_DATA[name];
-  const vars: Record<string, string> = {};
-  for (const [key, value] of Object.entries(tokens)) {
-    const cssVar = TOKEN_TO_VAR[key as keyof ThemeTokens];
-    if (cssVar) vars[cssVar] = value;
-  }
-  return { [CUSTOM_THEME_BRAND]: true, base: LIGHT_SET.has(name) ? "light" : "dark", vars };
-}
-
-export const industrial = buildTheme("industrial");
-export const graphite   = buildTheme("graphite");
-export const crimson    = buildTheme("crimson");
-export const amethyst   = buildTheme("amethyst");
-export const cyber      = buildTheme("cyber");
-export const espresso   = buildTheme("espresso");
-export const ember      = buildTheme("ember");
-export const phosphor   = buildTheme("phosphor");
-export const midnight   = buildTheme("midnight");
-export const sandstone  = buildTheme("sandstone");
-export const mint       = buildTheme("mint");
-export const rosa       = buildTheme("rosa");
-export const snow       = buildTheme("snow");
-export const solar      = buildTheme("solar");
-export const dracula    = buildTheme("dracula");
-export const comfy      = buildTheme("comfy");
-export const neon       = buildTheme("neon");
-export const temporal   = buildTheme("temporal");
-export const latte      = buildTheme("latte");
-export const prism      = buildTheme("prism");
-export const meadow     = buildTheme("meadow");
-export const forest     = buildTheme("forest");
-export const nebula     = buildTheme("nebula");
-export const aurora     = buildTheme("aurora");
-export const slate      = buildTheme("slate");
-export const scarlet    = buildTheme("scarlet");
-export const monsoon    = buildTheme("monsoon");
-export const pearl      = buildTheme("pearl");
-export const chalk      = buildTheme("chalk");
-export const split      = buildTheme("split");
-export const riso       = buildTheme("riso");
-export const flare      = buildTheme("flare");
+export const industrial: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#ffffff","--c-b":"#111111","--c-h":"#e85d00","--c-t":"#1c1c1c","--c-c":"#d4d4d4","--c-s":"#2a2a2a","--c-x":"#e85d0030","--c-d":"#505050","--c-we":"#ff7043","--c-r":"#f1c40f" } };
+export const graphite: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#ffffff","--c-b":"#f7f8f9","--c-h":"#f1a01d","--c-t":"#eeeff1","--c-c":"#1a1a1a","--c-s":"#e2e4e8","--c-x":"#f1a01d1e","--c-d":"#9aa0aa","--c-we":"#e53935","--c-r":"#4a90d9" } };
+export const crimson: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#161111","--c-b":"#0d0909","--c-h":"#f92f2f","--c-t":"#3a1616","--c-c":"#ffffff","--c-s":"#2b1a1a","--c-x":"#f92f2f2c","--c-d":"#5a3535","--c-we":"#ff6b6b","--c-r":"#ff9800" } };
+export const amethyst: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#ffffff","--c-b":"#f5f3f7","--c-h":"#681c9e","--c-t":"#ebdff4","--c-c":"#2b2533","--c-s":"#ddd5e6","--c-x":"#681c9e22","--c-d":"#b0a0be","--c-we":"#e53935","--c-r":"#2196f3" } };
+export const cyber: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#0d0d15","--c-b":"#07070b","--c-h":"#00f3ff","--c-t":"#301649","--c-c":"#ffffff","--c-s":"#303050","--c-x":"#00f3ff2c","--c-d":"#282840","--c-we":"#e040fb","--c-r":"#ff6d00" } };
+export const espresso: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#f8f0f4","--c-b":"#0c0608","--c-h":"#a05878","--c-t":"#1e0e14","--c-c":"#e8c8d4","--c-s":"#341424","--c-x":"#a0587828","--c-d":"#2e1020","--c-we":"#c07028","--c-r":"#4a90d9" } };
+export const ember: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#fdf8e8","--c-b":"#0e0b04","--c-h":"#c89020","--c-t":"#1e1808","--c-c":"#f0d878","--c-s":"#342a08","--c-x":"#c8902028","--c-d":"#2e2208","--c-we":"#c04e2f","--c-r":"#558b2f" } };
+export const phosphor: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#020602","--c-b":"#010401","--c-h":"#76ff03","--c-t":"#1a1f1a","--c-c":"#00e676","--c-s":"#1a4428","--c-x":"#76ff0328","--c-d":"#1a4020","--c-we":"#ff6d00","--c-r":"#00bcd4" } };
+export const midnight: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#141721","--c-b":"#1a1e2b","--c-h":"#3559e0","--c-t":"#212638","--c-c":"#ffffff","--c-s":"#444b68","--c-x":"#3559e02c","--c-d":"#3a4060","--c-we":"#e53935","--c-r":"#00bcd4" } };
+export const sandstone: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#1c1a17","--c-b":"#1f1c18","--c-h":"#e3ae5c","--c-t":"#2f2b24","--c-c":"#fdfbf7","--c-s":"#5d5448","--c-x":"#e3ae5c24","--c-d":"#504840","--c-we":"#e53935","--c-r":"#8bc34a" } };
+export const mint: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#ffffff","--c-b":"#f8f9fc","--c-h":"#60d276","--c-t":"#eaedf4","--c-c":"#171827","--c-s":"#b8c0d1","--c-x":"#60d27620","--c-d":"#8898aa","--c-we":"#e53935","--c-r":"#7c4dff" } };
+export const rosa: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#ffffff","--c-b":"#fef0f4","--c-h":"#d64c7f","--c-t":"#fce4ed","--c-c":"#2a1520","--c-s":"#f0b8cc","--c-x":"#d64c7f28","--c-d":"#c09aaa","--c-we":"#ff6b95","--c-r":"#8e44ad" } };
+export const snow: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#ffffff","--c-b":"#e2e5e9","--c-h":"#3a60d6","--c-t":"#eceff4","--c-c":"#212630","--c-s":"#acb9cb","--c-x":"#3a60d624","--c-d":"#8898a8","--c-we":"#e53935","--c-r":"#26c6da" } };
+export const solar: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#ffffff","--c-b":"#fffbe8","--c-h":"#e67e22","--c-t":"#fff3c4","--c-c":"#1e1a08","--c-s":"#d4aa5a","--c-x":"#e67e2224","--c-d":"#b09060","--c-we":"#f59e0b","--c-r":"#27ae60" } };
+export const dracula: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#1a0f0f","--c-b":"#1c1111","--c-h":"#ff5e5e","--c-t":"#341d1d","--c-c":"#ffffff","--c-s":"#614040","--c-x":"#ff5e5e2c","--c-d":"#583535","--c-we":"#ff6b6b","--c-r":"#ffd740" } };
+export const comfy: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#ffffff","--c-b":"#f2e8e0","--c-h":"#c04e2f","--c-t":"#fdddd0","--c-c":"#6e4531","--c-s":"#d4b0a0","--c-x":"#c04e2f28","--c-d":"#b08878","--c-we":"#d96040","--c-r":"#558b2f" } };
+export const neon: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#fcfcf5","--c-b":"#f7f8f9","--c-h":"#80ec27","--c-t":"#e9f3eb","--c-c":"#1f2937","--c-s":"#bed3c3","--c-x":"#80ec2722","--c-d":"#8a9a88","--c-we":"#e53935","--c-r":"#ff6b35" } };
+export const temporal: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#122127","--c-b":"#14252e","--c-h":"#27d1f4","--c-t":"#242f52","--c-c":"#f1f5f9","--c-s":"#6366f1","--c-x":"#27d1f42e","--c-d":"#3a4870","--c-we":"#f472b6","--c-r":"#fb923c" } };
+export const latte: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#ffffff","--c-b":"#faf8f4","--c-h":"#6f3d18","--c-t":"#f2eddf","--c-c":"#1a1208","--c-s":"#d8c8a8","--c-x":"#6f3d1826","--c-d":"#9e8f78","--c-we":"#c07a38","--c-r":"#4a90d9" } };
+export const prism: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#0a1525","--c-b":"#f0f9ff","--c-h":"#0ea5e9","--c-t":"#e0f2fe","--c-c":"#0c2340","--c-s":"#bae6fd","--c-x":"#0ea5e920","--c-d":"#90c4d8","--c-we":"#7c3aed","--c-r":"#06b6d4" } };
+export const meadow: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#071a10","--c-b":"#f2faf7","--c-h":"#059669","--c-t":"#d1fae5","--c-c":"#052e16","--c-s":"#a7f3d0","--c-x":"#05966920","--c-d":"#6ee7b7","--c-we":"#f43f5e","--c-r":"#0ea5e9" } };
+export const forest: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#0c1a10","--c-b":"#0f2016","--c-h":"#4ade80","--c-t":"#162b1e","--c-c":"#e2f5e8","--c-s":"#255038","--c-x":"#4ade8028","--c-d":"#1d3c2a","--c-we":"#86efac","--c-r":"#fb923c" } };
+export const nebula: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#090812","--c-b":"#0b0a16","--c-h":"#b388ff","--c-t":"#18103a","--c-c":"#ede7f6","--c-s":"#3d2f70","--c-x":"#b388ff28","--c-d":"#3a2d60","--c-we":"#ff8a65","--c-r":"#29b6f6" } };
+export const aurora: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#07091a","--c-b":"#0b0e24","--c-h":"#3de0a0","--c-t":"#131838","--c-c":"#e0f9f0","--c-s":"#2a1f5a","--c-x":"#3de0a028","--c-d":"#2d3560","--c-we":"#ff5fa2","--c-r":"#00d4f5" } };
+export const slate: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#ffffff","--c-b":"#f1f5f9","--c-h":"#475569","--c-t":"#e2e8f0","--c-c":"#0f172a","--c-s":"#cbd5e1","--c-x":"#47556920","--c-d":"#94a3b8","--c-we":"#e53935","--c-r":"#0ea5e9" } };
+export const scarlet: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#ffffff","--c-b":"#fff5f5","--c-h":"#d92121","--c-t":"#ffe4e4","--c-c":"#1c0808","--c-s":"#f4b4b4","--c-x":"#d9212124","--c-d":"#c89898","--c-we":"#ff6b6b","--c-r":"#ff9800" } };
+export const monsoon: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#ffffff","--c-b":"#d5ded9","--c-h":"#244a3d","--c-t":"#bfcdc5","--c-c":"#0a1a14","--c-s":"#9aaea3","--c-x":"#244a3d28","--c-d":"#6a8078","--c-we":"#c45e38","--c-r":"#3c7e95" } };
+export const pearl: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#ffffff","--c-b":"#ecebed","--c-h":"#3a2a42","--c-t":"#dedce0","--c-c":"#1f1624","--c-s":"#c6c3ca","--c-x":"#3a2a4226","--c-d":"#9994a0","--c-we":"#b14464","--c-r":"#7b6d88" } };
+export const chalk: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#ffffff","--c-b":"#f0f0f3","--c-h":"#2a2e5c","--c-t":"#e2e2e8","--c-c":"#0e1028","--c-s":"#cbcbd4","--c-x":"#2a2e5c22","--c-d":"#999cab","--c-we":"#c03554","--c-r":"#5866a8" } };
+export const split: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#ffffff","--c-b":"#fafaf6","--c-h":"#e8c43d","--c-t":"#f2f0ea","--c-c":"#1a1f2a","--c-s":"#d4d0c4","--c-x":"#e8c43d28","--c-d":"#b5b0a4","--c-we":"#3d9ee8","--c-r":"#e83d9e" } };
+export const riso: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#fef7e8","--c-b":"#fef7e8","--c-h":"#2b3fe0","--c-t":"#fdebf3","--c-c":"#1a1205","--c-s":"#e5dcc8","--c-x":"#2b3fe028","--c-d":"#b8ab8c","--c-we":"#ff3e8e","--c-r":"#2bce8b" } };
+export const flare: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#0e0e10","--c-b":"#141417","--c-h":"#8a8a92","--c-t":"#1e1e22","--c-c":"#e8e8ec","--c-s":"#2a2a30","--c-x":"#8a8a9220","--c-d":"#4a4a52","--c-we":"#ff6028","--c-r":"#3a3a40" } };
+export const abyss: CustomTheme = { [CUSTOM_THEME_BRAND]: true, vars: { "--c-a":"#09010e","--c-b":"#060009","--c-h":"#d400f0","--c-t":"#1c0030","--c-c":"#f0d0ff","--c-s":"#2e0050","--c-x":"#d400f028","--c-d":"#2a0040","--c-we":"#00ffee","--c-r":"#ff6b35" } };

@@ -15,10 +15,9 @@ import { CalendarYearsGrid } from "../modules/years-grid";
 import { createDisabled } from "../utils/create-disabled";
 import { basicPresets } from "../modules/presets/presets-pack";
 import type { PresetEntry } from "../types/presets";
-import "./calendar.css";
-import "../themes.gen.css";
-import "../appearances.gen.css";
-import { DARK_THEMES, LIGHT_THEMES } from "../types/themes";
+import "./calendar.css"; 
+import * as allThemes from "../../themes/index";
+import * as allAppearances from "../../appearances/index";
 import { CalendarMode, DateRange, StartOfWeek } from "../types/calendar";
 
 const LOCALES_LIST = [
@@ -66,7 +65,7 @@ const THEME_LABELS: Record<string, string> = {
   espresso: "Espresso",
   ember: "Ember",
   prism: "Prism",
-  void: "Void",
+  abyss: "Abyss",
   meadow: "Meadow",
 };
 
@@ -99,8 +98,8 @@ export const SixMonthsLayout = () => {
           value={date}
           mode={"range"}
           cols={6}
-          appearance={"bubble"}
-          theme={"scarlet"}
+          appearance={allAppearances.bubble}
+          theme={allThemes.scarlet}
         >
           <CalendarNav showMonthPicker compactYears col={2} />
           <CalendarNav monthLabel offset={1} col={2} />
@@ -606,10 +605,18 @@ export const KitchenSink = () => {
           : "No dates selected"
         : formatSubtitle(date, activeLocale, navProps.showTime);
 
-  const isLight =
-    activeTheme === "light" ||
-    activeTheme === "auto" ||
-    (LIGHT_THEMES as readonly string[]).includes(activeTheme);
+  const resolvedTheme =
+    activeTheme === "auto" || activeTheme === "light" || activeTheme === "dark"
+      ? activeTheme
+      : (allThemes[activeTheme as keyof typeof allThemes] ?? activeTheme);
+
+  const resolvedAppearance =
+    activeAppearance === "default"
+      ? undefined
+      : allAppearances[activeAppearance as keyof typeof allAppearances];
+
+  const STORY_LIGHT = new Set(["graphite","amethyst","mint","comfy","neon","rosa","snow","solar","latte","slate","scarlet","prism","meadow","monsoon","pearl","chalk","split","riso"]);
+  const isLight = activeTheme === "light" || activeTheme === "auto" || STORY_LIGHT.has(activeTheme);
 
   return (
     <StoryWrapper
@@ -979,8 +986,8 @@ export const KitchenSink = () => {
               }
               defaultMonth={defaultMonth}
               onChange={handleChange as any}
-              theme={activeTheme}
-              appearance={activeAppearance as any}
+              theme={resolvedTheme as any}
+              appearance={resolvedAppearance}
               locale={activeLocale}
               minDate={startDate}
               maxDate={endDate}
@@ -1066,17 +1073,10 @@ export const KitchenSink = () => {
               <option value="light">{THEME_LABELS.light}</option>
               <option value="dark">{THEME_LABELS.dark}</option>
             </optgroup>
-            <optgroup label="Dark">
-              {DARK_THEMES.map((t) => (
+            <optgroup label="Themes">
+              {Object.keys(allThemes).map((t) => (
                 <option key={t} value={t}>
-                  {THEME_LABELS[t]}
-                </option>
-              ))}
-            </optgroup>
-            <optgroup label="Light">
-              {LIGHT_THEMES.map((t) => (
-                <option key={t} value={t}>
-                  {THEME_LABELS[t]}
+                  {THEME_LABELS[t] ?? t}
                 </option>
               ))}
             </optgroup>

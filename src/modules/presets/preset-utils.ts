@@ -71,7 +71,7 @@ const getEntryId = (entry: PresetEntry, idx: number): string => {
   return `preset-${idx}`;
 };
 
-export interface ResolvedPreset {
+interface ResolvedPreset {
   id: string;
   label: string;
   value: Date | PresetRangeValue;

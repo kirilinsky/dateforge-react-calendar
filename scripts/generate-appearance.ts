@@ -2,29 +2,90 @@ import { readFileSync, writeFileSync, mkdirSync, readdirSync } from "fs";
 
 const srcDir = "./appearances";
 const distDir = "./dist/appearances";
-const srcGenFile = "./src/appearances.gen.css";
+const srcIndexFile = "./appearances/index.ts";
 mkdirSync(distDir, { recursive: true });
+
+const BRAND_EXPR = `Symbol.for("rcd.appearance.custom")`;
 
 const files = readdirSync(srcDir)
   .filter((f) => f.endsWith(".css"))
   .sort();
 
-const innerBlocks: string[] = [];
+type ParsedAppearance = { name: string; vars: Record<string, string> };
+const parsed: ParsedAppearance[] = [];
 
 for (const file of files) {
   const src = readFileSync(`${srcDir}/${file}`, "utf8");
-  writeFileSync(`${distDir}/${file}`, src);
 
-  const match = src.match(/@layer appearances\s*\{([\s\S]*)\}/);
-  if (match) innerBlocks.push(match[1].trim());
+  const nameMatch = src.match(/\[data-appearance="([^"]+)"\]/);
+  if (!nameMatch) continue;
+  const name = nameMatch[1];
+
+  const blockMatch = src.match(/\[data-appearance="[^"]+"\]\s*\{([^}]*)\}/);
+  if (!blockMatch) continue;
+
+  const vars: Record<string, string> = {};
+  for (const line of blockMatch[1].split("\n")) {
+    const m = line.match(/^\s*(--[\w-]+)\s*:\s*(.+?)\s*;/);
+    if (m) vars[m[1]] = m[2];
+  }
+
+  parsed.push({ name, vars });
 }
 
-const combined = `@layer appearances {\n${innerBlocks.map((b) => `  ${b.replace(/\n/g, "\n  ")}`).join("\n\n")}\n}`;
+const names = parsed.map((p) => p.name);
 
-writeFileSync(`${distDir}/index.css`, combined);
+// ── Per-appearance JS ─────────────────────────────────────────────────────────
+
+for (const { name, vars } of parsed) {
+  const varsStr = Object.entries(vars).map(([k, v]) => `"${k}":"${v}"`).join(",");
+
+  writeFileSync(
+    `${distDir}/${name}.mjs`,
+    `const B=${BRAND_EXPR};export const ${name}={[B]:true,vars:{${varsStr}}};`,
+  );
+
+  writeFileSync(
+    `${distDir}/${name}.cjs`,
+    `"use strict";Object.defineProperty(exports,"__esModule",{value:true});const B=${BRAND_EXPR};exports.${name}={[B]:true,vars:{${varsStr}}};`,
+  );
+
+  const dts = `import type{CustomAppearance}from"react-calendar-datetime";\nexport declare const ${name}:CustomAppearance;\n`;
+  writeFileSync(`${distDir}/${name}.d.ts`, dts);
+  writeFileSync(`${distDir}/${name}.d.cts`, dts);
+}
+
+// ── Barrel index ──────────────────────────────────────────────────────────────
+
 writeFileSync(
-  srcGenFile,
-  `/* generated — do not edit manually, run: npm run build */\n${combined}`,
+  `${distDir}/index.mjs`,
+  names.map((n) => `export{${n}}from"./${n}.mjs";`).join(""),
 );
 
-console.log(`✓ ${files.length} appearances → ${distDir}/ + ${srcGenFile}`);
+writeFileSync(
+  `${distDir}/index.cjs`,
+  `"use strict";Object.defineProperty(exports,"__esModule",{value:true});\n` +
+    names.map((n) => `var _${n}=require("./${n}.cjs");exports.${n}=_${n}.${n};`).join(""),
+);
+
+const barrelDts = names.map((n) => `export{${n}}from"./${n}.js";`).join("\n") + "\n";
+writeFileSync(`${distDir}/index.d.ts`, barrelDts);
+writeFileSync(`${distDir}/index.d.cts`, barrelDts);
+
+// ── Regenerate appearances/index.ts (CSS = single source of truth) ────────────
+
+const srcIndex = [
+  `// generated — do not edit manually, run: npm run build`,
+  `import { CUSTOM_APPEARANCE_BRAND } from "../src/types/appearances";`,
+  `import type { CustomAppearance } from "../src/types/appearances";`,
+  ``,
+  ...parsed.map(({ name, vars }) => {
+    const varsStr = Object.entries(vars).map(([k, v]) => `"${k}": "${v}"`).join(", ");
+    return `export const ${name}: CustomAppearance = { [CUSTOM_APPEARANCE_BRAND]: true, vars: { ${varsStr} } };`;
+  }),
+  ``,
+].join("\n");
+
+writeFileSync(srcIndexFile, srcIndex);
+
+console.log(`✓ ${names.length} appearances → ${distDir}/`);

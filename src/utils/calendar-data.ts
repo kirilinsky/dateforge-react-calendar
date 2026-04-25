@@ -1,7 +1,7 @@
 import { StartOfWeek } from "@/types/calendar";
 import { checkIsDateDisabled } from "./date-core";
 
-export interface RangeOptions {
+interface RangeOptions {
   rangeStart?: Date | null;
   rangeEnd?: Date | null;
   hoverDate?: Date | null;
@@ -52,7 +52,7 @@ export const getFirstDayOffset = (
   return (firstDay - startOfWeek + 7) % 7;
 };
 
-export const getWeekNumber = (date: Date): number => {
+const getWeekNumber = (date: Date): number => {
   const target = new Date(date.getTime());
   target.setDate(target.getDate() - ((date.getDay() + 6) % 7) + 3);
   const firstThursday = new Date(target.getFullYear(), 0, 4);

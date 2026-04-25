@@ -35,27 +35,27 @@ import { Calendar } from "react-calendar-datetime";
 
 ### Props
 
-| Prop           | Type                                | Default     | Description                                                                                                                                           |
-| -------------- | ----------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `mode`         | `"single" \| "multiple" \| "range"` | `"single"`  | Selection mode                                                                                                                                        |
-| `value`        | `CalendarValue<M>`                  | —           | Controlled value. `Date \| null` for single, `Date[]` for multiple, `DateRange` for range                                                             |
-| `onChange`     | `(value: CalendarValue<M>) => void` | —           | Fires when the selection changes                                                                                                                      |
-| `cols`         | `number`                            | —           | Number of columns in the internal CSS grid                                                                                                            |
-| `locale`       | `string`                            | `"en"`      | BCP 47 language tag used for all labels and formatting                                                                                                |
-| `timeZone`     | `string`                            | —           | IANA timezone (`"Europe/Paris"`, `"UTC"`) or fixed offset (`"UTC+2"`, `"UTC-5"`). Affects today detection, emitted date midnight, and chip formatting |
-| `readOnly`     | `boolean`                           | `false`     | Disables all state-changing interactions (date/time selection). Navigation still works. Adds `data-readonly` and `aria-readonly` on the root          |
-| `hour12`       | `boolean`                           | `false`     | Use 12-hour time format instead of 24-hour                                                                                                            |
-| `theme`        | `CalendarTheme`                     | `"auto"`    | Built-in theme name, `"auto"` / `"light"` / `"dark"`, or a `CustomTheme` from `createTheme()`                                                         |
-| `appearance`   | `CalendarAppearance`                | `"default"` | Built-in appearance preset name or a `CustomAppearance` from `createAppearance()`                                                                     |
-| `gradient`     | `boolean`                           | `false`     | Enable gradient backgrounds on selected cells                                                                                                         |
-| `width`        | `string \| number`                  | `"100%"`    | Container width                                                                                                                                       |
-| `minDate`      | `Date`                              | —           | Earliest selectable date                                                                                                                              |
-| `maxDate`      | `Date`                              | —           | Latest selectable date                                                                                                                                |
-| `maxDates`     | `number`                            | —           | Maximum number of selectable dates (multiple mode only)                                                                                               |
-| `minRangeDays` | `number`                            | —           | Minimum number of days in a range selection                                                                                                           |
-| `maxRangeDays` | `number`                            | —           | Maximum number of days in a range selection                                                                                                           |
-| `disabled`     | `DisabledConfig`                    | —           | Rules for disabling specific dates. Build with `createDisabled()`                                                                                     |
-| `children`     | `React.ReactNode`                   | —           | Module components that compose the calendar UI                                                                                                        |
+| Prop           | Type                                | Default     | Description                                                                                                                                                                                                           |
+| -------------- | ----------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mode`         | `"single" \| "multiple" \| "range"` | `"single"`  | Selection mode                                                                                                                                                                                                        |
+| `value`        | `CalendarValue<M>`                  | —           | Controlled value. `Date \| null` for single, `Date[]` for multiple, `DateRange` for range                                                                                                                             |
+| `onChange`     | `(value: CalendarValue<M>) => void` | —           | Fires when the selection changes                                                                                                                                                                                      |
+| `cols`         | `number`                            | —           | Number of columns in the internal CSS grid                                                                                                                                                                            |
+| `locale`       | `string`                            | `"en"`      | BCP 47 language tag used for all labels and formatting                                                                                                                                                                |
+| `timeZone`     | `string`                            | —           | IANA timezone (`"Europe/Paris"`, `"UTC"`) or fixed offset (`"UTC+2"`, `"UTC-5"`). Affects today detection, emitted date midnight, and chip formatting                                                                 |
+| `readOnly`     | `boolean`                           | `false`     | Disables all state-changing interactions (date/time selection). Navigation still works. Adds `data-readonly` and `aria-readonly` on the root                                                                          |
+| `hour12`       | `boolean`                           | `false`     | Use 12-hour time format instead of 24-hour                                                                                                                                                                            |
+| `theme`        | `CalendarTheme`                     | `"auto"`    | Base value (`"auto"` / `"light"` / `"dark"`), a pre-built theme object from `react-calendar-datetime/themes[/name]`, or a `CustomTheme` from `createTheme()`. Named string themes (e.g. `"midnight"`) are not supported — import the object instead. |
+| `appearance`   | `CalendarAppearance`                | —           | Pre-built appearance object from `react-calendar-datetime/appearances[/name]`, or a `CustomAppearance` from `createAppearance()`. Omit the prop entirely for the default appearance.                                  |
+| `gradient`     | `boolean`                           | `false`     | Enable gradient backgrounds on selected cells                                                                                                                                                                         |
+| `width`        | `string \| number`                  | `"100%"`    | Container width                                                                                                                                                                                                       |
+| `minDate`      | `Date`                              | —           | Earliest selectable date                                                                                                                                                                                              |
+| `maxDate`      | `Date`                              | —           | Latest selectable date                                                                                                                                                                                                |
+| `maxDates`     | `number`                            | —           | Maximum number of selectable dates (multiple mode only)                                                                                                                                                               |
+| `minRangeDays` | `number`                            | —           | Minimum number of days in a range selection                                                                                                                                                                           |
+| `maxRangeDays` | `number`                            | —           | Maximum number of days in a range selection                                                                                                                                                                           |
+| `disabled`     | `DisabledConfig`                    | —           | Rules for disabling specific dates. Build with `createDisabled()`                                                                                                                                                     |
+| `children`     | `React.ReactNode`                   | —           | Module components that compose the calendar UI                                                                                                                                                                        |
 
 ---
 
@@ -120,7 +120,7 @@ Navigation header with configurable controls.
 | `seconds`         | `boolean`          | `false` | Include seconds in `showTime` and `showNowTime` displays, and in the time picker popup                                                                               |
 | `home`            | `boolean`          | `false` | Show a button that navigates back to today                                                                                                                           |
 | `clear`           | `boolean`          | `false` | Show a button that clears the current selection                                                                                                                      |
-| `themeToggle`     | `boolean`          | `false` | Show a light/dark theme toggle button                                                                                                                                |
+| `themeToggle`     | `boolean`          | `false` | Show a light/dark theme toggle button. Has no effect when a custom theme (`createTheme()` or pre-built palette) is passed to `<Calendar theme={...} />`              |
 | `offset`          | `number`           | `0`     | Month offset relative to `viewDate`. Use to render two synced nav headers in `cols={2}` layouts (`<CalendarNav offset={1} />`)                                       |
 | `col`             | `number \| string` | —       | CSS grid `grid-column` value                                                                                                                                         |
 
@@ -350,31 +350,96 @@ In multiselect mode the active item follows the date in `selectedDates[]` whose 
 
 ## Utility Functions
 
-### `createTheme(tokens, base?)`
+### Theming
 
-Creates a custom theme object to pass to the `theme` prop.
+Three ways to apply a theme.
+
+**Option 1 — pre-built theme object** (one of the 33 built-in palettes):
+
+```ts
+// barrel — all themes, bundler tree-shakes to just the one you import
+import { midnight } from "react-calendar-datetime/themes";
+
+// per-theme — single file, zero overhead from other themes
+import { midnight } from "react-calendar-datetime/themes/midnight";
+
+<Calendar theme={midnight} />
+```
+
+Each theme is a self-contained `CustomTheme` object. The consuming bundler includes only the file you import. Theme vars are applied as inline CSS custom properties on the calendar container — no extra CSS file needed.
+
+**Option 2 — base theme** (`"auto"` / `"light"` / `"dark"`):
+
+```ts
+<Calendar theme="auto" />   // follows system preference (default)
+<Calendar theme="light" />
+<Calendar theme="dark" />
+```
+
+`"auto"` tracks `prefers-color-scheme` and switches in real time. These are the only string values supported — named palette strings like `"midnight"` are not valid and will be silently ignored.
+
+**Option 3 — fully custom theme** via `createTheme()`:
 
 ```ts
 import { createTheme } from "react-calendar-datetime";
 
-const myTheme = createTheme(
-  { accent: "#6366f1", backdrop: "#0f172a", text: "#f1f5f9" },
-  "dark",
-);
+const myTheme = createTheme({ highlight: "#6366f1", backdrop: "#0f172a", text: "#f1f5f9" });
+
+<Calendar theme={myTheme} />
 ```
 
-| Token       | Description                                 |
-| ----------- | ------------------------------------------- |
-| `accent`    | Primary highlight / selected-cell color     |
-| `backdrop`  | Calendar background color                   |
-| `highlight` | Secondary accent (hover, range ends)        |
-| `tone`      | Muted background tone for alternating cells |
-| `text`      | Default text color                          |
-| `stroke`    | Border / separator color                    |
-| `shadow`    | Drop-shadow color                           |
-| `disabled`  | Color for disabled date cells               |
-| `weekend`   | Color applied to weekend cells              |
-| `range`     | Background color for the in-range cells     |
+`createTheme` accepts a partial token map — only the tokens you provide are applied; the rest fall back to the base palette CSS variables.
+
+### Appearances
+
+Three ways to apply an appearance.
+
+**Default — omit the prop entirely:**
+
+```tsx
+<Calendar />  // default appearance, nothing to import
+```
+
+**Pre-built appearance object** (one of 5 presets):
+
+```ts
+// barrel — bundler tree-shakes to just the one you import
+import { loft } from "react-calendar-datetime/appearances";
+
+// per-appearance — single file
+import { compact } from "react-calendar-datetime/appearances/compact";
+
+<Calendar appearance={compact} />
+```
+
+Available presets: `soft` `compact` `square` `bubble` `loft`
+
+Each preset is a self-contained object. Vars are applied as inline CSS custom properties — no extra CSS file required.
+
+**Custom appearance** via `createAppearance()`:
+
+```ts
+import { createAppearance } from "react-calendar-datetime";
+
+const myAppearance = createAppearance({ radius: "0", spacing: "0.4em" });
+
+<Calendar appearance={myAppearance} />
+```
+
+### `createTheme(tokens)`
+
+| Token       | CSS variable | Role                                                                                                                 |
+| ----------- | ------------ | -------------------------------------------------------------------------------------------------------------------- |
+| `highlight` | `--c-h`      | **Primary accent.** Background of the selected day cell, active buttons, nav accents. The most impactful token.      |
+| `accent`    | `--c-a`      | **Inverted container color.** Text/icon color _inside_ the selected day circle — usually the inverse of `highlight`. |
+| `backdrop`  | `--c-b`      | Main calendar background.                                                                                            |
+| `tone`      | `--c-t`      | Secondary / muted background for rows, tracks, and hover states.                                                     |
+| `text`      | `--c-c`      | Default text color for all labels and numbers.                                                                       |
+| `stroke`    | `--c-s`      | Border and separator color between cells and sections.                                                               |
+| `shadow`    | `--c-x`      | Drop-shadow color. Should include alpha (e.g. `"#6366f130"`).                                                        |
+| `disabled`  | `--c-d`      | Color for disabled / out-of-range date cells.                                                                        |
+| `weekend`   | `--c-we`     | Accent color applied to weekend day labels (Saturday / Sunday).                                                      |
+| `range`     | `--c-r`      | Background tint for days that fall inside a selected date range.                                                     |
 
 ---
 
@@ -576,12 +641,44 @@ type StartOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 ### Built-in themes
 
+33 named palettes, each exported as a tree-shakeable `CustomTheme` object.
+
 **Light:** `mint` `comfy` `neon` `rosa` `snow` `solar` `graphite` `amethyst` `latte` `slate` `scarlet` `prism` `meadow` `monsoon` `pearl` `chalk` `split` `riso`
 
-**Dark:** `industrial` `midnight` `sandstone` `phosphor` `dracula` `cyber` `void` `temporal` `crimson` `forest` `nebula` `aurora` `espresso` `ember` `flare`
+**Dark:** `industrial` `midnight` `sandstone` `phosphor` `dracula` `cyber` `abyss` `temporal` `crimson` `forest` `nebula` `aurora` `espresso` `ember` `flare`
 
-**Base:** `light` `dark` `auto`
+**Base (no palette):** `"light"` `"dark"` `"auto"` — passed as strings, no import needed.
+
+```ts
+// barrel — your bundler only includes midnight
+import { midnight } from "react-calendar-datetime/themes";
+<Calendar theme={midnight} />
+
+// per-file — zero dependency on other themes
+import { midnight } from "react-calendar-datetime/themes/midnight";
+<Calendar theme={midnight} />
+
+// base strings — no import
+<Calendar theme="auto" />   // default, follows system preference
+<Calendar theme="dark" />
+<Calendar theme="light" />
+```
 
 ### Built-in appearances
 
-`default` `soft` `compact` `square` `bubble` `loft`
+5 presets, each a tree-shakeable `CustomAppearance` object. Omitting the prop gives the default appearance.
+
+`soft` `compact` `square` `bubble` `loft`
+
+```ts
+// barrel
+import { loft } from "react-calendar-datetime/appearances";
+<Calendar appearance={loft} />
+
+// per-file — zero dependency on other appearances
+import { compact } from "react-calendar-datetime/appearances/compact";
+<Calendar appearance={compact} />
+
+// default — nothing to import
+<Calendar />
+```

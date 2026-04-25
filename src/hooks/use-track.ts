@@ -18,7 +18,7 @@ interface UseTrackOptions {
   onChange: (index: number) => void;
 }
 
-export interface UseTrackReturn {
+interface UseTrackReturn {
   ref: React.RefObject<HTMLDivElement | null>;
   position: number; // float index (offset / pixelsPerItem)
   scrollTo: (targetIndex: number) => void;

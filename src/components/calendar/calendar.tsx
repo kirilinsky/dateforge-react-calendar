@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import "@/styles/layers.css";
 import { CalendarMode, CalendarProps } from "@/types/calendar";
-import { DARK_THEMES, CustomTheme, CUSTOM_THEME_BRAND } from "@/types/themes";
+import { CustomTheme, CUSTOM_THEME_BRAND } from "@/types/themes";
 import { CustomAppearance, CUSTOM_APPEARANCE_BRAND } from "@/types/appearances";
 import { CalendarProvider } from "@/core/provider";
 import { CalendarLayout } from "@/core/layout";
@@ -63,25 +63,20 @@ export function Calendar<M extends CalendarMode = "single">({
   }, []);
 
   const customTheme = isCustomTheme(themeProp) ? themeProp : undefined;
-  const themeKey = customTheme
-    ? customTheme.base
-    : (themeProp as string | undefined);
-
+  const themeKey = customTheme ? undefined : (themeProp as string | undefined);
   const baseTheme = !themeKey || themeKey === "auto" ? systemTheme : themeKey;
 
   useEffect(() => {
     setIsToggled(false);
   }, [themeProp]);
 
-  const isBaseDark =
-    baseTheme === "dark" ||
-    (DARK_THEMES as readonly string[]).includes(baseTheme);
-
-  const activeTheme = isToggled ? (isBaseDark ? "light" : "dark") : baseTheme;
+  const isBaseDark = baseTheme === "dark";
+  const activeTheme = customTheme
+    ? baseTheme
+    : isToggled ? (isBaseDark ? "light" : "dark") : baseTheme;
   const toggleTheme = () => setIsToggled((v) => !v);
 
   const customAppearance = isCustomAppearance(appearanceProp) ? appearanceProp : undefined;
-  const appearanceKey = customAppearance ? undefined : (appearanceProp as string | undefined);
   const customThemeVars = customTheme?.vars as React.CSSProperties | undefined;
   const customAppearanceVars = customAppearance?.vars as React.CSSProperties | undefined;
 
@@ -89,12 +84,8 @@ export function Calendar<M extends CalendarMode = "single">({
     <CalendarProvider
       locale={locale}
       hour12={hour12}
-      appearance={appearanceProp}
       gradient={gradient}
-      isDark={
-        activeTheme === "dark" ||
-        (DARK_THEMES as readonly string[]).includes(activeTheme)
-      }
+
       width={width}
       mode={mode}
       maxDates={maxDates}
@@ -111,7 +102,6 @@ export function Calendar<M extends CalendarMode = "single">({
         style={{ containerType: "inline-size", width, ...customThemeVars }}
       >
         <CalendarLayout
-          appearanceKey={appearanceKey}
           customAppearanceVars={customAppearanceVars}
           cols={cols}
           modules={children}

@@ -1,6 +1,6 @@
 import { isSameDay } from "@/utils/date-utils";
 
-export interface CalendarState {
+interface CalendarState {
   viewDate: Date;
   selectedDates: Date[];
   rangeStart: Date | null;
@@ -17,7 +17,7 @@ export interface SelectConfig {
   maxRangeDays?: number;
 }
 
-export type CalendarAction =
+type CalendarAction =
   | { type: "NAVIGATE"; date: Date }
   | { type: "SELECT"; date: Date | null; config: SelectConfig }
   | { type: "HOVER"; date: Date | null }

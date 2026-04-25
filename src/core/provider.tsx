@@ -8,7 +8,12 @@ import {
   useCallback,
   useState,
 } from "react";
-import { CalendarMode, CalendarProps, CalendarValue, DateRange } from "@/types/calendar";
+import {
+  CalendarMode,
+  CalendarProps,
+  CalendarValue,
+  DateRange,
+} from "@/types/calendar";
 import {
   calendarReducer,
   buildInitialState,
@@ -36,7 +41,9 @@ function serializeDate(d: Date | null | undefined): number {
   return d ? d.getTime() : 0;
 }
 
-function serializeValue(v: DateRange | Date[] | Date | null | undefined): string {
+function serializeValue(
+  v: DateRange | Date[] | Date | null | undefined,
+): string {
   if (v == null) return "null";
   if (v instanceof Date) return String(v.getTime());
   if (Array.isArray(v)) return v.map((d) => d.getTime()).join(",");
@@ -46,7 +53,6 @@ function serializeValue(v: DateRange | Date[] | Date | null | undefined): string
 export function CalendarProvider<M extends CalendarMode = "single">({
   children,
   toggleTheme,
-  isDark,
   value: externalValue,
   mode = "single" as M,
   maxDates,
@@ -66,7 +72,6 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   children: ReactNode;
   containerWidth?: number;
   toggleTheme?: () => void;
-  isDark?: boolean;
 }) {
   const range = mode === "range";
   const multiselect: number | boolean | undefined =
@@ -81,10 +86,16 @@ export function CalendarProvider<M extends CalendarMode = "single">({
     buildInitialState({ externalValue: externalValue ?? undefined, range }),
   );
 
-  const onChangeRef = useRef<((v: CalendarValue<M>) => void) | undefined>(onChange);
-  useLayoutEffect(() => { onChangeRef.current = onChange; });
+  const onChangeRef = useRef<((v: CalendarValue<M>) => void) | undefined>(
+    onChange,
+  );
+  useLayoutEffect(() => {
+    onChangeRef.current = onChange;
+  });
 
-  const externalKey = serializeValue(externalValue as DateRange | Date[] | Date | null | undefined);
+  const externalKey = serializeValue(
+    externalValue as DateRange | Date[] | Date | null | undefined,
+  );
   useEffect(() => {
     const externalRangeObj = isDateRange(externalValue)
       ? externalValue
@@ -126,7 +137,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
         type: "SYNC_EXTERNAL",
         viewDate: keepView
           ? state.viewDate
-          : nextDates[nextDates.length - 1] ?? state.viewDate,
+          : (nextDates[nextDates.length - 1] ?? state.viewDate),
         selectedDates: nextDates,
         rangeStart: null,
         rangeEnd: null,
@@ -152,7 +163,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       ? { from: state.rangeStart, to: state.rangeEnd }
       : multiselect
         ? state.selectedDates
-        : state.selectedDates[0] ?? null;
+        : (state.selectedDates[0] ?? null);
     onChangeRef.current?.(value as CalendarValue<M>);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.notifySeq]);
@@ -165,25 +176,37 @@ export function CalendarProvider<M extends CalendarMode = "single">({
     [selectConfig, readOnly],
   );
 
-  const handleChangeTime = useCallback((d: Date) => {
-    if (readOnly) return;
-    dispatch({ type: "CHANGE_TIME", date: d });
-  }, [readOnly]);
+  const handleChangeTime = useCallback(
+    (d: Date) => {
+      if (readOnly) return;
+      dispatch({ type: "CHANGE_TIME", date: d });
+    },
+    [readOnly],
+  );
 
-  const handleDatesSet = useCallback((dates: Date[]) => {
-    if (readOnly) return;
-    dispatch({ type: "SET_DATES", dates });
-  }, [readOnly]);
+  const handleDatesSet = useCallback(
+    (dates: Date[]) => {
+      if (readOnly) return;
+      dispatch({ type: "SET_DATES", dates });
+    },
+    [readOnly],
+  );
 
-  const handleRangeSet = useCallback((from: Date | null, to: Date | null) => {
-    if (readOnly) return;
-    dispatch({ type: "SET_RANGE", from, to });
-  }, [readOnly]);
+  const handleRangeSet = useCallback(
+    (from: Date | null, to: Date | null) => {
+      if (readOnly) return;
+      dispatch({ type: "SET_RANGE", from, to });
+    },
+    [readOnly],
+  );
 
-  const handleRangeBoundSet = useCallback((bound: "from" | "to", date: Date | null) => {
-    if (readOnly) return;
-    dispatch({ type: "SET_RANGE_BOUND", bound, date });
-  }, [readOnly]);
+  const handleRangeBoundSet = useCallback(
+    (bound: "from" | "to", date: Date | null) => {
+      if (readOnly) return;
+      dispatch({ type: "SET_RANGE_BOUND", bound, date });
+    },
+    [readOnly],
+  );
 
   const navigateTo = useCallback((d: Date) => {
     dispatch({ type: "NAVIGATE", date: d });
@@ -282,7 +305,14 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       onRangeBoundSet: handleRangeBoundSet,
       onChangeTime: handleChangeTime,
     }),
-    [setHoverDate, handleChangeDate, handleDatesSet, handleRangeSet, handleRangeBoundSet, handleChangeTime],
+    [
+      setHoverDate,
+      handleChangeDate,
+      handleDatesSet,
+      handleRangeSet,
+      handleRangeBoundSet,
+      handleChangeTime,
+    ],
   );
 
   const selectionHover = useMemo(
@@ -297,7 +327,6 @@ export function CalendarProvider<M extends CalendarMode = "single">({
 
   const ui = useMemo(
     () => ({
-      dark: isDark ?? false,
       toggleTheme: toggleTheme ?? (() => {}),
       containerWidth,
       containerRef,
@@ -315,7 +344,14 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       setNavShowSeconds,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isDark, toggleTheme, containerWidth, state.openPopup, daysTrackActive, popupAnchorEl, navShowSeconds],
+    [
+      toggleTheme,
+      containerWidth,
+      state.openPopup,
+      daysTrackActive,
+      popupAnchorEl,
+      navShowSeconds,
+    ],
   );
 
   return (
@@ -331,4 +367,4 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       </NavigationContext.Provider>
     </ConfigContext.Provider>
   );
-};
+}

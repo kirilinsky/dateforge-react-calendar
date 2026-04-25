@@ -13,7 +13,7 @@ export type {
   DisabledRule,
 } from "./types/calendar";
 export type { CalendarTheme, ThemeTokens, CustomTheme, BuiltInTheme } from "./types/themes";
-export type { CalendarAppearance, CustomAppearance, BuiltInAppearance, AppearanceTokens } from "./types/appearances";
+export type { CalendarAppearance, CustomAppearance, AppearanceTokens } from "./types/appearances";
 
 export type { CalendarNavProps } from "./modules/nav/index";
 export type { CalendarDaysTrackProps } from "./modules/days-track/index";

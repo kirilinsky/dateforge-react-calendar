@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import styles from "./days-track.module.css";
 import { useNavigation } from "@/context/navigation-context";
-import { useSelectionValue, useSelectionActions } from "@/context/selection-context";
+import {
+  useSelectionValue,
+  useSelectionActions,
+} from "@/context/selection-context";
 import { useConfig } from "@/context/config-context";
 import { useUI } from "@/context/ui-context";
 import { useTrack } from "@/hooks/use-track";
@@ -23,9 +26,14 @@ export interface CalendarDaysTrackProps {
   col?: number | string;
 }
 
-export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({ showMonthLabel = false, bound, col }) => {
+export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
+  showMonthLabel = false,
+  bound,
+  col,
+}) => {
   const { viewDate, navigateTo } = useNavigation();
-  const { selectedDate, selectedDates, rangeStart, rangeEnd } = useSelectionValue();
+  const { selectedDate, selectedDates, rangeStart, rangeEnd } =
+    useSelectionValue();
   const { onChangeDate, onRangeBoundSet } = useSelectionActions();
   const { minDate, maxDate, locale, range, multiselect } = useConfig();
   const { setDaysTrackActive } = useUI();
@@ -42,12 +50,12 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({ showMonthL
       ? rangeStart
       : rangeEnd
     : isMulti
-      ? selectedDates.find((d) => isSameDay(d, viewDate)) ?? null
+      ? (selectedDates.find((d) => isSameDay(d, viewDate)) ?? null)
       : selectedDate;
   const [localView, setLocalView] = useState<Date>(() => boundDate ?? viewDate);
   useEffect(() => {
     if (isBound && boundDate) setLocalView(boundDate);
-  }, [isBound, boundDate?.getTime()]);  // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isBound, boundDate?.getTime()]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const refDate = isBound ? localView : viewDate;
   const year = refDate.getFullYear();
@@ -72,7 +80,15 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({ showMonthL
       ? maxDate.getDate() - 1
       : undefined;
 
-  const { ref, position, scrollTo, onPointerDown, onPointerMove, onPointerUp, onPointerCancel } = useTrack({
+  const {
+    ref,
+    position,
+    scrollTo,
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
+    onPointerCancel,
+  } = useTrack({
     count: days,
     initialIndex: selectedDay,
     pixelsPerItem: itemWidth,
@@ -85,7 +101,7 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({ showMonthL
       next.setMonth(month);
       next.setDate(index + 1);
       if (isMulti) {
-        setLocalView(next); // multi: preview only, commit via button
+        setLocalView(next);
       } else if (isBound) {
         setLocalView(next);
         onRangeBoundSet(bound!, next);
@@ -111,9 +127,12 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({ showMonthL
   }, [ref]);
 
   const shortMonth = useMemo(
-    () => showMonthLabel
-      ? new Intl.DateTimeFormat(locale, { month: "short" }).format(new Date(year, month, 1))
-      : null,
+    () =>
+      showMonthLabel
+        ? new Intl.DateTimeFormat(locale, { month: "short" }).format(
+            new Date(year, month, 1),
+          )
+        : null,
     [showMonthLabel, locale, year, month],
   );
 
@@ -136,16 +155,23 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({ showMonthL
     else if (e.key === "ArrowLeft" || e.key === "ArrowUp") delta = -1;
     else if (e.key === "PageDown") delta = 7;
     else if (e.key === "PageUp") delta = -7;
-    else if (e.key === "Home") { e.preventDefault(); scrollTo(minIdx); return; }
-    else if (e.key === "End") { e.preventDefault(); scrollTo(maxIdx); return; }
-    else return;
+    else if (e.key === "Home") {
+      e.preventDefault();
+      scrollTo(minIdx);
+      return;
+    } else if (e.key === "End") {
+      e.preventDefault();
+      scrollTo(maxIdx);
+      return;
+    } else return;
     e.preventDefault();
     scrollTo(Math.round(position) + delta);
   };
 
   const containerWidth = ref.current?.offsetWidth ?? 0;
   const frac = position - Math.round(position);
-  const stripOffset = containerWidth / 2 - (HALF + frac) * itemWidth - itemWidth / 2;
+  const stripOffset =
+    containerWidth / 2 - (HALF + frac) * itemWidth - itemWidth / 2;
 
   const previewDate = useMemo(() => {
     const day = ((Math.round(position) % days) + days) % days;
@@ -160,7 +186,7 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({ showMonthL
     isMulti && selectedDates.some((d) => isSameDay(d, previewDate));
 
   const handleConfirm = () => {
-    onChangeDate(previewDate); // SELECT toggles in multi
+    onChangeDate(previewDate);
   };
 
   return (
@@ -187,14 +213,19 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({ showMonthL
         <button
           type="button"
           className={`${styles.confirmBtn} ${shared.interactive} ${shared.hoverable} ${matchesExisting ? styles.removeBtn : ""}`}
-          aria-label={matchesExisting ? "Remove selected date" : "Save selected date"}
+          aria-label={
+            matchesExisting ? "Remove selected date" : "Save selected date"
+          }
           onClick={handleConfirm}
           onPointerDown={(e) => e.stopPropagation()}
         >
           {matchesExisting ? <Clear /> : <Check />}
         </button>
       )}
-      <div className={styles.strip} style={{ transform: `translateX(${stripOffset}px)` }}>
+      <div
+        className={styles.strip}
+        style={{ transform: `translateX(${stripOffset}px)` }}
+      >
         {OFFSETS.map((o) => {
           const raw = Math.round(position) + o;
           const idx = ((raw % days) + days) % days;
@@ -210,14 +241,18 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({ showMonthL
               className={`${styles.item} ${isActive ? styles.active : ""}`}
               style={{ opacity, transform: `scale(${scale})` }}
               aria-hidden={!isActive}
-              onClick={!isActive ? () => scrollTo(Math.round(position) + o) : undefined}
+              onClick={
+                !isActive ? () => scrollTo(Math.round(position) + o) : undefined
+              }
             >
               {isActive && shortMonth ? (
                 <span className={styles.activeLabel}>
                   <span>{idx + 1}</span>
                   <span className={styles.monthLabel}>{shortMonth}</span>
                 </span>
-              ) : idx + 1}
+              ) : (
+                idx + 1
+              )}
             </div>
           );
         })}

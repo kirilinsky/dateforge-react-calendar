@@ -58,11 +58,10 @@ const CalendarAnnouncer: React.FC = () => {
 };
 
 export const CalendarLayout: React.FC<{
-  appearanceKey?: string;
   customAppearanceVars?: React.CSSProperties;
   cols?: number;
   modules?: React.ReactNode;
-}> = ({ appearanceKey, customAppearanceVars, cols, modules }) => {
+}> = ({ customAppearanceVars, cols, modules }) => {
   const { gradient } = useConfig();
   const { dark, containerRef } = useUI();
 
@@ -82,7 +81,6 @@ export const CalendarLayout: React.FC<{
       ]
         .filter(Boolean)
         .join(" ")}
-      data-appearance={appearanceKey}
       style={containerStyle}
     >
       <CalendarAnnouncer />

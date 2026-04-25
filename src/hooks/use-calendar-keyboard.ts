@@ -23,14 +23,12 @@ export function useCalendarKeyboard({
   const [focusedDate, setFocusedDate] = useState<Date>(() => initialFocusDate);
   const shouldFocusRef = useRef(false);
 
-  // sync from external selection (click) — no DOM focus move
   const syncDateT = syncDate?.getTime();
   useEffect(() => {
     if (syncDate) setFocusedDate(syncDate);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [syncDateT]);
 
-  // move DOM focus after keyboard navigation
   useEffect(() => {
     if (!shouldFocusRef.current) return;
     shouldFocusRef.current = false;
@@ -46,7 +44,16 @@ export function useCalendarKeyboard({
       shouldFocusRef.current = true;
       setFocusedDate(next);
       if (leavesMonth) {
-        navigateTo(new Date(next.getFullYear(), next.getMonth(), 1));
+        navigateTo(
+          new Date(
+            next.getFullYear(),
+            next.getMonth(),
+            1,
+            viewDate.getHours(),
+            viewDate.getMinutes(),
+            viewDate.getSeconds(),
+          ),
+        );
       }
     },
     [viewDate, navigateTo, blockNavigation],

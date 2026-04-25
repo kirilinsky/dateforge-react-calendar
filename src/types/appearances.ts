@@ -37,9 +37,6 @@ export type CustomAppearance = {
   readonly vars: Record<string, string>;
 };
 
-export type BuiltInAppearance = "default" | "soft" | "compact" | "square" | "bubble" | "loft";
-
 export type CalendarAppearance =
-  | BuiltInAppearance
   | CustomAppearance
   | (string & {});

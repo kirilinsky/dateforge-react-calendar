@@ -43,7 +43,7 @@
   font-weight: 700;
 }
 
-.boldWeekend[data-weekend] {
+.boldWeekend[data-weekend]:not([aria-selected="true"]) {
   color: var(--c-we) !important;
 }
 

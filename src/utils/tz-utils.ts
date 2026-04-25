@@ -1,4 +1,4 @@
-export function normalizeTZ(tz: string): string {
+function normalizeTZ(tz: string): string {
   const m = tz.match(/^UTC([+-])(\d{1,2})$/i);
   if (m) {
     const sign = m[1] === "+" ? "-" : "+";

@@ -227,7 +227,7 @@ function YearTrack({
   );
 }
 
-export interface MonthPopupProps {
+interface MonthPopupProps {
   date: Date;
   locale: string;
   minDate?: Date | null;
@@ -265,7 +265,7 @@ export const MonthPopup = ({
   );
 };
 
-export interface YearPopupProps {
+interface YearPopupProps {
   date: Date;
   minDate?: Date | null;
   maxDate?: Date | null;

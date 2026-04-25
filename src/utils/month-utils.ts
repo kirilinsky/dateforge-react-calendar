@@ -12,7 +12,7 @@ const cacheSet = (key: string, value: string[]): string[] => {
   return value;
 };
 
-export const isMonthFullyDisabled = (
+const isMonthFullyDisabled = (
   year: number,
   month: number,
   disabled?: DisabledConfig,
