@@ -23,13 +23,13 @@
 }
 
 .periodBtn {
-  padding: 4px 6px;
+  padding: 5px 9px;
   border-radius: calc(var(--cal-radius, 0.5em) * 99);
   border: none;
   background: transparent;
   color: var(--c-c);
   opacity: 0.5;
-  font-size: 0.5em;
+  font-size: 0.65em;
   font-weight: 600;
   cursor: pointer;
   transition: all var(--cal-transition, 0.2s);
