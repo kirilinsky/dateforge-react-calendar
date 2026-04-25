@@ -84,10 +84,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   const onChangeRef = useRef<((v: CalendarValue<M>) => void) | undefined>(onChange);
   useLayoutEffect(() => { onChangeRef.current = onChange; });
 
-  const externalKey = useMemo(
-    () => serializeValue(externalValue as DateRange | Date[] | Date | null | undefined),
-    [externalValue],
-  );
+  const externalKey = serializeValue(externalValue as DateRange | Date[] | Date | null | undefined);
   useEffect(() => {
     const externalRangeObj = isDateRange(externalValue)
       ? externalValue
