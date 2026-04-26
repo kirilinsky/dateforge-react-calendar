@@ -1,0 +1,17 @@
+import * as themes from "../../../themes/index";
+import * as appearances from "../../../appearances/index";
+import type { CalendarTheme } from "../../types/themes";
+import type { CalendarAppearance } from "../../types/appearances";
+
+export const resolveStoryTheme = (key: unknown): CalendarTheme | undefined => {
+  if (key === "auto" || key === "light" || key === "dark") return key;
+  if (typeof key !== "string") return undefined;
+  return (themes as Record<string, CalendarTheme>)[key];
+};
+
+export const resolveStoryAppearance = (
+  key: unknown,
+): CalendarAppearance | undefined => {
+  if (key === "default" || typeof key !== "string") return undefined;
+  return (appearances as Record<string, CalendarAppearance>)[key];
+};

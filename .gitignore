@@ -25,3 +25,5 @@ yarn-error.log*
 
 # planning
 /plans
+
+*storybook.log

@@ -20,11 +20,9 @@
       "react-calendar-datetime": ["./src/index.ts"]
     }
   },
-  "include": ["src/**/*", "global.d.ts", "themes/themes.ts"],
+  "include": ["src/**/*", "global.d.ts", "themes/themes.ts", ".storybook/**/*"],
   "exclude": [
     "node_modules",
-    "dist",
-    "**/*.stories.tsx",
-    "**/stories"
+    "dist"
   ]
 }

@@ -2,6 +2,7 @@ export { Calendar } from "./components/calendar/calendar";
 export { createTheme } from "./utils/create-theme";
 export { createAppearance } from "./utils/create-appearance";
 export { createDisabled } from "./utils/create-disabled";
+export { basicPresets } from "./modules/presets/presets-pack";
 
 export type {
   CalendarProps,

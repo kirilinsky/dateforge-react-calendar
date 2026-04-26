@@ -1,0 +1,201 @@
+# Architecture
+
+This document captures the conceptual model of `react-calendar-datetime`. It explains how the public surface is organized, what each part is responsible for, and how the parts compose. It is intended for contributors and for testers writing new test plans.
+
+It is **not** a prop-by-prop API reference — see `DOCUMENTATION.md` for that.
+
+---
+
+## Two-layer composition
+
+The library is built around a strict two-layer model:
+
+```
+┌─────────────────────────────────────────────────┐
+│  <Calendar>                                     │   Layer 1 — invisible wrapper
+│    state, contexts, theme, locale, timezone     │   No UI of its own
+│                                                 │
+│   ┌─────────┐  ┌──────────┐  ┌──────────────┐  │
+│   │ <Days>  │  │ <Nav>    │  │ <TimeGrid>   │  │   Layer 2 — modules
+│   └─────────┘  └──────────┘  └──────────────┘  │   Each is self-contained
+│                                                 │
+│   ┌────────────────┐  ┌──────────────────────┐ │
+│   │ <SelectedDates>│  │ <ManualSelect>       │ │
+│   └────────────────┘  └──────────────────────┘ │
+└─────────────────────────────────────────────────┘
+```
+
+### Layer 1 — `<Calendar>` wrapper
+
+`<Calendar>` is a **headless container**. By itself it renders effectively nothing visible — a positioning wrapper, theme/appearance attributes, and an inline-size container. It exists to hold:
+
+- React contexts (config, navigation, selection, UI)
+- Reducer state for selected dates / range / view date
+- Locale, timezone, hour12, theme, appearance, gradient, readOnly
+- onChange wiring back to the consumer
+
+A `<Calendar>` with no children is a valid (but useless) component. **All visible behavior comes from modules placed as children.**
+
+### Layer 2 — modules
+
+A **module** is a self-contained React component that:
+
+- Reads from the calendar contexts via hooks (no prop drilling).
+- Optionally renders UI.
+- Optionally writes back to the state via context actions.
+- Is idempotent under remounting and reordering.
+
+**Modules can be:**
+
+- Placed individually inside `<Calendar>` (a single module, no others).
+- Combined with any other modules in any order.
+- Repeated — the same module can appear multiple times with different props (e.g. several `<CalendarDays offset={n} />` in a multi-month layout).
+
+This is the central design promise: **any subset and any combination of modules must work**. The wrapper does not assume any particular module is present.
+
+---
+
+## Module classification
+
+Modules fall into two functional categories. The split matters for both UX reasoning and test planning.
+
+### A. Navigational modules
+
+> **Definition:** Change the calendar's internal view date (which year/month/grid is displayed) but **do not commit a final selection** and **do not fire `onChange`**.
+
+Their job is to let the user *navigate* through the calendar — to find the date they want to select. The actual select happens in an interactive module elsewhere on the page.
+
+| Module | Role |
+|---|---|
+| `<CalendarNav>` | Prev/next arrows, month label, optional month/year picker buttons |
+| `<CalendarMonthGrid>` | 12-cell grid of months for the current year |
+| `<CalendarYearsGrid>` | Grid of years (page-paginated) |
+| `<CalendarMonthsTrack>` | Horizontal/vertical scrollable strip of months |
+| `<CalendarYearsTrack>` | Horizontal/vertical scrollable strip of years |
+
+**Common contract:**
+- Reading: `viewDate` from navigation context.
+- Writing: only `navigateTo(date)` — never `onChangeDate` / `onRangeSet`.
+- Never fires the consumer's `onChange` callback.
+- May open/close popups via the UI context.
+
+### B. Interactive modules
+
+> **Definition:** Commit a final selection. Call selection actions (`onChangeDate`, `onRangeSet`, `onDatesSet`, `onChangeTime`) which lead to a consumer-visible `onChange` event.
+
+| Module | Role | Notes |
+|---|---|---|
+| `<CalendarDays>` | The day grid. Click → select day. | Most common interactive module. |
+| `<CalendarTimeGrid>` | Hour/minute drums (and seconds). Change → updates time on selected date. | Interactive at finer granularity than days. |
+| `<CalendarManualSelect>` | Masked text input(s) for typing dates directly. | Interactive via keyboard. |
+| `<CalendarPresets>` | Preset shortcuts (Today, Last 7 days, This month). | Interactive — applies a whole range/date in one click. |
+| `<CalendarDaysTrack>` | Horizontal scrollable strip of days. | Interactive when `selectOnClick` (or equivalent) is on. Otherwise navigational. **Hybrid** — see note below. |
+
+**Common contract:**
+- Writing: at least one of `onChangeDate`, `onRangeSet`, `onDatesSet`, `onChangeTime`.
+- Respects `readOnly` — must skip writes when `readOnly` is set.
+- Respects `disabled`, `minDate`, `maxDate` — must reject selections that violate these constraints.
+- Respects mode (`single` / `multiple` / `range`) and adapts internal flow accordingly.
+
+### C. Display / feedback modules
+
+> **Definition:** Render a representation of current selection or state. May trigger view navigation as a side effect of clicking on rendered items, but do not commit selection changes themselves.
+
+| Module | Role |
+|---|---|
+| `<CalendarSelectedDates>` | Chips showing currently selected date(s). Click chip → `navigateTo`. May fire `onChange(null)` only via the explicit clear button. |
+
+This is a **third category** that the user's two-bucket model didn't initially cover but exists in the codebase. Strictly speaking `<CalendarSelectedDates>` does nothing on its own — it's purely reactive UI plus an opt-in `Clear` action.
+
+### Special case — `<CalendarPresets>`
+
+Presets are interactive but operate at a different level than `<CalendarDays>`:
+
+- **Days**: per-cell, single click → one selection delta.
+- **Presets**: one click → entire range or whole `selectedDates[]` array applied.
+
+Presets accept user-provided resolver functions (custom presets), so they sit at the **boundary between library and consumer code**. This is the highest-risk surface for hostile or malformed input. They get their own dedicated test file (`integration/presets.test.tsx`) covering adversarial inputs in addition to happy-path.
+
+### Hybrid: `<CalendarDaysTrack>`
+
+`<CalendarDaysTrack>` is intentionally hybrid. By default it scrolls/navigates without selecting (navigational). With certain props it commits a selection on tap (interactive). Document and test both modes explicitly.
+
+---
+
+## Why the classification matters
+
+**For users of the library:**
+- A typical layout pairs at least one navigational module with one interactive module. (`<Nav>` + `<Days>`.)
+- An interactive-only layout (`<Days>` alone) works but offers no way to navigate months from the UI — the consumer must drive `value` externally.
+- A navigational-only layout (`<Nav>` + `<MonthGrid>`) is a date *viewer* — useful for showing context, never selecting.
+
+**For testing:**
+- Navigational modules: assert `viewDate` mutation, never `onChange` calls.
+- Interactive modules: assert `onChange` payloads, respect `readOnly` / `disabled` / `min` / `max`.
+- Display modules: assert rendered output matches state, no side effects beyond explicit user actions.
+
+**For new modules:**
+A new module proposal must declare which category it belongs to. Hybrid modules need explicit reasoning.
+
+---
+
+## State and context boundaries
+
+The wrapper exposes four contexts to modules. Each has a clear responsibility:
+
+| Context | Reads | Writes |
+|---|---|---|
+| `ConfigContext` | locale, timezone, mode, min/maxDate, disabled, hour12, minRangeDays, maxRangeDays, readOnly | (none — config is fixed per render) |
+| `NavigationContext` | viewDate | `navigateTo(date)` |
+| `SelectionContext` | selectedDates, rangeStart, rangeEnd, hoverDate, openPopup | `onChangeDate`, `onRangeSet`, `onDatesSet`, `onChangeTime`, `setHoverDate`, `setOpenPopup` |
+| `UIContext` | containerRef, containerWidth, popups visibility, daysTrackActive | toggleTheme, popup open/close setters |
+
+**Rules:**
+- Navigational modules touch only `NavigationContext` (writes) and `ConfigContext` (reads).
+- Interactive modules write to `SelectionContext`. They may also `navigateTo` if selection implies a view change.
+- Display modules read from `SelectionContext` and may `navigateTo`. They never write to `SelectionContext` except via explicit user action (Clear button).
+
+---
+
+## Themes and appearances
+
+Themes and appearances are independent dimensions of styling.
+
+- **Theme** = palette (colors). Applied via `data-theme` attribute and CSS custom properties on the wrapper element. Built-in light/dark/auto, plus a registry of named themes (e.g. `midnight`, `scarlet`). Custom themes via `createTheme()`.
+- **Appearance** = structure (radii, sizing, density, border styles). Applied via `data-appearance` attribute. Custom appearances via `createAppearance()`.
+
+A library consumer can mix any theme with any appearance freely. This combinatorial space is the primary target for visual regression testing (Chromatic).
+
+CSS layering enforces that user styles override library defaults predictably:
+
+```
+@layer cal-base, cal-components, cal-modules, themes, appearances, user;
+```
+
+User styles win over `themes` and `appearances`, which win over the base layers.
+
+---
+
+## Subpath imports
+
+The package ships individual modules and themes as separate entry points:
+
+```ts
+import { Calendar } from "react-calendar-datetime";
+import { CalendarDays } from "react-calendar-datetime/modules/days";
+import { midnight } from "react-calendar-datetime/themes/midnight";
+import { compact } from "react-calendar-datetime/appearances/compact";
+```
+
+Tree-shaking eliminates unused modules from the consumer bundle. **All modules and themes/appearances must remain individually importable.** The build verifies this via `publint` and `arethetypeswrong`.
+
+---
+
+## Reading order for new contributors
+
+1. This file (`ARCHITECTURE.md`) — conceptual model.
+2. `DOCUMENTATION.md` — prop reference per component.
+3. `plans/testing-strategy.md` — what to test and why.
+4. `plans/storybook-strategy.md` — how stories are organized.
+5. `src/core/state.ts` — the reducer (single source of truth for selection logic).
+6. `src/core/provider.tsx` — how state is wired to the four contexts.
