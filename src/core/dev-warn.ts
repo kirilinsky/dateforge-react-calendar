@@ -107,6 +107,29 @@ export function validateTheme(theme: unknown): void {
   );
 }
 
+export function validateTimeZone(tz: string | undefined): boolean {
+  if (tz == null) return true;
+  if (typeof tz !== "string" || tz.length === 0) {
+    warnOnce(
+      "tz:empty",
+      `timeZone must be a non-empty string. Received: ${JSON.stringify(tz)}.`,
+    );
+    return false;
+  }
+  // UTC±N is normalized internally — accept it without probing Intl.
+  if (/^UTC[+-]\d{1,2}$/i.test(tz)) return true;
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone: tz });
+    return true;
+  } catch {
+    warnOnce(
+      `tz:invalid:${tz}`,
+      `timeZone="${tz}" is not a valid IANA timezone. Falling back to local time. Use values like "Europe/Paris", "America/New_York", "UTC", or "UTC+2".`,
+    );
+    return false;
+  }
+}
+
 export function validateMinMax(
   minDate: Date | undefined,
   maxDate: Date | undefined,

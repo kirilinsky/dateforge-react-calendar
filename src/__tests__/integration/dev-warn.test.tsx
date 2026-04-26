@@ -137,6 +137,55 @@ describe("dev-warn — theme", () => {
   });
 });
 
+describe("dev-warn — timeZone", () => {
+  it("warns when an invalid IANA timezone is passed", () => {
+    render(
+      <Calendar timeZone="Europe/Wrongville">
+        <CalendarDays />
+      </Calendar>,
+    );
+    expect(warnSpy).toHaveBeenCalled();
+    expect(lastMsg()).toContain("Europe/Wrongville");
+    expect(lastMsg()).toContain("not a valid IANA timezone");
+  });
+
+  it('does not warn for "auto"', () => {
+    render(
+      <Calendar timeZone="auto">
+        <CalendarDays />
+      </Calendar>,
+    );
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+
+  it("does not warn for valid IANA timezone", () => {
+    render(
+      <Calendar timeZone="Europe/Paris">
+        <CalendarDays />
+      </Calendar>,
+    );
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+
+  it("does not warn for UTC offset format", () => {
+    render(
+      <Calendar timeZone="UTC+2">
+        <CalendarDays />
+      </Calendar>,
+    );
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+
+  it("does not warn when timeZone prop is omitted (auto-detect)", () => {
+    render(
+      <Calendar>
+        <CalendarDays />
+      </Calendar>,
+    );
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+});
+
 describe("dev-warn — dedupe", () => {
   it("warns only once for the same condition across renders", () => {
     const { rerender } = render(

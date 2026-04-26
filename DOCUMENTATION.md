@@ -43,7 +43,7 @@ import { Calendar } from "react-calendar-datetime";
 | `onChange`     | `(value: CalendarValue<M>) => void` | —           | Fires when the selection changes (in both controlled and uncontrolled modes)                                                                                                                                          |
 | `cols`         | `number`                            | —           | Number of columns in the internal CSS grid                                                                                                                                                                            |
 | `locale`       | `string`                            | `"en"`      | BCP 47 language tag used for all labels and formatting                                                                                                                                                                |
-| `timeZone`     | `string`                            | —           | IANA timezone (`"Europe/Paris"`, `"UTC"`) or fixed offset (`"UTC+2"`, `"UTC-5"`). Affects today detection, emitted date midnight, and chip formatting                                                                 |
+| `timeZone`     | `string \| "auto"`                  | `"auto"`    | IANA timezone (`"Europe/Paris"`, `"UTC"`), fixed offset (`"UTC+2"`, `"UTC-5"`), or `"auto"`. When `"auto"` (or omitted) the library detects the user's timezone via `Intl.DateTimeFormat().resolvedOptions().timeZone` after mount. Invalid values fall back to auto-detect with a dev warning. Affects today detection, emitted date midnight, and formatting |
 | `readOnly`     | `boolean`                           | `false`     | Disables all state-changing interactions (date/time selection). Navigation still works. Adds `data-readonly` and `aria-readonly` on the root                                                                          |
 | `hour12`       | `boolean`                           | `false`     | Use 12-hour time format instead of 24-hour                                                                                                                                                                            |
 | `theme`        | `CalendarTheme`                     | `"auto"`    | Base value (`"auto"` / `"light"` / `"dark"`), a pre-built theme object from `react-calendar-datetime/themes[/name]`, or a `CustomTheme` from `createTheme()`. Named string themes (e.g. `"midnight"`) are not supported — import the object instead. |
@@ -112,10 +112,34 @@ Per-mode behavior:
 
 **Pending vs committed.** "Pending" means `viewDate.hours / minutes / seconds` are updated for display and for the next selection, but the existing committed selection is not mutated and `onChange` is not called. The next click in `CalendarDays` will pick up the pending time automatically.
 
+### Timezone
+
+`Calendar` is **timezone-aware by default**. When you don't pass `timeZone` (or pass `"auto"`), the library reads the user's IANA timezone from `Intl.DateTimeFormat().resolvedOptions().timeZone` inside a `useEffect` after mount. This pattern is SSR-safe: the first render does not depend on browser locale, so server-rendered HTML and client hydration agree. After hydration, the resolved timezone is fed into the calendar config and any timezone-dependent UI (today highlight, emitted Date midnight, chip formatting) updates accordingly.
+
+When you need an explicit timezone — typically because your data is stored in a fixed zone (e.g. an event scheduler shown in `"America/New_York"` regardless of the viewer), or because you want to avoid the brief auto-resolve gap — pass an IANA name or a fixed offset:
+
+```tsx
+<Calendar timeZone="America/New_York">…</Calendar>
+<Calendar timeZone="UTC+2">…</Calendar>
+```
+
+Fixed offsets `"UTC+N"` / `"UTC-N"` are normalized internally to the corresponding `Etc/GMT∓N` IANA name.
+
+When does timezone matter?
+- **SSR / Next.js.** Server's `new Date()` is in server's locale (often UTC). Without an explicit timezone, "today" detection differs between server and client. The auto-detect default keeps the initial render server-stable and resolves to client zone post-hydration.
+- **Off-by-one selection.** When dates are stored as UTC midnight and the user is in a negative offset, displaying with local conversion shifts the rendered day back by one. Setting `timeZone` to the storage zone fixes this.
+- **Explicit data zone.** Scheduling apps where dates are anchored to a specific city's time, regardless of the viewer.
+
+For purely local single-user CRUD without SSR, the default `"auto"` is the right choice and you do not need to think about it.
+
+**Invalid timezone values** (e.g. `"Europe/Wrongville"`) fall back to auto-detect and emit a dev warning. In production they are silently treated as auto-detect.
+
 **Dev warnings.** In development, the library emits a `console.warn` (deduped per condition) for:
 - `value` / `defaultValue` shape that does not match `mode` (e.g. `Date` passed in `mode="range"`);
 - `Date` instances that are `NaN`;
-- `minDate` later than `maxDate`.
+- `minDate` later than `maxDate`;
+- invalid `timeZone` strings;
+- `theme` strings outside `"auto" | "light" | "dark"`.
 
 Warnings are silenced when `process.env.NODE_ENV === "production"`.
 

@@ -201,6 +201,26 @@ New validators belong in this module and follow the same dedupe-by-key conventio
 
 ---
 
+## Timezone resolution
+
+The library is timezone-aware. The `timeZone` prop has three forms:
+
+- **omitted** — same as `"auto"`. The default.
+- **`"auto"`** — detect via `Intl.DateTimeFormat().resolvedOptions().timeZone` after mount.
+- **explicit IANA / `"UTC±N"`** — used as-is after validation. `"UTC+N"` / `"UTC-N"` are normalized to the corresponding `Etc/GMT∓N`.
+
+`CalendarProvider` keeps a `resolvedTimeZone` `useState` that is fed into `ConfigContext`. The pattern:
+
+1. **Initial render.** If `timeZone` is omitted or `"auto"`, `resolvedTimeZone` is `undefined`. This is identical on server and client, so SSR hydration matches.
+2. **`useEffect` after mount.** Detects via `Intl` and updates `resolvedTimeZone`. Calendar UI re-renders with the user's zone.
+3. **Explicit value.** Validated synchronously via `validateTimeZone` (in `dev-warn.ts`). Valid → used directly. Invalid → falls back to auto-detect, emits a dev warning.
+
+This design avoids the common SSR pitfall (server's `new Date()` differs from client's) without making consumers think about it. The brief gap before `useEffect` runs renders with no explicit zone (default JS Date semantics), which is acceptable for any UI not hovering near midnight in a far-away zone — the first paint shows local-ish data, then snaps to the resolved zone.
+
+Timezone-dependent operations live in `src/utils/tz-utils.ts` (`getTodayInTimezone`, `toTZMidnight`). Modules read `timeZone` from `ConfigContext` and call into these utilities — no module reaches for `Intl` or `new Date()` directly when computing dates that participate in selection.
+
+---
+
 ## Time editing semantics
 
 Time interactions (`CalendarTimeGrid` drums, `CalendarNav.showTime` popup confirm) are unified through one reducer action: `CHANGE_TIME { date, config }`. The action is dispatched by `provider.handleChangeTime`, which always passes the current `selectConfig`.

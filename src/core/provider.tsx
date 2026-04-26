@@ -21,7 +21,11 @@ import {
   SelectConfig,
 } from "@/core/state";
 import { isSameDay } from "@/utils/date-core";
-import { validateCalendarValue, validateMinMax } from "@/core/dev-warn";
+import {
+  validateCalendarValue,
+  validateMinMax,
+  validateTimeZone,
+} from "@/core/dev-warn";
 import { ConfigContext, CalendarConfig } from "@/context/config-context";
 import { NavigationContext } from "@/context/navigation-context";
 import {
@@ -78,6 +82,29 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   const range = mode === "range";
   const multiselect: number | boolean | undefined =
     mode === "multiple" ? (maxDates ?? true) : undefined;
+
+  // Resolved timeZone — the value actually fed to ConfigContext.
+  // - undefined / "auto" prop  → detected from Intl after mount (SSR-safe;
+  //   first render uses no TZ to avoid hydration mismatch).
+  // - explicit IANA / "UTC±N" → validated, used as-is. Invalid value falls
+  //   back to detected TZ and emits a dev warning.
+  const isAutoTZ = timeZone == null || timeZone === "auto";
+  const [resolvedTimeZone, setResolvedTimeZone] = useState<string | undefined>(
+    isAutoTZ ? undefined : validateTimeZone(timeZone) ? timeZone : undefined,
+  );
+  useEffect(() => {
+    if (!isAutoTZ && validateTimeZone(timeZone)) {
+      setResolvedTimeZone(timeZone);
+      return;
+    }
+    if (typeof Intl !== "undefined") {
+      try {
+        setResolvedTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
+      } catch {
+        setResolvedTimeZone(undefined);
+      }
+    }
+  }, [timeZone, isAutoTZ]);
 
   const selectConfig = useMemo<SelectConfig>(
     () => ({ range, multiselect, minRangeDays, maxRangeDays, minDate, maxDate, disabled }),
@@ -276,7 +303,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       maxDate,
       disabled,
       gradient: gradient ?? false,
-      timeZone,
+      timeZone: resolvedTimeZone,
       readOnly,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -291,7 +318,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       maxDate,
       disabled,
       gradient,
-      timeZone,
+      resolvedTimeZone,
       readOnly,
     ],
   );
