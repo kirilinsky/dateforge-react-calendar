@@ -24,6 +24,7 @@ interface MaskedDateInputProps {
   className?: string;
   classNameInvalid?: string;
   placeholder?: string;
+  readOnly?: boolean;
 }
 
 const MaskedDateInput: React.FC<MaskedDateInputProps> = ({
@@ -37,6 +38,7 @@ const MaskedDateInput: React.FC<MaskedDateInputProps> = ({
   className,
   classNameInvalid,
   placeholder = "DD.MM.YYYY",
+  readOnly,
 }) => {
   const [text, setText] = useState(() => dateToMask(value));
   const [invalid, setInvalid] = useState(false);
@@ -97,6 +99,7 @@ const MaskedDateInput: React.FC<MaskedDateInputProps> = ({
       placeholder={placeholder}
       onChange={handleChange}
       onKeyDown={handleKeyDown}
+      readOnly={readOnly}
     />
   );
 };
@@ -109,6 +112,7 @@ interface DateSlotProps {
   placeholder?: string;
   isEditing?: boolean;
   onEditStart?: () => void;
+  readOnly?: boolean;
 }
 
 const DateSlot: React.FC<DateSlotProps> = ({
@@ -119,6 +123,7 @@ const DateSlot: React.FC<DateSlotProps> = ({
   placeholder = "DD.MM.YYYY",
   isEditing,
   onEditStart,
+  readOnly,
 }) => {
   const [editing, setEditing] = useState(() => !date);
   const [inputInitialDate, setInputInitialDate] = useState<Date | null>(null);
@@ -163,6 +168,7 @@ const DateSlot: React.FC<DateSlotProps> = ({
   }, [isEditing]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const enterEditMode = () => {
+    if (readOnly) return;
     if (onEditStart) {
       onEditStart();
     } else {
@@ -176,6 +182,7 @@ const DateSlot: React.FC<DateSlotProps> = ({
   };
 
   const handleClearInput = () => {
+    if (readOnly) return;
     setTypedDate(null);
     setHasText(false);
     setWrapperInvalid(false);
@@ -185,6 +192,7 @@ const DateSlot: React.FC<DateSlotProps> = ({
   };
 
   const handleSave = () => {
+    if (readOnly) return;
     if (!typedDate || !isAllowed(typedDate)) return;
     if (date && isSameDay(date, typedDate)) {
       setEditing(false);
@@ -202,7 +210,12 @@ const DateSlot: React.FC<DateSlotProps> = ({
 
   if (!editing && date) {
     return (
-      <button type="button" className={styles.chip} onClick={enterEditMode}>
+      <button
+        type="button"
+        className={styles.chip}
+        onClick={enterEditMode}
+        disabled={readOnly}
+      >
         {dateToMask(date)}
       </button>
     );
@@ -225,6 +238,7 @@ const DateSlot: React.FC<DateSlotProps> = ({
           aria-label="Clear"
           className={`${styles.saveBtn} ${styles.saveBtnMuted} ${styles.saveBtnLeft}`}
           onClick={handleClearInput}
+          disabled={readOnly}
         >
           <Clear />
         </button>
@@ -240,6 +254,7 @@ const DateSlot: React.FC<DateSlotProps> = ({
         onValidityChange={setWrapperInvalid}
         onEnter={handleSave}
         placeholder={placeholder}
+        readOnly={readOnly}
       />
       {hasText && (
         <button
@@ -249,6 +264,7 @@ const DateSlot: React.FC<DateSlotProps> = ({
             .filter(Boolean)
             .join(" ")}
           onClick={handleSave}
+          disabled={readOnly}
         >
           <Check />
         </button>
@@ -269,7 +285,7 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
   align = "left",
   col,
 }) => {
-  const { range, multiselect, disabled, minDate, maxDate } = useConfig();
+  const { range, multiselect, disabled, minDate, maxDate, readOnly } = useConfig();
   const { viewDate: date } = useNavigation();
   const { rangeStart, rangeEnd, selectedDates } = useSelectionValue();
   const { onChangeDate, onRangeSet, onDatesSet } = useSelectionActions();
@@ -309,6 +325,7 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
       aria-label="Clear"
       className={`${styles.clearBtn} ${shared.interactive} ${shared.hoverable}`}
       onClick={() => {
+        if (readOnly) return;
         if (range) {
           onRangeSet(null, null);
         } else {
@@ -323,7 +340,7 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
       }
       tabIndex={allowClear ? undefined : -1}
       aria-hidden={!allowClear}
-      disabled={!hasValue}
+      disabled={!hasValue || readOnly}
     >
       <Clear />
     </button>
@@ -334,6 +351,7 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
     const canAddMore = selectedDates.length < maxCount;
 
     const handleAddSave = () => {
+      if (readOnly) return;
       if (!addTypedDate || !isAllowed(addTypedDate)) return;
       onChangeDate(withTime(addTypedDate));
       setAddTypedDate(null);
@@ -369,6 +387,7 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
                 onHasText={setAddHasText}
                 onValidityChange={setAddWrapperInvalid}
                 onEnter={handleAddSave}
+                readOnly={readOnly}
               />
               {addHasText && (
                 <button
@@ -381,6 +400,7 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
                     .filter(Boolean)
                     .join(" ")}
                   onClick={handleAddSave}
+                  disabled={readOnly}
                 >
                   <Check />
                 </button>
@@ -406,6 +426,7 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
               }
               isEditing={editingKey === d.getTime()}
               onEditStart={() => setEditingKey(d.getTime())}
+              readOnly={readOnly}
             />
           ))}
         </div>
@@ -428,6 +449,7 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
             onSave={(d) => onRangeSet(withTime(d), rangeEnd)}
             onClear={() => onRangeSet(null, rangeEnd)}
             placeholder="DD.MM.YYYY"
+            readOnly={readOnly}
           />
           <span className={styles.sep}>—</span>
           <DateSlot
@@ -436,6 +458,7 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
             onSave={(d) => onRangeSet(rangeStart, withTime(d))}
             onClear={() => onRangeSet(rangeStart, null)}
             placeholder="DD.MM.YYYY"
+            readOnly={readOnly}
           />
         </div>
         {clearBtn}
@@ -455,6 +478,7 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
           isAllowed={isAllowed}
           onSave={(d) => onChangeDate(withTime(d))}
           onClear={() => onChangeDate(null)}
+          readOnly={readOnly}
         />
       </div>
       {clearBtn}

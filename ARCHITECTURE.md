@@ -70,8 +70,8 @@ Their job is to let the user *navigate* through the calendar — to find the dat
 | `<CalendarNav>` | Prev/next arrows, month label, optional month/year picker buttons |
 | `<CalendarMonthGrid>` | 12-cell grid of months for the current year |
 | `<CalendarYearsGrid>` | Grid of years (page-paginated) |
-| `<CalendarMonthsTrack>` | Horizontal/vertical scrollable strip of months |
-| `<CalendarYearsTrack>` | Horizontal/vertical scrollable strip of years |
+
+`<CalendarMonthsTrack>`, `<CalendarYearsTrack>`, and `<CalendarDaysTrack>` are navigational only in some configurations — see category **D. Hybrid modules** below.
 
 **Common contract:**
 - Reading: `viewDate` from navigation context.
@@ -89,7 +89,6 @@ Their job is to let the user *navigate* through the calendar — to find the dat
 | `<CalendarTimeGrid>` | Hour/minute drums (and seconds). Change → updates time on selected date. | Interactive at finer granularity than days. |
 | `<CalendarManualSelect>` | Masked text input(s) for typing dates directly. | Interactive via keyboard. |
 | `<CalendarPresets>` | Preset shortcuts (Today, Last 7 days, This month). | Interactive — applies a whole range/date in one click. |
-| `<CalendarDaysTrack>` | Horizontal scrollable strip of days. | Interactive when `selectOnClick` (or equivalent) is on. Otherwise navigational. **Hybrid** — see note below. |
 
 **Common contract:**
 - Writing: at least one of `onChangeDate`, `onRangeSet`, `onDatesSet`, `onChangeTime`.
@@ -107,6 +106,21 @@ Their job is to let the user *navigate* through the calendar — to find the dat
 
 This is a **third category** that the user's two-bucket model didn't initially cover but exists in the codebase. Strictly speaking `<CalendarSelectedDates>` does nothing on its own — it's purely reactive UI plus an opt-in `Clear` action.
 
+### D. Hybrid modules
+
+> **Definition:** Behave as navigational or interactive depending on props and/or mode. The category is decided at render time, not at module identity.
+
+| Module | Navigational when | Interactive when |
+|---|---|---|
+| `<CalendarDaysTrack>` | range mode without `bound` | `mode="single"` (item click commits date); `mode="range"` with `bound` (item click sets that boundary); `mode="multiple"` via auto save/remove button |
+| `<CalendarMonthsTrack>` | single / multiple / range without `bound` | `mode="range"` with `bound="from"\|"to"` (click sets that boundary's month) |
+| `<CalendarYearsTrack>` | single / multiple / range without `bound` | `mode="range"` with `bound="from"\|"to"` (click sets that boundary's year) |
+
+**Common contract:**
+- In navigational state: only `navigateTo` — never fires consumer `onChange`.
+- In interactive state: writes via `SelectionContext` (`onRangeBoundSet`, `onChangeDate`, etc.), respects `readOnly` / `disabled` / `minDate` / `maxDate`, and may fire consumer `onChange`.
+- Tests must cover both states explicitly per module.
+
 ### Special case — `<CalendarPresets>`
 
 Presets are interactive but operate at a different level than `<CalendarDays>`:
@@ -115,10 +129,6 @@ Presets are interactive but operate at a different level than `<CalendarDays>`:
 - **Presets**: one click → entire range or whole `selectedDates[]` array applied.
 
 Presets accept user-provided resolver functions (custom presets), so they sit at the **boundary between library and consumer code**. This is the highest-risk surface for hostile or malformed input. They get their own dedicated test file (`integration/presets.test.tsx`) covering adversarial inputs in addition to happy-path.
-
-### Hybrid: `<CalendarDaysTrack>`
-
-`<CalendarDaysTrack>` is intentionally hybrid. By default it scrolls/navigates without selecting (navigational). With certain props it commits a selection on tap (interactive). Document and test both modes explicitly.
 
 ---
 
@@ -133,6 +143,7 @@ Presets accept user-provided resolver functions (custom presets), so they sit at
 - Navigational modules: assert `viewDate` mutation, never `onChange` calls.
 - Interactive modules: assert `onChange` payloads, respect `readOnly` / `disabled` / `min` / `max`.
 - Display modules: assert rendered output matches state, no side effects beyond explicit user actions.
+- Hybrid modules: cover both states. Without the activating prop/mode, behave as navigational (no `onChange`). With it, behave as interactive (writes selection, respects `readOnly` / `disabled` / `min` / `max`).
 
 **For new modules:**
 A new module proposal must declare which category it belongs to. Hybrid modules need explicit reasoning.
@@ -154,6 +165,7 @@ The wrapper exposes four contexts to modules. Each has a clear responsibility:
 - Navigational modules touch only `NavigationContext` (writes) and `ConfigContext` (reads).
 - Interactive modules write to `SelectionContext`. They may also `navigateTo` if selection implies a view change.
 - Display modules read from `SelectionContext` and may `navigateTo`. They never write to `SelectionContext` except via explicit user action (Clear button).
+- Hybrid modules follow navigational rules in their navigational state and interactive rules in their interactive state. Switching is determined by props/mode at render time.
 
 ---
 

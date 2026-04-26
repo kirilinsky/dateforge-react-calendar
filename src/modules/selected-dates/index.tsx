@@ -51,7 +51,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
   showTime = false,
   col,
 }) => {
-  const { locale, range, hour12, timeZone } = useConfig();
+  const { locale, range, hour12, timeZone, readOnly } = useConfig();
   const { viewDate: date, navigateTo } = useNavigation();
   const { selectedDates, rangeStart, rangeEnd } = useSelectionValue();
   const { onChangeDate } = useSelectionActions();
@@ -89,6 +89,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
       aria-label="Clear"
       className={`${styles.clearBtn} ${shared.interactive} ${shared.hoverable}`}
       onClick={() => onChangeDate(null)}
+      disabled={readOnly}
     >
       ×
     </button>
