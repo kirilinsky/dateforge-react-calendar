@@ -154,6 +154,54 @@ All warnings go through `warnOnce` (dev-only, deduped per id+condition). In prod
 
 ---
 
+## Module behavior matrix
+
+The single source of truth for which user actions change view, mutate selection, fire `onChange`, and how they behave under `readOnly`. Use this when planning tests, designing new modules, or debugging unexpected behavior.
+
+| Module · Action                                   | Changes `viewDate`     | Changes selection | Fires `onChange` | Under `readOnly`               |
+| ------------------------------------------------- | ---------------------- | ----------------- | ---------------- | ------------------------------ |
+| `<CalendarNav>` prev/next arrows                  | yes                    | no                | no               | works (navigation allowed)     |
+| `<CalendarNav>` `home`                            | yes                    | no                | no               | works                          |
+| `<CalendarNav>` `clear`                           | no                     | yes (`null`)      | yes              | button disabled                |
+| `<CalendarNav>` `showTime` confirm                | yes (time-of-day)      | yes (time-of-day) | yes              | drums / AM-PM / confirm disabled |
+| `<CalendarNav>` `themeToggle`                     | no                     | no (UI-only)      | no               | works                          |
+| `<CalendarNav>` `monthLabel` / `yearLabel`        | no                     | no (display)      | no               | n/a                            |
+| `<CalendarNav>` month / year picker / popups      | yes                    | no                | no               | works                          |
+| `<CalendarDays>` day click                        | maybe (cross-month)    | yes               | yes              | aria-disabled, click blocked   |
+| `<CalendarDays>` arrow keys / PgUp / PgDn         | maybe                  | no                | no               | works (focus moves)            |
+| `<CalendarDays>` Enter / Space                    | maybe                  | yes               | yes              | blocked                        |
+| `<CalendarDays>` swipe (touch)                    | yes                    | no                | no               | works                          |
+| `<CalendarMonthGrid>` cell click                  | yes                    | no                | no               | works (navigation only)        |
+| `<CalendarYearsGrid>` cell click / page nav       | yes                    | no                | no               | works                          |
+| `<CalendarTimeGrid>` drum scroll / arrow keys     | yes (time-of-day)      | maybe ¹            | maybe ¹          | aria-disabled, blocked         |
+| `<CalendarPresets>` click (single date)           | yes                    | yes               | yes              | button disabled                |
+| `<CalendarPresets>` click (range, in `mode="range"`) | yes                 | yes               | yes              | button disabled                |
+| `<CalendarSelectedDates>` chip click              | yes                    | no                | no               | works (navigation)             |
+| `<CalendarSelectedDates>` clear                   | no                     | yes               | yes              | button disabled                |
+| `<CalendarManualSelect>` typing                   | no                     | no                | no               | input HTML `readOnly`          |
+| `<CalendarManualSelect>` Enter / apply (✓)        | maybe                  | yes               | yes              | inputs / buttons disabled      |
+| `<CalendarManualSelect>` per-chip remove (multi)  | no                     | yes               | yes              | disabled                       |
+| `<CalendarManualSelect>` top clear                | no                     | yes               | yes              | disabled                       |
+| `<CalendarDaysTrack>` item · `mode="single"`      | yes                    | yes               | yes              | item click blocked             |
+| `<CalendarDaysTrack>` item · `mode="multiple"`    | local preview only     | no                | no               | n/a (auto button blocked)      |
+| `<CalendarDaysTrack>` auto button · `mode="multiple"` | no                 | yes (toggle)      | yes              | button disabled                |
+| `<CalendarDaysTrack>` item · `mode="range"` (no bound) | local preview     | no                | no               | n/a                            |
+| `<CalendarDaysTrack>` item · `mode="range"` + `bound` | preview            | yes               | yes              | bound write blocked            |
+| `<CalendarMonthsTrack>` item · single / multiple / range no-bound | yes  | no                | no               | works                          |
+| `<CalendarMonthsTrack>` item · `mode="range"` + `bound` | preview         | yes               | yes              | bound write blocked            |
+| `<CalendarYearsTrack>` item · single / multiple / range no-bound | yes   | no                | no               | works                          |
+| `<CalendarYearsTrack>` item · `mode="range"` + `bound` | preview          | yes               | yes              | bound write blocked            |
+
+¹ See "Time editing semantics" — `single` mode without selection auto-creates one (time-only picker case); `multiple` / `range` without a matching boundary leave time pending and do not fire `onChange`.
+
+**Reading the columns:**
+- *Changes `viewDate`* — affects which month/year/day-of-month is currently displayed. "maybe" means the action sometimes changes view (e.g. clicking a day in a neighbor month implicitly navigates).
+- *Changes selection* — mutates `selectedDates` / `rangeStart` / `rangeEnd`.
+- *Fires `onChange`* — triggers the consumer-visible callback. The two columns are not redundant: a Track in preview state mutates local view but not committed selection, so it changes `viewDate`-equivalent without firing `onChange`.
+- *Under `readOnly`* — describes the visible UI under the `readOnly` flag. The reducer guards selection at the data layer regardless; the UI column tells you whether the affordance is rendered as disabled / hidden / unchanged.
+
+---
+
 ## Why the classification matters
 
 **For users of the library:**

@@ -3,6 +3,8 @@
 ## Table of Contents
 
 - [Calendar (Main Component)](#calendar)
+- [Edge cases](#edge-cases)
+- [Recommended compositions](#recommended-compositions)
 - [CalendarDays](#calendardays)
 - [Modules](#modules)
   - [CalendarNav](#calendarnav)
@@ -58,6 +60,17 @@ import { Calendar } from "react-calendar-datetime";
 | `maxRangeDays` | `number`                            | —           | Maximum number of days in a range selection                                                                                                                                                                           |
 | `disabled`     | `DisabledConfig`                    | —           | Rules for disabling specific dates. Build with `createDisabled()`                                                                                                                                                     |
 | `children`     | `React.ReactNode`                   | —           | Module components that compose the calendar UI                                                                                                                                                                        |
+
+### When does each action fire `onChange`?
+
+The complete cross-module matrix lives in `ARCHITECTURE.md → Module behavior matrix`. It tells you for every public action — Nav arrows, day click, preset click, drum scroll, manual input commit, etc. — whether it changes the view, mutates the selection, fires the consumer callback, and how it behaves under `readOnly`.
+
+Quick high-level summary:
+
+- **Pure navigation** (Nav arrows / popups, MonthGrid / YearsGrid clicks, Track scrolling without `bound`) never fires `onChange`.
+- **Pure selection** (Days click, ManualSelect Enter / apply, Presets click, SelectedDates clear) fires `onChange`.
+- **Mixed actions** (Nav `clear`, `showTime` confirm, Days click that crosses months, Track items in `bound` mode) change both view and selection — fire `onChange`.
+- **`readOnly`** disables every selection-affecting affordance; navigation stays enabled.
 
 ### Controlled and uncontrolled
 
@@ -233,6 +246,178 @@ When `readOnly` is `true`:
 - Hover preview in range mode.
 
 Interactive UI elements are rendered with `disabled` or `aria-disabled="true"` so they are visually inactive. State-changing actions are also blocked at the reducer layer, so even custom modules calling selection actions will no-op when `readOnly`.
+
+---
+
+## Edge cases
+
+A consolidated checklist of non-obvious cases the library handles, with pointers to the section that defines the behavior. Use this as a quick smoke list when integrating.
+
+| Case                                                                       | Behavior                                                              | Defined in                          |
+| -------------------------------------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------- |
+| `readOnly` + `clear` button (any module)                                   | Button disabled; `onChange` does not fire                             | `readOnly` contract                 |
+| `readOnly` + day click / Track item / preset                               | Affordance disabled (aria-disabled / hidden); `onChange` does not fire | `readOnly` contract                 |
+| `minDate > maxDate`                                                        | No date selectable; dev warn                                          | Dev warnings                        |
+| `minDate` / `maxDate` + preset whose target falls outside the bounds       | Preset filtered (button not rendered)                                 | Presets → Mode filtering            |
+| `minDate` / `maxDate` + manual input outside bounds                        | Wrapper turns red, no commit, `onChange` does not fire                | ManualSelect → When `onChange` fires |
+| `disabled` config + manual input typing a disabled date                    | Same as above — invalid state, no commit                              | ManualSelect → Constraints respected |
+| `mode="range"` with `minRangeDays` / `maxRangeDays`                        | Hover preview is gated by these; commit also rejected                 | Calendar props                      |
+| `mode="range"` + `<CalendarDaysTrack bound="from">` only (no `to` boundary) | User can set `from` but never `to`. Renders but UX incomplete.        | "Any subset … not every is UX"     |
+| `mode="multiple"` + `maxDates` reached                                     | Click on new date silently ignored; click on already-selected toggles off; ManualSelect add input hidden | Calendar props |
+| `mode="multiple"` + `<CalendarTimeGrid>` without selection                 | Time changes are pending, never commit (no unambiguous date)          | Time semantics                      |
+| `mode="single"` + `<CalendarTimeGrid>` without selection (time-only picker) | First time interaction auto-creates a date for `viewDate.day`         | Time semantics                      |
+| `mode="range"` + `<CalendarTimeGrid>` + viewDate matches neither boundary  | Time pending; no commit                                               | Time semantics                      |
+| `timeZone="auto"` (default) on SSR                                         | First render uses no TZ; resolved post-hydration via `Intl`           | Timezone, SSR / hydration           |
+| Explicit `timeZone="UTC+2"` / `"UTC-5"`                                    | Normalized internally to `Etc/GMT∓N`                                  | Timezone                            |
+| Invalid `timeZone` string (e.g. `"Europe/Wrongville"`)                     | Falls back to auto-detect; dev warn                                   | Timezone                            |
+| `value = new Date("invalid")`                                              | Replaced with today; dev warn                                         | Dev warnings                        |
+| `defaultViewDate = "garbage"` (non-Date)                                   | Treated as omitted; dev warn                                          | Dev warnings                        |
+| Repeated `<CalendarDays offset={n} />` (multi-month layout)                | All instances share `viewDate`, `selectedDates`, `hoverDate` — diverge only by `offset`. Cost scales linearly | Performance model |
+| Mode change at runtime (e.g. `single` → `range`)                           | Selection is **not** migrated. Each mode reads its own shape from internal state. Pass a compatible `value` together with the new `mode` for a clean transition | Controlled and uncontrolled |
+| `theme="midnight"` (string, not object)                                    | Falls back to system theme; dev warn                                  | Dev warnings                        |
+| `<CalendarPresets>` with a `getValue` that throws                          | Preset dropped; rest still render; dev warn                           | Presets → Defensive handling        |
+| `<CalendarPresets>` with two entries sharing the same `id`                 | First wins; duplicates dropped; dev warn                              | Presets → Defensive handling        |
+| `<CalendarYearsGrid yearsPerPage={999} />`                                 | Clamped to 40; dev warn                                               | CalendarYearsGrid → Props           |
+| `<CalendarNav showMonthPicker compactMonths />` (both true)                | Renders both UI variants; dev warn                                    | CalendarNav → Behavior matrix       |
+| `hideOutOfRange` + arrow-key navigation crossing hidden cells              | Focus may not land (no button rendered). Pair with `blockNavigation`. | `hideOutOfRange` accessibility      |
+| SSR (Next.js / Remix) without `defaultViewDate`                            | Works; momentary first-paint mismatch possible near midnight UTC      | SSR / hydration                     |
+
+If you hit a case not on this list and the behavior surprises you, that is a bug — please open an issue.
+
+---
+
+## Recommended compositions
+
+Copy-paste recipes. Each renders a complete, working calendar; pair with `useState` to make it interactive.
+
+### Basic date picker
+
+```tsx
+const [date, setDate] = useState<Date | null>(null);
+
+<Calendar mode="single" value={date} onChange={setDate}>
+  <CalendarNav showMonthPicker showYearPicker />
+  <CalendarDays />
+</Calendar>;
+```
+
+### Date picker with selection feedback and clear
+
+```tsx
+<Calendar mode="single" value={date} onChange={setDate}>
+  <CalendarNav showMonthPicker showYearPicker clear />
+  <CalendarDays />
+  <CalendarSelectedDates />
+</Calendar>;
+```
+
+### Date range picker
+
+```tsx
+const [range, setRange] = useState<DateRange>({ from: null, to: null });
+
+<Calendar mode="range" value={range} onChange={setRange}>
+  <CalendarNav showMonthPicker showYearPicker clear />
+  <CalendarDays />
+  <CalendarSelectedDates />
+</Calendar>;
+```
+
+### Date range picker with shortcuts
+
+```tsx
+<Calendar mode="range" value={range} onChange={setRange}>
+  <CalendarNav showMonthPicker showYearPicker clear />
+  <CalendarPresets presets={basicPresets} />
+  <CalendarDays />
+  <CalendarSelectedDates />
+</Calendar>;
+```
+
+### Multi-month range picker (two months side by side)
+
+```tsx
+<Calendar mode="range" cols={2} value={range} onChange={setRange}>
+  <CalendarNav col={1} />
+  <CalendarNav offset={1} col={2} />
+  <CalendarDays offset={0} col={1} />
+  <CalendarDays offset={1} col={2} />
+  <CalendarSelectedDates col="1 / span 2" />
+</Calendar>;
+```
+
+### Multiple-date picker (max 3)
+
+```tsx
+const [dates, setDates] = useState<Date[]>([]);
+
+<Calendar mode="multiple" maxDates={3} value={dates} onChange={setDates}>
+  <CalendarNav />
+  <CalendarDays />
+  <CalendarSelectedDates />
+</Calendar>;
+```
+
+### Date + time picker
+
+```tsx
+<Calendar mode="single" value={date} onChange={setDate}>
+  <CalendarNav />
+  <CalendarDays />
+  <CalendarTimeGrid />
+</Calendar>;
+```
+
+### Time-only picker (no day grid)
+
+Single mode auto-creates a date from `viewDate.day` + the new time on the first interaction — see "Time semantics".
+
+```tsx
+<Calendar mode="single" value={date} onChange={setDate}>
+  <CalendarNav showNowTime />
+  <CalendarTimeGrid />
+</Calendar>;
+```
+
+### Manual input + grid
+
+```tsx
+<Calendar mode="single" value={date} onChange={setDate}>
+  <CalendarManualSelect />
+  <CalendarNav />
+  <CalendarDays />
+</Calendar>;
+```
+
+### Read-only display showing a specific month
+
+```tsx
+<Calendar readOnly defaultViewDate={new Date(1990, 4, 1)}>
+  <CalendarNav />
+  <CalendarDays />
+</Calendar>;
+```
+
+### Track-driven picker (drum-style)
+
+```tsx
+<Calendar mode="single" value={date} onChange={setDate}>
+  <CalendarYearsTrack />
+  <CalendarMonthsTrack />
+  <CalendarDaysTrack />
+</Calendar>;
+```
+
+### Days + MonthsTrack (compact month switcher above the grid)
+
+A scrollable month strip plus a regular day grid. Saves vertical space compared to a full Nav header — the month strip doubles as the navigation control.
+
+```tsx
+<Calendar mode="single" value={date} onChange={setDate}>
+  <CalendarMonthsTrack />
+  <CalendarDays />
+</Calendar>;
+```
 
 ---
 
