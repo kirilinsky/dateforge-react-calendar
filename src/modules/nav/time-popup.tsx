@@ -8,6 +8,7 @@ interface TimePopupProps {
   onClose: () => void;
   hour12?: boolean;
   showSeconds?: boolean;
+  readOnly?: boolean;
 }
 
 export const TimePopup = ({
@@ -16,6 +17,7 @@ export const TimePopup = ({
   onClose,
   hour12 = false,
   showSeconds = false,
+  readOnly = false,
 }: TimePopupProps) => {
   const [current, setCurrent] = useState(date);
   const currentRef = useRef(current);
@@ -27,7 +29,7 @@ export const TimePopup = ({
 
   return (
     <Popup label="Select time" onConfirm={() => onConfirm(currentRef.current)} onClose={onClose}>
-      <TimeTrack date={current} hour12={hour12} showSeconds={showSeconds} onChange={handleChange} />
+      <TimeTrack date={current} hour12={hour12} showSeconds={showSeconds} readOnly={readOnly} onChange={handleChange} />
     </Popup>
   );
 };

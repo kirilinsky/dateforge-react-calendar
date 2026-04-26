@@ -5,6 +5,11 @@ import { Calendar } from "@/components/calendar/calendar";
 import { CalendarNav } from "@/modules/nav";
 import { CalendarSelectedDates } from "@/modules/selected-dates";
 import { CalendarManualSelect } from "@/modules/manual-select";
+import { CalendarPresets } from "@/modules/presets";
+import { CalendarDays } from "@/modules/days";
+import { CalendarDaysTrack } from "@/modules/days-track";
+import { CalendarTimeGrid } from "@/modules/time";
+import { basicPresets } from "@/modules/presets/presets-pack";
 
 const D = new Date(2024, 5, 15);
 
@@ -89,6 +94,83 @@ describe("readOnly — ManualSelect", () => {
     const clearBtn = clearBtns[clearBtns.length - 1];
     expect(clearBtn).toBeDisabled();
     await userEvent.click(clearBtn);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+});
+
+describe("readOnly — Presets", () => {
+  it("preset buttons are disabled and do not fire onChange", async () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <Calendar onChange={onChange} readOnly>
+        <CalendarPresets presets={basicPresets} />
+      </Calendar>,
+    );
+    const buttons = container.querySelectorAll("button");
+    expect(buttons.length).toBeGreaterThan(0);
+    for (const b of buttons) {
+      expect(b).toBeDisabled();
+    }
+    await userEvent.click(buttons[0]);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+});
+
+describe("readOnly — DaysTrack multi confirm", () => {
+  it("confirm button is disabled in multiselect mode", async () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <Calendar mode="multiple" onChange={onChange} readOnly>
+        <CalendarDaysTrack />
+      </Calendar>,
+    );
+    const btn = container.querySelector(
+      'button[aria-label="Save selected date"]',
+    ) as HTMLElement | null;
+    expect(btn).toBeTruthy();
+    expect(btn).toBeDisabled();
+    await userEvent.click(btn!);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+});
+
+describe("readOnly — TimeGrid", () => {
+  it("drum has aria-disabled and arrow keys do not fire onChange", async () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <Calendar value={D} onChange={onChange} readOnly>
+        <CalendarTimeGrid />
+      </Calendar>,
+    );
+    const drums = container.querySelectorAll('[role="spinbutton"]');
+    expect(drums.length).toBeGreaterThan(0);
+    for (const d of drums) {
+      expect(d.getAttribute("aria-disabled")).toBe("true");
+    }
+    (drums[0] as HTMLElement).focus();
+    await userEvent.keyboard("{ArrowUp}{ArrowDown}");
+    expect(onChange).not.toHaveBeenCalled();
+  });
+});
+
+describe("readOnly — Days", () => {
+  it("day cells are aria-disabled and click does not fire onChange", async () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <Calendar value={D} onChange={onChange} readOnly>
+        <CalendarDays defaultMonth={D} />
+      </Calendar>,
+    );
+    const grid = within(container).getByRole("grid");
+    const cells = within(grid).getAllByRole("gridcell").filter(
+      (c) => c.getAttribute("aria-hidden") !== "true",
+    );
+    expect(cells.length).toBeGreaterThan(0);
+    for (const cell of cells) {
+      expect(cell.getAttribute("aria-disabled")).toBe("true");
+    }
+    const firstBtn = cells[10].querySelector("button") as HTMLElement;
+    await userEvent.click(firstBtn);
     expect(onChange).not.toHaveBeenCalled();
   });
 });

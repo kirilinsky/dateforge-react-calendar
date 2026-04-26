@@ -8,6 +8,7 @@ interface TimeTrackProps {
   hour12?: boolean;
   locale?: string;
   showSeconds?: boolean;
+  readOnly?: boolean;
   onChange: (date: Date) => void;
 }
 
@@ -19,16 +20,23 @@ const Drum = ({
   onMove,
   label,
   getValueText,
+  readOnly,
 }: {
   val: number;
   max: number;
   onMove: (delta: number) => void;
   label: string;
   getValueText: (v: number) => string;
+  readOnly?: boolean;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
 
-  useScrollAccumulator(ref, onMove, { requireHover: true });
+  const guardedMove = (delta: number) => {
+    if (readOnly) return;
+    onMove(delta);
+  };
+
+  useScrollAccumulator(ref, guardedMove, { requireHover: true });
 
   return (
     <div
@@ -41,22 +49,23 @@ const Drum = ({
       aria-valuemin={0}
       aria-valuemax={max - 1}
       aria-valuetext={getValueText(val)}
+      aria-disabled={readOnly || undefined}
       onKeyDown={(e) => {
         if (e.key === "ArrowUp") {
           e.preventDefault();
-          onMove(-1);
+          guardedMove(-1);
         }
         if (e.key === "ArrowDown") {
           e.preventDefault();
-          onMove(1);
+          guardedMove(1);
         }
         if (e.key === "Home") {
           e.preventDefault();
-          onMove(-val);
+          guardedMove(-val);
         }
         if (e.key === "End") {
           e.preventDefault();
-          onMove(max - 1 - val);
+          guardedMove(max - 1 - val);
         }
       }}
     >
@@ -72,7 +81,7 @@ const Drum = ({
             className={`${styles.item} ${isActive ? styles.active : ""}`}
             style={!isActive ? { opacity } : undefined}
             aria-hidden={!isActive}
-            onClick={isActive ? undefined : () => onMove(o)}
+            onClick={isActive ? undefined : () => guardedMove(o)}
           >
             {padTime(getDrumValue(val, o, max))}
           </div>
@@ -96,6 +105,7 @@ export const TimeTrack = ({
   hour12 = false,
   locale = "en",
   showSeconds = false,
+  readOnly = false,
   onChange,
 }: TimeTrackProps) => {
   const raw = date.getHours();
@@ -110,6 +120,7 @@ export const TimeTrack = ({
   const secondText = makeUnitFormatter(locale, "second");
 
   const emit = (h: number, m: number, s: number, p: "AM" | "PM") => {
+    if (readOnly) return;
     const next = new Date(date);
     next.setHours(hour12 ? (p === "AM" ? h % 12 : (h % 12) + 12) : h, m, s, 0);
     onChange(next);
@@ -132,6 +143,7 @@ export const TimeTrack = ({
               className={`${styles.periodBtn} ${period === p ? styles.periodActive : ""}`}
               aria-pressed={period === p}
               onClick={() => emit(hours, minutes, seconds, p)}
+              disabled={readOnly}
             >
               {p}
             </button>
@@ -139,13 +151,13 @@ export const TimeTrack = ({
         </div>
       )}
       <div className={styles.drums}>
-        <Drum val={hours} max={hourMax} onMove={moveHours} label="Hours" getValueText={hourText} />
+        <Drum val={hours} max={hourMax} onMove={moveHours} label="Hours" getValueText={hourText} readOnly={readOnly} />
         <span className={styles.colon} aria-hidden>:</span>
-        <Drum val={minutes} max={60} onMove={moveMinutes} label="Minutes" getValueText={minuteText} />
+        <Drum val={minutes} max={60} onMove={moveMinutes} label="Minutes" getValueText={minuteText} readOnly={readOnly} />
         {showSeconds && (
           <>
             <span className={styles.colon} aria-hidden>:</span>
-            <Drum val={seconds} max={60} onMove={moveSeconds} label="Seconds" getValueText={secondText} />
+            <Drum val={seconds} max={60} onMove={moveSeconds} label="Seconds" getValueText={secondText} readOnly={readOnly} />
           </>
         )}
       </div>

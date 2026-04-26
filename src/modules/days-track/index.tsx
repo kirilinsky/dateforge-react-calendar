@@ -37,7 +37,7 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
   const { selectedDate, selectedDates, rangeStart, rangeEnd } =
     useSelectionValue();
   const { onChangeDate, onRangeBoundSet } = useSelectionActions();
-  const { minDate, maxDate, locale, range, multiselect } = useConfig();
+  const { minDate, maxDate, locale, range, multiselect, readOnly } = useConfig();
   const { setDaysTrackActive } = useUI();
   const isMulti = !!multiselect;
 
@@ -104,10 +104,10 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
         setLocalView(next);
       } else if (isBound) {
         setLocalView(next);
-        onRangeBoundSet(bound!, next);
+        if (!readOnly) onRangeBoundSet(bound!, next);
       } else {
         navigateTo(next);
-        if (!range) onChangeDate(next);
+        if (!range && !readOnly) onChangeDate(next);
       }
     },
   });
@@ -172,6 +172,7 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
     isMulti && selectedDates.some((d) => isSameDay(d, previewDate));
 
   const handleConfirm = () => {
+    if (readOnly) return;
     onChangeDate(previewDate);
   };
 
@@ -204,6 +205,7 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
           }
           onClick={handleConfirm}
           onPointerDown={(e) => e.stopPropagation()}
+          disabled={readOnly}
         >
           {matchesExisting ? <Clear /> : <Check />}
         </button>

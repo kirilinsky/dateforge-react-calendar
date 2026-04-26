@@ -57,6 +57,26 @@ import { Calendar } from "react-calendar-datetime";
 | `disabled`     | `DisabledConfig`                    | —           | Rules for disabling specific dates. Build with `createDisabled()`                                                                                                                                                     |
 | `children`     | `React.ReactNode`                   | —           | Module components that compose the calendar UI                                                                                                                                                                        |
 
+### `readOnly` contract
+
+When `readOnly` is `true`:
+
+**Blocked**
+- Selecting a date in `CalendarDays`, `CalendarDaysTrack`, `CalendarPresets`, `CalendarManualSelect`.
+- Setting a range boundary in `CalendarDaysTrack` / `CalendarMonthsTrack` / `CalendarYearsTrack` with `bound`.
+- Changing time in `CalendarTimeGrid` and the time popup of `CalendarNav`.
+- Clearing selection from `CalendarNav` (`clear`), `CalendarSelectedDates` (`allowClear`), `CalendarManualSelect` (`allowClear`).
+- Editing a date chip in `CalendarManualSelect`.
+
+**Still works**
+- Navigating the view (`CalendarNav` arrows, month/year popups, all Track scrolling, `CalendarMonthGrid`, `CalendarYearsGrid`).
+- Theme toggle (`CalendarNav.themeToggle`).
+- Opening the time popup in `CalendarNav` (drums inside are read-only).
+- Clicking a chip in `CalendarSelectedDates` to navigate to that date.
+- Hover preview in range mode.
+
+Interactive UI elements are rendered with `disabled` or `aria-disabled="true"` so they are visually inactive. State-changing actions are also blocked at the reducer layer, so even custom modules calling selection actions will no-op when `readOnly`.
+
 ---
 
 ## CalendarDays

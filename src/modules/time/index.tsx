@@ -13,7 +13,7 @@ export interface CalendarTimeGridProps {
 }
 
 export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({ col, seconds = false }) => {
-  const { hour12, locale } = useConfig();
+  const { hour12, locale, readOnly } = useConfig();
   const { viewDate: date } = useNavigation();
   const { onChangeTime } = useSelectionActions();
 
@@ -23,7 +23,7 @@ export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({ col, seconds
       className={`${styles.timeContainer} ${shared.flexCenter}`}
       style={useGridSlot(col)}
     >
-      <TimeTrack date={date} hour12={hour12} locale={locale} showSeconds={seconds} onChange={onChangeTime} />
+      <TimeTrack date={date} hour12={hour12} locale={locale} showSeconds={seconds} readOnly={readOnly} onChange={onChangeTime} />
     </div>
   );
 };

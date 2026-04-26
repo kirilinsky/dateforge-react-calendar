@@ -21,7 +21,7 @@ export interface CalendarYearsTrackProps {
 
 export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({ bound, col }) => {
   const { viewDate, navigateTo } = useNavigation();
-  const { minDate, maxDate, range } = useConfig();
+  const { minDate, maxDate, range, readOnly } = useConfig();
   const { rangeStart, rangeEnd } = useSelectionValue();
   const { onRangeBoundSet } = useSelectionActions();
   const { isBound, setLocalView, refDate } = useBoundDateView({ bound, range, rangeStart, rangeEnd, viewDate });
@@ -44,7 +44,7 @@ export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({ bound, c
       next.setFullYear(YEARS[index]);
       if (isBound) {
         setLocalView(next);
-        onRangeBoundSet(bound!, next);
+        if (!readOnly) onRangeBoundSet(bound!, next);
       } else {
         navigateTo(next);
       }

@@ -169,6 +169,27 @@ The wrapper exposes four contexts to modules. Each has a clear responsibility:
 
 ---
 
+## `readOnly` contract
+
+`readOnly` is the master flag for blocking all selection changes from the user. The contract is enforced on two layers:
+
+**Layer 1 — reducer (data).** The provider guards every selection-writing action (`onChangeDate`, `onChangeTime`, `onDatesSet`, `onRangeSet`, `onRangeBoundSet`) with `if (readOnly) return;`. This is the hard guarantee: even custom modules cannot mutate selection state under `readOnly`.
+
+**Layer 2 — UI (visual).** Every interactive module reads `readOnly` from `ConfigContext` and:
+- disables clear / save / preset / commit buttons via the HTML `disabled` attribute;
+- marks selectable cells/drums with `aria-disabled="true"` and short-circuits their click/keyboard handlers;
+- sets `readOnly` on `<input>` elements in `CalendarManualSelect`.
+
+**Always allowed under `readOnly`:**
+- view navigation (`navigateTo`, all Tracks scrolling, `CalendarNav` arrows, month/year popups);
+- hover preview (`setHoverDate`);
+- popup open/close (`UIContext`);
+- theme toggle.
+
+When adding a new module that writes selection, it MUST read `readOnly` and gate its UI accordingly. The reducer guard is a safety net, not a substitute.
+
+---
+
 ## Themes and appearances
 
 Themes and appearances are independent dimensions of styling.

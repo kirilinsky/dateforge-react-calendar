@@ -20,7 +20,7 @@ export interface CalendarMonthsTrackProps {
 
 export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({ short = true, bound, col }) => {
   const { viewDate, navigateTo } = useNavigation();
-  const { minDate, maxDate, locale, range } = useConfig();
+  const { minDate, maxDate, locale, range, readOnly } = useConfig();
   const { rangeStart, rangeEnd } = useSelectionValue();
   const { onRangeBoundSet } = useSelectionActions();
   const { isBound, setLocalView, refDate } = useBoundDateView({ bound, range, rangeStart, rangeEnd, viewDate });
@@ -46,7 +46,7 @@ export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({ short 
       next.setMonth(index);
       if (isBound) {
         setLocalView(next);
-        onRangeBoundSet(bound!, next);
+        if (!readOnly) onRangeBoundSet(bound!, next);
       } else {
         navigateTo(next);
       }

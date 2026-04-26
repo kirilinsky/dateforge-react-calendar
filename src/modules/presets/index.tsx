@@ -28,7 +28,7 @@ export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
   presets = EMPTY,
   col,
 }) => {
-  const { minDate, maxDate, locale, disabled, range } = useConfig();
+  const { minDate, maxDate, locale, disabled, range, readOnly } = useConfig();
   const { viewDate } = useNavigation();
   const { selectedDate, rangeStart, rangeEnd } = useSelectionValue();
   const { onChangeDate, onRangeSet } = useSelectionActions();
@@ -68,6 +68,7 @@ export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
               .filter(Boolean)
               .join(" ")}
             onClick={() => {
+              if (readOnly) return;
               if (p.isRange) {
                 if (isActive) {
                   onRangeSet(null, null);
@@ -79,6 +80,7 @@ export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
                 onChangeDate(isActive ? null : (p.value as Date));
               }
             }}
+            disabled={readOnly}
           >
             {p.label}
           </button>

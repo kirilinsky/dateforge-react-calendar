@@ -1,3 +1,4 @@
+// TODO: split MaskedDateInput and DateSlot into separate files — three components in one file is getting hard to navigate
 import React, { useEffect, useState } from "react";
 import styles from "./manual-select.module.css";
 import shared from "@/global/global.module.css";

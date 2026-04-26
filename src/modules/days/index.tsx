@@ -71,6 +71,7 @@ interface DayCellProps {
   range: boolean;
   ariaLabel: string;
   tabIndex: number;
+  readOnly: boolean;
   onSelect: (date: Date, isDisabled: boolean) => void;
   onMouseEnter: (date: Date) => void;
   onKeyDown: (e: React.KeyboardEvent, date: Date) => void;
@@ -101,6 +102,7 @@ const DayCell = React.memo(function DayCell({
   range,
   ariaLabel,
   tabIndex,
+  readOnly,
   onSelect,
   onMouseEnter,
   onKeyDown,
@@ -170,14 +172,15 @@ const DayCell = React.memo(function DayCell({
     isPreviewMid;
 
   return (
-    <div role="gridcell" aria-selected={isSelected} aria-disabled={isDisabled || undefined}>
+    <div role="gridcell" aria-selected={isSelected} aria-disabled={isDisabled || readOnly || undefined}>
       <button
         type="button"
         tabIndex={tabIndex}
-        onClick={() => !isDisabled && onSelect(fullDate, isDisabled)}
+        onClick={() => !isDisabled && !readOnly && onSelect(fullDate, isDisabled)}
         onMouseEnter={() => onMouseEnter(fullDate)}
         onKeyDown={(e) => onKeyDown(e, fullDate)}
         aria-label={ariaLabel}
+        aria-disabled={readOnly || undefined}
         aria-current={isTodayDate ? "date" : undefined}
         data-cell=""
         data-selected={isSelected || undefined}
@@ -262,6 +265,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
     maxRangeDays,
     locale,
     timeZone,
+    readOnly,
   } = useConfig();
 
   const { viewDate: rawDate, navigateTo } = useNavigation();
@@ -386,7 +390,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
 
   const handleSetDay = useCallback(
     (targetDate: Date, isDisabled: boolean) => {
-      if (isDisabled) return;
+      if (isDisabled || readOnly) return;
       if (
         (lockSelection || daysTrackActive) &&
         selectedDates.some((d) => isSameDay(d, targetDate))
@@ -424,6 +428,8 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
       lockSelection,
       daysTrackActive,
       selectedDates,
+      readOnly,
+      timeZone,
     ],
   );
 
@@ -647,6 +653,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
                         range,
                       })}
                       tabIndex={isSameDay(fullDate, focusedDate) ? 0 : -1}
+                      readOnly={readOnly}
                       onSelect={handleSetDay}
                       onMouseEnter={handleMouseEnter}
                       onKeyDown={handleKeyDown}
