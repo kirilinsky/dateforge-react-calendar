@@ -2,7 +2,7 @@
 
 First off, thanks for taking the time to contribute! It’s people like you who make this library better.
 
-**Repository:** [github.com/kirilinsky/react-calendar-datetime](https://github.com/kirilinsky/react-calendar-datetime)
+**Repository:** [github.com/kirilinsky/dateforge-react-calendar](https://github.com/kirilinsky/dateforge-react-calendar)
 
 ---
 
@@ -30,4 +30,4 @@ Basic commands for development and building:
 - If it's a **bug fix**, feel free to open a PR.
 - If it's a **new feature**, please open an Issue first to discuss your idea.
 
-**Don't forget to drop a ⭐ if you like the project!** [github.com/kirilinsky/react-calendar-datetime](https://github.com/kirilinsky/react-calendar-datetime)
+**Don't forget to drop a ⭐ if you like the project!** [github.com/kirilinsky/dateforge-react-calendar](https://github.com/kirilinsky/dateforge-react-calendar)

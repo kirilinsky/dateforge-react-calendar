@@ -1,6 +1,6 @@
 // TODO: split MaskedDateInput and DateSlot into separate files — three components in one file is getting hard to navigate
 import React, { useEffect, useState } from "react";
-import styles from "./manual-select.module.css";
+import styles from "./manual-input.module.css";
 import shared from "@/global/global.module.css";
 import { Check, Clear } from "@/Icons";
 import { useConfig } from "@/context/config-context";
@@ -297,13 +297,13 @@ const DateSlot: React.FC<DateSlotProps> = ({
 };
 
 
-export interface CalendarManualSelectProps {
+export interface CalendarManualInputProps {
   allowClear?: boolean;
   align?: AlignValue;
   col?: number | string;
 }
 
-export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
+export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
   allowClear = true,
   align = "left",
   col,
@@ -387,7 +387,7 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
     return (
       <div
         className={`${styles.container} ${styles.containerMulti}`}
-        data-area="manual-select"
+        data-area="manual-input"
         style={containerStyle}
       >
         <div className={styles.datesArea} style={contentStyle}>
@@ -465,7 +465,7 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
     return (
       <div
         className={styles.container}
-        data-area="manual-select"
+        data-area="manual-input"
         style={containerStyle}
       >
         <div className={styles.contentArea} style={contentStyle}>
@@ -495,7 +495,7 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
   return (
     <div
       className={styles.container}
-      data-area="manual-select"
+      data-area="manual-input"
       style={containerStyle}
     >
       <div className={styles.contentArea} style={contentStyle}>

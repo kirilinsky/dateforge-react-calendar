@@ -1,7 +1,7 @@
 {
-  "name": "react-calendar-datetime",
-  "version": "6.0.0-beta.16",
-  "description": "Zero-dependency React datepicker and time picker. Supports date range, multi-select, themes, gestures and responsive layout.",
+  "name": "@dateforge/react-calendar",
+  "version": "1.0.0-beta.0",
+  "description": "Modular React calendar and date/time picker. Single, range, and multi-select with time support and presets. Themeable, accessible, SSR-safe, zero dependencies.",
   "type": "module",
   "types": "./dist/index.d.ts",
   "main": "./dist/index.cjs",
@@ -57,14 +57,14 @@
         "default": "./dist/modules/nav.cjs"
       }
     },
-    "./modules/month-grid": {
+    "./modules/months-grid": {
       "import": {
-        "types": "./dist/modules/month-grid.d.ts",
-        "default": "./dist/modules/month-grid.mjs"
+        "types": "./dist/modules/months-grid.d.ts",
+        "default": "./dist/modules/months-grid.mjs"
       },
       "require": {
-        "types": "./dist/modules/month-grid.d.cts",
-        "default": "./dist/modules/month-grid.cjs"
+        "types": "./dist/modules/months-grid.d.cts",
+        "default": "./dist/modules/months-grid.cjs"
       }
     },
     "./modules/time": {
@@ -97,14 +97,14 @@
         "default": "./dist/modules/selected-dates.cjs"
       }
     },
-    "./modules/manual-select": {
+    "./modules/manual-input": {
       "import": {
-        "types": "./dist/modules/manual-select.d.ts",
-        "default": "./dist/modules/manual-select.mjs"
+        "types": "./dist/modules/manual-input.d.ts",
+        "default": "./dist/modules/manual-input.mjs"
       },
       "require": {
-        "types": "./dist/modules/manual-select.d.cts",
-        "default": "./dist/modules/manual-select.cjs"
+        "types": "./dist/modules/manual-input.d.cts",
+        "default": "./dist/modules/manual-input.cjs"
       }
     },
     "./modules/years-track": {
@@ -190,11 +190,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kirilinsky/react-calendar-datetime.git"
+    "url": "git+https://github.com/kirilinsky/dateforge-react-calendar.git"
   },
   "homepage": "https://calendar-demo-pi.vercel.app/",
   "bugs": {
-    "url": "https://github.com/kirilinsky/react-calendar-datetime/issues"
+    "url": "https://github.com/kirilinsky/dateforge-react-calendar/issues"
   },
   "files": [
     "dist"
@@ -253,18 +253,21 @@
     "time picker",
     "datetime-picker",
     "date range picker",
-    "range picker",
     "multi select",
-    "date-range",
     "typescript",
     "a11y",
-    "i18n",
     "accessibility",
-    "lightweight",
-    "localization",
     "headless",
+    "customizable",
     "mobile",
-    "customizable"
+    "composable",
+    "modular",
+    "ssr",
+    "themeable",
+    "css-grid",
+    "zero-dependencies",
+    "react-19",
+    "dateforge"
   ],
   "engines": {
     "node": ">=18.0.0"

@@ -1,6 +1,6 @@
 # Architecture
 
-This document captures the conceptual model of `react-calendar-datetime`. It explains how the public surface is organized, what each part is responsible for, and how the parts compose. It is intended for contributors and for testers writing new test plans.
+This document captures the conceptual model of `@dateforge/react-calendar`. It explains how the public surface is organized, what each part is responsible for, and how the parts compose. It is intended for contributors and for testers writing new test plans.
 
 It is **not** a prop-by-prop API reference — see `DOCUMENTATION.md` for that.
 
@@ -20,7 +20,7 @@ The library is built around a strict two-layer model:
 │   └─────────┘  └──────────┘  └──────────────┘  │   Each is self-contained
 │                                                 │
 │   ┌────────────────┐  ┌──────────────────────┐ │
-│   │ <SelectedDates>│  │ <ManualSelect>       │ │
+│   │ <SelectedDates>│  │ <ManualInput>       │ │
 │   └────────────────┘  └──────────────────────┘ │
 └─────────────────────────────────────────────────┘
 ```
@@ -74,16 +74,17 @@ Modules fall into two functional categories. The split matters for both UX reaso
 
 > **Definition:** Change the calendar's internal view date (which year/month/grid is displayed) but **do not commit a final selection** and **do not fire `onChange`**.
 
-Their job is to let the user *navigate* through the calendar — to find the date they want to select. The actual select happens in an interactive module elsewhere on the page.
+Their job is to let the user _navigate_ through the calendar — to find the date they want to select. The actual select happens in an interactive module elsewhere on the page.
 
-| Module | Role |
-|---|---|
-| `<CalendarMonthGrid>` | 12-cell grid of months for the current year |
-| `<CalendarYearsGrid>` | Grid of years (page-paginated) |
+| Module                 | Role                                        |
+| ---------------------- | ------------------------------------------- |
+| `<CalendarMonthsGrid>` | 12-cell grid of months for the current year |
+| `<CalendarYearsGrid>`  | Grid of years (page-paginated)              |
 
 `<CalendarNav>`, `<CalendarMonthsTrack>`, `<CalendarYearsTrack>`, and `<CalendarDaysTrack>` are navigational only in some configurations — see category **D. Hybrid modules** below.
 
 **Common contract:**
+
 - Reading: `viewDate` from navigation context.
 - Writing: only `navigateTo(date)` — never `onChangeDate` / `onRangeSet`.
 - Never fires the consumer's `onChange` callback.
@@ -93,14 +94,15 @@ Their job is to let the user *navigate* through the calendar — to find the dat
 
 > **Definition:** Commit a final selection. Call selection actions (`onChangeDate`, `onRangeSet`, `onDatesSet`, `onChangeTime`) which lead to a consumer-visible `onChange` event.
 
-| Module | Role | Notes |
-|---|---|---|
-| `<CalendarDays>` | The day grid. Click → select day. | Most common interactive module. |
-| `<CalendarTimeGrid>` | Hour/minute drums (and seconds). Change → updates time on selected date. | Interactive at finer granularity than days. |
-| `<CalendarManualSelect>` | Masked text input(s) for typing dates directly. | Interactive via keyboard. |
-| `<CalendarPresets>` | Preset shortcuts (Today, Last 7 days, This month). | Interactive — applies a whole range/date in one click. |
+| Module                  | Role                                                                     | Notes                                                  |
+| ----------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------ |
+| `<CalendarDays>`        | The day grid. Click → select day.                                        | Most common interactive module.                        |
+| `<CalendarTimeGrid>`    | Hour/minute drums (and seconds). Change → updates time on selected date. | Interactive at finer granularity than days.            |
+| `<CalendarManualInput>` | Masked text input(s) for typing dates directly.                          | Interactive via keyboard.                              |
+| `<CalendarPresets>`     | Preset shortcuts (Today, Last 7 days, This month).                       | Interactive — applies a whole range/date in one click. |
 
 **Common contract:**
+
 - Writing: at least one of `onChangeDate`, `onRangeSet`, `onDatesSet`, `onChangeTime`.
 - Respects `readOnly` — must skip writes when `readOnly` is set.
 - Respects `disabled`, `minDate`, `maxDate` — must reject selections that violate these constraints.
@@ -110,8 +112,8 @@ Their job is to let the user *navigate* through the calendar — to find the dat
 
 > **Definition:** Render a representation of current selection or state. May trigger view navigation as a side effect of clicking on rendered items, but do not commit selection changes themselves.
 
-| Module | Role |
-|---|---|
+| Module                    | Role                                                                                                                               |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | `<CalendarSelectedDates>` | Chips showing currently selected date(s). Click chip → `navigateTo`. May fire `onChange(null)` only via the explicit clear button. |
 
 This is a **third category** that the user's two-bucket model didn't initially cover but exists in the codebase. Strictly speaking `<CalendarSelectedDates>` does nothing on its own — it's purely reactive UI plus an opt-in `Clear` action.
@@ -120,14 +122,15 @@ This is a **third category** that the user's two-bucket model didn't initially c
 
 > **Definition:** Behave as navigational or interactive depending on props and/or mode. The category is decided at render time, not at module identity.
 
-| Module | Navigational when | Interactive / side-effecting when |
-|---|---|---|
-| `<CalendarNav>` | default — prev/next arrows, month/year labels, optional `showMonthPicker` / `showYearPicker` buttons (all view-only) | `clear` prop renders a button that calls `onChangeDate(null)`; `showTime` opens a time popup whose confirm calls `onChangeTime`; `themeToggle` mutates UI theme (no `onChange`) |
-| `<CalendarDaysTrack>` | range mode without `bound` | `mode="single"` (item click commits date); `mode="range"` with `bound` (item click sets that boundary); `mode="multiple"` via auto save/remove button |
-| `<CalendarMonthsTrack>` | single / multiple / range without `bound` | `mode="range"` with `bound="from"\|"to"` (click sets that boundary's month) |
-| `<CalendarYearsTrack>` | single / multiple / range without `bound` | `mode="range"` with `bound="from"\|"to"` (click sets that boundary's year) |
+| Module                  | Navigational when                                                                                                    | Interactive / side-effecting when                                                                                                                                               |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<CalendarNav>`         | default — prev/next arrows, month/year labels, optional `showMonthPicker` / `showYearPicker` buttons (all view-only) | `clear` prop renders a button that calls `onChangeDate(null)`; `showTime` opens a time popup whose confirm calls `onChangeTime`; `themeToggle` mutates UI theme (no `onChange`) |
+| `<CalendarDaysTrack>`   | range mode without `bound`                                                                                           | `mode="single"` (item click commits date); `mode="range"` with `bound` (item click sets that boundary); `mode="multiple"` via auto save/remove button                           |
+| `<CalendarMonthsTrack>` | single / multiple / range without `bound`                                                                            | `mode="range"` with `bound="from"\|"to"` (click sets that boundary's month)                                                                                                     |
+| `<CalendarYearsTrack>`  | single / multiple / range without `bound`                                                                            | `mode="range"` with `bound="from"\|"to"` (click sets that boundary's year)                                                                                                      |
 
 **Common contract:**
+
 - In navigational state: only `navigateTo` — never fires consumer `onChange`.
 - In interactive state: writes via `SelectionContext` (`onRangeBoundSet`, `onChangeDate`, `onChangeTime`, …), respects `readOnly` / `disabled` / `minDate` / `maxDate`, and may fire consumer `onChange`.
 - UI-only side effects (e.g. `<CalendarNav themeToggle>`, popup open/close) are independent of selection — they touch `UIContext` only and never fire `onChange`.
@@ -158,58 +161,61 @@ All warnings go through `warnOnce` (dev-only, deduped per id+condition). In prod
 
 The single source of truth for which user actions change view, mutate selection, fire `onChange`, and how they behave under `readOnly`. Use this when planning tests, designing new modules, or debugging unexpected behavior.
 
-| Module · Action                                   | Changes `viewDate`     | Changes selection | Fires `onChange` | Under `readOnly`               |
-| ------------------------------------------------- | ---------------------- | ----------------- | ---------------- | ------------------------------ |
-| `<CalendarNav>` prev/next arrows                  | yes                    | no                | no               | works (navigation allowed)     |
-| `<CalendarNav>` `home`                            | yes                    | no                | no               | works                          |
-| `<CalendarNav>` `clear`                           | no                     | yes (`null`)      | yes              | button disabled                |
-| `<CalendarNav>` `showTime` confirm                | yes (time-of-day)      | yes (time-of-day) | yes              | drums / AM-PM / confirm disabled |
-| `<CalendarNav>` `themeToggle`                     | no                     | no (UI-only)      | no               | works                          |
-| `<CalendarNav>` `monthLabel` / `yearLabel`        | no                     | no (display)      | no               | n/a                            |
-| `<CalendarNav>` month / year picker / popups      | yes                    | no                | no               | works                          |
-| `<CalendarDays>` day click                        | maybe (cross-month)    | yes               | yes              | aria-disabled, click blocked   |
-| `<CalendarDays>` arrow keys / PgUp / PgDn         | maybe                  | no                | no               | works (focus moves)            |
-| `<CalendarDays>` Enter / Space                    | maybe                  | yes               | yes              | blocked                        |
-| `<CalendarDays>` swipe (touch)                    | yes                    | no                | no               | works                          |
-| `<CalendarMonthGrid>` cell click                  | yes                    | no                | no               | works (navigation only)        |
-| `<CalendarYearsGrid>` cell click / page nav       | yes                    | no                | no               | works                          |
-| `<CalendarTimeGrid>` drum scroll / arrow keys     | yes (time-of-day)      | maybe ¹            | maybe ¹          | aria-disabled, blocked         |
-| `<CalendarPresets>` click (single date)           | yes                    | yes               | yes              | button disabled                |
-| `<CalendarPresets>` click (range, in `mode="range"`) | yes                 | yes               | yes              | button disabled                |
-| `<CalendarSelectedDates>` chip click              | yes                    | no                | no               | works (navigation)             |
-| `<CalendarSelectedDates>` clear                   | no                     | yes               | yes              | button disabled                |
-| `<CalendarManualSelect>` typing                   | no                     | no                | no               | input HTML `readOnly`          |
-| `<CalendarManualSelect>` Enter / apply (✓)        | maybe                  | yes               | yes              | inputs / buttons disabled      |
-| `<CalendarManualSelect>` per-chip remove (multi)  | no                     | yes               | yes              | disabled                       |
-| `<CalendarManualSelect>` top clear                | no                     | yes               | yes              | disabled                       |
-| `<CalendarDaysTrack>` item · `mode="single"`      | yes                    | yes               | yes              | item click blocked             |
-| `<CalendarDaysTrack>` item · `mode="multiple"`    | local preview only     | no                | no               | n/a (auto button blocked)      |
-| `<CalendarDaysTrack>` auto button · `mode="multiple"` | no                 | yes (toggle)      | yes              | button disabled                |
-| `<CalendarDaysTrack>` item · `mode="range"` (no bound) | local preview     | no                | no               | n/a                            |
-| `<CalendarDaysTrack>` item · `mode="range"` + `bound` | preview            | yes               | yes              | bound write blocked            |
-| `<CalendarMonthsTrack>` item · single / multiple / range no-bound | yes  | no                | no               | works                          |
-| `<CalendarMonthsTrack>` item · `mode="range"` + `bound` | preview         | yes               | yes              | bound write blocked            |
-| `<CalendarYearsTrack>` item · single / multiple / range no-bound | yes   | no                | no               | works                          |
-| `<CalendarYearsTrack>` item · `mode="range"` + `bound` | preview          | yes               | yes              | bound write blocked            |
+| Module · Action                                                   | Changes `viewDate`  | Changes selection | Fires `onChange` | Under `readOnly`                 |
+| ----------------------------------------------------------------- | ------------------- | ----------------- | ---------------- | -------------------------------- |
+| `<CalendarNav>` prev/next arrows                                  | yes                 | no                | no               | works (navigation allowed)       |
+| `<CalendarNav>` `home`                                            | yes                 | no                | no               | works                            |
+| `<CalendarNav>` `clear`                                           | no                  | yes (`null`)      | yes              | button disabled                  |
+| `<CalendarNav>` `showTime` confirm                                | yes (time-of-day)   | yes (time-of-day) | yes              | drums / AM-PM / confirm disabled |
+| `<CalendarNav>` `themeToggle`                                     | no                  | no (UI-only)      | no               | works                            |
+| `<CalendarNav>` `monthLabel` / `yearLabel`                        | no                  | no (display)      | no               | n/a                              |
+| `<CalendarNav>` month / year picker / popups                      | yes                 | no                | no               | works                            |
+| `<CalendarDays>` day click                                        | maybe (cross-month) | yes               | yes              | aria-disabled, click blocked     |
+| `<CalendarDays>` arrow keys / PgUp / PgDn                         | maybe               | no                | no               | works (focus moves)              |
+| `<CalendarDays>` Enter / Space                                    | maybe               | yes               | yes              | blocked                          |
+| `<CalendarDays>` swipe (touch)                                    | yes                 | no                | no               | works                            |
+| `<CalendarMonthsGrid>` cell click                                 | yes                 | no                | no               | works (navigation only)          |
+| `<CalendarYearsGrid>` cell click / page nav                       | yes                 | no                | no               | works                            |
+| `<CalendarTimeGrid>` drum scroll / arrow keys                     | yes (time-of-day)   | maybe ¹           | maybe ¹          | aria-disabled, blocked           |
+| `<CalendarPresets>` click (single date)                           | yes                 | yes               | yes              | button disabled                  |
+| `<CalendarPresets>` click (range, in `mode="range"`)              | yes                 | yes               | yes              | button disabled                  |
+| `<CalendarSelectedDates>` chip click                              | yes                 | no                | no               | works (navigation)               |
+| `<CalendarSelectedDates>` clear                                   | no                  | yes               | yes              | button disabled                  |
+| `<CalendarManualInput>` typing                                    | no                  | no                | no               | input HTML `readOnly`            |
+| `<CalendarManualInput>` Enter / apply (✓)                         | maybe               | yes               | yes              | inputs / buttons disabled        |
+| `<CalendarManualInput>` per-chip remove (multi)                   | no                  | yes               | yes              | disabled                         |
+| `<CalendarManualInput>` top clear                                 | no                  | yes               | yes              | disabled                         |
+| `<CalendarDaysTrack>` item · `mode="single"`                      | yes                 | yes               | yes              | item click blocked               |
+| `<CalendarDaysTrack>` item · `mode="multiple"`                    | local preview only  | no                | no               | n/a (auto button blocked)        |
+| `<CalendarDaysTrack>` auto button · `mode="multiple"`             | no                  | yes (toggle)      | yes              | button disabled                  |
+| `<CalendarDaysTrack>` item · `mode="range"` (no bound)            | local preview       | no                | no               | n/a                              |
+| `<CalendarDaysTrack>` item · `mode="range"` + `bound`             | preview             | yes               | yes              | bound write blocked              |
+| `<CalendarMonthsTrack>` item · single / multiple / range no-bound | yes                 | no                | no               | works                            |
+| `<CalendarMonthsTrack>` item · `mode="range"` + `bound`           | preview             | yes               | yes              | bound write blocked              |
+| `<CalendarYearsTrack>` item · single / multiple / range no-bound  | yes                 | no                | no               | works                            |
+| `<CalendarYearsTrack>` item · `mode="range"` + `bound`            | preview             | yes               | yes              | bound write blocked              |
 
 ¹ See "Time editing semantics" — `single` mode without selection auto-creates one (time-only picker case); `multiple` / `range` without a matching boundary leave time pending and do not fire `onChange`.
 
 **Reading the columns:**
-- *Changes `viewDate`* — affects which month/year/day-of-month is currently displayed. "maybe" means the action sometimes changes view (e.g. clicking a day in a neighbor month implicitly navigates).
-- *Changes selection* — mutates `selectedDates` / `rangeStart` / `rangeEnd`.
-- *Fires `onChange`* — triggers the consumer-visible callback. The two columns are not redundant: a Track in preview state mutates local view but not committed selection, so it changes `viewDate`-equivalent without firing `onChange`.
-- *Under `readOnly`* — describes the visible UI under the `readOnly` flag. The reducer guards selection at the data layer regardless; the UI column tells you whether the affordance is rendered as disabled / hidden / unchanged.
+
+- _Changes `viewDate`_ — affects which month/year/day-of-month is currently displayed. "maybe" means the action sometimes changes view (e.g. clicking a day in a neighbor month implicitly navigates).
+- _Changes selection_ — mutates `selectedDates` / `rangeStart` / `rangeEnd`.
+- _Fires `onChange`_ — triggers the consumer-visible callback. The two columns are not redundant: a Track in preview state mutates local view but not committed selection, so it changes `viewDate`-equivalent without firing `onChange`.
+- _Under `readOnly`_ — describes the visible UI under the `readOnly` flag. The reducer guards selection at the data layer regardless; the UI column tells you whether the affordance is rendered as disabled / hidden / unchanged.
 
 ---
 
 ## Why the classification matters
 
 **For users of the library:**
+
 - A typical layout pairs at least one navigational module with one interactive module. (`<Nav>` + `<Days>`.)
 - An interactive-only layout (`<Days>` alone) works but offers no way to navigate months from the UI — the consumer must drive `value` externally.
-- A navigational-only layout (`<Nav>` + `<MonthGrid>`) is a date *viewer* — useful for showing context, never selecting.
+- A navigational-only layout (`<Nav>` + `<MonthsGrid>`) is a date _viewer_ — useful for showing context, never selecting.
 
 **For testing:**
+
 - Navigational modules: assert `viewDate` mutation, never `onChange` calls.
 - Interactive modules: assert `onChange` payloads, respect `readOnly` / `disabled` / `min` / `max`.
 - Display modules: assert rendered output matches state, no side effects beyond explicit user actions.
@@ -224,16 +230,17 @@ A new module proposal must declare which category it belongs to. Hybrid modules 
 
 The wrapper exposes four contexts to modules. Each has a clear responsibility:
 
-| Context | Reads | Writes |
-|---|---|---|
-| `ConfigContext` | locale, timezone, mode, min/maxDate, disabled, hour12, minRangeDays, maxRangeDays, readOnly | (none — config is fixed per render) |
-| `NavigationContext` | viewDate | `navigateTo(date)` |
-| `SelectionContext` (split into `State`, `Actions`, `Hover` providers) | selectedDate, selectedDates, rangeStart, rangeEnd, hoverDate | `onChangeDate`, `onRangeSet`, `onDatesSet`, `onRangeBoundSet`, `onChangeTime`, `setHoverDate` |
-| `UIContext` | containerRef, containerWidth, `showTimePopup` / `showMonthPopup` / `showYearPopup`, daysTrackActive, popupAnchorEl, navShowSeconds | `toggleTheme`, `setShowTimePopup` / `setShowMonthPopup` / `setShowYearPopup`, `setDaysTrackActive`, `setPopupAnchorEl`, `setNavShowSeconds` |
+| Context                                                               | Reads                                                                                                                              | Writes                                                                                                                                      |
+| --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ConfigContext`                                                       | locale, timezone, mode, min/maxDate, disabled, hour12, minRangeDays, maxRangeDays, readOnly                                        | (none — config is fixed per render)                                                                                                         |
+| `NavigationContext`                                                   | viewDate                                                                                                                           | `navigateTo(date)`                                                                                                                          |
+| `SelectionContext` (split into `State`, `Actions`, `Hover` providers) | selectedDate, selectedDates, rangeStart, rangeEnd, hoverDate                                                                       | `onChangeDate`, `onRangeSet`, `onDatesSet`, `onRangeBoundSet`, `onChangeTime`, `setHoverDate`                                               |
+| `UIContext`                                                           | containerRef, containerWidth, `showTimePopup` / `showMonthPopup` / `showYearPopup`, daysTrackActive, popupAnchorEl, navShowSeconds | `toggleTheme`, `setShowTimePopup` / `setShowMonthPopup` / `setShowYearPopup`, `setDaysTrackActive`, `setPopupAnchorEl`, `setNavShowSeconds` |
 
 **Popup state ownership.** Popup open/close (`showTimePopup`, `showMonthPopup`, `showYearPopup`) is **pure UI state** and lives in a `useState` inside `CalendarProvider`, exposed via `UIContext`. It is intentionally **not** part of the reducer — popup transitions never need to be atomic with selection changes, and keeping the reducer focused on selection / view data avoids the "one giant store" anti-pattern. Only one popup can be open at a time.
 
 **Rules:**
+
 - Navigational modules touch only `NavigationContext` (writes) and `ConfigContext` (reads).
 - Interactive modules write to `SelectionContext`. They may also `navigateTo` if selection implies a view change.
 - Display modules read from `SelectionContext` and may `navigateTo`. They never write to `SelectionContext` except via explicit user action (Clear button).
@@ -267,6 +274,7 @@ The wrapper does not migrate selection across `mode` changes. Each mode reads it
 `createDisabled` and the presets resolver consume the same `warnOnce` channel for defensive validation of user-supplied data. Both never throw; bad entries are silently dropped after warning, and the rest of the structure is preserved. New consumer-facing builders MUST follow this convention.
 
 Validators are invoked at:
+
 - reducer initialization (initial seed);
 - the `SYNC_EXTERNAL` effect (each controlled value change);
 - a `useEffect` keyed on `[minDate, maxDate]`.
@@ -281,16 +289,16 @@ The library is built to support repeated and combined modules — multi-month pi
 
 ### What is already optimized
 
-| Optimization                                                        | Lives in                                          |
-| ------------------------------------------------------------------- | ------------------------------------------------- |
-| `SelectionContext` split into `State` / `Actions` / `Hover`         | `src/context/selection-context.tsx`               |
-| `DayCell` wrapped in `React.memo`                                   | `src/modules/days/index.tsx`                      |
-| `AnimatedTime` wrapped in `memo`                                    | `src/modules/nav/index.tsx`                       |
-| Live clock state local to Nav (`nowTime` in `useState`)             | `src/modules/nav/index.tsx`                       |
-| Per-render derived data in `useMemo`: `weeksData`, `gridLabel`, `cellFmt`, `today`, `selectionState`, `config`, ... | Days, Nav, Provider |
-| Reducer dispatch keyed via `notifySeq` so `onChange` only fires when commit actually happens | `src/core/state.ts`, `src/core/provider.tsx` |
-| `useReducer` initializer + `validateCalendarValue` run once          | `src/core/provider.tsx`                           |
-| Popup state outside the reducer (plain `useState`) so popup transitions don't bump selection consumers | `src/core/provider.tsx`             |
+| Optimization                                                                                                        | Lives in                                     |
+| ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| `SelectionContext` split into `State` / `Actions` / `Hover`                                                         | `src/context/selection-context.tsx`          |
+| `DayCell` wrapped in `React.memo`                                                                                   | `src/modules/days/index.tsx`                 |
+| `AnimatedTime` wrapped in `memo`                                                                                    | `src/modules/nav/index.tsx`                  |
+| Live clock state local to Nav (`nowTime` in `useState`)                                                             | `src/modules/nav/index.tsx`                  |
+| Per-render derived data in `useMemo`: `weeksData`, `gridLabel`, `cellFmt`, `today`, `selectionState`, `config`, ... | Days, Nav, Provider                          |
+| Reducer dispatch keyed via `notifySeq` so `onChange` only fires when commit actually happens                        | `src/core/state.ts`, `src/core/provider.tsx` |
+| `useReducer` initializer + `validateCalendarValue` run once                                                         | `src/core/provider.tsx`                      |
+| Popup state outside the reducer (plain `useState`) so popup transitions don't bump selection consumers              | `src/core/provider.tsx`                      |
 
 ### Re-render boundaries (what triggers what)
 
@@ -326,6 +334,7 @@ Without these, every parent render makes new objects → `useMemo` deps inside D
 ### Hover preview cost
 
 In range mode, moving the mouse over the grid updates `hoverDate`, which causes `weeksData` to recompute the preview band. This is intrinsic to the feature. Mitigations already in place:
+
 - `DayCell.memo` keeps cells whose preview-related props are unchanged from re-rendering.
 - `SelectionContext` split prevents non-Days consumers (Nav, Tracks, Presets) from re-rendering on hover.
 
@@ -334,6 +343,7 @@ If hover preview is not needed for your UX, omit it by not setting `hoverDate` o
 ### Performance test coverage
 
 `src/__tests__/integration/perf.test.tsx` mounts representative compositions and asserts:
+
 - A `<DayCell>` outside the range preview band does not re-render when `hoverDate` moves around.
 - `showNowTime` ticking does not re-render `<CalendarDays>`.
 
@@ -351,20 +361,21 @@ The library is **defensive at every consumer-facing boundary**. The contract is 
 
 The complete catalog of validators:
 
-| Validator                                         | Lives in                                | Catches                                                          |
-| ------------------------------------------------- | --------------------------------------- | ---------------------------------------------------------------- |
-| `validateCalendarValue(value, mode, source)`      | `core/dev-warn.ts`                      | `value` / `defaultValue` shape mismatch with `mode`; `NaN` Date   |
-| `validateMinMax(minDate, maxDate)`                | `core/dev-warn.ts`                      | `minDate > maxDate`                                              |
-| `validateTimeZone(tz)`                            | `core/dev-warn.ts`                      | empty string, non-IANA names, throwing `Intl` constructor        |
-| `validateTheme(theme)`                            | `core/dev-warn.ts`                      | string outside `"auto" \| "light" \| "dark"`                     |
-| `validateDateProp(value, propName)`               | `core/dev-warn.ts`                      | non-Date / Invalid Date for `defaultViewDate` (and any future Date prop) |
-| `getResolvedPresets` defense layer                | `modules/presets/preset-utils.ts`       | non-object entries; missing `label`; duplicate `id`; throwing `getValue`; Invalid Date / range |
-| `createDisabled` defense layer                    | `utils/create-disabled.ts`              | non-object init; invalid Dates in `before` / `after` / `dates` / `ranges`; non-array `dates` / `ranges` / `weekdays`; weekdays out of 0..6; `from > to` (swapped); throwing nothing |
-| `<CalendarYearsGrid yearsPerPage>` clamp warning  | `modules/years-grid/index.tsx`          | non-integer / out of 1..40 range — silently clamped + warn        |
-| Nav `showMonthPicker` + `compactMonths`           | `modules/nav/index.tsx`                 | both true → renders both UI variants + warn                       |
-| Nav `showYearPicker` + `compactYears`             | `modules/nav/index.tsx`                 | both true → renders both UI variants + warn                       |
+| Validator                                        | Lives in                          | Catches                                                                                                                                                                             |
+| ------------------------------------------------ | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `validateCalendarValue(value, mode, source)`     | `core/dev-warn.ts`                | `value` / `defaultValue` shape mismatch with `mode`; `NaN` Date                                                                                                                     |
+| `validateMinMax(minDate, maxDate)`               | `core/dev-warn.ts`                | `minDate > maxDate`                                                                                                                                                                 |
+| `validateTimeZone(tz)`                           | `core/dev-warn.ts`                | empty string, non-IANA names, throwing `Intl` constructor                                                                                                                           |
+| `validateTheme(theme)`                           | `core/dev-warn.ts`                | string outside `"auto" \| "light" \| "dark"`                                                                                                                                        |
+| `validateDateProp(value, propName)`              | `core/dev-warn.ts`                | non-Date / Invalid Date for `defaultViewDate` (and any future Date prop)                                                                                                            |
+| `getResolvedPresets` defense layer               | `modules/presets/preset-utils.ts` | non-object entries; missing `label`; duplicate `id`; throwing `getValue`; Invalid Date / range                                                                                      |
+| `createDisabled` defense layer                   | `utils/create-disabled.ts`        | non-object init; invalid Dates in `before` / `after` / `dates` / `ranges`; non-array `dates` / `ranges` / `weekdays`; weekdays out of 0..6; `from > to` (swapped); throwing nothing |
+| `<CalendarYearsGrid yearsPerPage>` clamp warning | `modules/years-grid/index.tsx`    | non-integer / out of 1..40 range — silently clamped + warn                                                                                                                          |
+| Nav `showMonthPicker` + `compactMonths`          | `modules/nav/index.tsx`           | both true → renders both UI variants + warn                                                                                                                                         |
+| Nav `showYearPicker` + `compactYears`            | `modules/nav/index.tsx`           | both true → renders both UI variants + warn                                                                                                                                         |
 
 Validators are wired into:
+
 - `useReducer` initializer (`provider.tsx`) — initial seed validation.
 - `useEffect` on `[externalValue]` and `[minDate, maxDate]` and `[timeZone]` and `[themeProp]` — runtime re-validation.
 - Builder functions (`createDisabled`, preset resolver) — every call site.
@@ -377,7 +388,7 @@ Tests reset the dedupe cache via `__resetWarnOnce()` between cases.
 
 ## SSR / hydration
 
-`react-calendar-datetime` is **SSR-safe**. Server-rendered HTML matches the first client render, no hydration warnings, works in Next.js (App Router and Pages), Remix, TanStack Start, and Astro server islands. The pattern below is enforced everywhere a value depends on the browser environment.
+`@dateforge/react-calendar` is **SSR-safe**. Server-rendered HTML matches the first client render, no hydration warnings, works in Next.js (App Router and Pages), Remix, TanStack Start, and Astro server islands. The pattern below is enforced everywhere a value depends on the browser environment.
 
 ### The rule
 
@@ -390,7 +401,9 @@ Any value that comes from a browser-only API — `new Date()`, `Intl.DateTimeFor
 ```ts
 function useClientValue<T>(getter: () => T, fallback: T): T {
   const [value, setValue] = useState<T>(fallback);
-  useEffect(() => { setValue(getter()); }, []);
+  useEffect(() => {
+    setValue(getter());
+  }, []);
   return value;
 }
 ```
@@ -404,14 +417,14 @@ Used by:
 
 ### Specifically handled cases
 
-| Source                                  | Risk                                                                | Mitigation                                                       |
-| --------------------------------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `prefers-color-scheme`                  | server defaults to "light", client may be "dark" → wrong `data-theme` on hydrate | `useClientValue` + `matchMedia` change subscription               |
-| `Intl.DateTimeFormat().resolvedOptions().timeZone` | server's TZ ≠ client's TZ → wrong "today" cell, wrong chip text | Auto-resolved via effect (see "Timezone resolution")             |
-| `new Date()` for "today"                | server clock ≠ client clock around midnight                         | `useClientValue(() => new Date(), null|NaN-Date)`                |
-| Live clock (`showNowTime`)              | every second tick depends on client time                            | Initial state is empty string; `setInterval` starts post-mount   |
-| `window.matchMedia` change events       | server has no API                                                   | Subscription only inside `useEffect`                             |
-| Reducer `useReducer` initializer        | runs on both server and client; `new Date()` fallback for view date | Acceptable for typical sub-second SSR turnaround. Pass `defaultViewDate` for strict cases. |
+| Source                                             | Risk                                                                             | Mitigation                                                                                 |
+| -------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ---------- |
+| `prefers-color-scheme`                             | server defaults to "light", client may be "dark" → wrong `data-theme` on hydrate | `useClientValue` + `matchMedia` change subscription                                        |
+| `Intl.DateTimeFormat().resolvedOptions().timeZone` | server's TZ ≠ client's TZ → wrong "today" cell, wrong chip text                  | Auto-resolved via effect (see "Timezone resolution")                                       |
+| `new Date()` for "today"                           | server clock ≠ client clock around midnight                                      | `useClientValue(() => new Date(), null                                                     | NaN-Date)` |
+| Live clock (`showNowTime`)                         | every second tick depends on client time                                         | Initial state is empty string; `setInterval` starts post-mount                             |
+| `window.matchMedia` change events                  | server has no API                                                                | Subscription only inside `useEffect`                                                       |
+| Reducer `useReducer` initializer                   | runs on both server and client; `new Date()` fallback for view date              | Acceptable for typical sub-second SSR turnaround. Pass `defaultViewDate` for strict cases. |
 
 ### Test coverage
 
@@ -428,35 +441,35 @@ Used by:
 
 ## Accessibility
 
-`react-calendar-datetime` is built **inclusive-first**. The library is meant to be usable by people who navigate with keyboards, screen readers, switch devices, voice control, and people who simply prefer larger touch targets or reduced motion. The contract below is enforceable — every public module ships with the ARIA attributes, keyboard handlers, and structural roles required to be operable by assistive technology out of the box. Tests in `src/__tests__/integration/a11y.test.tsx` use [`jest-axe`](https://github.com/nickcolley/jest-axe) to gate the contract on CI.
+`@dateforge/react-calendar` is built **inclusive-first**. The library is meant to be usable by people who navigate with keyboards, screen readers, switch devices, voice control, and people who simply prefer larger touch targets or reduced motion. The contract below is enforceable — every public module ships with the ARIA attributes, keyboard handlers, and structural roles required to be operable by assistive technology out of the box. Tests in `src/__tests__/integration/a11y.test.tsx` use [`jest-axe`](https://github.com/nickcolley/jest-axe) to gate the contract on CI.
 
 ### Day grid (`<CalendarDays>`)
 
 ARIA grid pattern (https://www.w3.org/WAI/ARIA/apg/patterns/grid/):
 
-| Element                                     | Role          | ARIA / DOM                                                                                |
-| ------------------------------------------- | ------------- | ----------------------------------------------------------------------------------------- |
-| Outer grid container                        | `grid`        | `aria-label` = localized month + year (e.g. "June 2024")                                  |
-| Weekday header row                          | `row`         | —                                                                                         |
-| Each weekday header                         | `columnheader`| `aria-label` = full weekday name; visible text may be the abbreviation                    |
-| Week row                                    | `row`         | `aria-label="Week N"` (ISO week number)                                                   |
-| Week number cell (when `weekNumbers`)       | `rowheader`   | `aria-label="Week N"`                                                                     |
-| Day cell                                    | `gridcell`    | `aria-selected` for selected; `aria-disabled` for disabled or `readOnly`                  |
-| Day button (inside cell)                    | (button)      | `aria-label` = full localized date + state suffix ("today", "selected", "disabled", …)    |
-| Today's button                              | (button)      | `aria-current="date"`                                                                     |
-| Hidden out-of-range cell (`hideOutOfRange`) | `presentation`| Not exposed to AT; preserves grid layout only                                              |
-| Empty week row (all cells hidden)           | `presentation`| Whole row dropped from AT                                                                  |
+| Element                                     | Role           | ARIA / DOM                                                                             |
+| ------------------------------------------- | -------------- | -------------------------------------------------------------------------------------- |
+| Outer grid container                        | `grid`         | `aria-label` = localized month + year (e.g. "June 2024")                               |
+| Weekday header row                          | `row`          | —                                                                                      |
+| Each weekday header                         | `columnheader` | `aria-label` = full weekday name; visible text may be the abbreviation                 |
+| Week row                                    | `row`          | `aria-label="Week N"` (ISO week number)                                                |
+| Week number cell (when `weekNumbers`)       | `rowheader`    | `aria-label="Week N"`                                                                  |
+| Day cell                                    | `gridcell`     | `aria-selected` for selected; `aria-disabled` for disabled or `readOnly`               |
+| Day button (inside cell)                    | (button)       | `aria-label` = full localized date + state suffix ("today", "selected", "disabled", …) |
+| Today's button                              | (button)       | `aria-current="date"`                                                                  |
+| Hidden out-of-range cell (`hideOutOfRange`) | `presentation` | Not exposed to AT; preserves grid layout only                                          |
+| Empty week row (all cells hidden)           | `presentation` | Whole row dropped from AT                                                              |
 
 Keyboard map (focused day button, see `use-calendar-keyboard.ts`):
 
-| Key                  | Action                                |
-| -------------------- | ------------------------------------- |
-| Arrow Left / Right   | Move focus by one day                 |
-| Arrow Up / Down      | Move focus by one week                |
-| Home / End           | First / last day of the focused week  |
-| Page Up / Page Down  | Previous / next month                 |
-| Shift + Page Up/Down | Previous / next year                  |
-| Enter or Space       | Select the focused day                |
+| Key                  | Action                               |
+| -------------------- | ------------------------------------ |
+| Arrow Left / Right   | Move focus by one day                |
+| Arrow Up / Down      | Move focus by one week               |
+| Home / End           | First / last day of the focused week |
+| Page Up / Page Down  | Previous / next month                |
+| Shift + Page Up/Down | Previous / next year                 |
+| Enter or Space       | Select the focused day               |
 
 Roving tabindex: only the focused day has `tabindex="0"`; all others are `tabindex="-1"`. Focus follows the user across months — `moveFocus` calls `navigateTo` when crossing month boundaries (unless `blockNavigation` is set).
 
@@ -466,20 +479,20 @@ Each drum (hour / minute / second) is a `role="spinbutton"` with `aria-label`, `
 
 Keyboard map:
 
-| Key                | Action                              |
-| ------------------ | ----------------------------------- |
-| Arrow Up / Down    | Decrement / increment by one        |
-| Home / End         | Jump to min / max value             |
+| Key             | Action                       |
+| --------------- | ---------------------------- |
+| Arrow Up / Down | Decrement / increment by one |
+| Home / End      | Jump to min / max value      |
 
 ### Tracks (`<CalendarDaysTrack>`, `<CalendarMonthsTrack>`, `<CalendarYearsTrack>`)
 
 Same `role="spinbutton"` pattern as the time drums, with values reflecting the highlighted item.
 
-| Key                | Action                              |
-| ------------------ | ----------------------------------- |
-| Arrow Left / Right | Step backwards / forwards by one    |
-| Page Up / Down     | Jump 7 items at a time (DaysTrack)  |
-| Home / End         | Jump to first / last allowed item   |
+| Key                | Action                             |
+| ------------------ | ---------------------------------- |
+| Arrow Left / Right | Step backwards / forwards by one   |
+| Page Up / Down     | Jump 7 items at a time (DaysTrack) |
+| Home / End         | Jump to first / last allowed item  |
 
 ### Popups (`MonthPopup`, `YearPopup`, `TimePopup`)
 
@@ -497,9 +510,9 @@ The root wrapper element gets `data-readonly` and `aria-readonly="true"` when th
 
 Chips are real `<button>`s with localized text content; clicking navigates the view (`navigateTo`). The clear-all button has `aria-label="Clear"` and is disabled under `readOnly`.
 
-### Manual input (`<CalendarManualSelect>`)
+### Manual input (`<CalendarManualInput>`)
 
-The masked input is a regular `<input type="text" inputMode="numeric">` — it inherits the platform's IME / a11y behavior. Under `readOnly` the HTML `readOnly` attribute is applied. Apply / clear buttons use `aria-label`. Invalid input flips a red wrapper class (visual only); the rejected commit policy is documented in the `<CalendarManualSelect>` "When `onChange` fires" table.
+The masked input is a regular `<input type="text" inputMode="numeric">` — it inherits the platform's IME / a11y behavior. Under `readOnly` the HTML `readOnly` attribute is applied. Apply / clear buttons use `aria-label`. Invalid input flips a red wrapper class (visual only); the rejected commit policy is documented in the `<CalendarManualInput>` "When `onChange` fires" table.
 
 ### Reduced motion
 
@@ -534,6 +547,7 @@ Keyboard navigation does not currently skip over hidden positions (computed by d
 `viewDate` is owned by `NavigationContext` and seeded once by `buildInitialState`. Modules **read** `viewDate` and may call `navigateTo(date)` — they never seed it.
 
 Initial seed precedence:
+
 1. If `value` / `defaultValue` carries a date, the first selected date is used as `viewDate`.
 2. Otherwise `defaultViewDate` (a `<Calendar>` prop) is used.
 3. Otherwise `new Date()` (today).
@@ -588,11 +602,13 @@ The `multiple` and `range` modes intentionally do **not** auto-create on time ch
 **Layer 1 — reducer (data).** The provider guards every selection-writing action (`onChangeDate`, `onChangeTime`, `onDatesSet`, `onRangeSet`, `onRangeBoundSet`) with `if (readOnly) return;`. This is the hard guarantee: even custom modules cannot mutate selection state under `readOnly`.
 
 **Layer 2 — UI (visual).** Every interactive module reads `readOnly` from `ConfigContext` and:
+
 - disables clear / save / preset / commit buttons via the HTML `disabled` attribute;
 - marks selectable cells/drums with `aria-disabled="true"` and short-circuits their click/keyboard handlers;
-- sets `readOnly` on `<input>` elements in `CalendarManualSelect`.
+- sets `readOnly` on `<input>` elements in `CalendarManualInput`.
 
 **Always allowed under `readOnly`:**
+
 - view navigation (`navigateTo`, all Tracks scrolling, `CalendarNav` arrows, month/year popups);
 - hover preview (`setHoverDate`);
 - popup open/close (`UIContext`);
@@ -606,7 +622,7 @@ When adding a new module that writes selection, it MUST read `readOnly` and gate
 
 Themes and appearances are independent dimensions of styling.
 
-- **Theme** = palette (colors). Applied via `data-theme` attribute and CSS custom properties on the wrapper element. Three string values are accepted (`"auto"`, `"light"`, `"dark"`); everything else must be a `CustomTheme` object — either an exported named theme (e.g. `midnight`, `scarlet`) imported from `react-calendar-datetime/themes/<name>`, or a user-built one from `createTheme()`. Named theme **names are module export names, not accepted string values** — passing the string `"midnight"` is invalid and emits a dev warning.
+- **Theme** = palette (colors). Applied via `data-theme` attribute and CSS custom properties on the wrapper element. Three string values are accepted (`"auto"`, `"light"`, `"dark"`); everything else must be a `CustomTheme` object — either an exported named theme (e.g. `midnight`, `scarlet`) imported from `@dateforge/react-calendar/themes/<name>`, or a user-built one from `createTheme()`. Named theme **names are module export names, not accepted string values** — passing the string `"midnight"` is invalid and emits a dev warning.
 - **Appearance** = structure (radii, sizing, density, border styles). Applied via `data-appearance` attribute. Custom appearances via `createAppearance()`.
 
 A library consumer can mix any theme with any appearance freely. This combinatorial space is the primary target for visual regression testing (Chromatic).
@@ -626,17 +642,17 @@ User styles win over `themes` and `appearances`, which win over the base layers.
 The package ships individual modules and themes as separate entry points:
 
 ```ts
-import { Calendar } from "react-calendar-datetime";
-import { CalendarDays } from "react-calendar-datetime/modules/days";
-import { midnight } from "react-calendar-datetime/themes/midnight";
-import { compact } from "react-calendar-datetime/appearances/compact";
+import { Calendar } from "@dateforge/react-calendar";
+import { CalendarDays } from "@dateforge/react-calendar/modules/days";
+import { midnight } from "@dateforge/react-calendar/themes/midnight";
+import { compact } from "@dateforge/react-calendar/appearances/compact";
 ```
 
 Tree-shaking eliminates unused modules from the consumer bundle. **All modules and themes/appearances must remain individually importable.** The build verifies this via `publint` and `arethetypeswrong`.
 
 ### Data packs (e.g. `basicPresets`)
 
-Static data packs live at the root barrel (`react-calendar-datetime`) — there is no parallel `/presets/<pack>` namespace. Two reasons:
+Static data packs live at the root barrel (`@dateforge/react-calendar`) — there is no parallel `/presets/<pack>` namespace. Two reasons:
 
 - The component (`CalendarPresets`) is a UI module; the pack is a data array. Different categories.
 - Adding one subpath per pack would proliferate as packs grow.

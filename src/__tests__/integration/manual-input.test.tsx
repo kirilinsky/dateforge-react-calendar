@@ -2,17 +2,17 @@ import { describe, it, expect, vi } from "vitest";
 import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Calendar } from "@/components/calendar/calendar";
-import { CalendarManualSelect } from "@/modules/manual-select";
+import { CalendarManualInput } from "@/modules/manual-input";
 
 const findInput = (container: HTMLElement) =>
   container.querySelector("input") as HTMLInputElement;
 
-describe("ManualSelect — single mode typing", () => {
+describe("ManualInput — single mode typing", () => {
   it("does not commit while user is typing — only on Enter", async () => {
     const onChange = vi.fn();
     const { container } = render(
       <Calendar mode="single" onChange={onChange}>
-        <CalendarManualSelect />
+        <CalendarManualInput />
       </Calendar>,
     );
     const input = findInput(container);
@@ -31,7 +31,7 @@ describe("ManualSelect — single mode typing", () => {
     const onChange = vi.fn();
     const { container } = render(
       <Calendar mode="single" onChange={onChange}>
-        <CalendarManualSelect />
+        <CalendarManualInput />
       </Calendar>,
     );
     const input = findInput(container);
@@ -44,7 +44,7 @@ describe("ManualSelect — single mode typing", () => {
     const onChange = vi.fn();
     const { container } = render(
       <Calendar mode="single" onChange={onChange}>
-        <CalendarManualSelect />
+        <CalendarManualInput />
       </Calendar>,
     );
     const input = findInput(container);
@@ -64,7 +64,7 @@ describe("ManualSelect — single mode typing", () => {
         minDate={new Date(2024, 5, 10)}
         onChange={onChange}
       >
-        <CalendarManualSelect />
+        <CalendarManualInput />
       </Calendar>,
     );
     const input = findInput(container);
@@ -74,11 +74,11 @@ describe("ManualSelect — single mode typing", () => {
   });
 });
 
-describe("ManualSelect — input mask format", () => {
+describe("ManualInput — input mask format", () => {
   it("inserts dots automatically while typing", async () => {
     const { container } = render(
       <Calendar mode="single">
-        <CalendarManualSelect />
+        <CalendarManualInput />
       </Calendar>,
     );
     const input = findInput(container);
@@ -98,7 +98,7 @@ describe("ManualSelect — input mask format", () => {
   it("ignores non-digit characters", async () => {
     const { container } = render(
       <Calendar mode="single">
-        <CalendarManualSelect />
+        <CalendarManualInput />
       </Calendar>,
     );
     const input = findInput(container);
@@ -108,7 +108,7 @@ describe("ManualSelect — input mask format", () => {
   });
 });
 
-describe("ManualSelect — multi mode cap", () => {
+describe("ManualInput — multi mode cap", () => {
   it("hides the add-date input once selectedDates reaches maxDates", () => {
     const { container } = render(
       <Calendar
@@ -116,7 +116,7 @@ describe("ManualSelect — multi mode cap", () => {
         maxDates={2}
         value={[new Date(2024, 5, 1), new Date(2024, 5, 2)]}
       >
-        <CalendarManualSelect />
+        <CalendarManualInput />
       </Calendar>,
     );
     // 2 chips, no add-input
@@ -125,7 +125,7 @@ describe("ManualSelect — multi mode cap", () => {
   });
 });
 
-describe("ManualSelect — per-chip remove (multiple mode)", () => {
+describe("ManualInput — per-chip remove (multiple mode)", () => {
   it("renders × button per chip and removes only that date", async () => {
     const onChange = vi.fn();
     const { container } = render(
@@ -134,7 +134,7 @@ describe("ManualSelect — per-chip remove (multiple mode)", () => {
         value={[new Date(2024, 5, 1), new Date(2024, 5, 2), new Date(2024, 5, 3)]}
         onChange={onChange}
       >
-        <CalendarManualSelect />
+        <CalendarManualInput />
       </Calendar>,
     );
     const removeButtons = container.querySelectorAll('button[aria-label="Remove"]');
@@ -150,7 +150,7 @@ describe("ManualSelect — per-chip remove (multiple mode)", () => {
   it("× button does not enter edit mode", async () => {
     const { container } = render(
       <Calendar mode="multiple" value={[new Date(2024, 5, 1)]} onChange={() => {}}>
-        <CalendarManualSelect />
+        <CalendarManualInput />
       </Calendar>,
     );
     const removeBtn = container.querySelector('button[aria-label="Remove"]') as HTMLElement;
@@ -162,7 +162,7 @@ describe("ManualSelect — per-chip remove (multiple mode)", () => {
   it("× button is disabled when readOnly", () => {
     const { container } = render(
       <Calendar mode="multiple" value={[new Date(2024, 5, 1)]} onChange={() => {}} readOnly>
-        <CalendarManualSelect />
+        <CalendarManualInput />
       </Calendar>,
     );
     const removeBtn = container.querySelector('button[aria-label="Remove"]') as HTMLButtonElement;
@@ -170,11 +170,11 @@ describe("ManualSelect — per-chip remove (multiple mode)", () => {
   });
 });
 
-describe("ManualSelect — invalid feedback while typing", () => {
+describe("ManualInput — invalid feedback while typing", () => {
   it("flags day=32 as invalid before full date is typed", async () => {
     const { container } = render(
       <Calendar mode="single">
-        <CalendarManualSelect />
+        <CalendarManualInput />
       </Calendar>,
     );
     const input = findInput(container);
@@ -187,7 +187,7 @@ describe("ManualSelect — invalid feedback while typing", () => {
   it("flags month=13 as invalid before year is typed", async () => {
     const { container } = render(
       <Calendar mode="single">
-        <CalendarManualSelect />
+        <CalendarManualInput />
       </Calendar>,
     );
     const input = findInput(container);
@@ -200,7 +200,7 @@ describe("ManualSelect — invalid feedback while typing", () => {
   it("flags Feb 31 as invalid (calendrical impossible)", async () => {
     const { container } = render(
       <Calendar mode="single">
-        <CalendarManualSelect />
+        <CalendarManualInput />
       </Calendar>,
     );
     const input = findInput(container);
@@ -213,7 +213,7 @@ describe("ManualSelect — invalid feedback while typing", () => {
   it("clears invalid state when user fixes the input", async () => {
     const { container } = render(
       <Calendar mode="single">
-        <CalendarManualSelect />
+        <CalendarManualInput />
       </Calendar>,
     );
     const input = findInput(container);

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Calendar } from "@/components/calendar/calendar";
-import { CalendarManualSelect } from "@/modules/manual-select";
+import { CalendarManualInput } from "@/modules/manual-input";
 import { FIXED_DATE } from "../_constants";
 import {
   resolveStoryTheme,
@@ -9,13 +9,13 @@ import {
 } from "../_helpers/resolve-globals";
 import { debugStyle, fmtDate, fmtRange } from "../_helpers/debug";
 
-type ManualSelectArgs = {
+type ManualInputArgs = {
   allowClear?: boolean;
   align?: "left" | "center" | "right";
 };
 
-const meta: Meta<ManualSelectArgs> = {
-  title: "Modules/ManualSelect",
+const meta: Meta<ManualInputArgs> = {
+  title: "Modules/ManualInput",
   argTypes: {
     allowClear: { control: "boolean" },
     align: { control: "inline-radio", options: ["left", "center", "right"] },
@@ -24,7 +24,7 @@ const meta: Meta<ManualSelectArgs> = {
 
 export default meta;
 
-type Story = StoryObj<ManualSelectArgs>;
+type Story = StoryObj<ManualInputArgs>;
 
 export const SingleEmpty: Story = {
   render: (_args, ctx) => {
@@ -38,7 +38,7 @@ export const SingleEmpty: Story = {
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
         >
-          <CalendarManualSelect />
+          <CalendarManualInput />
         </Calendar>
       </>
     );
@@ -58,7 +58,7 @@ export const SinglePrefilled: Story = {
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
         >
-          <CalendarManualSelect />
+          <CalendarManualInput />
         </Calendar>
       </>
     );
@@ -80,7 +80,7 @@ export const SingleEnterEscape: Story = {
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
         >
-          <CalendarManualSelect />
+          <CalendarManualInput />
         </Calendar>
       </>
     );
@@ -105,7 +105,7 @@ export const SingleInvalidDate: Story = {
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
         >
-          <CalendarManualSelect />
+          <CalendarManualInput />
         </Calendar>
       </>
     );
@@ -132,7 +132,7 @@ export const SingleOutsideMinMax: Story = {
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
         >
-          <CalendarManualSelect />
+          <CalendarManualInput />
         </Calendar>
       </>
     );
@@ -153,7 +153,7 @@ export const RangeBothEmpty: Story = {
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
         >
-          <CalendarManualSelect />
+          <CalendarManualInput />
         </Calendar>
       </>
     );
@@ -174,7 +174,7 @@ export const RangeOnlyFromFilled: Story = {
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
         >
-          <CalendarManualSelect />
+          <CalendarManualInput />
         </Calendar>
       </>
     );
@@ -198,7 +198,7 @@ export const RangeBothFilled: Story = {
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
         >
-          <CalendarManualSelect />
+          <CalendarManualInput />
         </Calendar>
       </>
     );
@@ -219,7 +219,7 @@ export const MultipleEmpty: Story = {
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
         >
-          <CalendarManualSelect />
+          <CalendarManualInput />
         </Calendar>
       </>
     );
@@ -241,7 +241,7 @@ export const MultipleCapped: Story = {
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
         >
-          <CalendarManualSelect />
+          <CalendarManualInput />
         </Calendar>
       </>
     );
@@ -259,7 +259,7 @@ export const NoTopLevelClear: Story = {
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
       >
-        <CalendarManualSelect allowClear={false} />
+        <CalendarManualInput allowClear={false} />
       </Calendar>
     );
   },
@@ -276,7 +276,7 @@ export const AlignCenter: Story = {
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
       >
-        <CalendarManualSelect align="center" />
+        <CalendarManualInput align="center" />
       </Calendar>
     );
   },
@@ -298,7 +298,7 @@ export const ReadOnly: Story = {
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
         >
-          <CalendarManualSelect />
+          <CalendarManualInput />
         </Calendar>
       </>
     );
@@ -317,7 +317,7 @@ export const Playground: Story = {
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
       >
-        <CalendarManualSelect allowClear={args.allowClear} align={args.align} />
+        <CalendarManualInput allowClear={args.allowClear} align={args.align} />
       </Calendar>
     );
   },

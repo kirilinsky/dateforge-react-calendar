@@ -17,7 +17,7 @@
     "noImplicitReturns": true, 
     "paths": {
       "@/*": ["./src/*"],
-      "react-calendar-datetime": ["./src/index.ts"]
+      "@dateforge/react-calendar": ["./src/index.ts"]
     }
   },
   "include": ["src/**/*", "global.d.ts", "themes/themes.ts", ".storybook/**/*"],

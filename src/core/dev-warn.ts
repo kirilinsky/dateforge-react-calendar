@@ -1,6 +1,6 @@
 import type { CalendarMode } from "@/types/calendar";
 
-const PREFIX = "[react-calendar-datetime]";
+const PREFIX = "[@dateforge/react-calendar]";
 const seen = new Set<string>();
 
 const isDev = (): boolean =>
@@ -103,7 +103,7 @@ export function validateTheme(theme: unknown): void {
   if (VALID_THEME_STRINGS.has(theme)) return;
   warnOnce(
     `theme:invalid-string:${theme}`,
-    `theme="${theme}" is not a supported string value. Only "auto" | "light" | "dark" are accepted as strings; named palettes like "midnight" must be imported as objects: import { ${theme} } from "react-calendar-datetime/themes/${theme}".`,
+    `theme="${theme}" is not a supported string value. Only "auto" | "light" | "dark" are accepted as strings; named palettes like "midnight" must be imported as objects: import { ${theme} } from "@dateforge/react-calendar/themes/${theme}".`,
   );
 }
 

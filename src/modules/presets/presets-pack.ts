@@ -19,7 +19,7 @@ const addYears = (d: Date, n: number) => {
  * Mix of simple (day / week offsets) and advanced (calendar-accurate month / year shifts).
  *
  * @example
- * import { basicPresets } from "react-calendar-datetime";
+ * import { basicPresets } from "@dateforge/react-calendar";
  * <CalendarPresets presets={basicPresets} />
  *
  * @example

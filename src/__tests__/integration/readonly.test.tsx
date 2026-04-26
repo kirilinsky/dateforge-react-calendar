@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarNav } from "@/modules/nav";
 import { CalendarSelectedDates } from "@/modules/selected-dates";
-import { CalendarManualSelect } from "@/modules/manual-select";
+import { CalendarManualInput } from "@/modules/manual-input";
 import { CalendarPresets } from "@/modules/presets";
 import { CalendarDays } from "@/modules/days";
 import { CalendarDaysTrack } from "@/modules/days-track";
@@ -69,12 +69,12 @@ describe("readOnly — SelectedDates clear", () => {
   });
 });
 
-describe("readOnly — ManualSelect", () => {
+describe("readOnly — ManualInput", () => {
   it("input has readOnly attribute and onChange does not fire on Enter", async () => {
     const onChange = vi.fn();
     const { container } = render(
       <Calendar onChange={onChange} readOnly>
-        <CalendarManualSelect />
+        <CalendarManualInput />
       </Calendar>,
     );
     const input = container.querySelector("input") as HTMLInputElement;
@@ -89,7 +89,7 @@ describe("readOnly — ManualSelect", () => {
     const onChange = vi.fn();
     const { container } = render(
       <Calendar value={D} onChange={onChange} readOnly>
-        <CalendarManualSelect />
+        <CalendarManualInput />
       </Calendar>,
     );
     const chip = container.querySelector("button[disabled]") as HTMLElement;
@@ -103,7 +103,7 @@ describe("readOnly — ManualSelect", () => {
     const onChange = vi.fn();
     const { container } = render(
       <Calendar value={D} onChange={onChange} readOnly>
-        <CalendarManualSelect />
+        <CalendarManualInput />
       </Calendar>,
     );
     const clearBtns = within(container).getAllByLabelText("Clear");

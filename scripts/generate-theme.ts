@@ -31,7 +31,7 @@ for (const name of names) {
     `"use strict";Object.defineProperty(exports,"__esModule",{value:true});const B=${BRAND_EXPR};exports.${name}={[B]:true,vars:{${vars}}};`,
   );
 
-  const dts = `import type{CustomTheme}from"react-calendar-datetime";\nexport declare const ${name}:CustomTheme;\n`;
+  const dts = `import type{CustomTheme}from"@dateforge/react-calendar";\nexport declare const ${name}:CustomTheme;\n`;
   writeFileSync(`${distDir}/${name}.d.ts`, dts);
   writeFileSync(`${distDir}/${name}.d.cts`, dts);
 }

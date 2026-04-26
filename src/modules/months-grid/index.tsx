@@ -1,19 +1,19 @@
 import React, { useMemo } from "react";
-import styles from "./month-grid.module.css";
+import styles from "./months-grid.module.css";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import { getMonthListData, setMonth } from "@/utils/date-utils";
 import { useGridSlot } from "@/hooks/use-grid-slot";
 import shared from "@/global/global.module.css";
 
-export interface CalendarMonthGridProps {
+export interface CalendarMonthsGridProps {
   short?: boolean;
   disableOutOfRange?: boolean;
   hideOutOfRange?: boolean;
   col?: number | string;
 }
 
-export const CalendarMonthGrid: React.FC<CalendarMonthGridProps> = ({
+export const CalendarMonthsGrid: React.FC<CalendarMonthsGridProps> = ({
   short = true,
   disableOutOfRange = true,
   hideOutOfRange = false,
@@ -26,7 +26,16 @@ export const CalendarMonthGrid: React.FC<CalendarMonthGridProps> = ({
   const currentYear = viewDate.getFullYear();
 
   const mNames = useMemo(
-    () => getMonthListData(locale, currentYear, minDate, maxDate, short, disabled, disableOutOfRange),
+    () =>
+      getMonthListData(
+        locale,
+        currentYear,
+        minDate,
+        maxDate,
+        short,
+        disabled,
+        disableOutOfRange,
+      ),
     [locale, currentYear, minDate, maxDate, short, disabled, disableOutOfRange],
   );
 
@@ -60,7 +69,12 @@ export const CalendarMonthGrid: React.FC<CalendarMonthGridProps> = ({
           <button
             key={i}
             type="button"
-            className={[styles.item, shared.interactive, shared.hoverable, isCurrent ? shared.activeItem : ""]
+            className={[
+              styles.item,
+              shared.interactive,
+              shared.hoverable,
+              isCurrent ? shared.activeItem : "",
+            ]
               .filter(Boolean)
               .join(" ")}
             aria-label={fullLabel}

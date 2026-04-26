@@ -18,7 +18,7 @@ const externalizeContextsPlugin = {
   name: "externalize-contexts",
   resolveId(id: string) {
     if (id.startsWith("@/context/")) {
-      return { id: "react-calendar-datetime/context", external: true };
+      return { id: "@dateforge/react-calendar/context", external: true };
     }
   },
 };
@@ -51,18 +51,18 @@ export default defineConfig([
   {
     ...sharedBase,
     entry: {
-      "index":          "src/modules/index.ts",
-      "days":           "src/modules/days/index.tsx",
-      "nav":            "src/modules/nav/index.tsx",
-      "month-grid":     "src/modules/month-grid/index.tsx",
-      "time":           "src/modules/time/index.tsx",
-      "presets":        "src/modules/presets/index.tsx",
+      index: "src/modules/index.ts",
+      days: "src/modules/days/index.tsx",
+      nav: "src/modules/nav/index.tsx",
+      "months-grid": "src/modules/months-grid/index.tsx",
+      time: "src/modules/time/index.tsx",
+      presets: "src/modules/presets/index.tsx",
       "selected-dates": "src/modules/selected-dates/index.tsx",
-      "manual-select":  "src/modules/manual-select/index.tsx",
-      "years-track":    "src/modules/years-track/index.tsx",
-      "months-track":   "src/modules/months-track/index.tsx",
-      "days-track":     "src/modules/days-track/index.tsx",
-      "years-grid":     "src/modules/years-grid/index.tsx",
+      "manual-input": "src/modules/manual-input/index.tsx",
+      "years-track": "src/modules/years-track/index.tsx",
+      "months-track": "src/modules/months-track/index.tsx",
+      "days-track": "src/modules/days-track/index.tsx",
+      "years-grid": "src/modules/years-grid/index.tsx",
     },
     outDir: "dist/modules",
     format: ["esm"],
@@ -73,8 +73,8 @@ export default defineConfig([
     deps: {
       neverBundle: [
         ...sharedDeps.neverBundle,
-        "react-calendar-datetime",
-        "react-calendar-datetime/context",
+        "@dateforge/react-calendar",
+        "@dateforge/react-calendar/context",
       ],
     },
   },
@@ -82,18 +82,18 @@ export default defineConfig([
   {
     ...sharedBase,
     entry: {
-      "index":          "src/modules/index.ts",
-      "days":           "src/modules/days/index.tsx",
-      "nav":            "src/modules/nav/index.tsx",
-      "month-grid":     "src/modules/month-grid/index.tsx",
-      "time":           "src/modules/time/index.tsx",
-      "presets":        "src/modules/presets/index.tsx",
+      index: "src/modules/index.ts",
+      days: "src/modules/days/index.tsx",
+      nav: "src/modules/nav/index.tsx",
+      "months-grid": "src/modules/months-grid/index.tsx",
+      time: "src/modules/time/index.tsx",
+      presets: "src/modules/presets/index.tsx",
       "selected-dates": "src/modules/selected-dates/index.tsx",
-      "manual-select":  "src/modules/manual-select/index.tsx",
-      "years-track":    "src/modules/years-track/index.tsx",
-      "months-track":   "src/modules/months-track/index.tsx",
-      "days-track":     "src/modules/days-track/index.tsx",
-      "years-grid":     "src/modules/years-grid/index.tsx",
+      "manual-input": "src/modules/manual-input/index.tsx",
+      "years-track": "src/modules/years-track/index.tsx",
+      "months-track": "src/modules/months-track/index.tsx",
+      "days-track": "src/modules/days-track/index.tsx",
+      "years-grid": "src/modules/years-grid/index.tsx",
     },
     outDir: "dist/modules",
     format: ["cjs"],
@@ -104,8 +104,8 @@ export default defineConfig([
     deps: {
       neverBundle: [
         ...sharedDeps.neverBundle,
-        "react-calendar-datetime",
-        "react-calendar-datetime/context",
+        "@dateforge/react-calendar",
+        "@dateforge/react-calendar/context",
       ],
     },
   },

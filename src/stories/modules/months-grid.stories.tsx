@@ -1,22 +1,22 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Calendar } from "@/components/calendar/calendar";
-import { CalendarMonthGrid } from "@/modules/month-grid";
+import { CalendarMonthsGrid } from "@/modules/months-grid";
 import { FIXED_DATE } from "../_constants";
 import {
   resolveStoryTheme,
   resolveStoryAppearance,
 } from "../_helpers/resolve-globals";
 
-type MonthGridArgs = {
+type MonthsGridArgs = {
   short?: boolean;
   disableOutOfRange?: boolean;
   hideOutOfRange?: boolean;
   locale?: string;
 };
 
-const meta: Meta<MonthGridArgs> = {
-  title: "Modules/MonthGrid",
+const meta: Meta<MonthsGridArgs> = {
+  title: "Modules/MonthsGrid",
   argTypes: {
     short: { control: "boolean" },
     disableOutOfRange: { control: "boolean" },
@@ -39,7 +39,7 @@ const meta: Meta<MonthGridArgs> = {
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
       >
-        <CalendarMonthGrid
+        <CalendarMonthsGrid
           short={args.short}
           disableOutOfRange={args.disableOutOfRange}
           hideOutOfRange={args.hideOutOfRange}
@@ -51,7 +51,7 @@ const meta: Meta<MonthGridArgs> = {
 
 export default meta;
 
-type Story = StoryObj<MonthGridArgs>;
+type Story = StoryObj<MonthsGridArgs>;
 
 export const Default: Story = {};
 
@@ -73,7 +73,7 @@ export const WithDisabledRange: Story = {
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
       >
-        <CalendarMonthGrid
+        <CalendarMonthsGrid
           short={args.short}
           disableOutOfRange={args.disableOutOfRange}
           hideOutOfRange={args.hideOutOfRange}
@@ -98,7 +98,7 @@ export const HideOutOfRange: Story = {
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
       >
-        <CalendarMonthGrid
+        <CalendarMonthsGrid
           short={args.short}
           disableOutOfRange={args.disableOutOfRange}
           hideOutOfRange={args.hideOutOfRange}

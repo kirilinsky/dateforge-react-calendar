@@ -6,7 +6,7 @@ import { CalendarNav } from "@/modules/nav";
 import { CalendarTimeGrid } from "@/modules/time";
 import { CalendarSelectedDates } from "@/modules/selected-dates";
 import { CalendarPresets } from "@/modules/presets";
-import { CalendarManualSelect } from "@/modules/manual-select";
+import { CalendarManualInput } from "@/modules/manual-input";
 import { CalendarDaysTrack } from "@/modules/days-track";
 import { CalendarMonthsTrack } from "@/modules/months-track";
 import { CalendarYearsTrack } from "@/modules/years-track";
@@ -210,7 +210,7 @@ export const ManualInputAndGrid: Story = {
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
       >
-        <CalendarManualSelect />
+        <CalendarManualInput />
         <CalendarNav label="Type or pick" />
         <CalendarDays />
       </Calendar>

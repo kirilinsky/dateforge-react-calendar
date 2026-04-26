@@ -1,11 +1,11 @@
 export { CalendarDays } from "./days";
 export { CalendarNav } from "./nav";
-export { CalendarMonthGrid } from "./month-grid";
+export { CalendarMonthsGrid } from "./months-grid";
 export { CalendarTimeGrid } from "./time";
 export { CalendarYearsGrid } from "./years-grid";
 export { CalendarPresets } from "./presets";
 export { CalendarSelectedDates } from "./selected-dates";
-export { CalendarManualSelect } from "./manual-select";
+export { CalendarManualInput } from "./manual-input";
 export { CalendarYearsTrack } from "./years-track";
 export { CalendarMonthsTrack } from "./months-track";
 export { CalendarDaysTrack } from "./days-track";

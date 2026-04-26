@@ -50,7 +50,7 @@ for (const { name, vars } of parsed) {
     `"use strict";Object.defineProperty(exports,"__esModule",{value:true});const B=${BRAND_EXPR};exports.${name}={[B]:true,vars:{${varsStr}}};`,
   );
 
-  const dts = `import type{CustomAppearance}from"react-calendar-datetime";\nexport declare const ${name}:CustomAppearance;\n`;
+  const dts = `import type{CustomAppearance}from"@dateforge/react-calendar";\nexport declare const ${name}:CustomAppearance;\n`;
   writeFileSync(`${distDir}/${name}.d.ts`, dts);
   writeFileSync(`${distDir}/${name}.d.cts`, dts);
 }

@@ -13,12 +13,21 @@ export type {
   DisabledConfig,
   DisabledRule,
 } from "./types/calendar";
-export type { CalendarTheme, ThemeTokens, CustomTheme, BuiltInTheme } from "./types/themes";
-export type { CalendarAppearance, CustomAppearance, AppearanceTokens } from "./types/appearances";
+export type {
+  CalendarTheme,
+  ThemeTokens,
+  CustomTheme,
+  BuiltInTheme,
+} from "./types/themes";
+export type {
+  CalendarAppearance,
+  CustomAppearance,
+  AppearanceTokens,
+} from "./types/appearances";
 
 export type { CalendarNavProps } from "./modules/nav/index";
 export type { CalendarDaysTrackProps } from "./modules/days-track/index";
-export type { CalendarMonthGridProps } from "./modules/month-grid/index";
+export type { CalendarMonthsGridProps } from "./modules/months-grid/index";
 export type { CalendarMonthsTrackProps } from "./modules/months-track/index";
 export type { CalendarYearsGridProps } from "./modules/years-grid/index";
 export type { CalendarYearsTrackProps } from "./modules/years-track/index";
@@ -32,4 +41,4 @@ export type {
   PresetRangeValue,
 } from "./types/presets";
 export type { CalendarSelectedDatesProps } from "./modules/selected-dates/index";
-export type { CalendarManualSelectProps } from "./modules/manual-select/index";
+export type { CalendarManualInputProps } from "./modules/manual-input/index";
