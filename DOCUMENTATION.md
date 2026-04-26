@@ -87,6 +87,31 @@ Internal state lives independently. `defaultValue` is read once on mount; subseq
 
 **Mode change at runtime.** Changing `mode` (e.g. `"single"` → `"range"`) does not migrate selection. The new mode reads internal state through its own shape: range mode looks for `from`/`to`, multiple looks for an array, single looks for a `Date`. Pass a compatible `value` together with the mode change if you need a clean transition.
 
+### Time semantics — when does time editing fire `onChange`?
+
+`CalendarTimeGrid` and `CalendarNav.showTime` both edit time. They share the same rules. The principle is:
+
+> `viewDate` always carries the **current working time**. A selection's time is updated only when the selection corresponds to `viewDate`'s day. Otherwise the time stays "pending" — applied to the next date the user selects in `CalendarDays` (because Days commits a new date with `viewDate.hours / minutes / seconds`).
+
+Per-mode behavior:
+
+| Mode       | State                                     | Effect of time change                                          | Fires `onChange`? |
+|------------|-------------------------------------------|----------------------------------------------------------------|-------------------|
+| `single`   | no selection                              | auto-creates `selectedDate = viewDate.day + new time` ¹        | yes               |
+| `single`   | selection day matches `viewDate`          | updates that date's time                                       | yes               |
+| `single`   | selection day differs from `viewDate`     | pending — selection untouched, only `viewDate` updates         | no                |
+| `multiple` | no selection                              | pending — no auto-create                                       | no                |
+| `multiple` | one of `selectedDates` matches `viewDate` | updates that date's time, others untouched                     | yes               |
+| `multiple` | none match                                | pending — selection untouched                                  | no                |
+| `range`    | no selection                              | pending                                                        | no                |
+| `range`    | `rangeStart` day matches `viewDate`       | updates `rangeStart`'s time                                    | yes               |
+| `range`    | `rangeEnd` day matches `viewDate`         | updates `rangeEnd`'s time                                      | yes               |
+| `range`    | neither matches                           | pending                                                        | no                |
+
+¹ This makes `<Calendar mode="single"><CalendarNav showTime /><CalendarTimeGrid /></Calendar>` work as a **time-only picker**: scrolling time drums commits a date for today (or whatever `viewDate` defaults to). For `multiple` and `range` modes time-only pickers are not supported by design — the user must select a date first because there is no unambiguous boundary to attach time to.
+
+**Pending vs committed.** "Pending" means `viewDate.hours / minutes / seconds` are updated for display and for the next selection, but the existing committed selection is not mutated and `onChange` is not called. The next click in `CalendarDays` will pick up the pending time automatically.
+
 **Dev warnings.** In development, the library emits a `console.warn` (deduped per condition) for:
 - `value` / `defaultValue` shape that does not match `mode` (e.g. `Date` passed in `mode="range"`);
 - `Date` instances that are `NaN`;
@@ -180,6 +205,21 @@ Navigation header with configurable controls.
 | `themeToggle`     | `boolean`          | `false` | Show a light/dark theme toggle button. Has no effect when a custom theme (`createTheme()` or pre-built palette) is passed to `<Calendar theme={...} />`              |
 | `offset`          | `number`           | `0`     | Month offset relative to `viewDate`. Use to render two synced nav headers in `cols={2}` layouts (`<CalendarNav offset={1} />`)                                       |
 | `col`             | `number \| string` | —       | CSS grid `grid-column` value                                                                                                                                         |
+
+### Behavior matrix
+
+`<CalendarNav>` is a hybrid module — its category depends on which props are enabled.
+
+| Prop                                                              | Effect                                                              | Fires `onChange`? | Respects `readOnly`? |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------- | ----------------- | -------------------- |
+| `showMonthPicker` / `compactMonths` / month/year arrows / popups  | `navigateTo` (changes `viewDate`)                                   | no                | n/a — navigation     |
+| `home`                                                            | `navigateTo(today)`                                                 | no                | n/a — navigation     |
+| `monthLabel` / `yearLabel` / `showNowTime`                        | display only                                                        | no                | n/a                  |
+| `themeToggle`                                                     | toggles UI theme via `UIContext.toggleTheme`                        | no                | yes — UI not blocked |
+| `clear`                                                           | `onChangeDate(null)` — clears current selection                     | yes               | yes — button disabled when `readOnly` |
+| `showTime`                                                        | opens time popup; confirm calls `onChangeTime`                      | yes (on confirm)  | yes — drums and confirm read-only when `readOnly` |
+
+Use this table to decide which guarantees apply to your composition. A `<CalendarNav>` without `clear` and without `showTime` is purely navigational and never fires `onChange`.
 
 ---
 

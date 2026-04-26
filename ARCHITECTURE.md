@@ -109,16 +109,18 @@ This is a **third category** that the user's two-bucket model didn't initially c
 
 > **Definition:** Behave as navigational or interactive depending on props and/or mode. The category is decided at render time, not at module identity.
 
-| Module | Navigational when | Interactive when |
+| Module | Navigational when | Interactive / side-effecting when |
 |---|---|---|
+| `<CalendarNav>` | default — prev/next arrows, month/year labels, optional `showMonthPicker` / `showYearPicker` buttons (all view-only) | `clear` prop renders a button that calls `onChangeDate(null)`; `showTime` opens a time popup whose confirm calls `onChangeTime`; `themeToggle` mutates UI theme (no `onChange`) |
 | `<CalendarDaysTrack>` | range mode without `bound` | `mode="single"` (item click commits date); `mode="range"` with `bound` (item click sets that boundary); `mode="multiple"` via auto save/remove button |
 | `<CalendarMonthsTrack>` | single / multiple / range without `bound` | `mode="range"` with `bound="from"\|"to"` (click sets that boundary's month) |
 | `<CalendarYearsTrack>` | single / multiple / range without `bound` | `mode="range"` with `bound="from"\|"to"` (click sets that boundary's year) |
 
 **Common contract:**
 - In navigational state: only `navigateTo` — never fires consumer `onChange`.
-- In interactive state: writes via `SelectionContext` (`onRangeBoundSet`, `onChangeDate`, etc.), respects `readOnly` / `disabled` / `minDate` / `maxDate`, and may fire consumer `onChange`.
-- Tests must cover both states explicitly per module.
+- In interactive state: writes via `SelectionContext` (`onRangeBoundSet`, `onChangeDate`, `onChangeTime`, …), respects `readOnly` / `disabled` / `minDate` / `maxDate`, and may fire consumer `onChange`.
+- UI-only side effects (e.g. `<CalendarNav themeToggle>`, popup open/close) are independent of selection — they touch `UIContext` only and never fire `onChange`.
+- Tests must cover each enabled prop explicitly per module: a Nav with `clear` is contractually different from a Nav without.
 
 ### Special case — `<CalendarPresets>`
 
@@ -194,6 +196,25 @@ Validators are invoked at:
 - a `useEffect` keyed on `[minDate, maxDate]`.
 
 New validators belong in this module and follow the same dedupe-by-key convention. Tests reset the dedupe cache via `__resetWarnOnce()`.
+
+---
+
+## Time editing semantics
+
+Time interactions (`CalendarTimeGrid` drums, `CalendarNav.showTime` popup confirm) are unified through one reducer action: `CHANGE_TIME { date, config }`. The action is dispatched by `provider.handleChangeTime`, which always passes the current `selectConfig`.
+
+The reducer's contract:
+
+1. `viewDate` is always updated to `date` — `viewDate` is the source of truth for "current working time" and feeds `CalendarDays.handleSetDay` so a subsequent date click inherits it.
+2. Selection is mutated **only** when there is a meaningful match between `viewDate.day` and an existing selected slot.
+   - `range` mode: matches against `rangeStart` then `rangeEnd`; updates whichever matches.
+   - `multiple` mode: matches against an entry in `selectedDates`; updates only that entry, never replaces the array.
+   - `single` mode: matches the only `selectedDate`; updates it. **Special case:** if `selectedDates` is empty, single mode auto-creates `[date]` to keep time-only picker compositions (`<CalendarNav showTime />` + `<CalendarTimeGrid />` without `<CalendarDays />`) functional.
+3. `notifySeq` (the trigger for the consumer's `onChange`) is incremented **only when selection actually changed**. Pure `viewDate` time updates ("pending time") do not fire `onChange`.
+
+This rule set replaces the earlier behavior where `notifySeq` always incremented (firing spurious `onChange(null)` when no selection existed) and where a non-matching `viewDate` would overwrite the entire selection. Both were latent bugs surfaced while documenting the time contract.
+
+The `multiple` and `range` modes intentionally do **not** auto-create on time change. Without an explicit user action choosing a date or boundary, the library cannot pick where the time should live, and silently inventing a selection would be surprising. Single mode is the only ambiguity-free case.
 
 ---
 

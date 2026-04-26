@@ -27,7 +27,7 @@ type CalendarAction =
   | { type: "HOVER"; date: Date | null }
   | { type: "OPEN_POPUP"; popup: "time" | "month" | "year" }
   | { type: "CLOSE_POPUP" }
-  | { type: "CHANGE_TIME"; date: Date }
+  | { type: "CHANGE_TIME"; date: Date; config: SelectConfig }
   | { type: "SET_DATES"; dates: Date[] }
   | { type: "SET_RANGE"; from: Date | null; to: Date | null }
   | { type: "SET_RANGE_BOUND"; bound: "from" | "to"; date: Date | null }
@@ -148,23 +148,64 @@ export function calendarReducer(
       return { ...state, openPopup: null };
 
     case "CHANGE_TIME": {
-      const { date } = action;
-      let nextDates = state.selectedDates;
-      if (state.selectedDates.length > 0) {
+      const { date, config } = action;
+      // viewDate always reflects the current working time. Whether selection
+      // is committed depends on mode and whether viewDate's day matches an
+      // existing selected date / range boundary. Time-only picker for single
+      // mode auto-creates the selection from viewDate's day + new time.
+      const baseUpdate: CalendarState = { ...state, viewDate: date };
+
+      if (config.range) {
+        if (state.rangeStart && isSameDay(state.rangeStart, state.viewDate)) {
+          return {
+            ...baseUpdate,
+            rangeStart: date,
+            notifySeq: state.notifySeq + 1,
+          };
+        }
+        if (state.rangeEnd && isSameDay(state.rangeEnd, state.viewDate)) {
+          return {
+            ...baseUpdate,
+            rangeEnd: date,
+            notifySeq: state.notifySeq + 1,
+          };
+        }
+        return baseUpdate;
+      }
+
+      if (config.multiselect) {
+        if (state.selectedDates.length === 0) return baseUpdate;
         const idx = state.selectedDates.findIndex((d) =>
           isSameDay(d, state.viewDate),
         );
-        nextDates =
-          idx >= 0
-            ? state.selectedDates.map((d, i) => (i === idx ? date : d))
-            : [date];
+        if (idx < 0) return baseUpdate;
+        const nextDates = state.selectedDates.map((d, i) =>
+          i === idx ? date : d,
+        );
+        return {
+          ...baseUpdate,
+          selectedDates: nextDates,
+          notifySeq: state.notifySeq + 1,
+        };
       }
-      return {
-        ...state,
-        viewDate: date,
-        selectedDates: nextDates,
-        notifySeq: state.notifySeq + 1,
-      };
+
+      // single
+      const single = state.selectedDates[0];
+      if (!single) {
+        return {
+          ...baseUpdate,
+          selectedDates: [date],
+          notifySeq: state.notifySeq + 1,
+        };
+      }
+      if (isSameDay(single, state.viewDate)) {
+        return {
+          ...baseUpdate,
+          selectedDates: [date],
+          notifySeq: state.notifySeq + 1,
+        };
+      }
+      return baseUpdate;
     }
 
     case "SET_DATES":

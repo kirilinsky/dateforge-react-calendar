@@ -8,6 +8,7 @@ import {
   resolveStoryAppearance,
 } from "../_helpers/resolve-globals";
 import { FIXED_DATE } from "../_constants";
+import { CalendarSelectedDates } from "@/modules";
 
 const meta: Meta = {
   title: "Compositions/Days + Nav",
@@ -25,8 +26,9 @@ export const Default: StoryObj = {
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
       >
-        <CalendarNav showMonthPicker />
+        <CalendarNav showTime showMonthPicker />
         <CalendarDays />
+        <CalendarSelectedDates showTime/>
       </Calendar>
     );
   },

@@ -191,9 +191,9 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   const handleChangeTime = useCallback(
     (d: Date) => {
       if (readOnly) return;
-      dispatch({ type: "CHANGE_TIME", date: d });
+      dispatch({ type: "CHANGE_TIME", date: d, config: selectConfig });
     },
-    [readOnly],
+    [readOnly, selectConfig],
   );
 
   const handleDatesSet = useCallback(

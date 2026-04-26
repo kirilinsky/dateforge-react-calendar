@@ -256,47 +256,175 @@ describe("OPEN_POPUP / CLOSE_POPUP", () => {
 
 // ─── CHANGE_TIME ─────────────────────────────────────────────────────────────
 
-describe("CHANGE_TIME", () => {
-  it("updates viewDate to new date", () => {
-    const date = d(2024, 6, 15);
-    date.setHours(10, 30);
-    const next = calendarReducer(baseState, { type: "CHANGE_TIME", date });
-    expect(next.viewDate).toBe(date);
+describe("CHANGE_TIME — single mode", () => {
+  it("updates viewDate to new date even when no commit happens", () => {
+    const view = d(2024, 6, 15);
+    const updated = new Date(view);
+    updated.setHours(10, 30);
+    const other = d(2024, 6, 20);
+    // Selection exists but viewDate's day does not match → pending
+    const state = { ...baseState, viewDate: view, selectedDates: [other] };
+    const next = calendarReducer(state, {
+      type: "CHANGE_TIME",
+      date: updated,
+      config: singleCfg(),
+    });
+    expect(next.viewDate).toBe(updated);
+    expect(next.selectedDates).toEqual([other]);
+    expect(next.notifySeq).toBe(state.notifySeq);
   });
 
-  it("replaces matching selectedDate by viewDate", () => {
+  it("updates time of selectedDate when viewDate matches its day", () => {
     const orig = d(2024, 6, 15);
     const updated = new Date(orig);
     updated.setHours(14, 45);
     const state = { ...baseState, viewDate: orig, selectedDates: [orig] };
-    const next = calendarReducer(state, { type: "CHANGE_TIME", date: updated });
+    const next = calendarReducer(state, {
+      type: "CHANGE_TIME",
+      date: updated,
+      config: singleCfg(),
+    });
     expect(next.selectedDates[0]).toBe(updated);
+    expect(next.notifySeq).toBe(state.notifySeq + 1);
   });
 
-  it("no selectedDates → selectedDates stays empty (only viewDate updates)", () => {
+  it("auto-creates selectedDate from viewDate+time when no selection (time-only picker)", () => {
     const date = d(2024, 6, 15);
     date.setHours(9, 0);
     const state = { ...baseState, selectedDates: [] };
-    const next = calendarReducer(state, { type: "CHANGE_TIME", date });
-    expect(next.selectedDates).toHaveLength(0);
-    expect(next.viewDate).toBe(date);
+    const next = calendarReducer(state, {
+      type: "CHANGE_TIME",
+      date,
+      config: singleCfg(),
+    });
+    expect(next.selectedDates).toEqual([date]);
+    expect(next.notifySeq).toBe(state.notifySeq + 1);
+  });
+});
+
+describe("CHANGE_TIME — multiple mode", () => {
+  it("updates the matching date's time when viewDate matches one of them", () => {
+    const a = d(2024, 6, 15);
+    const b = d(2024, 6, 20);
+    const updated = new Date(a);
+    updated.setHours(11, 0);
+    const state = { ...baseState, viewDate: a, selectedDates: [a, b] };
+    const next = calendarReducer(state, {
+      type: "CHANGE_TIME",
+      date: updated,
+      config: multiCfg(true),
+    });
+    expect(next.selectedDates).toEqual([updated, b]);
+    expect(next.notifySeq).toBe(state.notifySeq + 1);
   });
 
-  it("selectedDates present but none match viewDate → replaces with [date]", () => {
-    const view = d(2024, 6, 15);
-    const other = d(2024, 6, 20);
+  it("no match → does NOT mutate selection; pending only", () => {
+    const a = d(2024, 6, 15);
+    const b = d(2024, 6, 20);
+    const view = d(2024, 6, 17);
     const updated = new Date(view);
-    updated.setHours(14, 0);
-    // viewDate = Jun 15, selectedDates has Jun 20 — no isSameDay match
-    const state = { ...baseState, viewDate: view, selectedDates: [other] };
-    const next = calendarReducer(state, { type: "CHANGE_TIME", date: updated });
-    expect(next.selectedDates).toEqual([updated]);
+    updated.setHours(11, 0);
+    const state = { ...baseState, viewDate: view, selectedDates: [a, b] };
+    const next = calendarReducer(state, {
+      type: "CHANGE_TIME",
+      date: updated,
+      config: multiCfg(true),
+    });
+    expect(next.selectedDates).toEqual([a, b]);
+    expect(next.viewDate).toBe(updated);
+    expect(next.notifySeq).toBe(state.notifySeq);
   });
 
-  it("increments notifySeq", () => {
+  it("empty selection → pending; does NOT auto-create", () => {
     const date = d(2024, 6, 15);
-    const next = calendarReducer(baseState, { type: "CHANGE_TIME", date });
-    expect(next.notifySeq).toBe(baseState.notifySeq + 1);
+    const state = { ...baseState, selectedDates: [] };
+    const next = calendarReducer(state, {
+      type: "CHANGE_TIME",
+      date,
+      config: multiCfg(true),
+    });
+    expect(next.selectedDates).toEqual([]);
+    expect(next.notifySeq).toBe(state.notifySeq);
+  });
+});
+
+describe("CHANGE_TIME — range mode", () => {
+  it("updates rangeStart's time when viewDate matches its day", () => {
+    const start = d(2024, 6, 15);
+    const end = d(2024, 6, 20);
+    const updated = new Date(start);
+    updated.setHours(8, 0);
+    const state = {
+      ...baseState,
+      viewDate: start,
+      rangeStart: start,
+      rangeEnd: end,
+    };
+    const next = calendarReducer(state, {
+      type: "CHANGE_TIME",
+      date: updated,
+      config: rangeCfg(),
+    });
+    expect(next.rangeStart).toBe(updated);
+    expect(next.rangeEnd).toBe(end);
+    expect(next.notifySeq).toBe(state.notifySeq + 1);
+  });
+
+  it("updates rangeEnd's time when viewDate matches its day", () => {
+    const start = d(2024, 6, 15);
+    const end = d(2024, 6, 20);
+    const updated = new Date(end);
+    updated.setHours(20, 30);
+    const state = {
+      ...baseState,
+      viewDate: end,
+      rangeStart: start,
+      rangeEnd: end,
+    };
+    const next = calendarReducer(state, {
+      type: "CHANGE_TIME",
+      date: updated,
+      config: rangeCfg(),
+    });
+    expect(next.rangeStart).toBe(start);
+    expect(next.rangeEnd).toBe(updated);
+    expect(next.notifySeq).toBe(state.notifySeq + 1);
+  });
+
+  it("no match → pending only, no commit", () => {
+    const start = d(2024, 6, 15);
+    const end = d(2024, 6, 20);
+    const view = d(2024, 6, 17);
+    const updated = new Date(view);
+    updated.setHours(11, 0);
+    const state = {
+      ...baseState,
+      viewDate: view,
+      rangeStart: start,
+      rangeEnd: end,
+    };
+    const next = calendarReducer(state, {
+      type: "CHANGE_TIME",
+      date: updated,
+      config: rangeCfg(),
+    });
+    expect(next.rangeStart).toBe(start);
+    expect(next.rangeEnd).toBe(end);
+    expect(next.viewDate).toBe(updated);
+    expect(next.notifySeq).toBe(state.notifySeq);
+  });
+
+  it("empty selection → pending only, does NOT auto-create", () => {
+    const date = d(2024, 6, 15);
+    const state = { ...baseState, rangeStart: null, rangeEnd: null };
+    const next = calendarReducer(state, {
+      type: "CHANGE_TIME",
+      date,
+      config: rangeCfg(),
+    });
+    expect(next.rangeStart).toBeNull();
+    expect(next.rangeEnd).toBeNull();
+    expect(next.notifySeq).toBe(state.notifySeq);
   });
 });
 
