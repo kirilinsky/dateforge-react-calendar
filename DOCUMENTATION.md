@@ -38,8 +38,9 @@ import { Calendar } from "react-calendar-datetime";
 | Prop           | Type                                | Default     | Description                                                                                                                                                                                                           |
 | -------------- | ----------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `mode`         | `"single" \| "multiple" \| "range"` | `"single"`  | Selection mode                                                                                                                                                                                                        |
-| `value`        | `CalendarValue<M>`                  | —           | Controlled value. `Date \| null` for single, `Date[]` for multiple, `DateRange` for range                                                                                                                             |
-| `onChange`     | `(value: CalendarValue<M>) => void` | —           | Fires when the selection changes                                                                                                                                                                                      |
+| `value`        | `CalendarValue<M>`                  | —           | Controlled value. `Date \| null` for single, `Date[]` for multiple, `DateRange` for range. Pass `undefined` to opt out of controlled mode.                                                                            |
+| `defaultValue` | `CalendarValue<M>`                  | —           | Initial value for uncontrolled mode. Used only when `value` is `undefined`. Subsequent changes to `defaultValue` are ignored.                                                                                         |
+| `onChange`     | `(value: CalendarValue<M>) => void` | —           | Fires when the selection changes (in both controlled and uncontrolled modes)                                                                                                                                          |
 | `cols`         | `number`                            | —           | Number of columns in the internal CSS grid                                                                                                                                                                            |
 | `locale`       | `string`                            | `"en"`      | BCP 47 language tag used for all labels and formatting                                                                                                                                                                |
 | `timeZone`     | `string`                            | —           | IANA timezone (`"Europe/Paris"`, `"UTC"`) or fixed offset (`"UTC+2"`, `"UTC-5"`). Affects today detection, emitted date midnight, and chip formatting                                                                 |
@@ -56,6 +57,42 @@ import { Calendar } from "react-calendar-datetime";
 | `maxRangeDays` | `number`                            | —           | Maximum number of days in a range selection                                                                                                                                                                           |
 | `disabled`     | `DisabledConfig`                    | —           | Rules for disabling specific dates. Build with `createDisabled()`                                                                                                                                                     |
 | `children`     | `React.ReactNode`                   | —           | Module components that compose the calendar UI                                                                                                                                                                        |
+
+### Controlled and uncontrolled
+
+`Calendar` works in both modes. The decision is made by whether `value` is passed.
+
+**Controlled** — `value` is provided (including `null`):
+
+```tsx
+const [date, setDate] = useState<Date | null>(null);
+<Calendar value={date} onChange={setDate}>
+  <CalendarDays />
+</Calendar>
+```
+
+External changes to `value` are synced into internal state on every change.
+
+**Uncontrolled** — `value` is `undefined`. Optional `defaultValue` seeds the initial selection:
+
+```tsx
+<Calendar defaultValue={new Date()} onChange={(d) => console.log(d)}>
+  <CalendarDays />
+</Calendar>
+```
+
+Internal state lives independently. `defaultValue` is read once on mount; subsequent changes are ignored. `onChange` still fires for every selection change.
+
+**Mixing rule.** When both `value` and `defaultValue` are passed, `value` wins (controlled mode). `defaultValue` is ignored.
+
+**Mode change at runtime.** Changing `mode` (e.g. `"single"` → `"range"`) does not migrate selection. The new mode reads internal state through its own shape: range mode looks for `from`/`to`, multiple looks for an array, single looks for a `Date`. Pass a compatible `value` together with the mode change if you need a clean transition.
+
+**Dev warnings.** In development, the library emits a `console.warn` (deduped per condition) for:
+- `value` / `defaultValue` shape that does not match `mode` (e.g. `Date` passed in `mode="range"`);
+- `Date` instances that are `NaN`;
+- `minDate` later than `maxDate`.
+
+Warnings are silenced when `process.env.NODE_ENV === "production"`.
 
 ### `readOnly` contract
 

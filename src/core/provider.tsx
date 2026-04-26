@@ -21,6 +21,7 @@ import {
   SelectConfig,
 } from "@/core/state";
 import { isSameDay } from "@/utils/date-core";
+import { validateCalendarValue, validateMinMax } from "@/core/dev-warn";
 import { ConfigContext, CalendarConfig } from "@/context/config-context";
 import { NavigationContext } from "@/context/navigation-context";
 import {
@@ -54,6 +55,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   children,
   toggleTheme,
   value: externalValue,
+  defaultValue,
   mode = "single" as M,
   maxDates,
   onChange,
@@ -82,9 +84,17 @@ export function CalendarProvider<M extends CalendarMode = "single">({
     [range, multiselect, minRangeDays, maxRangeDays, minDate, maxDate, disabled],
   );
 
-  const [state, dispatch] = useReducer(calendarReducer, undefined, () =>
-    buildInitialState({ externalValue: externalValue ?? undefined, range }),
-  );
+  const isControlled = externalValue !== undefined;
+  const seedValue = isControlled ? externalValue : defaultValue;
+  const [state, dispatch] = useReducer(calendarReducer, undefined, () => {
+    validateCalendarValue(
+      seedValue,
+      mode,
+      isControlled ? "value" : "defaultValue",
+    );
+    validateMinMax(minDate, maxDate);
+    return buildInitialState({ externalValue: seedValue ?? undefined, range });
+  });
 
   const onChangeRef = useRef<((v: CalendarValue<M>) => void) | undefined>(
     onChange,
@@ -97,6 +107,8 @@ export function CalendarProvider<M extends CalendarMode = "single">({
     externalValue as DateRange | Date[] | Date | null | undefined,
   );
   useEffect(() => {
+    if (!isControlled) return;
+    validateCalendarValue(externalValue, mode, "value");
     const externalRangeObj = isDateRange(externalValue)
       ? externalValue
       : undefined;
@@ -211,6 +223,10 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   const navigateTo = useCallback((d: Date) => {
     dispatch({ type: "NAVIGATE", date: d });
   }, []);
+
+  useEffect(() => {
+    validateMinMax(minDate, maxDate);
+  }, [minDate, maxDate]);
 
   const setHoverDate = useCallback((d: Date | null) => {
     dispatch({ type: "HOVER", date: d });

@@ -32,6 +32,7 @@ export interface CalendarProps<M extends CalendarMode = "single"> {
   children?: React.ReactNode;
   cols?: number;
   value?: CalendarValue<M>;
+  defaultValue?: CalendarValue<M>;
   mode?: M;
   maxDates?: number;
   minDate?: Date;

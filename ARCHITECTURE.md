@@ -169,6 +169,35 @@ The wrapper exposes four contexts to modules. Each has a clear responsibility:
 
 ---
 
+## Controlled vs uncontrolled
+
+`<Calendar>` supports both modes. The decision is made by `value`:
+
+- **`value !== undefined`** — controlled. The reducer's selection state is synced from `value` on every change (via the `SYNC_EXTERNAL` action dispatched in an effect keyed on `serializeValue(value)`). `onChange` fires for every internal selection event.
+- **`value === undefined`** — uncontrolled. Optional `defaultValue` seeds the reducer once at mount; subsequent changes to `defaultValue` are ignored. Internal state is the source of truth. `onChange` still fires.
+
+The two modes are mutually exclusive at any moment: passing both `value` and `defaultValue` makes `value` win, and `defaultValue` is ignored.
+
+The wrapper does not migrate selection across `mode` changes. Each mode reads its own shape from internal state (`single` → `selectedDates[0]`; `multiple` → `selectedDates`; `range` → `{ rangeStart, rangeEnd }`). Consumers needing a clean transition must pass a compatible `value` together with the new `mode`.
+
+---
+
+## Dev warnings
+
+`src/core/dev-warn.ts` provides `warnOnce(key, message)` — a deduped `console.warn` that is a no-op when `process.env.NODE_ENV === "production"`. The same module exports two domain validators used by the provider:
+
+- `validateCalendarValue(value, mode, source)` — flags shape mismatches (e.g. `Date` in `range` mode) and `NaN` dates.
+- `validateMinMax(minDate, maxDate)` — flags inverted bounds.
+
+Validators are invoked at:
+- reducer initialization (initial seed);
+- the `SYNC_EXTERNAL` effect (each controlled value change);
+- a `useEffect` keyed on `[minDate, maxDate]`.
+
+New validators belong in this module and follow the same dedupe-by-key convention. Tests reset the dedupe cache via `__resetWarnOnce()`.
+
+---
+
 ## `readOnly` contract
 
 `readOnly` is the master flag for blocking all selection changes from the user. The contract is enforced on two layers:
