@@ -141,3 +141,8 @@ export const ShowTimePicker: Story = {
   args: { showMonthPicker: true, showTime: true },
 };
 ShowTimePicker.storyName = "Show time picker popup";
+
+export const WithLabel: Story = {
+  args: { label: "This is label" },
+};
+WithLabel.storyName = "With label";

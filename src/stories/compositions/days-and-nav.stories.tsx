@@ -11,7 +11,7 @@ import { FIXED_DATE } from "../_constants";
 import { CalendarSelectedDates } from "@/modules";
 
 const meta: Meta = {
-  title: "Compositions/Days + Nav",
+  title: "Compositions/Days + Nav + Selected",
 };
 
 export default meta;
@@ -28,7 +28,7 @@ export const Default: StoryObj = {
       >
         <CalendarNav showTime showMonthPicker />
         <CalendarDays />
-        <CalendarSelectedDates showTime/>
+        <CalendarSelectedDates showTime />
       </Calendar>
     );
   },
