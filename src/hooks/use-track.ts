@@ -309,11 +309,36 @@ export function useTrack({
     const el = ref.current;
     if (!el) return;
     const handler = (e: WheelEvent) => {
-      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+      // Pick the dominant axis. Mouse wheels only emit deltaY; trackpads emit
+      // both. Either way, hijack scroll while the cursor is over the track.
+      const useY = Math.abs(e.deltaY) > Math.abs(e.deltaX);
+      const raw = useY ? e.deltaY : e.deltaX;
+      if (raw === 0) return;
       e.preventDefault();
-      const delta =
-        e.deltaMode === 1 ? e.deltaX * 20 : e.deltaMode === 2 ? e.deltaX * 300 : e.deltaX;
-      p.current.velocity += delta * 0.08;
+
+      const lineToPx = e.deltaMode === 1 ? 20 : e.deltaMode === 2 ? 300 : 1;
+      const delta = raw * lineToPx;
+
+      const { lo, hi, isCircular, c, ppi } = getBounds();
+
+      // Direct offset push — feels like real scroll. Velocity carries small
+      // residual for inertia after the wheel stops.
+      p.current.offset += delta;
+      p.current.velocity = delta * 0.6;
+
+      if (!isCircular) {
+        p.current.offset = clamp(
+          p.current.offset,
+          lo * ppi - ppi,
+          hi * ppi + ppi,
+        );
+      } else {
+        const range = c * ppi;
+        p.current.offset = ((p.current.offset % range) + range) % range;
+      }
+
+      notifyIfChanged(p.current.offset);
+      setPosition(p.current.offset / ppi);
     };
     el.addEventListener("wheel", handler, { passive: false });
     return () => el.removeEventListener("wheel", handler);
