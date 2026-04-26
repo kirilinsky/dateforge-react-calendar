@@ -131,6 +131,16 @@ Presets are interactive but operate at a different level than `<CalendarDays>`:
 
 Presets accept user-provided resolver functions (custom presets), so they sit at the **boundary between library and consumer code**. This is the highest-risk surface for hostile or malformed input. They get their own dedicated test file (`integration/presets.test.tsx`) covering adversarial inputs in addition to happy-path.
 
+The resolver (`getResolvedPresets` in `preset-utils.ts`) wraps each entry in a defense layer:
+
+1. Reject non-object entries (null, primitives) — warn, skip.
+2. Reject entries missing `label` — warn, skip.
+3. Detect duplicate `id` (including collisions with auto-derived ids) — first wins, warn, skip rest.
+4. Wrap `getValue(ctx)` in `try/catch` — exception caught, warn, skip; component does not crash.
+5. Validate the result is `Date` (not `NaN`), or `{ from, to }` with valid Dates, or `null`. Anything else — warn, skip.
+
+All warnings go through `warnOnce` (dev-only, deduped per id+condition). In production every malformed entry is silently dropped. See `DOCUMENTATION.md → Defensive handling of bad input` for the consumer-facing matrix.
+
 ---
 
 ## Why the classification matters
@@ -324,6 +334,15 @@ import { compact } from "react-calendar-datetime/appearances/compact";
 ```
 
 Tree-shaking eliminates unused modules from the consumer bundle. **All modules and themes/appearances must remain individually importable.** The build verifies this via `publint` and `arethetypeswrong`.
+
+### Data packs (e.g. `basicPresets`)
+
+Static data packs live at the root barrel (`react-calendar-datetime`) — there is no parallel `/presets/<pack>` namespace. Two reasons:
+
+- The component (`CalendarPresets`) is a UI module; the pack is a data array. Different categories.
+- Adding one subpath per pack would proliferate as packs grow.
+
+Tree-shaking stays correct because pack files are pure (no top-level side effects) and `package.json` has `sideEffects: ["**/*.css"]`. A consumer who imports `Calendar` from the root barrel and never references `basicPresets` does not pull the pack into their bundle. New data packs added in the future MUST follow the same discipline: side-effect-free module body, no top-level execution.
 
 ---
 

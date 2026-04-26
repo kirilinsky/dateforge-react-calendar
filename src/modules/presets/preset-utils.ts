@@ -7,6 +7,13 @@ import {
 } from "@/types/presets";
 import { DisabledConfig } from "@/types/calendar";
 import { checkIsDateDisabled } from "@/utils/date-core";
+import { warnOnce } from "@/core/dev-warn";
+
+const isValidDate = (d: unknown): d is Date =>
+  d instanceof Date && !isNaN(d.getTime());
+
+const isPlainObject = (v: unknown): v is Record<string, unknown> =>
+  typeof v === "object" && v !== null && !Array.isArray(v);
 
 const rtfCache: Record<string, Intl.RelativeTimeFormat> = {};
 
@@ -103,32 +110,94 @@ export const getResolvedPresets = (
   const ctx: PresetContext = { now, isValid, locale };
 
   const out: ResolvedPreset[] = [];
+  const seenIds = new Set<string>();
+
   items.forEach((entry, idx) => {
-    const result = isAdvanced(entry) ? entry.getValue(ctx) : resolveSimple(entry, now);
+    if (!isPlainObject(entry)) {
+      warnOnce(
+        `preset:invalid-entry:${idx}`,
+        `preset[${idx}] is not an object (received: ${JSON.stringify(entry)}). Entry skipped.`,
+      );
+      return;
+    }
+    if (entry.label == null) {
+      warnOnce(
+        `preset:missing-label:${idx}`,
+        `preset[${idx}] is missing the required \`label\` field. Entry skipped.`,
+      );
+      return;
+    }
+
+    const id = getEntryId(entry, idx);
+    if (seenIds.has(id)) {
+      warnOnce(
+        `preset:duplicate-id:${id}`,
+        `Duplicate preset id "${id}" detected. The first occurrence wins; subsequent entries with the same id are skipped.`,
+      );
+      return;
+    }
+
+    let result: Date | PresetRangeValue | null;
+    try {
+      result = isAdvanced(entry)
+        ? entry.getValue(ctx)
+        : resolveSimple(entry, now);
+    } catch (err) {
+      warnOnce(
+        `preset:throws:${id}`,
+        `preset "${id}" getValue threw: ${err instanceof Error ? err.message : String(err)}. Entry skipped.`,
+      );
+      return;
+    }
+
     if (!result) return;
 
     if (result instanceof Date) {
+      if (!isValidDate(result)) {
+        warnOnce(
+          `preset:invalid-date:${id}`,
+          `preset "${id}" produced an invalid Date (NaN). Entry skipped.`,
+        );
+        return;
+      }
       const d = applyTimeFromSource(result, viewDate);
       const clamped = clampTime(d, minDate, maxDate);
       if (!isValid(clamped)) return;
+      seenIds.add(id);
       out.push({
-        id: getEntryId(entry, idx),
+        id,
         label: resolveLabel(entry.label, locale),
         value: clamped,
         isRange: false,
       });
-    } else {
-      if (!rangeMode) return;
-      const from = applyTimeFromSource(result.from, viewDate);
-      const to = applyTimeFromSource(result.to, viewDate);
-      if (!isValid(from) || !isValid(to)) return;
-      out.push({
-        id: getEntryId(entry, idx),
-        label: resolveLabel(entry.label, locale),
-        value: { from, to },
-        isRange: true,
-      });
+      return;
     }
+
+    if (!isPlainObject(result) || !("from" in result) || !("to" in result)) {
+      warnOnce(
+        `preset:bad-shape:${id}`,
+        `preset "${id}" returned an unexpected shape from getValue. Expected Date | { from, to } | null.`,
+      );
+      return;
+    }
+    if (!isValidDate(result.from) || !isValidDate(result.to)) {
+      warnOnce(
+        `preset:invalid-range:${id}`,
+        `preset "${id}" produced a range with invalid Date(s). Entry skipped.`,
+      );
+      return;
+    }
+    if (!rangeMode) return;
+    const from = applyTimeFromSource(result.from, viewDate);
+    const to = applyTimeFromSource(result.to, viewDate);
+    if (!isValid(from) || !isValid(to)) return;
+    seenIds.add(id);
+    out.push({
+      id,
+      label: resolveLabel(entry.label, locale),
+      value: { from, to },
+      isRange: true,
+    });
   });
   return out;
 };

@@ -689,7 +689,7 @@ Declarative. Covers day offsets, fixed dates, fixed-length ranges. Zero imports 
 | `id`    | `string` (optional)                    | Stable React key. Auto-derived from `label` / index if omitted                            |
 | `label` | `string \| (locale: string) => string` | Button text. Function form for locale-aware labels                                        |
 | `value` | `number \| Date`                       | `number` — day offset from today (neg = past, pos = future). `Date` — absolute fixed date |
-| `range` | `number` (optional)                    | Length of range in days after `value`. Absent → single date. Any number → range           |
+| `range` | `number` (optional)                    | Length of range in days after `value`. Absent → single date. Any number → range. Range presets are rendered **only** when `<Calendar mode="range" />`; in `single` and `multiple` modes they are silently filtered out (no button rendered). |
 
 `range` examples:
 
@@ -739,6 +739,37 @@ Return-type semantics:
 
 All preset targets are auto-filtered through `isValid` — a target that is disabled / out of range is not rendered.
 
+#### Defensive handling of bad input
+
+Presets accept user-provided functions and arrays, so the resolver guards against malformed entries. Each guard emits a deduped dev warning and silently drops the offending entry — the rest of the array still renders.
+
+| Condition                                              | Behavior                                              | Warning                                |
+| ------------------------------------------------------ | ----------------------------------------------------- | -------------------------------------- |
+| Array element is not an object (`null`, primitive)     | Entry skipped                                         | `not an object`                        |
+| Entry missing required `label`                         | Entry skipped                                         | `missing the required \`label\` field` |
+| Two entries share the same `id` (or auto-derived id)   | First wins; duplicates skipped                        | `Duplicate preset id`                  |
+| `getValue` throws                                      | Entry skipped, error message included in warning      | `getValue threw: ...`                  |
+| `getValue` returns `new Date(NaN)`                     | Entry skipped                                         | `invalid Date`                         |
+| `getValue` returns a range with NaN `from` / `to`      | Entry skipped                                         | `range with invalid Date(s)`           |
+| `getValue` returns an unexpected shape                 | Entry skipped                                         | `unexpected shape`                     |
+| `getValue` returns `null`                              | Entry skipped silently — documented contract          | (none)                                 |
+
+In production all of the above silently fall back to "skip"; no warning is emitted. The component never crashes due to a single malformed preset.
+
+#### Mode filtering
+
+Whether a preset renders depends on the calendar's `mode`:
+
+| Preset shape                                   | `mode="single"` | `mode="multiple"` | `mode="range"` |
+| ---------------------------------------------- | --------------- | ----------------- | -------------- |
+| Simple `{ value }` (no `range`)                | rendered        | rendered          | rendered       |
+| Simple `{ value, range }` (with `range`)       | **filtered**    | **filtered**      | rendered       |
+| Advanced `getValue` returning `Date`           | rendered        | rendered          | rendered       |
+| Advanced `getValue` returning `{ from, to }`   | **filtered**    | **filtered**      | rendered       |
+| Advanced `getValue` returning `null`           | filtered        | filtered          | filtered       |
+
+Filtered presets are silently dropped — no warning, no placeholder. Click handler is never reached because the button is not in the DOM.
+
 ```tsx
 <CalendarPresets
   presets={[
@@ -781,6 +812,8 @@ import { basicPresets } from "react-calendar-datetime";
 ```
 
 Toggle behavior: clicking an active preset deselects (fires `onChangeDate(null)` / `onRangeSet(null, null)`).
+
+**Tree-shaking.** `basicPresets` is exported from the root barrel only (no separate subpath). The pack module is side-effect-free and the package declares `sideEffects: ["**/*.css"]`, so consumers who import `Calendar` (or any other symbol) from the root and never reference `basicPresets` do not pay the bundle cost. Modern bundlers (esbuild, rollup, webpack 5+) eliminate it automatically.
 
 ---
 
