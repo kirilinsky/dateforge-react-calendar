@@ -58,14 +58,17 @@ describe("SSR — renderToString", () => {
     expect(html).toContain('data-theme="auto"');
   });
 
-  it("readOnly survives SSR with aria-readonly", () => {
+  it("readOnly survives SSR with data-readonly", () => {
     const html = renderToString(
       <Calendar value={D} readOnly>
         <CalendarDays />
       </Calendar>,
     );
-    expect(html).toContain('aria-readonly="true"');
+    // Plain <div> does not support aria-readonly per ARIA spec — axe flags it.
+    // CSS / styling reads data-readonly; per-cell aria-disabled covers the
+    // accessibility surface. aria-readonly removed from the wrapper.
     expect(html).toContain('data-readonly="true"');
+    expect(html).not.toContain("aria-readonly");
   });
 
   it("does not contain any 'undefined' or 'NaN' literal text in Days", () => {

@@ -115,7 +115,6 @@ export function Calendar<M extends CalendarMode = "single">({
         ref={wrapperRef}
         data-theme={activeTheme}
         data-readonly={readOnly || undefined}
-        aria-readonly={readOnly ? "true" : undefined}
         style={{ containerType: "inline-size", width, ...customThemeVars }}
       >
         <CalendarLayout
