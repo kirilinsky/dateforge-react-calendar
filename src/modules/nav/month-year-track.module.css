@@ -1,0 +1,75 @@
+@layer cal-base {
+
+.root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex: 1;
+  min-height: 8em;
+  overflow: hidden;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+.drum {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  overflow: hidden;
+  cursor: pointer;
+  outline: none;
+  border-radius: calc(var(--cal-radius, 0.5em) * 2);
+  transition: box-shadow calc(var(--cal-transition, 0.2s) * 0.75);
+}
+
+.drum:focus-visible {
+  outline: 2px solid var(--c-h);
+  outline-offset: 2px;
+}
+
+.highlight {
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  right: 2px;
+  height: calc(100% / 7);
+  transform: translateY(-50%);
+  background: var(--c-h);
+  border-radius: var(--cal-radius, 0.5em);
+  box-shadow: var(--cal-shadow-md, 0 0.2em 0.6em var(--c-x));
+  pointer-events: none;
+  z-index: 0;
+}
+
+.item {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8em;
+  font-weight: 300;
+  color: var(--c-c);
+  padding: 0.25em 0.4em;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.active {
+  font-weight: 600;
+  color: var(--c-a);
+  cursor: default;
+}
+
+.disabled {
+  cursor: default;
+}
+
+}

@@ -1,3 +1,5 @@
+@layer cal-base {
+
 .flexCenter {
   display: flex;
   align-items: center;
@@ -5,25 +7,28 @@
 }
 
 .interactive {
-  composes: flexCenter;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   background: transparent;
   color: var(--c-c);
-  transition: all 0.2s ease;
+  transition: all var(--cal-transition, 0.2s) ease;
   cursor: pointer;
   user-select: none;
   height: 2.1em;
-  border-radius: 0.5em;
+  border-radius: var(--cal-radius, 0.5em);
 }
 
-.hoverable:hover:not([disabled]) {
+.hoverable:hover:not([disabled]):not([aria-disabled="true"]) {
   background: var(--hover-bg, var(--c-t));
   color: var(--hover-color, inherit);
   box-shadow: var(--hover-shadow, 0 0.1em 0.3em var(--c-x));
   outline: var(--hover-outline, none);
 }
 
-.interactive[disabled] {
+.interactive[disabled],
+.interactive[aria-disabled="true"] {
   cursor: not-allowed;
   opacity: 0.9;
   color: var(--c-d);
@@ -51,4 +56,6 @@
 
 .selectedOtherItem {
   opacity: 0.9;
+}
+
 }

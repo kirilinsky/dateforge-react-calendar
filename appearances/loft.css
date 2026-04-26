@@ -1,0 +1,17 @@
+@layer appearances {
+  [data-appearance="loft"] {
+    --cal-radius: 1em;
+    --cal-container-radius: 2.5em;
+    --header-min-height: 5em;
+    --cal-border: 0px;
+    --cal-spacing: 1em;
+    --cal-shadow-sm: 0 0.3em 0.9em var(--c-x);
+    --cal-shadow-md: 0 0.8em 2em var(--c-x);
+    --cal-shadow-lg: 0 1.5em 3.5em var(--c-x);
+    --cal-font-size: clamp(14px, 3.5cqw, 22px);
+    --cal-transition: 0.35s;
+    --cal-days-padding: 1.8em;
+    --cal-track-height: 5em;
+    --cal-day-ratio: 1 / 1;
+  }
+}

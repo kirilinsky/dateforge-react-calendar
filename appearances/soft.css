@@ -1,0 +1,12 @@
+@layer appearances {
+  [data-appearance="soft"] {
+    --cal-radius: 0.75em;
+    --cal-border: 1px;
+    --cal-spacing: 0.7em;
+    --cal-shadow-sm: 0 0.15em 0.5em var(--c-x);
+    --cal-shadow-md: 0 0.25em 0.8em var(--c-x);
+    --cal-shadow-lg: 0 0.3em 1.2em var(--c-x);
+    --cal-transition: 0.25s;
+    --cal-days-padding: 0.95em;
+  }
+}

@@ -1,4 +1,6 @@
+import React from "react";
 import { CalendarTheme } from "./themes";
+import { CalendarAppearance } from "./appearances";
 
 export type StartOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -9,6 +11,11 @@ export type DisabledRule =
   | { dayOfWeek: number[] }
   | { before?: Date; after?: Date };
 
+export interface DisabledConfig {
+  readonly __type: "disabled-config";
+  readonly rules: DisabledRule[];
+}
+
 export type DateRange = {
   from: Date | null;
   to: Date | null;
@@ -16,81 +23,41 @@ export type DateRange = {
 
 export type CalendarMode = "single" | "multiple" | "range";
 
-export interface CalendarProps {
-  value?: Date | Date[] | DateRange;
-  mode?: CalendarMode;
-  max?: number;
-  startDate?: Date;
-  endDate?: Date;
-  startMonth?: Date;
-  onChange?: (date: Date | null) => void;
-  onDatesChange?: (dates: Date[]) => void;
-  onRangeChange?: (range: DateRange) => void;
-  rangeMinDays?: number;
-  rangeMaxDays?: number;
-  showSelectedDates?: boolean;
+export type CalendarValue<M extends CalendarMode> =
+  M extends "range" ? DateRange :
+  M extends "multiple" ? Date[] :
+  Date | null;
+
+export interface CalendarProps<M extends CalendarMode = "single"> {
+  children?: React.ReactNode;
+  cols?: number;
+  value?: CalendarValue<M>;
+  defaultValue?: CalendarValue<M>;
+  defaultViewDate?: Date;
+  mode?: M;
+  maxDates?: number;
+  minDate?: Date;
+  maxDate?: Date;
+  onChange?: (value: CalendarValue<M>) => void;
+  minRangeDays?: number;
+  maxRangeDays?: number;
   locale?: string;
+  timeZone?: string;
+  readOnly?: boolean;
+  /**
+   * @example theme="midnight"
+   * @example import { midnight } from "@dateforge/react-calendar/themes"; <Calendar theme={midnight} />
+   * @example import { abyss } from "@dateforge/react-calendar/themes/abyss"; <Calendar theme={abyss} />
+   */
   theme?: CalendarTheme;
   width?: string | number;
-  startOfWeek?: StartOfWeek;
-  time?: boolean;
   hour12?: boolean;
-  timeGrid?: boolean;
-  presets?: boolean;
-  years?: boolean;
-  months?: boolean;
-  monthsGrid?: boolean;
-  compactYears?: boolean;
-  compactMonths?: boolean;
-  brutalism?: boolean;
-  gestures?: boolean;
+  /**
+   * @example // default — no import needed, just omit the prop
+   * @example import { loft } from "@dateforge/react-calendar/appearances"; <Calendar appearance={loft} />
+   * @example import { compact } from "@dateforge/react-calendar/appearances/compact"; <Calendar appearance={compact} />
+   */
+  appearance?: CalendarAppearance;
   gradient?: boolean;
-  highlightWeekends?: boolean;
-  showWeekNumber?: boolean;
-  hideLimited?: boolean;
-  hideDisabled?: boolean;
-  hideWeekdays?: boolean;
-  shortMonths?: boolean;
-  disabled?: DisabledRule | DisabledRule[];
-  twoMonthsLayout?: boolean;
-  monthsColumn?: boolean;
-  showHomeButton?: boolean;
-  showClearButton?: boolean;
-  showThemeToggle?: boolean;
-  highlightToday?: boolean;
-}
-
-export interface CalendarContextValue extends Omit<
-  CalendarProps,
-  "onChange" | "onDatesChange" | "onRangeChange" | "mode" | "max"
-> {
-  range: boolean;
-  multiselect: number | boolean | undefined;
-  date: Date;
-  containerWidth: number;
-  locale: string;
-  startOfWeek: StartOfWeek;
-  time: boolean;
-  presets: boolean;
-  years: boolean;
-  months: boolean;
-  monthsGrid: boolean;
-  compactMonths: boolean;
-  onChangeDate: (date: Date | null) => void;
-  onChangeTime: (date: Date) => void;
-  navigateTo: (date: Date) => void;
-  selectedDate: Date | null;
-  selectedDates: Date[];
-  rangeStart: Date | null;
-  rangeEnd: Date | null;
-  hoverDate: Date | null;
-  setHoverDate: (d: Date | null) => void;
-  dark: boolean;
-  toggleTheme: () => void;
-  showTimePopup: boolean;
-  setShowTimePopup: (v: boolean) => void;
-  showMonthPopup: boolean;
-  setShowMonthPopup: (v: boolean) => void;
-  showYearPopup: boolean;
-  setShowYearPopup: (v: boolean) => void;
+  disabled?: DisabledConfig;
 }

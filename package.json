@@ -1,82 +1,280 @@
 {
-  "name": "react-calendar-datetime",
-  "version": "5.2.2",
-  "description": "Zero-dependency React date & time picker, range & multi-select, themes, gestures, fluid adaptive layout.",
+  "name": "@dateforge/react-calendar",
+  "version": "1.0.0-beta.0",
+  "description": "Modular React calendar and date/time picker. Single, range, and multi-select with time support and presets. Themeable, accessible, SSR-safe, zero dependencies.",
   "type": "module",
   "types": "./dist/index.d.ts",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs",
-      "default": "./dist/index.mjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./context": {
+      "import": {
+        "types": "./dist/context.d.ts",
+        "default": "./dist/context.mjs"
+      },
+      "require": {
+        "types": "./dist/context.d.cts",
+        "default": "./dist/context.cjs"
+      }
+    },
+    "./modules": {
+      "import": {
+        "types": "./dist/modules/index.d.ts",
+        "default": "./dist/modules/index.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/index.d.cts",
+        "default": "./dist/modules/index.cjs"
+      }
+    },
+    "./modules/days": {
+      "import": {
+        "types": "./dist/modules/days.d.ts",
+        "default": "./dist/modules/days.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/days.d.cts",
+        "default": "./dist/modules/days.cjs"
+      }
+    },
+    "./modules/nav": {
+      "import": {
+        "types": "./dist/modules/nav.d.ts",
+        "default": "./dist/modules/nav.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/nav.d.cts",
+        "default": "./dist/modules/nav.cjs"
+      }
+    },
+    "./modules/months-grid": {
+      "import": {
+        "types": "./dist/modules/months-grid.d.ts",
+        "default": "./dist/modules/months-grid.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/months-grid.d.cts",
+        "default": "./dist/modules/months-grid.cjs"
+      }
+    },
+    "./modules/time": {
+      "import": {
+        "types": "./dist/modules/time.d.ts",
+        "default": "./dist/modules/time.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/time.d.cts",
+        "default": "./dist/modules/time.cjs"
+      }
+    },
+    "./modules/presets": {
+      "import": {
+        "types": "./dist/modules/presets.d.ts",
+        "default": "./dist/modules/presets.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/presets.d.cts",
+        "default": "./dist/modules/presets.cjs"
+      }
+    },
+    "./modules/selected-dates": {
+      "import": {
+        "types": "./dist/modules/selected-dates.d.ts",
+        "default": "./dist/modules/selected-dates.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/selected-dates.d.cts",
+        "default": "./dist/modules/selected-dates.cjs"
+      }
+    },
+    "./modules/manual-input": {
+      "import": {
+        "types": "./dist/modules/manual-input.d.ts",
+        "default": "./dist/modules/manual-input.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/manual-input.d.cts",
+        "default": "./dist/modules/manual-input.cjs"
+      }
+    },
+    "./modules/years-track": {
+      "import": {
+        "types": "./dist/modules/years-track.d.ts",
+        "default": "./dist/modules/years-track.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/years-track.d.cts",
+        "default": "./dist/modules/years-track.cjs"
+      }
+    },
+    "./modules/months-track": {
+      "import": {
+        "types": "./dist/modules/months-track.d.ts",
+        "default": "./dist/modules/months-track.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/months-track.d.cts",
+        "default": "./dist/modules/months-track.cjs"
+      }
+    },
+    "./modules/days-track": {
+      "import": {
+        "types": "./dist/modules/days-track.d.ts",
+        "default": "./dist/modules/days-track.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/days-track.d.cts",
+        "default": "./dist/modules/days-track.cjs"
+      }
+    },
+    "./modules/years-grid": {
+      "import": {
+        "types": "./dist/modules/years-grid.d.ts",
+        "default": "./dist/modules/years-grid.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/years-grid.d.cts",
+        "default": "./dist/modules/years-grid.cjs"
+      }
+    },
+    "./themes": {
+      "import": {
+        "types": "./dist/themes/index.d.ts",
+        "default": "./dist/themes/index.mjs"
+      },
+      "require": {
+        "types": "./dist/themes/index.d.cts",
+        "default": "./dist/themes/index.cjs"
+      }
+    },
+    "./themes/*": {
+      "import": {
+        "types": "./dist/themes/*.d.ts",
+        "default": "./dist/themes/*.mjs"
+      },
+      "require": {
+        "types": "./dist/themes/*.d.cts",
+        "default": "./dist/themes/*.cjs"
+      }
+    },
+    "./appearances": {
+      "import": {
+        "types": "./dist/appearances/index.d.ts",
+        "default": "./dist/appearances/index.mjs"
+      },
+      "require": {
+        "types": "./dist/appearances/index.d.cts",
+        "default": "./dist/appearances/index.cjs"
+      }
+    },
+    "./appearances/*": {
+      "import": {
+        "types": "./dist/appearances/*.d.ts",
+        "default": "./dist/appearances/*.mjs"
+      },
+      "require": {
+        "types": "./dist/appearances/*.d.cts",
+        "default": "./dist/appearances/*.cjs"
+      }
     }
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kirilinsky/react-calendar-datetime"
+    "url": "git+https://github.com/kirilinsky/dateforge-react-calendar.git"
   },
   "homepage": "https://calendar-demo-pi.vercel.app/",
   "bugs": {
-    "url": "https://github.com/kirilinsky/react-calendar-datetime/issues"
+    "url": "https://github.com/kirilinsky/dateforge-react-calendar/issues"
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "start": "ladle serve",
+    "start": "storybook dev -p 6006 --no-open",
     "dev": "tsdown --watch",
-    "build": "npx tsx scripts/generate-theme.ts && tsdown --dts",
-    "clean": "rm -rf dist"
+    "knip": "knip",
+    "build": "tsdown --dts && npx tsx scripts/generate-theme.ts && npx tsx scripts/generate-appearance.ts",
+    "clean": "rm -rf dist",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "storybook": "storybook dev -p 6006 --no-open",
+    "build-storybook": "storybook build",
+    "chromatic": "node --env-file=.env.local node_modules/.bin/chromatic"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0"
   },
   "devDependencies": {
-    "@ladle/react": "^5.1.1",
+    "@chromatic-com/storybook": "^5.1.2",
+    "@storybook/addon-a11y": "^10.3.5",
+    "@storybook/addon-docs": "^10.3.5",
+    "@storybook/addon-vitest": "^10.3.5",
+    "@storybook/react-vite": "^10.3.5",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@tsdown/css": "^0.21.4",
-    "@types/node": "^25.5.0",
+    "@types/jest-axe": "^3.5.9",
+    "@types/node": "^25.6.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@vitest/browser-playwright": "^4.1.5",
+    "@vitest/coverage-v8": "^4.1.5",
+    "chromatic": "^16.6.0",
+    "happy-dom": "^20.9.0",
+    "jest-axe": "^10.0.0",
+    "knip": "^6.7.0",
+    "playwright": "^1.59.1",
     "react": "^19",
     "react-dom": "^19",
+    "storybook": "^10.3.5",
     "tsdown": "^0.21.4",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "var-th": "^0.1.7"
+    "vitest": "^4.1.5"
   },
   "keywords": [
     "react",
     "calendar",
     "datepicker",
+    "date picker",
+    "time picker",
     "datetime-picker",
-    "time-picker",
-    "date-range-picker",
-    "react-calendar",
-    "react-datepicker",
-    "date-picker",
-    "range-picker",
-    "multi-select",
-    "localization",
-    "i18n",
-    "themes",
-    "dark-mode",
-    "css-variables",
-    "customizable",
-    "lightweight",
-    "zero-dependencies",
+    "date range picker",
+    "multi select",
     "typescript",
-    "nextjs",
-    "gestures",
-    "presets",
-    "responsive"
+    "a11y",
+    "accessibility",
+    "headless",
+    "customizable",
+    "mobile",
+    "composable",
+    "modular",
+    "ssr",
+    "themeable",
+    "css-grid",
+    "zero-dependencies",
+    "react-19",
+    "dateforge"
   ],
   "engines": {
     "node": ">=18.0.0"
   },
-  "sideEffects": false,
+  "sideEffects": [
+    "**/*.css"
+  ],
   "author": "Kirilinsky (https://github.com/kirilinsky)",
   "license": "MIT"
 }

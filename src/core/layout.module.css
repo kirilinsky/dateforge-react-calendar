@@ -1,0 +1,157 @@
+@layer themes {
+  :global([data-theme="light"]),
+  :global([data-theme="auto"]) {
+    --c-a: #ffffff;
+    --c-b: #ffffff;
+    --c-h: #1a1a1c;
+    --c-t: #f4f4f4;
+    --c-c: #1a1a1c;
+    --c-s: #e8e8e8;
+    --c-x: #1a1a1c14;
+    --c-d: #a0a0a2;
+    --c-we: #e32825;
+    --c-r: #4a90d9;
+  }
+
+  :global([data-theme="dark"]) {
+    --c-a: #1a1a1c;
+    --c-b: #1a1a1c;
+    --c-h: #ffffff;
+    --c-t: #2d2d2d;
+    --c-c: #f0f0f0;
+    --c-s: #333333;
+    --c-x: #ffffff16;
+    --c-d: #555558;
+    --c-we: #e32825;
+    --c-r: #4a90d9;
+  }
+
+  /* CSS-native auto: when no JS-resolved theme is set, follow the OS
+     preference. This kills the white flash on first paint with theme="auto" +
+     dark system — CSS picks dark before any JS runs. */
+  @media (prefers-color-scheme: dark) {
+    :global([data-theme="auto"]) {
+      --c-a: #1a1a1c;
+      --c-b: #1a1a1c;
+      --c-h: #ffffff;
+      --c-t: #2d2d2d;
+      --c-c: #f0f0f0;
+      --c-s: #333333;
+      --c-x: #ffffff16;
+      --c-d: #555558;
+      --c-we: #e32825;
+      --c-r: #4a90d9;
+    }
+  }
+}
+
+@layer cal-base {
+  .calendarContainer {
+    --cal-radius: 0.5em;
+    --cal-font: system-ui, -apple-system, sans-serif;
+    --cal-transition: 0.2s;
+    --cal-border: 1px;
+    --cal-spacing: 0.6em;
+    --cal-shadow-sm: 0 0.1em 0.3em var(--c-x);
+    --cal-shadow-md: 0 0.2em 0.6em var(--c-x);
+    --cal-shadow-lg: 0 0.2em 0.8em var(--c-x);
+
+    container-type: inline-size;
+    display: grid;
+    gap: 1px;
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 864px;
+    font-size: var(--cal-font-size, clamp(11px, 2.7cqw, 18px));
+    background: var(--c-s);
+    color: var(--c-c);
+    font-family: var(--cal-font);
+    user-select: none;
+    border-radius: var(--cal-container-radius, calc(var(--cal-radius) * 1.6));
+    border: var(--cal-border) solid var(--c-s);
+    box-shadow: var(--cal-shadow-lg);
+    overflow: hidden;
+  }
+
+  .calendarContainer * {
+    box-sizing: border-box;
+  }
+
+  .calendarContainer > [data-area] {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    background: var(--c-b);
+    grid-column: 1 / -1;
+  }
+
+  .calendarContainer.gradient {
+    background:
+      radial-gradient(
+        ellipse 50% 45% at 5% 5%,
+        color-mix(in srgb, var(--c-b) 89%, var(--c-h)) 0%,
+        transparent 100%
+      ),
+      radial-gradient(
+        ellipse 40% 38% at 95% 95%,
+        color-mix(in srgb, var(--c-b) 90%, var(--c-h)) 0%,
+        transparent 100%
+      ),
+      var(--c-b);
+  }
+
+  .calendarContainer.gradient > [data-area] {
+    background: transparent;
+    outline: 1px solid var(--c-s);
+  }
+
+  .emptyState {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55em;
+    padding: 2.5em 2em;
+    text-align: center;
+    background: var(--c-b);
+  }
+
+  .emptyStateTitle {
+    font-size: 1em;
+    font-weight: 700;
+    color: var(--c-h);
+    opacity: 0.25;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .emptyStateHint {
+    font-size: 0.78em;
+    color: var(--c-h);
+    opacity: 0.18;
+    line-height: 1.6;
+    max-width: 22em;
+
+    & code {
+      font-family: ui-monospace, monospace;
+      opacity: 0.9;
+    }
+  }
+
+  .secondMonthLabel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5em;
+    min-height: 3em;
+    font-size: 0.9em;
+    font-weight: 800;
+    border-top: var(--cal-border) solid var(--c-s);
+    border-bottom: var(--cal-border) solid var(--c-s);
+    background: var(--c-a);
+    color: var(--c-c);
+    grid-column: 1 / -1;
+  }
+}

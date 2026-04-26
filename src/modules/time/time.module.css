@@ -1,0 +1,22 @@
+@layer cal-base {
+
+.timeContainer {
+  container-type: inline-size;
+  position: relative;
+  padding: var(--cal-spacing);
+  min-height: 10em;
+  transition: all var(--cal-transition) linear;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+@container (min-width: 15em) {
+  .timeContainer {
+    min-height: 8em;
+    align-items: center;
+  }
+}
+
+}

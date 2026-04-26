@@ -1,0 +1,40 @@
+@layer cal-base {
+
+.presetsContainer {
+  container-type: inline-size;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: stretch;
+  gap: 0.25em;
+  padding: 0.75em 0.3em;
+  height: auto;
+  z-index: 3;
+  transition: all var(--cal-transition) linear;
+}
+
+@container (max-width: 20em) {
+  .presetsContainer {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.presetItem {
+  justify-self: center;
+  align-self: center;
+  width: 95%;
+  height: auto !important;
+  min-height: 2.1em;
+  padding-top: 1em !important;
+  padding-bottom: 1em !important;
+  font-size: 0.8em !important;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.inactiveItem {
+  background: transparent;
+}
+
+}

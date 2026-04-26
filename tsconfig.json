@@ -16,15 +16,13 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true, 
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@dateforge/react-calendar": ["./src/index.ts"]
     }
   },
-  "include": ["src/**/*", "global.d.ts", "themes/themes.ts"],
+  "include": ["src/**/*", "global.d.ts", "themes/themes.ts", ".storybook/**/*"],
   "exclude": [
     "node_modules",
-    "dist",
-    "**/*.stories.tsx",
-    "**/stories",
-    "**/*.test.tsx"
+    "dist"
   ]
 }

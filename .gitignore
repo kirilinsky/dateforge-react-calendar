@@ -24,4 +24,6 @@ yarn-debug.log*
 yarn-error.log*
 
 # planning
-plan.md
+/plans
+
+*storybook.log

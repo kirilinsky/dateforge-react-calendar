@@ -1,0 +1,199 @@
+@layer cal-base {
+
+.dayGridContainer {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+  --day-gap: 0.15em;
+  --rng-bg: color-mix(in srgb, var(--c-r) 28%, var(--c-b));
+  --rng-prev: color-mix(in srgb, var(--c-r) 16%, transparent);
+  padding: var(--cal-days-padding, 0.85em);
+  height: auto;
+  box-sizing: border-box;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.weekRow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--day-gap);
+}
+
+.dayGridContainer.withWeekNumbers {
+  padding: var(--days-wn-padding, 0.85em);
+  gap: var(--days-wn-gap, 0.15em);
+  --day-gap: var(--days-wn-gap, 0.15em);
+}
+
+.dayGridContainer.withWeekNumbers .weekRow {
+  grid-template-columns: 2.2em repeat(7, 1fr);
+}
+
+.weekNumberItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7em;
+  color: var(--c-h);
+  opacity: 0.35;
+  font-weight: 600;
+  padding: 0.5em 0.25em !important;
+}
+
+.todayItem {
+  outline: var(--cal-today-outline-width, 1px) solid color-mix(in srgb, var(--c-h) 50%, transparent);
+  outline-offset: -1px;
+  --hover-outline: var(--cal-today-outline-width, 1px) solid color-mix(in srgb, var(--c-h) 50%, transparent);
+}
+
+.boldWeekend {
+  font-weight: 700;
+}
+
+.boldWeekend[data-weekend]:not([aria-selected="true"]) {
+  color: var(--c-we) !important;
+}
+
+.dayItemEmpty {
+  width: 100%;
+  aspect-ratio: var(--cal-day-ratio, 1 / 0.85);
+}
+
+.dayItem {
+  width: 100%;
+  min-width: 0;
+  height: auto !important;
+  aspect-ratio: var(--cal-day-ratio, 1 / 0.85);
+  padding: 0;
+  position: relative;
+  z-index: 1;
+  font-size: clamp(0.7em, 4.4cqi, 1.15em);
+  &:disabled,
+  &[aria-disabled="true"] {
+    text-decoration: line-through;
+    color: var(--c-h);
+  }
+}
+
+.rangeStart {
+  border-radius: var(--cal-radius, 0.5em) 0 0 var(--cal-radius, 0.5em) !important;
+  box-shadow: calc(var(--day-gap) / 2) 0 0 0 var(--c-h) !important;
+}
+
+.rangeEnd {
+  border-radius: 0 var(--cal-radius, 0.5em) var(--cal-radius, 0.5em) 0 !important;
+  box-shadow: calc(-1 * var(--day-gap) / 2) 0 0 0 var(--c-h) !important;
+}
+
+.rangeMid {
+  border-radius: 0 !important;
+  box-shadow:
+    calc(var(--day-gap) / 2) 0 0 0 var(--c-h),
+    calc(-1 * var(--day-gap) / 2) 0 0 0 var(--c-h) !important;
+}
+
+.rStart {
+  border-radius: var(--cal-radius, 0.5em) 0 0 var(--cal-radius, 0.5em) !important;
+}
+.rEnd {
+  border-radius: 0 var(--cal-radius, 0.5em) var(--cal-radius, 0.5em) 0 !important;
+}
+
+.rBridgeRight {
+  box-shadow: calc(var(--day-gap) / 2) 0 0 0
+    var(--rng-bg) !important;
+}
+.rBridgeLeft {
+  box-shadow: calc(-1 * var(--day-gap) / 2) 0 0 0
+    var(--rng-bg) !important;
+}
+.rBridgeBoth {
+  box-shadow:
+    calc(var(--day-gap) / 2) 0 0 0
+      var(--rng-bg),
+    calc(-1 * var(--day-gap) / 2) 0 0 0
+      var(--rng-bg) !important;
+}
+
+.rIn {
+  background: var(--rng-bg) !important;
+  color: var(--c-c) !important;
+  border-radius: 0 !important;
+}
+
+.rInDisabled {
+  background: color-mix(in srgb, var(--c-we) 32%, var(--rng-bg)) !important;
+  color: var(--c-c) !important;
+  border-radius: 0 !important;
+}
+
+.rPreviewStart {
+  background: var(--rng-prev) !important;
+  border-radius: var(--cal-radius, 0.5em) 0 0 var(--cal-radius, 0.5em) !important;
+}
+.rPreviewEnd {
+  background: var(--rng-prev) !important;
+  border-radius: 0 var(--cal-radius, 0.5em) var(--cal-radius, 0.5em) 0 !important;
+}
+.rPreview {
+  background: var(--rng-prev) !important;
+  border-radius: 0 !important;
+}
+.rPreviewBridgeRight {
+  box-shadow: calc(var(--day-gap) / 2) 0 0 0
+    var(--rng-prev) !important;
+}
+.rPreviewBridgeLeft {
+  box-shadow: calc(-1 * var(--day-gap) / 2) 0 0 0
+    var(--rng-prev) !important;
+}
+.rPreviewBridgeBoth {
+  box-shadow:
+    calc(var(--day-gap) / 2) 0 0 0
+      var(--rng-prev),
+    calc(-1 * var(--day-gap) / 2) 0 0 0
+      var(--rng-prev) !important;
+}
+
+@container (max-width: 14em) {
+  .dayGridContainer {
+    padding: min(var(--cal-days-padding, 0.85em), 0.5em);
+  }
+  .dayGridContainer.withWeekNumbers {
+    padding: min(var(--days-wn-padding, 0.5em), 0.3em);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(1.5em) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-1.5em) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.right {
+  animation: slideInRight 0.31s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.left {
+  animation: slideInLeft 0.31s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+}
