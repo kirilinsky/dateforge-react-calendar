@@ -71,7 +71,10 @@ export const AppearancesOverview: Story = {
 AppearancesOverview.storyName = "All appearances (default theme)";
 
 export const Matrix: Story = {
-  parameters: { storyWidth: "auto" },
+  // Heavy: 33 themes × 6 appearances = 198 cells. Skip in addon-vitest test runner
+  // and Chromatic's default; render only in interactive Storybook.
+  tags: ["!test"],
+  parameters: { storyWidth: "auto", chromatic: { disable: true } },
   render: () => (
     <div
       style={{

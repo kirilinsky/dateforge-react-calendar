@@ -24,7 +24,7 @@ interface UseTrackReturn {
   position: number; // float index (offset / pixelsPerItem)
   scrollTo: (targetIndex: number) => void;
   onPointerDown: (e: React.PointerEvent) => void;
-  onPointerMove: (e: React.PointerEvent) => void;
+  onPointerMove: () => void;
   onPointerUp: () => void;
   onPointerCancel: () => void;
 }
@@ -219,39 +219,80 @@ export function useTrack({
     p.current.velocity = (p.current.velocity / oldPpi) * pixelsPerItem;
   }, [pixelsPerItem]);
 
+  // Stable window-level handlers, set up once on mount.
+  // Reason: relying on React's onPointerMove/Up on the element itself loses
+  // events the moment the cursor leaves the element bounds — leaving isDragging
+  // stuck at true. Window listeners catch the pointerup wherever it happens.
+  const handlers = useRef<{ move: (e: PointerEvent) => void; up: () => void } | null>(null);
+  if (!handlers.current) {
+    handlers.current = {
+      move: (e: PointerEvent) => {
+        if (!p.current.isDragging) return;
+        const { lo, hi, isCircular, c, ppi } = getBounds();
+        const delta = p.current.lastX - e.clientX;
+        p.current.lastX = e.clientX;
+
+        p.current.offset += delta;
+        p.current.velocity = delta;
+
+        if (!isCircular) {
+          p.current.offset = clamp(
+            p.current.offset,
+            lo * ppi - ppi,
+            hi * ppi + ppi,
+          );
+        } else {
+          const range = c * ppi;
+          p.current.offset = ((p.current.offset % range) + range) % range;
+        }
+
+        notifyIfChanged(p.current.offset);
+        setPosition(p.current.offset / ppi);
+      },
+      up: () => {
+        p.current.isDragging = false;
+        const h = handlers.current!;
+        window.removeEventListener("pointermove", h.move);
+        window.removeEventListener("pointerup", h.up);
+        window.removeEventListener("pointercancel", h.up);
+      },
+    };
+  }
+
+  // Cleanup window listeners on unmount.
+  useEffect(() => {
+    return () => {
+      const h = handlers.current;
+      if (!h) return;
+      window.removeEventListener("pointermove", h.move);
+      window.removeEventListener("pointerup", h.up);
+      window.removeEventListener("pointercancel", h.up);
+    };
+  }, []);
+
   const onPointerDown = (e: React.PointerEvent) => {
+    const h = handlers.current!;
+    // Detach defensively in case a previous gesture left listeners attached.
+    window.removeEventListener("pointermove", h.move);
+    window.removeEventListener("pointerup", h.up);
+    window.removeEventListener("pointercancel", h.up);
+
     p.current.isDragging = true;
     p.current.fromGesture = true;
     p.current.lastX = e.clientX;
     p.current.velocity = 0;
+
+    window.addEventListener("pointermove", h.move);
+    window.addEventListener("pointerup", h.up);
+    window.addEventListener("pointercancel", h.up);
   };
 
-  const onPointerMove = (e: React.PointerEvent) => {
-    if (!p.current.isDragging) return;
-    const { lo, hi, isCircular, c, ppi } = getBounds();
-    const delta = p.current.lastX - e.clientX;
-    p.current.lastX = e.clientX;
-
-    p.current.offset += delta;
-    p.current.velocity = delta;
-
-    if (!isCircular) {
-      p.current.offset = clamp(
-        p.current.offset,
-        lo * ppi - ppi,
-        hi * ppi + ppi,
-      );
-    } else {
-      const range = c * ppi;
-      p.current.offset = ((p.current.offset % range) + range) % range;
-    }
-
-    notifyIfChanged(p.current.offset);
-    setPosition(p.current.offset / ppi);
+  const onPointerMove = () => {
+    // No-op: handled at window level.
   };
 
   const onPointerUp = () => {
-    p.current.isDragging = false;
+    // No-op: handled at window level.
   };
 
   const scrollTo = (targetIndex: number) => {
