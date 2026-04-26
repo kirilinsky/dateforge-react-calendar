@@ -10,7 +10,7 @@
   - [CalendarYearsGrid](#calendaryearsgrid)
   - [CalendarTimeGrid](#calendartimegrid)
   - [CalendarPresets](#calendarpresets)
-  - [CalendarSelectedDates](#calendarselectedates)
+  - [CalendarSelectedDates](#calendarselecteddates)
   - [CalendarManualSelect](#calendarmanualselect)
   - [CalendarDaysTrack](#calendardaystrack)
   - [CalendarMonthsTrack](#calendarmonthstrack)
@@ -231,10 +231,10 @@ Navigation header with configurable controls.
 | Prop              | Type               | Default | Description                                                                                                                                                          |
 | ----------------- | ------------------ | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `label`           | `string`           | —       | Custom text shown as the header label, max 180 length.                                                                                                               |
-| `showMonthPicker` | `boolean`          | `false` | Show previous/next month arrow buttons                                                                                                                               |
-| `compactMonths`   | `boolean`          | `false` | Show a compact month dropdown instead of arrows                                                                                                                      |
-| `showYearPicker`  | `boolean`          | `false` | Show previous/next year arrow buttons                                                                                                                                |
-| `compactYears`    | `boolean`          | `false` | Show a compact year dropdown instead of arrows                                                                                                                       |
+| `showMonthPicker` | `boolean`          | `false` | Render the month controls block: previous/next month arrows plus a clickable month label that opens a full-page month grid popup. Mutually exclusive with `compactMonths` (combining both fires a dev warning) |
+| `compactMonths`   | `boolean`          | `false` | Render the same month popup behind a compact dropdown button (no inline arrows). Use this **instead of** `showMonthPicker` for a smaller header                       |
+| `showYearPicker`  | `boolean`          | `false` | Render the year controls block: previous/next year arrows plus a clickable year label that opens a year grid popup. Mutually exclusive with `compactYears`            |
+| `compactYears`    | `boolean`          | `false` | Render the same year popup behind a compact dropdown button. Use this **instead of** `showYearPicker`                                                                 |
 | `animateTime`     | `boolean`          | `true`  | Show flip animation for in `showTime` and `showNowTime`                                                                                                              |
 | `monthLabel`      | `boolean`          | `false` | Show the current month name as plain text (no controls, no popup)                                                                                                    |
 | `yearLabel`       | `boolean`          | `false` | Show the current year as plain text (no controls, no popup)                                                                                                          |

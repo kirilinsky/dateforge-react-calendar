@@ -195,6 +195,7 @@ export const MonthPopup = ({
   const [month, setMonth] = useState(date.getMonth());
   return (
     <Popup
+      label="Select month"
       onConfirm={() => onConfirm(applyMonth(date, month))}
       onClose={onClose}
     >
@@ -228,7 +229,11 @@ export const YearPopup = ({
 }: YearPopupProps) => {
   const [year, setYear] = useState(date.getFullYear());
   return (
-    <Popup onConfirm={() => onConfirm(applyYear(date, year))} onClose={onClose}>
+    <Popup
+      label="Select year"
+      onConfirm={() => onConfirm(applyYear(date, year))}
+      onClose={onClose}
+    >
       <YearTrack
         year={year}
         minDate={minDate}
