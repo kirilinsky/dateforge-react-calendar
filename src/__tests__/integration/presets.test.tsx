@@ -184,6 +184,31 @@ describe("Presets — defensive handling of bad input", () => {
   });
 });
 
+describe("Presets — maxDates cap", () => {
+  it("preset click is silently dropped when cap is reached", async () => {
+    const onChange = vi.fn();
+    const D = (day: number) => new Date(2024, 5, day);
+    const { container } = render(
+      <Calendar
+        mode="multiple"
+        maxDates={3}
+        value={[D(1), D(2), D(3)]}
+        onChange={onChange}
+      >
+        <CalendarPresets
+          presets={[{ id: "tenth", label: "Tenth", value: D(10) }]}
+        />
+      </Calendar>,
+    );
+    const btn = Array.from(container.querySelectorAll("button")).find(
+      (b) => b.textContent?.trim() === "Tenth",
+    );
+    expect(btn).toBeTruthy();
+    await userEvent.click(btn!);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+});
+
 describe("Presets — mode filtering", () => {
   it("simple range preset is filtered in single mode", () => {
     const { container } = render(

@@ -34,6 +34,9 @@ const getRangeSep = (
 };
 
 
+// TODO: per-chip remove (× icon on each chip). Useful in mode="multiple" to drop one
+// date without wiping the whole selection, and in mode="range" to clear from/to
+// individually via onRangeBoundSet(bound, null). Gate behind a new prop, e.g. `chipRemove`.
 export interface CalendarSelectedDatesProps {
   allowClear?: boolean;
   allowNavigate?: boolean;

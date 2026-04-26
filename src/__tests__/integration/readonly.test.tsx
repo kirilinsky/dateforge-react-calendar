@@ -51,6 +51,22 @@ describe("readOnly — SelectedDates clear", () => {
     await userEvent.click(btn);
     expect(onChange).not.toHaveBeenCalled();
   });
+
+  it("chip is rendered enabled under readOnly (chip click = navigation, allowed)", async () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <Calendar value={D} onChange={onChange} readOnly>
+        <CalendarSelectedDates />
+      </Calendar>,
+    );
+    const chip = Array.from(container.querySelectorAll("button")).find(
+      (b) => b.getAttribute("aria-label") !== "Clear",
+    ) as HTMLElement | undefined;
+    expect(chip).toBeTruthy();
+    expect(chip).not.toBeDisabled();
+    await userEvent.click(chip!);
+    expect(onChange).not.toHaveBeenCalled();
+  });
 });
 
 describe("readOnly — ManualSelect", () => {

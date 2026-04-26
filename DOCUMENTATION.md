@@ -53,7 +53,7 @@ import { Calendar } from "react-calendar-datetime";
 | `width`        | `string \| number`                  | `"100%"`    | Container width                                                                                                                                                                                                       |
 | `minDate`      | `Date`                              | —           | Earliest selectable date                                                                                                                                                                                              |
 | `maxDate`      | `Date`                              | —           | Latest selectable date                                                                                                                                                                                                |
-| `maxDates`     | `number`                            | —           | Maximum number of selectable dates (multiple mode only)                                                                                                                                                               |
+| `maxDates`     | `number`                            | —           | Maximum number of selectable dates (`mode="multiple"` only). When the cap is reached: clicking a not-yet-selected date (in `<CalendarDays>`, via a preset, or any other interactive module) is silently ignored — no `onChange`, no view change. Clicking an already-selected date still toggles it off, freeing a slot. `<CalendarManualSelect>` hides its add-input when the cap is reached. |
 | `minRangeDays` | `number`                            | —           | Minimum number of days in a range selection                                                                                                                                                                           |
 | `maxRangeDays` | `number`                            | —           | Maximum number of days in a range selection                                                                                                                                                                           |
 | `disabled`     | `DisabledConfig`                    | —           | Rules for disabling specific dates. Build with `createDisabled()`                                                                                                                                                     |
@@ -235,7 +235,7 @@ Navigation header with configurable controls.
 | `compactMonths`   | `boolean`          | `false` | Render the same month popup behind a compact dropdown button (no inline arrows). Use this **instead of** `showMonthPicker` for a smaller header                       |
 | `showYearPicker`  | `boolean`          | `false` | Render the year controls block: previous/next year arrows plus a clickable year label that opens a year grid popup. Mutually exclusive with `compactYears`            |
 | `compactYears`    | `boolean`          | `false` | Render the same year popup behind a compact dropdown button. Use this **instead of** `showYearPicker`                                                                 |
-| `animateTime`     | `boolean`          | `true`  | Show flip animation for in `showTime` and `showNowTime`                                                                                                              |
+| `animateTime`     | `boolean`          | `true`  | Enable per-digit flip animation for both `showTime` (the inline display of the selected time) and `showNowTime` (the live system clock). Set `false` to render plain text |
 | `monthLabel`      | `boolean`          | `false` | Show the current month name as plain text (no controls, no popup)                                                                                                    |
 | `yearLabel`       | `boolean`          | `false` | Show the current year as plain text (no controls, no popup)                                                                                                          |
 | `showTime`        | `boolean`          | `false` | Show a button that opens the time picker popup                                                                                                                       |
@@ -365,7 +365,7 @@ import { CalendarPresets, basicPresets } from "react-calendar-datetime";
 
 ### CalendarSelectedDates
 
-Displays the currently selected dates as removable chips.
+Displays the currently selected dates as chips. Clicking a chip navigates the view to that date (when `allowNavigate`). An optional clear-all button next to the chips wipes the selection. Per-chip remove is **not** currently supported — use `<CalendarManualSelect>` in multi/range mode if individual remove is required.
 
 ```tsx
 <CalendarSelectedDates allowClear animated align="center" />

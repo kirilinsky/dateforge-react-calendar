@@ -101,6 +101,47 @@ describe("defaultViewDate — Calendar root", () => {
   });
 });
 
+describe("maxDates cap", () => {
+  it("Days click on a non-selected date does not fire onChange when cap is reached", async () => {
+    const onChange = vi.fn();
+    const D2 = (day: number) => new Date(2024, 5, day);
+    const { container } = render(
+      <Calendar
+        mode="multiple"
+        maxDates={3}
+        value={[D2(1), D2(2), D2(3)]}
+        onChange={onChange}
+      >
+        <CalendarDays />
+      </Calendar>,
+    );
+    const target = findDayButton(container, 10);
+    await userEvent.click(target);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("Days click on an already-selected date toggles it off (frees a slot)", async () => {
+    const onChange = vi.fn();
+    const D2 = (day: number) => new Date(2024, 5, day);
+    const { container } = render(
+      <Calendar
+        mode="multiple"
+        maxDates={3}
+        value={[D2(1), D2(2), D2(3)]}
+        onChange={onChange}
+      >
+        <CalendarDays />
+      </Calendar>,
+    );
+    const target = findDayButton(container, 2);
+    await userEvent.click(target);
+    expect(onChange).toHaveBeenCalled();
+    const last = onChange.mock.calls.at(-1)![0] as Date[];
+    expect(last.length).toBe(2);
+    expect(last.some((d) => d.getDate() === 2)).toBe(false);
+  });
+});
+
 describe("controlled vs uncontrolled — value precedence", () => {
   it("value takes precedence over defaultValue when both provided", () => {
     const { container } = render(
