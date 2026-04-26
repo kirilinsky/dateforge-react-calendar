@@ -95,6 +95,18 @@ export function validateCalendarValue(
   }
 }
 
+const VALID_THEME_STRINGS = new Set(["auto", "light", "dark"]);
+
+export function validateTheme(theme: unknown): void {
+  if (!isDev() || theme == null) return;
+  if (typeof theme !== "string") return;
+  if (VALID_THEME_STRINGS.has(theme)) return;
+  warnOnce(
+    `theme:invalid-string:${theme}`,
+    `theme="${theme}" is not a supported string value. Only "auto" | "light" | "dark" are accepted as strings; named palettes like "midnight" must be imported as objects: import { ${theme} } from "react-calendar-datetime/themes/${theme}".`,
+  );
+}
+
 export function validateMinMax(
   minDate: Date | undefined,
   maxDate: Date | undefined,

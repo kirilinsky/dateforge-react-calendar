@@ -67,11 +67,10 @@ Their job is to let the user *navigate* through the calendar — to find the dat
 
 | Module | Role |
 |---|---|
-| `<CalendarNav>` | Prev/next arrows, month label, optional month/year picker buttons |
 | `<CalendarMonthGrid>` | 12-cell grid of months for the current year |
 | `<CalendarYearsGrid>` | Grid of years (page-paginated) |
 
-`<CalendarMonthsTrack>`, `<CalendarYearsTrack>`, and `<CalendarDaysTrack>` are navigational only in some configurations — see category **D. Hybrid modules** below.
+`<CalendarNav>`, `<CalendarMonthsTrack>`, `<CalendarYearsTrack>`, and `<CalendarDaysTrack>` are navigational only in some configurations — see category **D. Hybrid modules** below.
 
 **Common contract:**
 - Reading: `viewDate` from navigation context.
@@ -223,7 +222,7 @@ When adding a new module that writes selection, it MUST read `readOnly` and gate
 
 Themes and appearances are independent dimensions of styling.
 
-- **Theme** = palette (colors). Applied via `data-theme` attribute and CSS custom properties on the wrapper element. Built-in light/dark/auto, plus a registry of named themes (e.g. `midnight`, `scarlet`). Custom themes via `createTheme()`.
+- **Theme** = palette (colors). Applied via `data-theme` attribute and CSS custom properties on the wrapper element. Three string values are accepted (`"auto"`, `"light"`, `"dark"`); everything else must be a `CustomTheme` object — either an exported named theme (e.g. `midnight`, `scarlet`) imported from `react-calendar-datetime/themes/<name>`, or a user-built one from `createTheme()`. Named theme **names are module export names, not accepted string values** — passing the string `"midnight"` is invalid and emits a dev warning.
 - **Appearance** = structure (radii, sizing, density, border styles). Applied via `data-appearance` attribute. Custom appearances via `createAppearance()`.
 
 A library consumer can mix any theme with any appearance freely. This combinatorial space is the primary target for visual regression testing (Chromatic).

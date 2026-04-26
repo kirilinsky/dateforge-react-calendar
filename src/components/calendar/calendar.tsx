@@ -5,6 +5,7 @@ import { CustomTheme, CUSTOM_THEME_BRAND } from "@/types/themes";
 import { CustomAppearance, CUSTOM_APPEARANCE_BRAND } from "@/types/appearances";
 import { CalendarProvider } from "@/core/provider";
 import { CalendarLayout } from "@/core/layout";
+import { validateTheme } from "@/core/dev-warn";
 
 const isCustomTheme = (t: unknown): t is CustomTheme =>
   typeof t === "object" && t !== null && CUSTOM_THEME_BRAND in (t as object);
@@ -63,11 +64,19 @@ export function Calendar<M extends CalendarMode = "single">({
   }, []);
 
   const customTheme = isCustomTheme(themeProp) ? themeProp : undefined;
-  const themeKey = customTheme ? undefined : (themeProp as string | undefined);
+  const rawThemeKey = customTheme ? undefined : (themeProp as string | undefined);
+  const themeKey =
+    rawThemeKey === "auto" ||
+    rawThemeKey === "light" ||
+    rawThemeKey === "dark" ||
+    rawThemeKey === undefined
+      ? rawThemeKey
+      : undefined;
   const baseTheme = !themeKey || themeKey === "auto" ? systemTheme : themeKey;
 
   useEffect(() => {
     setIsToggled(false);
+    validateTheme(themeProp);
   }, [themeProp]);
 
   const isBaseDark = baseTheme === "dark";

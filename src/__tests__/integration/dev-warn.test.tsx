@@ -104,6 +104,39 @@ describe("dev-warn — minDate vs maxDate", () => {
   });
 });
 
+describe("dev-warn — theme", () => {
+  it("warns when an unsupported theme string is passed", () => {
+    render(
+      <Calendar theme={"midnight" as never}>
+        <CalendarDays />
+      </Calendar>,
+    );
+    expect(warnSpy).toHaveBeenCalled();
+    expect(lastMsg()).toContain('"midnight"');
+    expect(lastMsg()).toContain("not a supported string");
+  });
+
+  it('does not warn for "auto" / "light" / "dark"', () => {
+    render(
+      <Calendar theme="dark">
+        <CalendarDays />
+      </Calendar>,
+    );
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+
+  it("falls back to system theme on invalid string (data-theme not 'midnight')", () => {
+    const { container } = render(
+      <Calendar theme={"midnight" as never}>
+        <CalendarDays />
+      </Calendar>,
+    );
+    const root = container.querySelector("[data-theme]") as HTMLElement;
+    expect(root.getAttribute("data-theme")).not.toBe("midnight");
+    expect(["light", "dark"]).toContain(root.getAttribute("data-theme"));
+  });
+});
+
 describe("dev-warn — dedupe", () => {
   it("warns only once for the same condition across renders", () => {
     const { rerender } = render(

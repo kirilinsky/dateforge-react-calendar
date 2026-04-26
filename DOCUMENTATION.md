@@ -433,7 +433,7 @@ Each theme is a self-contained `CustomTheme` object. The consuming bundler inclu
 <Calendar theme="dark" />
 ```
 
-`"auto"` tracks `prefers-color-scheme` and switches in real time. These are the only string values supported — named palette strings like `"midnight"` are not valid and will be silently ignored.
+`"auto"` tracks `prefers-color-scheme` and switches in real time. These are the only string values supported — named palette strings like `"midnight"` are not valid. In development a `console.warn` is emitted; in production the value is ignored. Always import the theme object instead.
 
 **Option 3 — fully custom theme** via `createTheme()`:
 
