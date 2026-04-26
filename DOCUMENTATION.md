@@ -386,7 +386,11 @@ Displays the currently selected dates as removable chips.
 
 ### CalendarManualSelect
 
-Text input that lets the user type a date directly.
+Text input that lets the user type a date directly. Adapts shape to the calendar `mode`:
+
+- `mode="single"` — one input.
+- `mode="range"` — two inputs separated by `—`, one per boundary.
+- `mode="multiple"` — one "add date" input plus a chip per selected date; each chip is editable.
 
 ```tsx
 <CalendarManualSelect allowClear={false} />
@@ -396,9 +400,46 @@ Text input that lets the user type a date directly.
 
 | Prop         | Type                            | Default  | Description                               |
 | ------------ | ------------------------------- | -------- | ----------------------------------------- |
-| `allowClear` | `boolean`                       | `true`   | Show a clear button inside the input      |
+| `allowClear` | `boolean`                       | `true`   | Show a top-level clear button that wipes the entire selection |
 | `align`      | `"left" \| "center" \| "right"` | `"left"` | Horizontal alignment of the input content |
 | `col`        | `number \| string`              | —        | CSS grid `grid-column` value              |
+
+### Input format
+
+The format is **fixed `DD.MM.YYYY`** — day, month, year separated by dots. It does **not** vary by `locale`. The input applies a digit-only mask: dots are inserted automatically as the user types digits, non-digit input is rejected, and at most 8 digits are accepted.
+
+```text
+"1"        → "1"
+"15"       → "15"
+"156"      → "15.6"
+"15062024" → "15.06.2024"
+```
+
+Time is **not** parseable from the input. To set time use `<CalendarTimeGrid>` or `<CalendarNav showTime>`.
+
+### When `onChange` fires
+
+Typing **does not** commit by itself. The user has to confirm the typed date with `Enter` or by clicking the inline apply button (`✓`). Validation runs per keystroke, but its result feeds the visual state (valid / invalid wrapper, apply button enabled / disabled), not the consumer's `onChange`.
+
+| User action                                                  | Effect                                                                                                               |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| Typing characters                                            | Updates internal text and validity state. **No `onChange`.**                                                         |
+| `Enter`                                                      | Commits the typed date if valid and allowed. Exits edit mode. `onChange` fires. Otherwise no commit, no `onChange`.   |
+| Click the inline apply (`✓`) button                          | Same as `Enter`.                                                                                                     |
+| `Escape`                                                     | Clears the input text without changing selection. No `onChange`.                                                     |
+| Click a chip / filled date slot                              | Enters edit mode for that slot. No `onChange` until the user commits via Enter / apply.                              |
+| Click the inline clear (`×`) icon while editing              | Clears the local input text only. No `onChange`.                                                                     |
+| Per-chip remove icon (multiple mode)                         | Removes that single date from the selection — `onChange` fires.                                                      |
+| Top-level clear button (`allowClear`)                        | Clears the entire selection — `onChange(null)` (single) / `onChange({ from: null, to: null })` (range) / `onChange([])` (multiple). |
+| `Enter` / apply on a date outside `minDate` / `maxDate` / `disabled` | Wrapper shows invalid state (red). No commit, no `onChange`.                                                  |
+| `Enter` / apply on a malformed date (`32.13.2024`, etc.)     | No commit, no `onChange`.                                                                                            |
+| Calendar root has `readOnly`                                 | Input is HTML `readOnly`. All commits / clears no-op. See "`readOnly` contract".                                     |
+
+Per-keystroke commit is intentionally avoided — it would fire `onChange` for every intermediate valid date the user types through (e.g. `01.01.0202` is valid before the user finishes typing `2024`). The Enter/apply confirmation makes intent explicit.
+
+### Constraints respected
+
+`minDate`, `maxDate`, and the `disabled` config from `<Calendar>` are all enforced. Disallowed dates trigger the invalid state and do not commit. Multi-mode inputs additionally respect `maxDates` — the "add date" input is hidden once the cap is reached.
 
 ---
 

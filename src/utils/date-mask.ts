@@ -1,3 +1,7 @@
+// TODO: locale-aware format support (e.g. MM/DD/YYYY for en-US, YYYY-MM-DD for ISO).
+// Today the mask is hardcoded to DD.MM.YYYY. Add a `format` prop on CalendarManualSelect
+// or read from locale once there is real demand.
+
 export const dateToMask = (d: Date | null): string => {
   if (!d) return "";
   return [
