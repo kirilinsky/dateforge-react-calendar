@@ -10,11 +10,16 @@ First off, thanks for taking the time to contribute! It’s people like you who 
 
 Basic commands for development and building:
 
-- `npm run start` — Launches **Ladle** to preview components and themes in isolation.
-- `npm run dev` — Starts **tsup** in watch mode for active development.
-- `npm run build` — Compiles the library into the `dist` folder for production.
-- `npm run build:demo` — Builds a static version of the Ladle documentation/demo.
+- `npm run start` / `npm run storybook` — Launches **Storybook** at `http://localhost:6006` to preview components, themes, and appearances in isolation.
+- `npm run dev` — Starts **tsdown** in watch mode for active development.
+- `npm run build` — Compiles the library into the `dist` folder (ESM + CJS + DTS, themes, appearances).
+- `npm run build-storybook` — Builds a static Storybook bundle.
 - `npm run clean` — Removes the `dist` folder to ensure a fresh build.
+- `npm test` — Runs the Vitest suite (unit + integration + Storybook stories).
+- `npm run test:watch` — Vitest in watch mode.
+- `npm run test:coverage` — Coverage report.
+- `npm run chromatic` — Pushes Storybook to Chromatic for visual regression (requires `.env.local` with `CHROMATIC_PROJECT_TOKEN`).
+- `npm run knip` — Detects unused exports / dependencies.
 
 ---
 
