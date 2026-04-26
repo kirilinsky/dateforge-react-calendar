@@ -275,3 +275,24 @@ export const DaysAndMonthsTrack: Story = {
   },
 };
 DaysAndMonthsTrack.storyName = "Days + MonthsTrack (compact month switcher)";
+
+export const WithGradient: Story = {
+  render: (_args, ctx) => {
+    const [date, setDate] = useState<Date | null>(FIXED_DATE);
+    return (
+      <Calendar
+        mode="single"
+        value={date}
+        onChange={setDate}
+        gradient
+        theme={resolveStoryTheme(ctx.globals.theme)}
+        appearance={resolveStoryAppearance(ctx.globals.appearance)}
+      >
+        <CalendarNav label="Gradient cells" showMonthPicker compactYears />
+        <CalendarDays />
+        <CalendarSelectedDates />
+      </Calendar>
+    );
+  },
+};
+WithGradient.storyName = "With gradient (gradient prop on selected cells)";

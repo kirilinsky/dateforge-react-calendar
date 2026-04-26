@@ -1,5 +1,6 @@
 @layer themes {
-  :global([data-theme="light"]) {
+  :global([data-theme="light"]),
+  :global([data-theme="auto"]) {
     --c-a: #ffffff;
     --c-b: #ffffff;
     --c-h: #1a1a1c;
@@ -23,6 +24,24 @@
     --c-d: #555558;
     --c-we: #e32825;
     --c-r: #4a90d9;
+  }
+
+  /* CSS-native auto: when no JS-resolved theme is set, follow the OS
+     preference. This kills the white flash on first paint with theme="auto" +
+     dark system — CSS picks dark before any JS runs. */
+  @media (prefers-color-scheme: dark) {
+    :global([data-theme="auto"]) {
+      --c-a: #1a1a1c;
+      --c-b: #1a1a1c;
+      --c-h: #ffffff;
+      --c-t: #2d2d2d;
+      --c-c: #f0f0f0;
+      --c-s: #333333;
+      --c-x: #ffffff16;
+      --c-d: #555558;
+      --c-we: #e32825;
+      --c-r: #4a90d9;
+    }
   }
 }
 

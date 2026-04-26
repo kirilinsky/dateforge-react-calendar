@@ -1,4 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
+
+// SSR-safe layout effect: useLayoutEffect on client so the resolved value is
+// applied before the browser paints (no flash), useEffect on server (no
+// warning, no DOM access). Aliasing the symbol — not switching at call site —
+// keeps React's hook-order rule intact.
+const useIsoLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 /**
  * Returns `fallback` on the first (server-side or pre-hydration) render and the
@@ -7,13 +14,14 @@ import { useEffect, useState } from "react";
  * HTML matches the client's first render and React does not produce a hydration
  * mismatch warning.
  *
- * The getter is called once after mount via useEffect. Re-running it requires
- * remounting the consumer — by design; values that need to stay live should use
- * their own subscription effect on top.
+ * The getter runs in a layout effect — the resolved value is applied
+ * synchronously before the browser paints, so consumers like `theme="auto"`
+ * do not flash the fallback (light) before resolving (dark).
+ * Re-running requires remounting the consumer — by design.
  */
 export function useClientValue<T>(getter: () => T, fallback: T): T {
   const [value, setValue] = useState<T>(fallback);
-  useEffect(() => {
+  useIsoLayoutEffect(() => {
     setValue(getter());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

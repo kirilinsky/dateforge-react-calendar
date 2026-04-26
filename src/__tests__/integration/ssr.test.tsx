@@ -18,7 +18,7 @@ describe("SSR — renderToString", () => {
       </Calendar>,
     );
     expect(html).toContain('role="grid"');
-    expect(html).toContain('aria-label');
+    expect(html).toContain("aria-label");
   });
 
   it("renders Nav with showTime / clear / themeToggle without crashing", () => {
@@ -49,13 +49,13 @@ describe("SSR — renderToString", () => {
     expect(html).toContain('role="group"');
   });
 
-  it("data-theme is stable on initial server render (defaults to light)", () => {
+  it('data-theme="auto" on SSR — CSS @media (prefers-color-scheme) handles initial paint without flash', () => {
     const html = renderToString(
       <Calendar value={D}>
         <CalendarDays />
       </Calendar>,
     );
-    expect(html).toContain('data-theme="light"');
+    expect(html).toContain('data-theme="auto"');
   });
 
   it("readOnly survives SSR with aria-readonly", () => {

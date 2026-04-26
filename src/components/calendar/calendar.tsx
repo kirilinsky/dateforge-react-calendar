@@ -6,7 +6,6 @@ import { CustomAppearance, CUSTOM_APPEARANCE_BRAND } from "@/types/appearances";
 import { CalendarProvider } from "@/core/provider";
 import { CalendarLayout } from "@/core/layout";
 import { validateTheme } from "@/core/dev-warn";
-import { useClientValue } from "@/hooks/use-client-value";
 
 const isCustomTheme = (t: unknown): t is CustomTheme =>
   typeof t === "object" && t !== null && CUSTOM_THEME_BRAND in (t as object);
@@ -49,24 +48,17 @@ export function Calendar<M extends CalendarMode = "single">({
 
   const [isToggled, setIsToggled] = useState(false);
 
-  // Initial render uses "light" on both server and client so SSR HTML matches
-  // the first client render. The actual preference is read after mount.
-  const initialSystemTheme = useClientValue<"light" | "dark">(
-    () =>
-      window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light",
-    "light",
-  );
-  const [systemTheme, setSystemTheme] = useState<"light" | "dark">("light");
-  useEffect(() => {
-    setSystemTheme(initialSystemTheme);
-  }, [initialSystemTheme]);
+  // Resolved system theme — known only after mount via matchMedia. Before mount
+  // we render `data-theme="auto"` so CSS handles the light/dark choice via
+  // `@media (prefers-color-scheme: dark)` — no white flash on dark systems.
+  const [systemTheme, setSystemTheme] = useState<"light" | "dark" | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const handler = (e: MediaQueryListEvent) => setSystemTheme(e.matches ? "dark" : "light");
+    setSystemTheme(mq.matches ? "dark" : "light");
+    const handler = (e: MediaQueryListEvent) =>
+      setSystemTheme(e.matches ? "dark" : "light");
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
   }, []);
@@ -80,7 +72,11 @@ export function Calendar<M extends CalendarMode = "single">({
     rawThemeKey === undefined
       ? rawThemeKey
       : undefined;
-  const baseTheme = !themeKey || themeKey === "auto" ? systemTheme : themeKey;
+  const isAutoTheme = !themeKey || themeKey === "auto";
+  // baseTheme used only when systemTheme is resolved (post-mount) or theme is
+  // explicit. Pre-mount auto skips this branch via activeTheme === "auto".
+  const baseTheme: "light" | "dark" =
+    isAutoTheme ? (systemTheme ?? "light") : (themeKey as "light" | "dark");
 
   useEffect(() => {
     setIsToggled(false);
@@ -88,9 +84,13 @@ export function Calendar<M extends CalendarMode = "single">({
   }, [themeProp]);
 
   const isBaseDark = baseTheme === "dark";
-  const activeTheme = customTheme
+  const activeTheme: "light" | "dark" | "auto" = customTheme
     ? baseTheme
-    : isToggled ? (isBaseDark ? "light" : "dark") : baseTheme;
+    : isAutoTheme && systemTheme === null && !isToggled
+      ? "auto"
+      : isToggled
+        ? (isBaseDark ? "light" : "dark")
+        : baseTheme;
   const toggleTheme = () => setIsToggled((v) => !v);
 
   const customAppearance = isCustomAppearance(appearanceProp) ? appearanceProp : undefined;
