@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { dateToMask, maskToDate, applyMask } from "@/utils/date-mask";
+import { dateToMask, maskToDate, applyMask, validatePartialMask } from "@/utils/date-mask";
 
 // ─── dateToMask ───────────────────────────────────────────────────────────────
 
@@ -47,4 +47,35 @@ describe("applyMask", () => {
   it("truncates past 8 digits", () => expect(applyMask("150620241234")).toBe("15.06.2024"));
   it("empty → empty", () => expect(applyMask("")).toBe(""));
   it("already masked input → idempotent", () => expect(applyMask("15.06.2024")).toBe("15.06.2024"));
+});
+
+// ─── maskToDate calendrical validation ────────────────────────────────────────
+
+describe("maskToDate — calendrical validation", () => {
+  it("Feb 31 → null (no rollover)", () => expect(maskToDate("31.02.2024")).toBeNull());
+  it("Apr 31 → null (April has 30 days)", () => expect(maskToDate("31.04.2024")).toBeNull());
+  it("Feb 29 in leap year → valid", () => {
+    const result = maskToDate("29.02.2024");
+    expect(result).not.toBeNull();
+    expect(result!.getMonth()).toBe(1);
+    expect(result!.getDate()).toBe(29);
+  });
+  it("Feb 29 in non-leap year → null", () => expect(maskToDate("29.02.2023")).toBeNull());
+});
+
+// ─── validatePartialMask ──────────────────────────────────────────────────────
+
+describe("validatePartialMask", () => {
+  it("empty → ok", () => expect(validatePartialMask("")).toBe(false));
+  it("partial single digit → ok", () => expect(validatePartialMask("3")).toBe(false));
+  it("day 32 → invalid", () => expect(validatePartialMask("32")).toBe(true));
+  it("day 00 → invalid", () => expect(validatePartialMask("00")).toBe(true));
+  it("day 31 → ok (partial, month not yet)", () => expect(validatePartialMask("31")).toBe(false));
+  it("month 13 → invalid", () => expect(validatePartialMask("01.13")).toBe(true));
+  it("month 00 → invalid", () => expect(validatePartialMask("01.00")).toBe(true));
+  it("Feb 30 partial → invalid even before year", () => expect(validatePartialMask("30.02")).toBe(true));
+  it("Apr 31 partial → invalid even before year", () => expect(validatePartialMask("31.04")).toBe(true));
+  it("valid partial mid-typing → ok", () => expect(validatePartialMask("15.06.20")).toBe(false));
+  it("full valid date → ok", () => expect(validatePartialMask("15.06.2024")).toBe(false));
+  it("full impossible date → invalid", () => expect(validatePartialMask("31.02.2024")).toBe(true));
 });

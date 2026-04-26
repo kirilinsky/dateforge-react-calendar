@@ -11,7 +11,12 @@ import {
 } from "@/context/selection-context";
 import { checkIsDateDisabled, isSameDay } from "@/utils/date-core";
 import { useGridSlot } from "@/hooks/use-grid-slot";
-import { applyMask, dateToMask, maskToDate } from "@/utils/date-mask";
+import {
+  applyMask,
+  dateToMask,
+  maskToDate,
+  validatePartialMask,
+} from "@/utils/date-mask";
 import { alignToJustify, AlignValue } from "@/utils/layout-utils";
 
 interface MaskedDateInputProps {
@@ -54,22 +59,24 @@ const MaskedDateInput: React.FC<MaskedDateInputProps> = ({
     const masked = applyMask(e.target.value);
     setText(masked);
     onHasText?.(masked.length > 0);
+
+    let nextInvalid = validatePartialMask(masked);
     const date = maskToDate(masked);
+
     if (date) {
       onTyped?.(date);
       if (isDateAllowed(date)) {
-        setInvalid(false);
-        onValidityChange?.(false);
+        nextInvalid = false;
         onChange(date);
       } else {
-        setInvalid(true);
-        onValidityChange?.(true);
+        nextInvalid = true;
       }
     } else {
       onTyped?.(null);
-      setInvalid(false);
-      onValidityChange?.(false);
     }
+
+    setInvalid(nextInvalid);
+    onValidityChange?.(nextInvalid);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -110,6 +117,7 @@ interface DateSlotProps {
   isAllowed: (d: Date) => boolean;
   onSave: (d: Date) => void;
   onClear?: () => void;
+  onRemove?: () => void;
   placeholder?: string;
   isEditing?: boolean;
   onEditStart?: () => void;
@@ -121,6 +129,7 @@ const DateSlot: React.FC<DateSlotProps> = ({
   isAllowed,
   onSave,
   onClear,
+  onRemove,
   placeholder = "DD.MM.YYYY",
   isEditing,
   onEditStart,
@@ -211,14 +220,27 @@ const DateSlot: React.FC<DateSlotProps> = ({
 
   if (!editing && date) {
     return (
-      <button
-        type="button"
-        className={styles.chip}
-        onClick={enterEditMode}
-        disabled={readOnly}
-      >
-        {dateToMask(date)}
-      </button>
+      <span className={styles.chipWrapper}>
+        <button
+          type="button"
+          className={styles.chip}
+          onClick={enterEditMode}
+          disabled={readOnly}
+        >
+          {dateToMask(date)}
+        </button>
+        {onRemove && (
+          <button
+            type="button"
+            className={styles.chipRemove}
+            onClick={onRemove}
+            aria-label="Remove"
+            disabled={readOnly}
+          >
+            <Clear />
+          </button>
+        )}
+      </span>
     );
   }
 
@@ -423,6 +445,9 @@ export const CalendarManualSelect: React.FC<CalendarManualSelectProps> = ({
                 setEditingKey(null);
               }}
               onClear={() =>
+                onDatesSet(selectedDates.filter((_, j) => j !== i))
+              }
+              onRemove={() =>
                 onDatesSet(selectedDates.filter((_, j) => j !== i))
               }
               isEditing={editingKey === d.getTime()}

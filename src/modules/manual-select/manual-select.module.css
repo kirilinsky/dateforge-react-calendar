@@ -51,7 +51,9 @@
     animation: msSlotIn var(--cal-transition, 0.2s) ease;
   }
 
-  .inputWrapperInvalid {
+  .inputWrapperInvalid,
+  .inputWrapperInvalid:hover,
+  .inputWrapperInvalid:focus-within {
     border-color: var(--c-we);
     box-shadow: 0 0 0 0.15em color-mix(in srgb, var(--c-we) 25%, transparent);
   }
@@ -123,29 +125,70 @@
     border-right: var(--cal-border) solid var(--c-s);
   }
 
-  .chip {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .chipWrapper {
+    display: inline-flex;
+    align-items: stretch;
     height: 2.1em;
-    padding: 0 2em;
-    font-size: 0.85em;
-    white-space: nowrap;
     background: var(--c-t);
-    letter-spacing: 0.2px;
     border: var(--cal-border) solid transparent;
     border-radius: var(--cal-radius, 0.5em);
-    color: var(--c-c);
-    cursor: pointer;
-    user-select: none;
+    overflow: hidden;
     transition: all var(--cal-transition, 0.2s) ease;
     animation: msSlotIn var(--cal-transition, 0.2s) ease;
-    overflow: hidden;
-    text-overflow: ellipsis;
 
     &:hover {
       border-color: var(--c-s);
       box-shadow: var(--cal-shadow-sm, 0 0.1em 0.3em var(--c-x));
+    }
+  }
+
+  .chip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 0 0.8em;
+    font-size: 0.85em;
+    white-space: nowrap;
+    background: transparent;
+    letter-spacing: 0.2px;
+    border: none;
+    color: var(--c-c);
+    cursor: pointer;
+    user-select: none;
+    transition: color var(--cal-transition, 0.2s) ease;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .chipRemove {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 0 0.45em;
+    border: none;
+    border-left: var(--cal-border) solid var(--c-s);
+    background: transparent;
+    color: var(--c-d);
+    cursor: pointer;
+    transition: all var(--cal-transition, 0.2s) ease;
+    flex-shrink: 0;
+
+    & svg {
+      width: 0.8em;
+      height: 0.8em;
+      fill: currentColor;
+    }
+
+    &:hover:not([disabled]) {
+      background: color-mix(in srgb, var(--c-we) 12%, transparent);
+      color: var(--c-we);
+    }
+
+    &[disabled] {
+      opacity: 0.3;
+      cursor: not-allowed;
     }
   }
 

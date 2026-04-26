@@ -124,3 +124,105 @@ describe("ManualSelect — multi mode cap", () => {
     expect(inputs.length).toBe(0);
   });
 });
+
+describe("ManualSelect — per-chip remove (multiple mode)", () => {
+  it("renders × button per chip and removes only that date", async () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <Calendar
+        mode="multiple"
+        value={[new Date(2024, 5, 1), new Date(2024, 5, 2), new Date(2024, 5, 3)]}
+        onChange={onChange}
+      >
+        <CalendarManualSelect />
+      </Calendar>,
+    );
+    const removeButtons = container.querySelectorAll('button[aria-label="Remove"]');
+    expect(removeButtons.length).toBe(3);
+    await userEvent.click(removeButtons[1] as HTMLElement);
+    expect(onChange).toHaveBeenCalledTimes(1);
+    const next = onChange.mock.calls[0][0] as Date[];
+    expect(next.length).toBe(2);
+    expect(next[0].getDate()).toBe(1);
+    expect(next[1].getDate()).toBe(3);
+  });
+
+  it("× button does not enter edit mode", async () => {
+    const { container } = render(
+      <Calendar mode="multiple" value={[new Date(2024, 5, 1)]} onChange={() => {}}>
+        <CalendarManualSelect />
+      </Calendar>,
+    );
+    const removeBtn = container.querySelector('button[aria-label="Remove"]') as HTMLElement;
+    await userEvent.click(removeBtn);
+    // No <input> should appear since the chip was removed, not opened for editing.
+    expect(container.querySelectorAll("input").length).toBeLessThanOrEqual(1);
+  });
+
+  it("× button is disabled when readOnly", () => {
+    const { container } = render(
+      <Calendar mode="multiple" value={[new Date(2024, 5, 1)]} onChange={() => {}} readOnly>
+        <CalendarManualSelect />
+      </Calendar>,
+    );
+    const removeBtn = container.querySelector('button[aria-label="Remove"]') as HTMLButtonElement;
+    expect(removeBtn.disabled).toBe(true);
+  });
+});
+
+describe("ManualSelect — invalid feedback while typing", () => {
+  it("flags day=32 as invalid before full date is typed", async () => {
+    const { container } = render(
+      <Calendar mode="single">
+        <CalendarManualSelect />
+      </Calendar>,
+    );
+    const input = findInput(container);
+    await userEvent.click(input);
+    await userEvent.keyboard("32");
+    const wrapper = input.closest('[class*="inputWrapper"]') as HTMLElement;
+    expect(wrapper.className).toMatch(/Invalid/);
+  });
+
+  it("flags month=13 as invalid before year is typed", async () => {
+    const { container } = render(
+      <Calendar mode="single">
+        <CalendarManualSelect />
+      </Calendar>,
+    );
+    const input = findInput(container);
+    await userEvent.click(input);
+    await userEvent.keyboard("0113");
+    const wrapper = input.closest('[class*="inputWrapper"]') as HTMLElement;
+    expect(wrapper.className).toMatch(/Invalid/);
+  });
+
+  it("flags Feb 31 as invalid (calendrical impossible)", async () => {
+    const { container } = render(
+      <Calendar mode="single">
+        <CalendarManualSelect />
+      </Calendar>,
+    );
+    const input = findInput(container);
+    await userEvent.click(input);
+    await userEvent.keyboard("31022024");
+    const wrapper = input.closest('[class*="inputWrapper"]') as HTMLElement;
+    expect(wrapper.className).toMatch(/Invalid/);
+  });
+
+  it("clears invalid state when user fixes the input", async () => {
+    const { container } = render(
+      <Calendar mode="single">
+        <CalendarManualSelect />
+      </Calendar>,
+    );
+    const input = findInput(container);
+    await userEvent.click(input);
+    await userEvent.keyboard("32");
+    let wrapper = input.closest('[class*="inputWrapper"]') as HTMLElement;
+    expect(wrapper.className).toMatch(/Invalid/);
+    await userEvent.keyboard("{Backspace}{Backspace}15");
+    wrapper = input.closest('[class*="inputWrapper"]') as HTMLElement;
+    expect(wrapper.className).not.toMatch(/Invalid/);
+  });
+});
