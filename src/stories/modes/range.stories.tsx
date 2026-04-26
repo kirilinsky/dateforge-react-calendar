@@ -150,6 +150,32 @@ export const DisabledInsideRange: Story = {
 };
 DisabledInsideRange.storyName = "Disabled inside range";
 
+export const TwoMonths: Story = {
+  render: (_args, ctx) => {
+    const [range, setRange] = useState<RangeValue>({ from: new Date(2016, 3, 21), to: new Date(2016, 4, 11) });
+    return (
+      <>
+        <p style={debugStyle}>{fmtRange(range)}</p>
+        <Calendar
+          mode="range"
+          value={range}
+          onChange={setRange}
+          cols={4}
+          theme={resolveStoryTheme(ctx.globals.theme)}
+          appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        >
+          <CalendarNav showMonthPicker  col={2} />
+          <CalendarNav monthLabel compactYears offset={1} col={2} />
+          <CalendarDays offset={0} col={2} />
+          <CalendarDays offset={1} col={2} />
+        </Calendar>
+      </>
+    );
+  },
+};
+TwoMonths.storyName = "Two months side by side";
+TwoMonths.parameters = { storyWidth: 915 };
+
 export const ReadOnly: Story = {
   render: (_args, ctx) => {
     return (

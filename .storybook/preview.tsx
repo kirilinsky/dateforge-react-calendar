@@ -31,7 +31,7 @@ const preview: Preview = {
   },
   decorators: [
     (Story, ctx) => (
-      <div style={{ padding: 20, width: 305 }}>
+      <div style={{ padding: 20, width: ctx.parameters.storyWidth ?? 305 }}>
         <Story key={`${ctx.globals.theme}-${ctx.globals.appearance}`} />
       </div>
     ),
