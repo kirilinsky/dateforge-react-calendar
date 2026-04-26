@@ -43,187 +43,11 @@ const meta: Meta<NavArgs> = {
     clear: { control: "boolean" },
     themeToggle: { control: "boolean" },
   },
-};
-
-export default meta;
-
-type Story = StoryObj<NavArgs>;
-
-export const Default: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarNav showMonthPicker showYearPicker />
-      </Calendar>
-    );
-  },
-};
-
-export const WithMonthPicker: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarNav showMonthPicker />
-      </Calendar>
-    );
-  },
-};
-WithMonthPicker.storyName = "With month picker";
-
-export const WithYearPicker: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarNav showYearPicker />
-      </Calendar>
-    );
-  },
-};
-WithYearPicker.storyName = "With year picker";
-
-export const CompactMonths: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarNav compactMonths />
-      </Calendar>
-    );
-  },
-};
-CompactMonths.storyName = "Compact months";
-
-export const CompactYears: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarNav compactYears />
-      </Calendar>
-    );
-  },
-};
-CompactYears.storyName = "Compact years";
-
-export const AmbiguousMonthCombo: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        {/* Both props active — dev warn fires (expected) */}
-        <CalendarNav showMonthPicker compactMonths />
-      </Calendar>
-    );
-  },
-};
-AmbiguousMonthCombo.storyName = "Ambiguous month combo (dev warn fires)";
-
-export const WithClearAndHome: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarNav showMonthPicker showYearPicker home clear />
-      </Calendar>
-    );
-  },
-};
-WithClearAndHome.storyName = "With clear and home";
-
-export const WithThemeToggle: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarNav showMonthPicker showYearPicker themeToggle />
-      </Calendar>
-    );
-  },
-};
-WithThemeToggle.storyName = "With theme toggle";
-
-export const ShowNowTime: Story = {
-  parameters: { chromatic: { disable: true } },
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarNav showMonthPicker showNowTime />
-      </Calendar>
-    );
-  },
-};
-ShowNowTime.storyName = "Show now time (live clock)";
-
-export const ShowTimePicker: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarNav showMonthPicker showTime />
-      </Calendar>
-    );
-  },
-};
-ShowTimePicker.storyName = "Show time picker popup";
-
-export const Playground: Story = {
   args: {
-    showMonthPicker: true,
-    showYearPicker: true,
+    showMonthPicker: false,
+    compactMonths: false,
+    showYearPicker: false,
+    compactYears: false,
     animateTime: true,
     monthLabel: false,
     yearLabel: false,
@@ -234,7 +58,6 @@ export const Playground: Story = {
     clear: false,
     themeToggle: false,
   },
-  parameters: { chromatic: { disable: true } },
   render: (args, ctx) => {
     const [date, setDate] = useState<Date | null>(FIXED_DATE);
     return (
@@ -264,3 +87,57 @@ export const Playground: Story = {
     );
   },
 };
+
+export default meta;
+
+type Story = StoryObj<NavArgs>;
+
+export const Default: Story = {
+  args: { showMonthPicker: true, showYearPicker: true },
+};
+
+export const WithMonthPicker: Story = {
+  args: { showMonthPicker: true },
+};
+WithMonthPicker.storyName = "With month picker";
+
+export const WithYearPicker: Story = {
+  args: { showYearPicker: true },
+};
+WithYearPicker.storyName = "With year picker";
+
+export const CompactMonths: Story = {
+  args: { compactMonths: true },
+};
+CompactMonths.storyName = "Compact months";
+
+export const CompactYears: Story = {
+  args: { compactYears: true },
+};
+CompactYears.storyName = "Compact years";
+
+export const AmbiguousMonthCombo: Story = {
+  args: { showMonthPicker: true, compactMonths: true },
+};
+AmbiguousMonthCombo.storyName = "Ambiguous month combo (dev warn fires)";
+
+export const WithClearAndHome: Story = {
+  args: { showMonthPicker: true, showYearPicker: true, home: true, clear: true },
+};
+WithClearAndHome.storyName = "With clear and home";
+
+export const WithThemeToggle: Story = {
+  args: { showMonthPicker: true, showYearPicker: true, themeToggle: true },
+};
+WithThemeToggle.storyName = "With theme toggle";
+
+export const ShowNowTime: Story = {
+  args: { showMonthPicker: true, showNowTime: true },
+  parameters: { chromatic: { disable: true } },
+};
+ShowNowTime.storyName = "Show now time (live clock)";
+
+export const ShowTimePicker: Story = {
+  args: { showMonthPicker: true, showTime: true },
+};
+ShowTimePicker.storyName = "Show time picker popup";

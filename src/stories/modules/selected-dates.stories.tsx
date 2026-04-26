@@ -25,114 +25,6 @@ const meta: Meta<SelectedDatesArgs> = {
     align: { control: "inline-radio", options: ["left", "center", "right"] },
     showTime: { control: "boolean" },
   },
-};
-
-export default meta;
-
-type Story = StoryObj<SelectedDatesArgs>;
-
-export const Default: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarSelectedDates />
-      </Calendar>
-    );
-  },
-};
-
-export const NoClear: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarSelectedDates allowClear={false} />
-      </Calendar>
-    );
-  },
-};
-NoClear.storyName = "No clear";
-
-export const NoNavigate: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarSelectedDates allowNavigate={false} />
-      </Calendar>
-    );
-  },
-};
-NoNavigate.storyName = "No navigate";
-
-export const WithTime: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarSelectedDates showTime />
-      </Calendar>
-    );
-  },
-};
-WithTime.storyName = "With time";
-
-export const AnimatedOff: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarSelectedDates animated={false} />
-      </Calendar>
-    );
-  },
-};
-AnimatedOff.storyName = "Animated off";
-
-export const AlignCenter: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarSelectedDates align="center" />
-      </Calendar>
-    );
-  },
-};
-AlignCenter.storyName = "Aligned center";
-
-export const Playground: Story = {
   args: {
     allowClear: true,
     allowNavigate: true,
@@ -160,3 +52,34 @@ export const Playground: Story = {
     );
   },
 };
+
+export default meta;
+
+type Story = StoryObj<SelectedDatesArgs>;
+
+export const Default: Story = {};
+
+export const NoClear: Story = {
+  args: { allowClear: false },
+};
+NoClear.storyName = "No clear";
+
+export const NoNavigate: Story = {
+  args: { allowNavigate: false },
+};
+NoNavigate.storyName = "No navigate";
+
+export const WithTime: Story = {
+  args: { showTime: true },
+};
+WithTime.storyName = "With time";
+
+export const AnimatedOff: Story = {
+  args: { animated: false },
+};
+AnimatedOff.storyName = "Animated off";
+
+export const AlignCenter: Story = {
+  args: { align: "center" },
+};
+AlignCenter.storyName = "Aligned center";

@@ -8,45 +8,42 @@ import {
   resolveStoryAppearance,
 } from "../_helpers/resolve-globals";
 
-const meta: Meta = {
+type DaysTrackArgs = {
+  showMonthLabel?: boolean;
+};
+
+const meta: Meta<DaysTrackArgs> = {
   title: "Modules/DaysTrack",
+  argTypes: {
+    showMonthLabel: { control: "boolean" },
+  },
+  args: {
+    showMonthLabel: false,
+  },
+  render: (args, ctx) => {
+    const [date, setDate] = useState<Date | null>(FIXED_DATE);
+    return (
+      <Calendar
+        value={date}
+        onChange={setDate}
+        theme={resolveStoryTheme(ctx.globals.theme)}
+        appearance={resolveStoryAppearance(ctx.globals.appearance)}
+      >
+        <CalendarDaysTrack showMonthLabel={args.showMonthLabel} />
+      </Calendar>
+    );
+  },
 };
 
 export default meta;
 
-type Story = StoryObj;
+type Story = StoryObj<DaysTrackArgs>;
 
-export const Default: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarDaysTrack />
-      </Calendar>
-    );
-  },
-};
+export const Default: Story = {};
 Default.storyName = "Horizontal interactive";
 
 export const WithMonthLabel: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarDaysTrack showMonthLabel />
-      </Calendar>
-    );
-  },
+  args: { showMonthLabel: true },
 };
 WithMonthLabel.storyName = "With month label";
 

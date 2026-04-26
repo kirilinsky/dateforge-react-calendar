@@ -26,10 +26,7 @@ type DaysArgs = {
 const meta: Meta<DaysArgs> = {
   title: "Modules/Days",
   argTypes: {
-    startOfWeek: {
-      control: { type: "select" },
-      options: [0, 1, 2, 3, 4, 5, 6],
-    },
+    startOfWeek: { control: { type: "select" }, options: [0, 1, 2, 3, 4, 5, 6] },
     currentMonthOnly: { control: "boolean" },
     highlightWeekends: { control: "boolean" },
     boldWeekends: { control: "boolean" },
@@ -42,203 +39,6 @@ const meta: Meta<DaysArgs> = {
     blockNavigation: { control: "boolean" },
     swipe: { control: "boolean" },
   },
-};
-
-export default meta;
-
-type Story = StoryObj<DaysArgs>;
-
-export const Default: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarDays />
-      </Calendar>
-    );
-  },
-};
-
-export const WeekNumbers: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarDays weekNumbers />
-      </Calendar>
-    );
-  },
-};
-WeekNumbers.storyName = "With week numbers";
-
-export const BoldWeekends: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarDays boldWeekends />
-      </Calendar>
-    );
-  },
-};
-BoldWeekends.storyName = "Bold weekends";
-
-export const HiddenWeekdayHeader: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarDays hideWeekdays />
-      </Calendar>
-    );
-  },
-};
-HiddenWeekdayHeader.storyName = "Hidden weekday header";
-
-export const StartOfWeekSunday: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarDays startOfWeek={0} />
-      </Calendar>
-    );
-  },
-};
-StartOfWeekSunday.storyName = "Custom start of week (Sunday)";
-
-export const HideOutOfRange: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        minDate={new Date(2016, 1, 3)}
-        maxDate={new Date(2016, 1, 20)}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarDays hideOutOfRange blockNavigation />
-      </Calendar>
-    );
-  },
-};
-HideOutOfRange.storyName = "Hide out-of-range";
-
-export const FixedRowsOff: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarDays fixedRows={false} />
-      </Calendar>
-    );
-  },
-};
-FixedRowsOff.storyName = "Fixed rows off";
-
-export const LockedDeselection: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarDays lockDeselection />
-      </Calendar>
-    );
-  },
-};
-LockedDeselection.storyName = "Locked deselection";
-
-export const BlockNavigation: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarDays blockNavigation />
-      </Calendar>
-    );
-  },
-};
-BlockNavigation.storyName = "Block navigation";
-
-export const CurrentMonthOnly: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarDays currentMonthOnly />
-      </Calendar>
-    );
-  },
-};
-CurrentMonthOnly.storyName = "Current month only";
-
-export const MultiMonthOffset: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        cols={2}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarDays offset={0} col={1} />
-        <CalendarDays offset={1} col={2} />
-      </Calendar>
-    );
-  },
-};
-MultiMonthOffset.storyName = "Multi-month (offset)";
-
-export const Playground: Story = {
   args: {
     startOfWeek: 1,
     currentMonthOnly: false,
@@ -280,3 +80,131 @@ export const Playground: Story = {
     );
   },
 };
+
+export default meta;
+
+type Story = StoryObj<DaysArgs>;
+
+export const Default: Story = {};
+
+export const WeekNumbers: Story = {
+  args: { weekNumbers: true },
+};
+WeekNumbers.storyName = "With week numbers";
+
+export const BoldWeekends: Story = {
+  args: { boldWeekends: true },
+};
+BoldWeekends.storyName = "Bold weekends";
+
+export const HiddenWeekdayHeader: Story = {
+  args: { hideWeekdays: true },
+};
+HiddenWeekdayHeader.storyName = "Hidden weekday header";
+
+export const StartOfWeekSunday: Story = {
+  args: { startOfWeek: 0 },
+};
+StartOfWeekSunday.storyName = "Custom start of week (Sunday)";
+
+export const HideOutOfRange: Story = {
+  args: { hideOutOfRange: true, blockNavigation: true },
+  render: (args, ctx) => {
+    const [date, setDate] = useState<Date | null>(FIXED_DATE);
+    return (
+      <Calendar
+        value={date}
+        onChange={setDate}
+        minDate={new Date(2016, 1, 3)}
+        maxDate={new Date(2016, 1, 20)}
+        theme={resolveStoryTheme(ctx.globals.theme)}
+        appearance={resolveStoryAppearance(ctx.globals.appearance)}
+      >
+        <CalendarDays
+          startOfWeek={args.startOfWeek}
+          currentMonthOnly={args.currentMonthOnly}
+          highlightWeekends={args.highlightWeekends}
+          boldWeekends={args.boldWeekends}
+          highlightToday={args.highlightToday}
+          fixedRows={args.fixedRows}
+          weekNumbers={args.weekNumbers}
+          hideWeekdays={args.hideWeekdays}
+          hideOutOfRange={args.hideOutOfRange}
+          lockDeselection={args.lockDeselection}
+          blockNavigation={args.blockNavigation}
+          swipe={args.swipe}
+        />
+      </Calendar>
+    );
+  },
+};
+HideOutOfRange.storyName = "Hide out-of-range";
+
+export const FixedRowsOff: Story = {
+  args: { fixedRows: false },
+};
+FixedRowsOff.storyName = "Fixed rows off";
+
+export const LockedDeselection: Story = {
+  args: { lockDeselection: true },
+};
+LockedDeselection.storyName = "Locked deselection";
+
+export const BlockNavigation: Story = {
+  args: { blockNavigation: true },
+};
+BlockNavigation.storyName = "Block navigation";
+
+export const CurrentMonthOnly: Story = {
+  args: { currentMonthOnly: true },
+};
+CurrentMonthOnly.storyName = "Current month only";
+
+export const MultiMonthOffset: Story = {
+  render: (args, ctx) => {
+    const [date, setDate] = useState<Date | null>(FIXED_DATE);
+    return (
+      <Calendar
+        value={date}
+        onChange={setDate}
+        cols={2}
+        theme={resolveStoryTheme(ctx.globals.theme)}
+        appearance={resolveStoryAppearance(ctx.globals.appearance)}
+      >
+        <CalendarDays
+          offset={0}
+          col={1}
+          startOfWeek={args.startOfWeek}
+          currentMonthOnly={args.currentMonthOnly}
+          highlightWeekends={args.highlightWeekends}
+          boldWeekends={args.boldWeekends}
+          highlightToday={args.highlightToday}
+          fixedRows={args.fixedRows}
+          weekNumbers={args.weekNumbers}
+          hideWeekdays={args.hideWeekdays}
+          hideOutOfRange={args.hideOutOfRange}
+          lockDeselection={args.lockDeselection}
+          blockNavigation={args.blockNavigation}
+          swipe={args.swipe}
+        />
+        <CalendarDays
+          offset={1}
+          col={2}
+          startOfWeek={args.startOfWeek}
+          currentMonthOnly={args.currentMonthOnly}
+          highlightWeekends={args.highlightWeekends}
+          boldWeekends={args.boldWeekends}
+          highlightToday={args.highlightToday}
+          fixedRows={args.fixedRows}
+          weekNumbers={args.weekNumbers}
+          hideWeekdays={args.hideWeekdays}
+          hideOutOfRange={args.hideOutOfRange}
+          lockDeselection={args.lockDeselection}
+          blockNavigation={args.blockNavigation}
+          swipe={args.swipe}
+        />
+      </Calendar>
+    );
+  },
+};
+MultiMonthOffset.storyName = "Multi-month (offset)";

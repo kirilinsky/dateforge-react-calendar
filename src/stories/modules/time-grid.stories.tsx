@@ -10,74 +10,18 @@ import {
 
 type TimeGridArgs = {
   seconds?: boolean;
+  hour12?: boolean;
 };
 
 const meta: Meta<TimeGridArgs> = {
   title: "Modules/TimeGrid",
   argTypes: {
     seconds: { control: "boolean" },
+    hour12: { control: "boolean" },
   },
-};
-
-export default meta;
-
-type Story = StoryObj<TimeGridArgs>;
-
-export const Default: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarTimeGrid />
-      </Calendar>
-    );
-  },
-};
-Default.storyName = "Default (24h)";
-
-export const Hour12: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        hour12
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarTimeGrid />
-      </Calendar>
-    );
-  },
-};
-Hour12.storyName = "12-hour format";
-
-export const WithSeconds: Story = {
-  render: (_args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <CalendarTimeGrid seconds />
-      </Calendar>
-    );
-  },
-};
-WithSeconds.storyName = "With seconds";
-
-export const Playground: Story = {
   args: {
     seconds: false,
+    hour12: false,
   },
   render: (args, ctx) => {
     const [date, setDate] = useState<Date | null>(FIXED_DATE);
@@ -85,6 +29,7 @@ export const Playground: Story = {
       <Calendar
         value={date}
         onChange={setDate}
+        hour12={args.hour12}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
       >
@@ -93,3 +38,20 @@ export const Playground: Story = {
     );
   },
 };
+
+export default meta;
+
+type Story = StoryObj<TimeGridArgs>;
+
+export const Default: Story = {};
+Default.storyName = "Default (24h)";
+
+export const Hour12: Story = {
+  args: { hour12: true },
+};
+Hour12.storyName = "12-hour format";
+
+export const WithSeconds: Story = {
+  args: { seconds: true },
+};
+WithSeconds.storyName = "With seconds";
