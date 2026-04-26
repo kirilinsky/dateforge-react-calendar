@@ -23,6 +23,7 @@ import {
 import { isSameDay } from "@/utils/date-core";
 import {
   validateCalendarValue,
+  validateDateProp,
   validateMinMax,
   validateTimeZone,
 } from "@/core/dev-warn";
@@ -60,6 +61,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   toggleTheme,
   value: externalValue,
   defaultValue,
+  defaultViewDate,
   mode = "single" as M,
   maxDates,
   onChange,
@@ -120,7 +122,11 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       isControlled ? "value" : "defaultValue",
     );
     validateMinMax(minDate, maxDate);
-    return buildInitialState({ externalValue: seedValue ?? undefined, range });
+    return buildInitialState({
+      externalValue: seedValue ?? undefined,
+      defaultViewDate: validateDateProp(defaultViewDate, "defaultViewDate"),
+      range,
+    });
   });
 
   const onChangeRef = useRef<((v: CalendarValue<M>) => void) | undefined>(

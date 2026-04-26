@@ -186,6 +186,38 @@ describe("dev-warn — timeZone", () => {
   });
 });
 
+describe("dev-warn — defaultViewDate", () => {
+  it("warns when a non-Date value is passed", () => {
+    render(
+      <Calendar defaultViewDate={"dfgdg" as never}>
+        <CalendarDays />
+      </Calendar>,
+    );
+    expect(warnSpy).toHaveBeenCalled();
+    expect(lastMsg()).toContain("defaultViewDate");
+    expect(lastMsg()).toContain("valid Date");
+  });
+
+  it("warns and falls back when an Invalid Date is passed", () => {
+    render(
+      <Calendar defaultViewDate={new Date("nope") as never}>
+        <CalendarDays />
+      </Calendar>,
+    );
+    expect(warnSpy).toHaveBeenCalled();
+    expect(lastMsg()).toContain("Invalid Date");
+  });
+
+  it("does not warn for a valid Date", () => {
+    render(
+      <Calendar defaultViewDate={new Date(2024, 5, 15)}>
+        <CalendarDays />
+      </Calendar>,
+    );
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+});
+
 describe("dev-warn — dedupe", () => {
   it("warns only once for the same condition across renders", () => {
     const { rerender } = render(

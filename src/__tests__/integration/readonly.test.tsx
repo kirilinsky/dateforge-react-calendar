@@ -157,8 +157,8 @@ describe("readOnly — Days", () => {
   it("day cells are aria-disabled and click does not fire onChange", async () => {
     const onChange = vi.fn();
     const { container } = render(
-      <Calendar value={D} onChange={onChange} readOnly>
-        <CalendarDays defaultMonth={D} />
+      <Calendar value={D} defaultViewDate={D} onChange={onChange} readOnly>
+        <CalendarDays />
       </Calendar>,
     );
     const grid = within(container).getByRole("grid");

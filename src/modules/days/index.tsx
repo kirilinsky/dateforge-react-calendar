@@ -233,7 +233,6 @@ export interface CalendarDaysProps {
   swipe?: boolean;
   hideOutOfRange?: boolean;
   lockSelection?: boolean;
-  defaultMonth?: Date;
   fixedRows?: boolean;
   blockNavigation?: boolean;
 }
@@ -251,7 +250,6 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   swipe = true,
   hideOutOfRange = false,
   lockSelection = false,
-  defaultMonth,
   fixedRows = true,
   blockNavigation = false,
 }) => {
@@ -270,13 +268,6 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
 
   const { viewDate: rawDate, navigateTo } = useNavigation();
 
-  useEffect(() => {
-    if (defaultMonth)
-      navigateTo(
-        new Date(defaultMonth.getFullYear(), defaultMonth.getMonth(), 1),
-      );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [defaultMonth?.getTime()]);
   const date = offset
     ? new Date(rawDate.getFullYear(), rawDate.getMonth() + offset, 1)
     : rawDate;

@@ -130,6 +130,21 @@ export function validateTimeZone(tz: string | undefined): boolean {
   }
 }
 
+export function validateDateProp(
+  value: unknown,
+  propName: string,
+): Date | undefined {
+  if (value == null) return undefined;
+  if (value instanceof Date && !isNaN(value.getTime())) return value;
+  warnOnce(
+    `date-prop:invalid:${propName}`,
+    `${propName} must be a valid Date instance. Received: ${
+      value instanceof Date ? "Invalid Date" : JSON.stringify(value)
+    }. Falling back to undefined.`,
+  );
+  return undefined;
+}
+
 export function validateMinMax(
   minDate: Date | undefined,
   maxDate: Date | undefined,

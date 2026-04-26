@@ -69,6 +69,38 @@ describe("defaultValue — uncontrolled with seed", () => {
   });
 });
 
+describe("defaultViewDate — Calendar root", () => {
+  it("seeds initial view month without affecting selection", () => {
+    const { container } = render(
+      <Calendar defaultViewDate={new Date(2024, 5, 1)}>
+        <CalendarDays />
+      </Calendar>,
+    );
+    const grid = within(container).getByRole("grid");
+    const label = grid.getAttribute("aria-label");
+    expect(label?.toLowerCase()).toContain("june");
+    expect(label).toContain("2024");
+    const selected = within(grid)
+      .getAllByRole("gridcell")
+      .filter((c) => c.getAttribute("aria-selected") === "true");
+    expect(selected).toHaveLength(0);
+  });
+
+  it("explicit value overrides defaultViewDate's month", () => {
+    const { container } = render(
+      <Calendar
+        value={new Date(2024, 0, 5)}
+        defaultViewDate={new Date(2024, 5, 1)}
+      >
+        <CalendarDays />
+      </Calendar>,
+    );
+    const grid = within(container).getByRole("grid");
+    const label = grid.getAttribute("aria-label");
+    expect(label?.toLowerCase()).toContain("january");
+  });
+});
+
 describe("controlled vs uncontrolled — value precedence", () => {
   it("value takes precedence over defaultValue when both provided", () => {
     const { container } = render(

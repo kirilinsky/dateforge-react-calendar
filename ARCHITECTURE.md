@@ -191,6 +191,9 @@ The wrapper does not migrate selection across `mode` changes. Each mode reads it
 
 - `validateCalendarValue(value, mode, source)` — flags shape mismatches (e.g. `Date` in `range` mode) and `NaN` dates.
 - `validateMinMax(minDate, maxDate)` — flags inverted bounds.
+- `validateTimeZone(tz)` — runtime check; warns and returns `false` for non-IANA / `Invalid Date` strings. Used for fallback decisions in production too.
+- `validateTheme(theme)` — warns on string values outside `"auto" | "light" | "dark"`.
+- `validateDateProp(value, propName)` — generic Date-instance sanitizer. Returns the value if it is a valid Date, `undefined` otherwise (with a dev warn). Used for `defaultViewDate`; reusable for any future Date prop where silent acceptance of garbage would crash render.
 
 Validators are invoked at:
 - reducer initialization (initial seed);
@@ -198,6 +201,19 @@ Validators are invoked at:
 - a `useEffect` keyed on `[minDate, maxDate]`.
 
 New validators belong in this module and follow the same dedupe-by-key convention. Tests reset the dedupe cache via `__resetWarnOnce()`.
+
+---
+
+## View date ownership
+
+`viewDate` is owned by `NavigationContext` and seeded once by `buildInitialState`. Modules **read** `viewDate` and may call `navigateTo(date)` — they never seed it.
+
+Initial seed precedence:
+1. If `value` / `defaultValue` carries a date, the first selected date is used as `viewDate`.
+2. Otherwise `defaultViewDate` (a `<Calendar>` prop) is used.
+3. Otherwise `new Date()` (today).
+
+`<CalendarDays>` does not own a "default month" prop. Repeating multiple `<CalendarDays>` (e.g. in a multi-month layout) all read the same shared `viewDate` plus their own `offset`. There is no race because there is no per-module seed.
 
 ---
 

@@ -15,9 +15,10 @@ const renderRange = (props: {
     <Calendar
       mode="range"
       value={props.value ?? { from: null, to: null }}
+      defaultViewDate={VIEW_DATE}
       onChange={props.onChange}
     >
-      <CalendarDays defaultMonth={VIEW_DATE} />
+      <CalendarDays />
     </Calendar>,
   );
 
@@ -47,8 +48,8 @@ describe("Calendar — smoke", () => {
 
   it("renders without value (uncontrolled)", () => {
     const { getByRole } = render(
-      <Calendar>
-        <CalendarDays defaultMonth={VIEW_DATE} />
+      <Calendar defaultViewDate={VIEW_DATE}>
+        <CalendarDays />
       </Calendar>,
     );
     expect(getByRole("grid")).toBeInTheDocument();
@@ -158,9 +159,10 @@ describe("Calendar — min/maxDate disable", () => {
     const { container } = render(
       <Calendar
         value={VIEW_DATE}
+        defaultViewDate={VIEW_DATE}
         maxDate={new Date(2024, 5, 10)}
       >
-        <CalendarDays defaultMonth={VIEW_DATE} />
+        <CalendarDays />
       </Calendar>,
     );
     const grid = within(container).getByRole("grid");
@@ -176,10 +178,11 @@ describe("Calendar — min/maxDate disable", () => {
     const { container } = render(
       <Calendar
         value={null}
+        defaultViewDate={VIEW_DATE}
         onChange={onChange}
         maxDate={new Date(2024, 5, 10)}
       >
-        <CalendarDays defaultMonth={VIEW_DATE} />
+        <CalendarDays />
       </Calendar>,
     );
     const btn = findDayButton(container, 20);
@@ -189,8 +192,8 @@ describe("Calendar — min/maxDate disable", () => {
 
   it("days before minDate disabled", () => {
     const { container } = render(
-      <Calendar value={VIEW_DATE} minDate={new Date(2024, 5, 10)}>
-        <CalendarDays defaultMonth={VIEW_DATE} />
+      <Calendar value={VIEW_DATE} defaultViewDate={VIEW_DATE} minDate={new Date(2024, 5, 10)}>
+        <CalendarDays />
       </Calendar>,
     );
     const grid = within(container).getByRole("grid");
@@ -208,8 +211,8 @@ describe("Calendar — keyboard", () => {
   it("ArrowRight then Enter → selects next day", () => {
     const onChange = vi.fn();
     const { container } = render(
-      <Calendar value={new Date(2024, 5, 10)} onChange={onChange}>
-        <CalendarDays defaultMonth={VIEW_DATE} />
+      <Calendar value={new Date(2024, 5, 10)} defaultViewDate={VIEW_DATE} onChange={onChange}>
+        <CalendarDays />
       </Calendar>,
     );
     const grid = within(container).getByRole("grid");
@@ -236,8 +239,8 @@ describe("Calendar — keyboard", () => {
 describe("Calendar — selection ARIA", () => {
   it("selected day has aria-selected=true on gridcell", () => {
     const { container } = render(
-      <Calendar value={new Date(2024, 5, 10)}>
-        <CalendarDays defaultMonth={VIEW_DATE} />
+      <Calendar value={new Date(2024, 5, 10)} defaultViewDate={VIEW_DATE}>
+        <CalendarDays />
       </Calendar>,
     );
     const grid = within(container).getByRole("grid");

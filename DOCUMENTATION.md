@@ -40,6 +40,7 @@ import { Calendar } from "react-calendar-datetime";
 | `mode`         | `"single" \| "multiple" \| "range"` | `"single"`  | Selection mode                                                                                                                                                                                                        |
 | `value`        | `CalendarValue<M>`                  | —           | Controlled value. `Date \| null` for single, `Date[]` for multiple, `DateRange` for range. Pass `undefined` to opt out of controlled mode.                                                                            |
 | `defaultValue` | `CalendarValue<M>`                  | —           | Initial value for uncontrolled mode. Used only when `value` is `undefined`. Subsequent changes to `defaultValue` are ignored.                                                                                         |
+| `defaultViewDate` | `Date`                           | —           | Initial month/year displayed on mount when no selection seeds the view. Read once; subsequent changes are ignored. Use this instead of repeating the prop on every `CalendarDays`. Non-`Date` values and `Invalid Date` are rejected (dev warn) and treated as omitted.                                    |
 | `onChange`     | `(value: CalendarValue<M>) => void` | —           | Fires when the selection changes (in both controlled and uncontrolled modes)                                                                                                                                          |
 | `cols`         | `number`                            | —           | Number of columns in the internal CSS grid                                                                                                                                                                            |
 | `locale`       | `string`                            | `"en"`      | BCP 47 language tag used for all labels and formatting                                                                                                                                                                |
@@ -136,10 +137,13 @@ For purely local single-user CRUD without SSR, the default `"auto"` is the right
 
 **Dev warnings.** In development, the library emits a `console.warn` (deduped per condition) for:
 - `value` / `defaultValue` shape that does not match `mode` (e.g. `Date` passed in `mode="range"`);
-- `Date` instances that are `NaN`;
+- `Date` instances that are `NaN` (`new Date("invalid")`) inside `value` / `defaultValue`;
+- `defaultViewDate` that is not a valid `Date` instance — falls back to omitted;
 - `minDate` later than `maxDate`;
-- invalid `timeZone` strings;
-- `theme` strings outside `"auto" | "light" | "dark"`.
+- invalid `timeZone` strings — falls back to auto-detect;
+- `theme` strings outside `"auto" | "light" | "dark"` — falls back to system theme.
+
+In production all of the above silently fall back to a safe default; no warning is emitted.
 
 Warnings are silenced when `process.env.NODE_ENV === "production"`.
 
@@ -190,7 +194,6 @@ Renders the month grid — weekday headers, week numbers (optional), and the day
 | `lockSelection`     | `boolean`          | `false` | Prevent the user from deselecting the currently selected date                              |
 | `blockNavigation`   | `boolean`          | `false` | Block keyboard navigation (arrow keys, `PageUp`/`PageDown`) from crossing month boundaries |
 | `swipe`             | `boolean`          | `true`  | Enable swipe gestures to navigate between months                                           |
-| `defaultMonth`      | `Date`             | —       | Initial month displayed on mount. Navigates whenever the value changes                     |
 | `col`               | `number \| string` | —       | CSS grid `grid-column` value for layout positioning                                        |
 
 ---

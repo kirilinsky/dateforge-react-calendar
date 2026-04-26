@@ -33,6 +33,7 @@ export interface CalendarProps<M extends CalendarMode = "single"> {
   cols?: number;
   value?: CalendarValue<M>;
   defaultValue?: CalendarValue<M>;
+  defaultViewDate?: Date;
   mode?: M;
   maxDates?: number;
   minDate?: Date;

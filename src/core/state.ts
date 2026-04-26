@@ -253,9 +253,11 @@ export const toValidDate = (d?: Date | null): Date => {
 
 export function buildInitialState(params: {
   externalValue?: Date | Date[] | { from: Date | null; to: Date | null };
+  defaultViewDate?: Date;
   range: boolean;
 }): CalendarState {
-  const { externalValue, range } = params;
+  const { externalValue, defaultViewDate, range } = params;
+  const viewFallback = defaultViewDate ?? new Date();
 
   const isRangeObj =
     externalValue !== null &&
@@ -289,7 +291,7 @@ export function buildInitialState(params: {
         ? toValidDate(datesArr[1])
         : null;
     return {
-      viewDate: rangeStart ?? new Date(),
+      viewDate: rangeStart ?? viewFallback,
       selectedDates: [],
       rangeStart,
       rangeEnd,
@@ -304,7 +306,7 @@ export function buildInitialState(params: {
       ? [toValidDate(singleDate)]
       : [];
 
-  const viewDate = selectedDates[0] ?? new Date();
+  const viewDate = selectedDates[0] ?? viewFallback;
 
   return {
     viewDate,

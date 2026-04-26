@@ -35,10 +35,11 @@ describe("Time semantics — single mode", () => {
         mode="single"
         value={otherDate}
         defaultValue={undefined}
+        defaultViewDate={new Date(2024, 11, 1)}
         onChange={onChange}
       >
         <CalendarTimeGrid />
-        <CalendarDays defaultMonth={new Date(2024, 11, 1)} />
+        <CalendarDays />
       </Calendar>,
     );
     const drum = focusFirstDrum(container);
