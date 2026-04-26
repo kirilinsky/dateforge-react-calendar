@@ -196,6 +196,21 @@ describe("CalendarDays — day cell ARIA", () => {
     expect(disabledCells.length).toBeGreaterThan(0);
   });
 
+  it("disabled day buttons carry aria-disabled on the button element itself", () => {
+    // Regression: aria-disabled was removed from <button> in 939ed13,
+    // leaving it only on the parent <td>. CSS rules (cursor, line-through)
+    // target the button directly, so they silently broke.
+    const { getByRole } = renderDays({
+      value: new Date(2024, 5, 15),
+      maxDate: new Date(2024, 5, 10),
+    });
+    const grid = getByRole("grid");
+    const disabledButtons = within(grid)
+      .getAllByRole("button")
+      .filter((btn) => btn.getAttribute("aria-disabled") === "true");
+    expect(disabledButtons.length).toBeGreaterThan(0);
+  });
+
   it("enabled cells do not have aria-disabled", () => {
     const { getByRole } = renderDays({ value: new Date(2024, 5, 5) });
     const grid = getByRole("grid");

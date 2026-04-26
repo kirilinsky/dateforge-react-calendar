@@ -7,6 +7,7 @@ import {
   resolveStoryTheme,
   resolveStoryAppearance,
 } from "../_helpers/resolve-globals";
+import { debugStyle, fmtRange } from "../_helpers/debug";
 
 type MonthsTrackArgs = {
   short?: boolean;
@@ -17,9 +18,7 @@ const meta: Meta<MonthsTrackArgs> = {
   argTypes: {
     short: { control: "boolean" },
   },
-  args: {
-    short: true,
-  },
+  args: { short: true },
   render: (args, ctx) => {
     const [date, setDate] = useState<Date | null>(FIXED_DATE);
     return (
@@ -54,9 +53,7 @@ export const RangeBounds: Story = {
     });
     return (
       <>
-        <p style={{ marginBottom: 8, fontFamily: "monospace", fontSize: 12 }}>
-          from: {range.from?.toISOString() ?? "null"} | to: {range.to?.toISOString() ?? "null"}
-        </p>
+        <p style={debugStyle}>{fmtRange(range)}</p>
         <Calendar
           mode="range"
           value={range}

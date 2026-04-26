@@ -7,6 +7,7 @@ import {
   resolveStoryTheme,
   resolveStoryAppearance,
 } from "../_helpers/resolve-globals";
+import { debugStyle, fmtDate, fmtRange } from "../_helpers/debug";
 
 type DaysTrackArgs = {
   showMonthLabel?: boolean;
@@ -17,9 +18,7 @@ const meta: Meta<DaysTrackArgs> = {
   argTypes: {
     showMonthLabel: { control: "boolean" },
   },
-  args: {
-    showMonthLabel: false,
-  },
+  args: { showMonthLabel: false },
   render: (args, ctx) => {
     const [date, setDate] = useState<Date | null>(FIXED_DATE);
     return (
@@ -55,9 +54,7 @@ export const RangeBounds: Story = {
     });
     return (
       <>
-        <p style={{ marginBottom: 8, fontFamily: "monospace", fontSize: 12 }}>
-          from: {range.from?.toISOString() ?? "null"} | to: {range.to?.toISOString() ?? "null"}
-        </p>
+        <p style={debugStyle}>{fmtRange(range)}</p>
         <Calendar
           mode="range"
           value={range}
@@ -79,9 +76,7 @@ export const MultipleMode: Story = {
     const [dates, setDates] = useState<Date[]>([FIXED_DATE]);
     return (
       <>
-        <p style={{ marginBottom: 8, fontFamily: "monospace", fontSize: 12 }}>
-          selected: [{dates.map((d) => d.toISOString()).join(", ")}]
-        </p>
+        <p style={debugStyle}>selected: [{dates.map(fmtDate).join(", ")}]</p>
         <Calendar
           mode="multiple"
           value={dates}

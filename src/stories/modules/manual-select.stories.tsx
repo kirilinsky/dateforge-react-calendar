@@ -7,6 +7,7 @@ import {
   resolveStoryTheme,
   resolveStoryAppearance,
 } from "../_helpers/resolve-globals";
+import { debugStyle, fmtDate, fmtRange } from "../_helpers/debug";
 
 type ManualSelectArgs = {
   allowClear?: boolean;
@@ -30,9 +31,7 @@ export const SingleEmpty: Story = {
     const [date, setDate] = useState<Date | null>(null);
     return (
       <>
-        <p style={{ marginBottom: 8, fontFamily: "monospace", fontSize: 12 }}>
-          value: {date?.toISOString() ?? "null"}
-        </p>
+        <p style={debugStyle}>value: {date ? fmtDate(date) : "null"}</p>
         <Calendar
           value={date}
           onChange={setDate}
@@ -52,9 +51,7 @@ export const SinglePrefilled: Story = {
     const [date, setDate] = useState<Date | null>(FIXED_DATE);
     return (
       <>
-        <p style={{ marginBottom: 8, fontFamily: "monospace", fontSize: 12 }}>
-          value: {date?.toISOString() ?? "null"}
-        </p>
+        <p style={debugStyle}>value: {date ? fmtDate(date) : "null"}</p>
         <Calendar
           value={date}
           onChange={setDate}
@@ -75,12 +72,8 @@ export const SingleEnterEscape: Story = {
     const [calls, setCalls] = useState(0);
     return (
       <>
-        <p style={{ marginBottom: 4, fontFamily: "monospace", fontSize: 12 }}>
-          value: {date?.toISOString() ?? "null"}
-        </p>
-        <p style={{ marginBottom: 8, fontFamily: "monospace", fontSize: 12 }}>
-          onChange calls: {calls}
-        </p>
+        <p style={{ ...debugStyle, marginBottom: 4 }}>value: {date ? fmtDate(date) : "null"}</p>
+        <p style={debugStyle}>onChange calls: {calls}</p>
         <Calendar
           value={date}
           onChange={(v) => { setDate(v as Date | null); setCalls((c) => c + 1); }}
@@ -101,14 +94,10 @@ export const SingleInvalidDate: Story = {
     const [calls, setCalls] = useState(0);
     return (
       <>
-        <p style={{ marginBottom: 4, fontFamily: "monospace", fontSize: 12 }}>
-          value: {date?.toISOString() ?? "null"}
-        </p>
-        <p style={{ marginBottom: 4, fontFamily: "monospace", fontSize: 12 }}>
-          onChange calls: {calls}
-        </p>
-        <p style={{ marginBottom: 8, fontSize: 11, color: "#888" }}>
-          Try typing "32.13.2024" then Enter — no commit, red wrapper
+        <p style={{ ...debugStyle, marginBottom: 4 }}>value: {date ? fmtDate(date) : "null"}</p>
+        <p style={{ ...debugStyle, marginBottom: 4 }}>onChange calls: {calls}</p>
+        <p style={{ ...debugStyle, marginBottom: 8, opacity: 0.6 }}>
+          Type "32.13.2024" then Enter — no commit, red wrapper
         </p>
         <Calendar
           value={date}
@@ -130,14 +119,10 @@ export const SingleOutsideMinMax: Story = {
     const [calls, setCalls] = useState(0);
     return (
       <>
-        <p style={{ marginBottom: 4, fontFamily: "monospace", fontSize: 12 }}>
-          value: {date?.toISOString() ?? "null"}
-        </p>
-        <p style={{ marginBottom: 4, fontFamily: "monospace", fontSize: 12 }}>
-          onChange calls: {calls}
-        </p>
-        <p style={{ marginBottom: 8, fontSize: 11, color: "#888" }}>
-          Allowed: 03.02.2016 – 20.02.2016. Type outside range → red, no commit.
+        <p style={{ ...debugStyle, marginBottom: 4 }}>value: {date ? fmtDate(date) : "null"}</p>
+        <p style={{ ...debugStyle, marginBottom: 4 }}>onChange calls: {calls}</p>
+        <p style={{ ...debugStyle, marginBottom: 8, opacity: 0.6 }}>
+          Allowed: 03.02.2016 – 20.02.2016. Outside → red, no commit.
         </p>
         <Calendar
           value={date}
@@ -157,15 +142,10 @@ SingleOutsideMinMax.storyName = "Single — outside minDate/maxDate (invalid, no
 
 export const RangeBothEmpty: Story = {
   render: (_args, ctx) => {
-    const [range, setRange] = useState<{ from: Date | null; to: Date | null }>({
-      from: null,
-      to: null,
-    });
+    const [range, setRange] = useState<{ from: Date | null; to: Date | null }>({ from: null, to: null });
     return (
       <>
-        <p style={{ marginBottom: 8, fontFamily: "monospace", fontSize: 12 }}>
-          value: {JSON.stringify({ from: range.from?.toISOString() ?? null, to: range.to?.toISOString() ?? null })}
-        </p>
+        <p style={debugStyle}>{fmtRange(range)}</p>
         <Calendar
           mode="range"
           value={range}
@@ -183,15 +163,10 @@ RangeBothEmpty.storyName = "Range — both empty";
 
 export const RangeOnlyFromFilled: Story = {
   render: (_args, ctx) => {
-    const [range, setRange] = useState<{ from: Date | null; to: Date | null }>({
-      from: FIXED_DATE,
-      to: null,
-    });
+    const [range, setRange] = useState<{ from: Date | null; to: Date | null }>({ from: FIXED_DATE, to: null });
     return (
       <>
-        <p style={{ marginBottom: 8, fontFamily: "monospace", fontSize: 12 }}>
-          value: {JSON.stringify({ from: range.from?.toISOString() ?? null, to: range.to?.toISOString() ?? null })}
-        </p>
+        <p style={debugStyle}>{fmtRange(range)}</p>
         <Calendar
           mode="range"
           value={range}
@@ -215,9 +190,7 @@ export const RangeBothFilled: Story = {
     });
     return (
       <>
-        <p style={{ marginBottom: 8, fontFamily: "monospace", fontSize: 12 }}>
-          value: {JSON.stringify({ from: range.from?.toISOString() ?? null, to: range.to?.toISOString() ?? null })}
-        </p>
+        <p style={debugStyle}>{fmtRange(range)}</p>
         <Calendar
           mode="range"
           value={range}
@@ -238,9 +211,7 @@ export const MultipleEmpty: Story = {
     const [dates, setDates] = useState<Date[]>([]);
     return (
       <>
-        <p style={{ marginBottom: 8, fontFamily: "monospace", fontSize: 12 }}>
-          value: [{dates.map((d) => d.toISOString()).join(", ")}]
-        </p>
+        <p style={debugStyle}>selected: [{dates.map(fmtDate).join(", ")}]</p>
         <Calendar
           mode="multiple"
           value={dates}
@@ -261,9 +232,7 @@ export const MultipleCapped: Story = {
     const [dates, setDates] = useState<Date[]>([FIXED_DATE]);
     return (
       <>
-        <p style={{ marginBottom: 8, fontFamily: "monospace", fontSize: 12 }}>
-          value ({dates.length}/3): [{dates.map((d) => d.toISOString()).join(", ")}]
-        </p>
+        <p style={debugStyle}>selected ({dates.length}/3): [{dates.map(fmtDate).join(", ")}]</p>
         <Calendar
           mode="multiple"
           value={dates}
@@ -319,7 +288,7 @@ export const ReadOnly: Story = {
     const [date, setDate] = useState<Date | null>(FIXED_DATE);
     return (
       <>
-        <p style={{ marginBottom: 8, fontSize: 11, color: "#888" }}>
+        <p style={{ ...debugStyle, marginBottom: 8, opacity: 0.6 }}>
           readOnly — input HTML readOnly, all clears disabled, onChange never fires
         </p>
         <Calendar
@@ -338,10 +307,7 @@ export const ReadOnly: Story = {
 ReadOnly.storyName = "readOnly";
 
 export const Playground: Story = {
-  args: {
-    allowClear: true,
-    align: "left",
-  },
+  args: { allowClear: true, align: "left" },
   render: (args, ctx) => {
     const [date, setDate] = useState<Date | null>(FIXED_DATE);
     return (

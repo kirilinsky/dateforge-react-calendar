@@ -187,7 +187,7 @@ const DayCell = React.memo(function DayCell({
         onMouseEnter={() => onMouseEnter(fullDate)}
         onKeyDown={(e) => onKeyDown(e, fullDate)}
         aria-label={ariaLabel}
-        aria-disabled={readOnly || undefined}
+        aria-disabled={isDisabled || undefined}
         aria-current={isTodayDate ? "date" : undefined}
         data-cell=""
         data-selected={isSelected || undefined}
