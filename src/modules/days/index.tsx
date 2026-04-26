@@ -555,7 +555,6 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
               key={wIndex}
               role={isVisuallyEmpty ? "presentation" : "row"}
               aria-label={isVisuallyEmpty ? undefined : `Week ${week.weekNumber}`}
-              aria-hidden={isVisuallyEmpty ? true : undefined}
               className={styles.weekRow}
             >
               {weekNumbers && (
@@ -594,8 +593,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
                     return (
                       <div
                         key={i}
-                        role="gridcell"
-                        aria-hidden="true"
+                        role="presentation"
                         className={styles.dayItemEmpty}
                       />
                     );

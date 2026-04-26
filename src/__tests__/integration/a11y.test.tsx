@@ -16,6 +16,9 @@ function renderDays(
     minDate?: Date;
     maxDate?: Date;
     mode?: "single" | "range" | "multiple";
+    hideOutOfRange?: boolean;
+    fixedRows?: boolean;
+    currentMonthOnly?: boolean;
   } = {},
 ) {
   return render(
@@ -26,7 +29,11 @@ function renderDays(
       maxDate={props.maxDate}
     >
       <div>
-        <CalendarDays />
+        <CalendarDays
+          hideOutOfRange={props.hideOutOfRange}
+          fixedRows={props.fixedRows}
+          currentMonthOnly={props.currentMonthOnly}
+        />
       </div>
     </CalendarProvider>,
   );
@@ -59,6 +66,38 @@ describe("CalendarDays — axe", () => {
 
   it("no violations — range mode", async () => {
     const { container } = renderDays({ mode: "range" });
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it("no violations — hideOutOfRange with min/max", async () => {
+    const { container } = renderDays({
+      value: new Date(2024, 5, 15),
+      minDate: new Date(2024, 5, 5),
+      maxDate: new Date(2024, 5, 25),
+      hideOutOfRange: true,
+    });
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it("no violations — hideOutOfRange + fixedRows", async () => {
+    const { container } = renderDays({
+      value: new Date(2024, 5, 15),
+      minDate: new Date(2024, 5, 10),
+      maxDate: new Date(2024, 5, 20),
+      hideOutOfRange: true,
+      fixedRows: true,
+    });
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it("no violations — currentMonthOnly", async () => {
+    const { container } = renderDays({
+      value: new Date(2024, 5, 15),
+      currentMonthOnly: true,
+    });
     const results = await axe(container);
     expect(results).toHaveNoViolations();
   });
@@ -155,6 +194,22 @@ describe("CalendarDays — day cell ARIA", () => {
       '[role="gridcell"] button[aria-label]',
     );
     expect(buttons.length).toBeGreaterThan(20);
+  });
+
+  it("hidden out-of-range cells use role=presentation, not gridcell", () => {
+    const { container } = renderDays({
+      value: new Date(2024, 5, 15),
+      minDate: new Date(2024, 5, 10),
+      maxDate: new Date(2024, 5, 20),
+      hideOutOfRange: true,
+    });
+    const presentations = container.querySelectorAll('[role="presentation"]');
+    expect(presentations.length).toBeGreaterThan(0);
+    // Confirm none of these placeholders also pose as gridcells.
+    presentations.forEach((p) => {
+      expect(p.getAttribute("role")).toBe("presentation");
+      expect(p.getAttribute("aria-hidden")).toBeNull();
+    });
   });
 
   it("today cell button has aria-current=date", () => {

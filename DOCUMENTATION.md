@@ -190,11 +190,25 @@ Renders the month grid — weekday headers, week numbers (optional), and the day
 | `fixedRows`         | `boolean`          | `true`  | Always render 6 rows of day cells                                                          |
 | `weekNumbers`       | `boolean`          | `false` | Show ISO week numbers in the leftmost column                                               |
 | `hideWeekdays`      | `boolean`          | `false` | Hide the row of weekday name headers                                                       |
-| `hideOutOfRange`    | `boolean`          | `false` | Completely hide dates that fall outside `minDate`/`maxDate` or match disabled rules        |
+| `hideOutOfRange`    | `boolean`          | `false` | Do not render visible day buttons for dates outside `minDate`/`maxDate` or disabled rules. Layout placeholders are still rendered with `role="presentation"` so the grid stays aligned and accessibility tree contains only real cells. See "`hideOutOfRange` accessibility" below. |
 | `lockSelection`     | `boolean`          | `false` | Prevent the user from deselecting the currently selected date                              |
 | `blockNavigation`   | `boolean`          | `false` | Block keyboard navigation (arrow keys, `PageUp`/`PageDown`) from crossing month boundaries |
 | `swipe`             | `boolean`          | `true`  | Enable swipe gestures to navigate between months                                           |
 | `col`               | `number \| string` | —       | CSS grid `grid-column` value for layout positioning                                        |
+
+### `hideOutOfRange` accessibility
+
+When `hideOutOfRange` is enabled, dates outside `minDate`/`maxDate` (or matching disabled rules) are not rendered as interactive day buttons. To keep the visual grid aligned, an empty placeholder `<div role="presentation" />` is rendered in their place.
+
+WCAG/ARIA semantics:
+
+- Disabled-but-visible cells (default behavior) keep `role="gridcell"`, `aria-disabled="true"`, and an `aria-label` ending in "disabled". Screen readers announce them so users know the position is reachable but blocked.
+- Hidden cells (`hideOutOfRange={true}`) are removed from the accessibility tree entirely (`role="presentation"`). They are not announced. The row reports a smaller cell count.
+- Rows that end up entirely empty after hiding are also `role="presentation"`.
+
+**Trade-off — keyboard navigation.** Arrow-key navigation is computed by date math, not by what is visible. If the user arrows past the visible edge into a hidden region, focus may not land on a button (because no button was rendered for that date). To keep keyboard traversal predictable, pair `hideOutOfRange` with `blockNavigation` so arrows do not leave the visible range, or prefer the default disabled-and-visible mode when full keyboard reachability matters more than visual cleanliness.
+
+This trade-off is exercised by `axe` checks in `src/__tests__/integration/a11y.test.tsx`.
 
 ---
 

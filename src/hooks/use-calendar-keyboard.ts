@@ -35,6 +35,9 @@ export function useCalendarKeyboard({
     gridRef.current?.querySelector<HTMLElement>('[tabindex="0"]')?.focus();
   });
 
+  // TODO: accept an optional isHidden(date) predicate so arrow keys skip over
+  // out-of-range cells when CalendarDays runs with hideOutOfRange. Today the
+  // workaround is to pair hideOutOfRange with blockNavigation.
   const moveFocus = useCallback(
     (next: Date) => {
       const leavesMonth =

@@ -204,6 +204,22 @@ New validators belong in this module and follow the same dedupe-by-key conventio
 
 ---
 
+## Hidden day cells (a11y)
+
+`<CalendarDays hideOutOfRange>` and `<CalendarDays currentMonthOnly>` replace skipped cells with `<div role="presentation" />` placeholders. These placeholders preserve the grid layout (so `fixedRows` and column alignment still work) but are removed from the accessibility tree — screen readers see only real `gridcell`s.
+
+Disabled-but-visible cells follow the standard ARIA grid pattern: `role="gridcell"` + `aria-disabled="true"` on the cell, an `aria-label` describing why (e.g. "16 June 2024, disabled"). They remain reachable by keyboard so users do not silently lose positions.
+
+The decision tree for any out-of-range date:
+
+1. Default — render as gridcell with `aria-disabled="true"`.
+2. `hideOutOfRange` enabled — render as `role="presentation"` placeholder. AT skips it.
+3. Whole row of placeholders — outer row also becomes `role="presentation"`.
+
+Keyboard navigation does not currently skip over hidden positions (computed by date math, not visibility). When `hideOutOfRange` is desired together with full keyboard traversal, consumers should add `blockNavigation` to constrain arrows to the visible month. This is documented in `DOCUMENTATION.md` and exercised by `a11y.test.tsx`.
+
+---
+
 ## View date ownership
 
 `viewDate` is owned by `NavigationContext` and seeded once by `buildInitialState`. Modules **read** `viewDate` and may call `navigateTo(date)` — they never seed it.
