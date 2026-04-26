@@ -89,7 +89,7 @@ export function validateCalendarValue(
     if (isInvalidDate(d)) {
       warnOnce(
         `invalid-date:${source}`,
-        `${source} contains an invalid Date (NaN). It will be replaced with today.`,
+        `${source} contains an invalid Date (NaN). It will be dropped from the selection.`,
       );
     }
   }

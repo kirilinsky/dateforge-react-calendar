@@ -245,10 +245,13 @@ export function calendarReducer(
   }
 }
 
-export const toValidDate = (d?: Date | null): Date => {
-  if (!d) return new Date();
+// Selection-context fallback: invalid or nullish input is dropped (returns null)
+// rather than silently replaced with today. Lets app errors surface instead of
+// being masked as a "today" selection.
+export const toValidDateOrNull = (d?: Date | null): Date | null => {
+  if (!d) return null;
   const parsed = new Date(d);
-  return isNaN(parsed.getTime()) ? new Date() : parsed;
+  return isNaN(parsed.getTime()) ? null : parsed;
 };
 
 export function buildInitialState(params: {
@@ -279,16 +282,16 @@ export function buildInitialState(params: {
 
   if (range) {
     const rangeStart = rangeObj?.from
-      ? toValidDate(rangeObj.from)
+      ? toValidDateOrNull(rangeObj.from)
       : datesArr?.[0]
-        ? toValidDate(datesArr[0])
+        ? toValidDateOrNull(datesArr[0])
         : singleDate
-          ? toValidDate(singleDate)
+          ? toValidDateOrNull(singleDate)
           : null;
     const rangeEnd = rangeObj?.to
-      ? toValidDate(rangeObj.to)
+      ? toValidDateOrNull(rangeObj.to)
       : datesArr?.[1]
-        ? toValidDate(datesArr[1])
+        ? toValidDateOrNull(datesArr[1])
         : null;
     return {
       viewDate: rangeStart ?? viewFallback,
@@ -301,9 +304,12 @@ export function buildInitialState(params: {
   }
 
   const selectedDates = datesArr
-    ? datesArr.map(toValidDate)
+    ? (datesArr.map(toValidDateOrNull).filter(Boolean) as Date[])
     : singleDate
-      ? [toValidDate(singleDate)]
+      ? ((): Date[] => {
+          const v = toValidDateOrNull(singleDate);
+          return v ? [v] : [];
+        })()
       : [];
 
   const viewDate = selectedDates[0] ?? viewFallback;

@@ -174,3 +174,58 @@ describe("controlled vs uncontrolled — value precedence", () => {
     expect(selected[0].textContent).toContain("25");
   });
 });
+
+describe("Invalid Date — drop policy", () => {
+  it("single mode: invalid value yields no selection (no silent today fallback)", () => {
+    const { container } = render(
+      <Calendar value={new Date("nope") as never} defaultViewDate={D}>
+        <CalendarDays />
+      </Calendar>,
+    );
+    const grid = within(container).getByRole("grid");
+    const selected = within(grid)
+      .getAllByRole("gridcell")
+      .filter((c) => c.getAttribute("aria-selected") === "true");
+    expect(selected).toHaveLength(0);
+  });
+
+  it("multiple mode: invalid entries are dropped, valid kept", () => {
+    const { container } = render(
+      <Calendar
+        mode="multiple"
+        value={[D, new Date("nope") as never, new Date(2024, 5, 20)]}
+        defaultViewDate={D}
+      >
+        <CalendarDays />
+      </Calendar>,
+    );
+    const grid = within(container).getByRole("grid");
+    const selected = within(grid)
+      .getAllByRole("gridcell")
+      .filter((c) => c.getAttribute("aria-selected") === "true");
+    expect(selected).toHaveLength(2);
+    const labels = selected.map((c) => c.textContent?.trim()).sort();
+    expect(labels).toEqual(["15", "20"]);
+  });
+
+  it("range mode: invalid 'from' nulls the bound, 'to' kept if valid", () => {
+    const { container } = render(
+      <Calendar
+        mode="range"
+        value={{ from: new Date("nope") as never, to: new Date(2024, 5, 20) }}
+        defaultViewDate={D}
+      >
+        <CalendarDays />
+      </Calendar>,
+    );
+    const grid = within(container).getByRole("grid");
+    const selected = within(grid)
+      .getAllByRole("gridcell")
+      .filter(
+        (c) =>
+          c.getAttribute("aria-selected") === "true" ||
+          c.querySelector('[data-range="end"]') !== null,
+      );
+    expect(selected.length).toBeGreaterThan(0);
+  });
+});

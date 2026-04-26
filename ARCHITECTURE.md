@@ -265,7 +265,7 @@ The wrapper does not migrate selection across `mode` changes. Each mode reads it
 
 `src/core/dev-warn.ts` provides `warnOnce(key, message)` — a deduped `console.warn` that is a no-op when `process.env.NODE_ENV === "production"`. The same module exports two domain validators used by the provider:
 
-- `validateCalendarValue(value, mode, source)` — flags shape mismatches (e.g. `Date` in `range` mode) and `NaN` dates.
+- `validateCalendarValue(value, mode, source)` — flags shape mismatches (e.g. `Date` in `range` mode) and `NaN` dates. Invalid Dates are dropped from the selection (single → no value; multiple → filtered; range → bound nulled) rather than silently replaced with today, so app-side bugs surface instead of being masked.
 - `validateMinMax(minDate, maxDate)` — flags inverted bounds.
 - `validateTimeZone(tz)` — runtime check; warns and returns `false` for non-IANA / `Invalid Date` strings. Used for fallback decisions in production too.
 - `validateTheme(theme)` — warns on string values outside `"auto" | "light" | "dark"`.

@@ -17,7 +17,7 @@ import {
 import {
   calendarReducer,
   buildInitialState,
-  toValidDate,
+  toValidDateOrNull,
   SelectConfig,
 } from "@/core/state";
 import { isSameDay } from "@/utils/date-core";
@@ -157,16 +157,16 @@ export function CalendarProvider<M extends CalendarMode = "single">({
 
     if (range) {
       const from = externalRangeObj?.from
-        ? toValidDate(externalRangeObj.from)
+        ? toValidDateOrNull(externalRangeObj.from)
         : externalDates?.[0]
-          ? toValidDate(externalDates[0])
+          ? toValidDateOrNull(externalDates[0])
           : externalSingle
-            ? toValidDate(externalSingle)
+            ? toValidDateOrNull(externalSingle)
             : null;
       const to = externalRangeObj?.to
-        ? toValidDate(externalRangeObj.to)
+        ? toValidDateOrNull(externalRangeObj.to)
         : externalDates?.[1]
-          ? toValidDate(externalDates[1])
+          ? toValidDateOrNull(externalDates[1])
           : null;
       dispatch({
         type: "SYNC_EXTERNAL",
@@ -176,7 +176,9 @@ export function CalendarProvider<M extends CalendarMode = "single">({
         rangeEnd: to,
       });
     } else if (externalDates) {
-      const nextDates = externalDates.map(toValidDate);
+      const nextDates = externalDates
+        .map(toValidDateOrNull)
+        .filter((d): d is Date => d !== null);
       const keepView = nextDates.some((d) => isSameDay(d, state.viewDate));
       dispatch({
         type: "SYNC_EXTERNAL",
@@ -188,7 +190,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
         rangeEnd: null,
       });
     } else {
-      const parsed = externalSingle ? toValidDate(externalSingle) : null;
+      const parsed = externalSingle ? toValidDateOrNull(externalSingle) : null;
       dispatch({
         type: "SYNC_EXTERNAL",
         viewDate: parsed ?? state.viewDate,
