@@ -205,12 +205,114 @@ The wrapper does not migrate selection across `mode` changes. Each mode reads it
 - `validateTheme(theme)` — warns on string values outside `"auto" | "light" | "dark"`.
 - `validateDateProp(value, propName)` — generic Date-instance sanitizer. Returns the value if it is a valid Date, `undefined` otherwise (with a dev warn). Used for `defaultViewDate`; reusable for any future Date prop where silent acceptance of garbage would crash render.
 
+`createDisabled` and the presets resolver consume the same `warnOnce` channel for defensive validation of user-supplied data. Both never throw; bad entries are silently dropped after warning, and the rest of the structure is preserved. New consumer-facing builders MUST follow this convention.
+
 Validators are invoked at:
 - reducer initialization (initial seed);
 - the `SYNC_EXTERNAL` effect (each controlled value change);
 - a `useEffect` keyed on `[minDate, maxDate]`.
 
 New validators belong in this module and follow the same dedupe-by-key convention. Tests reset the dedupe cache via `__resetWarnOnce()`.
+
+---
+
+## Performance model
+
+The library is built to support repeated and combined modules — multi-month pickers (`<CalendarDays offset={0..11} />`), Track + Days mirroring, etc. Performance must hold under those compositions, not just the canonical single-grid case.
+
+### What is already optimized
+
+| Optimization                                                        | Lives in                                          |
+| ------------------------------------------------------------------- | ------------------------------------------------- |
+| `SelectionContext` split into `State` / `Actions` / `Hover`         | `src/context/selection-context.tsx`               |
+| `DayCell` wrapped in `React.memo`                                   | `src/modules/days/index.tsx`                      |
+| `AnimatedTime` wrapped in `memo`                                    | `src/modules/nav/index.tsx`                       |
+| Live clock state local to Nav (`nowTime` in `useState`)             | `src/modules/nav/index.tsx`                       |
+| Per-render derived data in `useMemo`: `weeksData`, `gridLabel`, `cellFmt`, `today`, `selectionState`, `config`, ... | Days, Nav, Provider |
+| Reducer dispatch keyed via `notifySeq` so `onChange` only fires when commit actually happens | `src/core/state.ts`, `src/core/provider.tsx` |
+| `useReducer` initializer + `validateCalendarValue` run once          | `src/core/provider.tsx`                           |
+| Popup state outside the reducer (plain `useState`) so popup transitions don't bump selection consumers | `src/core/provider.tsx`             |
+
+### Re-render boundaries (what triggers what)
+
+- **`viewDate` change** (navigation) → Nav re-renders, all `<CalendarDays>` instances recompute their month grid, all Tracks recompute their highlight. Necessary.
+- **`selectedDates` / `rangeStart` / `rangeEnd` change** → Days recomputes `weeksData`; cells whose state changed re-render (others are skipped by `DayCell.memo`).
+- **`hoverDate` change** (range preview) → only `SelectionHoverContext` consumers re-render. `weeksData` does include `hoverDate` in its `useMemo` deps, so the highlighted month re-derives the preview range. Cells outside the changing preview band are skipped by `DayCell.memo`.
+- **`showNowTime` tick** → only Nav re-renders (state lives there).
+- **`readOnly` toggle** → entire tree re-renders once (config change). Acceptable.
+- **Theme / appearance toggle** → root re-renders; modules read tokens from CSS variables, no JS re-derivation.
+
+### Consumer responsibilities
+
+The library cannot guarantee performance if the consumer hands it a fresh-reference object on every render. Recommend memoization for:
+
+```tsx
+const disabled = useMemo(() => createDisabled({ weekends: true }), []);
+const presets = useMemo(() => [...basicPresets, { id: "x", label: "X", value: 0 }], []);
+const customTheme = useMemo(() => createTheme({...}), []);
+
+<Calendar disabled={disabled} presets={presets} theme={customTheme} />
+```
+
+Without these, every parent render makes new objects → `useMemo` deps inside Days / Provider invalidate → grid recomputes for every module instance. In a 12-month layout this multiplies cost by 12.
+
+### Repeated modules
+
+`<CalendarDays offset={n} />` instances share `viewDate`, `selectedDates`, `hoverDate`, all config. They diverge only by `offset` (which affects which month they display). The cost of N instances is roughly N × (single-instance cost) — there is no shared cache across them. For very wide multi-month grids (12+) consider:
+
+- Aggressive memoization on the consumer side (above).
+- Pre-flat `disabled` rule arrays — e.g. expand `before` / `after` once on the consumer rather than re-checking each cell.
+- Avoid `showNowTime` with very frequent `seconds=true` ticking — animation runs once per second across the whole Nav subtree.
+
+### Hover preview cost
+
+In range mode, moving the mouse over the grid updates `hoverDate`, which causes `weeksData` to recompute the preview band. This is intrinsic to the feature. Mitigations already in place:
+- `DayCell.memo` keeps cells whose preview-related props are unchanged from re-rendering.
+- `SelectionContext` split prevents non-Days consumers (Nav, Tracks, Presets) from re-rendering on hover.
+
+If hover preview is not needed for your UX, omit it by not setting `hoverDate` on cell mouseenter in your custom modules — hover is opt-in per module.
+
+### Performance test coverage
+
+`src/__tests__/integration/perf.test.tsx` mounts representative compositions and asserts:
+- A `<DayCell>` outside the range preview band does not re-render when `hoverDate` moves around.
+- `showNowTime` ticking does not re-render `<CalendarDays>`.
+
+These are render-count tests using a render-counting wrapper, not wall-clock benchmarks. They guard against regressions in the boundary list above.
+
+---
+
+## Invalid input policy
+
+The library is **defensive at every consumer-facing boundary**. The contract is uniform:
+
+1. **Never throw.** Bad input is silently dropped, replaced with a safe default, or clamped to a valid range.
+2. **Warn once in development.** `warnOnce(key, message)` from `src/core/dev-warn.ts` deduplicates per condition + identifier so the console isn't flooded.
+3. **Silent in production.** `process.env.NODE_ENV === "production"` short-circuits the warning. The fallback behavior is identical to dev.
+
+The complete catalog of validators:
+
+| Validator                                         | Lives in                                | Catches                                                          |
+| ------------------------------------------------- | --------------------------------------- | ---------------------------------------------------------------- |
+| `validateCalendarValue(value, mode, source)`      | `core/dev-warn.ts`                      | `value` / `defaultValue` shape mismatch with `mode`; `NaN` Date   |
+| `validateMinMax(minDate, maxDate)`                | `core/dev-warn.ts`                      | `minDate > maxDate`                                              |
+| `validateTimeZone(tz)`                            | `core/dev-warn.ts`                      | empty string, non-IANA names, throwing `Intl` constructor        |
+| `validateTheme(theme)`                            | `core/dev-warn.ts`                      | string outside `"auto" \| "light" \| "dark"`                     |
+| `validateDateProp(value, propName)`               | `core/dev-warn.ts`                      | non-Date / Invalid Date for `defaultViewDate` (and any future Date prop) |
+| `getResolvedPresets` defense layer                | `modules/presets/preset-utils.ts`       | non-object entries; missing `label`; duplicate `id`; throwing `getValue`; Invalid Date / range |
+| `createDisabled` defense layer                    | `utils/create-disabled.ts`              | non-object init; invalid Dates in `before` / `after` / `dates` / `ranges`; non-array `dates` / `ranges` / `weekdays`; weekdays out of 0..6; `from > to` (swapped); throwing nothing |
+| `<CalendarYearsGrid yearsPerPage>` clamp warning  | `modules/years-grid/index.tsx`          | non-integer / out of 1..40 range — silently clamped + warn        |
+| Nav `showMonthPicker` + `compactMonths`           | `modules/nav/index.tsx`                 | both true → renders both UI variants + warn                       |
+| Nav `showYearPicker` + `compactYears`             | `modules/nav/index.tsx`                 | both true → renders both UI variants + warn                       |
+
+Validators are wired into:
+- `useReducer` initializer (`provider.tsx`) — initial seed validation.
+- `useEffect` on `[externalValue]` and `[minDate, maxDate]` and `[timeZone]` and `[themeProp]` — runtime re-validation.
+- Builder functions (`createDisabled`, preset resolver) — every call site.
+
+When you add a new prop that accepts user data, add a validator next to the existing ones in `dev-warn.ts` and wire it via the same `warnOnce` channel. Tests live in `src/__tests__/integration/dev-warn.test.tsx` and follow a consistent pattern (mock `console.warn`, render, assert spy and message).
+
+Tests reset the dedupe cache via `__resetWarnOnce()` between cases.
 
 ---
 

@@ -5,6 +5,7 @@ import { useNavigation } from "@/context/navigation-context";
 import { DisabledConfig } from "@/types/calendar";
 import { useGridSlot } from "@/hooks/use-grid-slot";
 import shared from "@/global/global.module.css";
+import { warnOnce } from "@/core/dev-warn";
 
 const MIN_YEAR = 1900;
 const MAX_YEAR = 2100;
@@ -71,6 +72,17 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
   col,
 }) => {
   const pageSize = Math.min(40, Math.max(1, yearsPerPage));
+  if (
+    !Number.isFinite(yearsPerPage) ||
+    yearsPerPage !== Math.floor(yearsPerPage) ||
+    yearsPerPage < 1 ||
+    yearsPerPage > 40
+  ) {
+    warnOnce(
+      "years-grid:clamped",
+      `<CalendarYearsGrid yearsPerPage={${yearsPerPage}} /> is out of the supported 1..40 integer range. Clamped to ${pageSize}.`,
+    );
+  }
   const { minDate, maxDate, disabled } = useConfig();
   const { viewDate, navigateTo } = useNavigation();
 

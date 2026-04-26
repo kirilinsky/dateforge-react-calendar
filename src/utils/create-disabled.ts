@@ -1,4 +1,5 @@
 import { DisabledConfig, DisabledRule } from "../types/calendar";
+import { warnOnce } from "../core/dev-warn";
 
 interface CreateDisabledInit {
   all?: boolean;
@@ -9,6 +10,41 @@ interface CreateDisabledInit {
   dates?: Date[];
   ranges?: Array<{ from: Date; to: Date }>;
 }
+
+const isValidDate = (d: unknown): d is Date =>
+  d instanceof Date && !isNaN(d.getTime());
+
+const sanitizeDate = (d: unknown, field: string): Date | undefined => {
+  if (d == null) return undefined;
+  if (isValidDate(d)) return d;
+  warnOnce(
+    `createDisabled:invalid-date:${field}`,
+    `createDisabled.${field} is not a valid Date instance — entry skipped.`,
+  );
+  return undefined;
+};
+
+const sanitizeWeekdays = (input: unknown): number[] | undefined => {
+  if (input == null) return undefined;
+  if (!Array.isArray(input)) {
+    warnOnce(
+      "createDisabled:weekdays-not-array",
+      `createDisabled.weekdays must be an array of integers 0..6 — entry skipped.`,
+    );
+    return undefined;
+  }
+  const out = input.filter(
+    (n): n is number =>
+      typeof n === "number" && Number.isInteger(n) && n >= 0 && n <= 6,
+  );
+  if (out.length !== input.length) {
+    warnOnce(
+      "createDisabled:weekdays-bad-values",
+      `createDisabled.weekdays contains values outside 0..6 (or non-integers); they were dropped.`,
+    );
+  }
+  return out.length > 0 ? out : undefined;
+};
 
 /**
  * Creates a `DisabledConfig` object for the `disabled` prop of `<Calendar />`.
@@ -28,15 +64,83 @@ interface CreateDisabledInit {
  * })
  */
 export function createDisabled(init: CreateDisabledInit): DisabledConfig {
+  if (init == null || typeof init !== "object" || Array.isArray(init)) {
+    warnOnce(
+      "createDisabled:invalid-init",
+      `createDisabled() expects an object. Received: ${JSON.stringify(init)}. Returning empty config.`,
+    );
+    return { __type: "disabled-config", rules: [] };
+  }
+
   const rules: DisabledRule[] = [];
+
   if (init.all) rules.push(true);
   if (init.weekends) rules.push({ dayOfWeek: [0, 6] });
-  if (init.weekdays?.length) rules.push({ dayOfWeek: init.weekdays });
-  if (init.before) rules.push({ before: init.before });
-  if (init.after) rules.push({ after: init.after });
-  if (init.dates?.length) rules.push(...init.dates);
-  if (init.ranges?.length) {
-    for (const r of init.ranges) rules.push({ from: r.from, to: r.to });
+
+  const weekdays = sanitizeWeekdays(init.weekdays);
+  if (weekdays) rules.push({ dayOfWeek: weekdays });
+
+  const before = sanitizeDate(init.before, "before");
+  if (before) rules.push({ before });
+
+  const after = sanitizeDate(init.after, "after");
+  if (after) rules.push({ after });
+
+  if (init.dates != null) {
+    if (!Array.isArray(init.dates)) {
+      warnOnce(
+        "createDisabled:dates-not-array",
+        `createDisabled.dates must be Date[] — entry skipped.`,
+      );
+    } else {
+      for (let i = 0; i < init.dates.length; i++) {
+        const d = init.dates[i];
+        if (isValidDate(d)) rules.push(d);
+        else {
+          warnOnce(
+            `createDisabled:dates-invalid:${i}`,
+            `createDisabled.dates[${i}] is not a valid Date — dropped.`,
+          );
+        }
+      }
+    }
   }
+
+  if (init.ranges != null) {
+    if (!Array.isArray(init.ranges)) {
+      warnOnce(
+        "createDisabled:ranges-not-array",
+        `createDisabled.ranges must be an array of { from, to } — entry skipped.`,
+      );
+    } else {
+      for (let i = 0; i < init.ranges.length; i++) {
+        const r = init.ranges[i];
+        if (r == null || typeof r !== "object") {
+          warnOnce(
+            `createDisabled:range-not-object:${i}`,
+            `createDisabled.ranges[${i}] is not an object — dropped.`,
+          );
+          continue;
+        }
+        if (!isValidDate(r.from) || !isValidDate(r.to)) {
+          warnOnce(
+            `createDisabled:range-invalid-dates:${i}`,
+            `createDisabled.ranges[${i}] has invalid Date(s) — dropped.`,
+          );
+          continue;
+        }
+        if (r.from.getTime() > r.to.getTime()) {
+          warnOnce(
+            `createDisabled:range-inverted:${i}`,
+            `createDisabled.ranges[${i}] has from > to — values were swapped.`,
+          );
+          rules.push({ from: r.to, to: r.from });
+        } else {
+          rules.push({ from: r.from, to: r.to });
+        }
+      }
+    }
+  }
+
   return { __type: "disabled-config", rules };
 }

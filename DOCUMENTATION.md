@@ -135,17 +135,44 @@ For purely local single-user CRUD without SSR, the default `"auto"` is the right
 
 **Invalid timezone values** (e.g. `"Europe/Wrongville"`) fall back to auto-detect and emit a dev warning. In production they are silently treated as auto-detect.
 
-**Dev warnings.** In development, the library emits a `console.warn` (deduped per condition) for:
-- `value` / `defaultValue` shape that does not match `mode` (e.g. `Date` passed in `mode="range"`);
-- `Date` instances that are `NaN` (`new Date("invalid")`) inside `value` / `defaultValue`;
-- `defaultViewDate` that is not a valid `Date` instance — falls back to omitted;
-- `minDate` later than `maxDate`;
-- invalid `timeZone` strings — falls back to auto-detect;
-- `theme` strings outside `"auto" | "light" | "dark"` — falls back to system theme.
+**Dev warnings.** The library never throws on bad input. In development a deduped `console.warn` is emitted; in production the same fallback runs silently. The complete list of validated cases:
 
-In production all of the above silently fall back to a safe default; no warning is emitted.
+| Source                                                  | Behavior                                                         |
+| ------------------------------------------------------- | ---------------------------------------------------------------- |
+| `value` / `defaultValue` shape does not match `mode`    | Best-effort normalization (e.g. `Date` in range mode → `from`)    |
+| `value` / `defaultValue` contains `Invalid Date`        | Replaced with today; entry warned                                |
+| `defaultViewDate` not a valid Date                      | Treated as omitted                                               |
+| `minDate > maxDate`                                     | No date selectable; warn                                         |
+| `timeZone` not a valid IANA / `UTC±N`                   | Falls back to auto-detect                                        |
+| `theme` string outside `"auto" \| "light" \| "dark"`    | Falls back to system theme                                       |
+| `<CalendarYearsGrid yearsPerPage>` outside 1..40 / non-integer | Clamped to 1..40                                          |
+| `<CalendarNav>` with both `showMonthPicker` + `compactMonths` (or year equivalents) | Both UI variants render; warn          |
+| `<CalendarPresets>` entry: not an object / missing `label` / duplicate `id` / throwing `getValue` / Invalid Date result | Entry skipped |
+| `createDisabled()` bad input (non-object init, invalid Dates, malformed ranges, weekdays out of 0..6) | Bad pieces dropped, valid kept |
 
-Warnings are silenced when `process.env.NODE_ENV === "production"`.
+`process.env.NODE_ENV === "production"` short-circuits the `console.warn`. The fallback behavior is identical in both modes.
+
+### Performance tips
+
+The library memoizes its internals (split selection contexts, `React.memo` on day cells, `useMemo` for derived data, popup state outside the reducer). Repeated `<CalendarDays>` for multi-month layouts is a first-class case.
+
+What you can do to keep things fast:
+
+- **Memoize objects you pass down.** `disabled`, `theme`, `appearance`, `presets` should be stable references between renders. Wrap creation in `useMemo`:
+
+  ```tsx
+  const disabled = useMemo(() => createDisabled({ weekends: true }), []);
+  const presets = useMemo(() => [...basicPresets], []);
+  <Calendar disabled={disabled} presets={presets} />
+  ```
+
+  Without this every parent render invalidates the calendar's internal `useMemo` chain.
+
+- **Wide multi-month layouts** (12+ instances of `<CalendarDays>`) work, but cost scales linearly. Avoid heavy `disabled` configs (long `ranges` / `dates` arrays) when you can express the same constraint via `minDate` / `maxDate` instead.
+
+- **`<CalendarNav showNowTime />`** ticks every second; the tick is isolated to `Nav` so it does not re-render the day grid. Adding `seconds={true}` makes the animation more frequent but still local.
+
+- **Hover range preview** (in `mode="range"`) recomputes the day grid as the mouse moves over cells. `<CalendarDays>` cells outside the preview band are skipped via `React.memo`, so the cost stays bounded. If preview is not desired, omit hover-driven custom modules.
 
 ### Server-side rendering
 
@@ -335,7 +362,7 @@ Full-page **year navigation grid** with pagination. Clicking a year sets `viewDa
 
 | Prop                | Type               | Default | Description                                     |
 | ------------------- | ------------------ | ------- | ----------------------------------------------- |
-| `yearsPerPage`      | `number`           | `10`    | Number of years shown per page. Clamped to 1–40 |
+| `yearsPerPage`      | `number`           | `10`    | Number of years shown per page. Integer in 1..40; out-of-range values are clamped and warn in dev |
 | `disableOutOfRange` | `boolean`          | `true`  | Disable years outside `minDate`/`maxDate` range |
 | `hideOutOfRange`    | `boolean`          | `false` | Completely hide years outside the allowed range |
 | `col`               | `number \| string` | —       | CSS grid `grid-column` value                    |
@@ -713,6 +740,23 @@ const disabled = createDisabled({
 | `after`    | `Date`                       | Disable all dates after this date                     |
 | `dates`    | `Date[]`                     | Disable specific individual dates                     |
 | `ranges`   | `{ from: Date; to: Date }[]` | Disable one or more date ranges                       |
+
+#### Defensive handling
+
+`createDisabled` validates every input and silently drops malformed entries. In development each drop emits a deduped `console.warn`; in production the function never throws.
+
+| Bad input                                          | Behavior                                              |
+| -------------------------------------------------- | ----------------------------------------------------- |
+| `init` is not an object                            | Returns empty config + warn                           |
+| `before` / `after` is not a valid Date             | Rule skipped + warn                                   |
+| Item in `dates` is not a Date or is `Invalid Date` | Item dropped + warn; valid items kept                 |
+| `dates` is not an array                            | Rule skipped + warn                                   |
+| Item in `ranges` lacks valid `from` / `to`         | Item dropped + warn; valid items kept                 |
+| Range with `from > to`                             | Values swapped + warn (range still applied correctly) |
+| `weekdays` contains values outside 0..6 or non-integers | Bad values dropped + warn                       |
+| `weekdays` is not an array                         | Rule skipped + warn                                   |
+
+The function never returns an object whose `rules` contain malformed entries — downstream code (`checkIsDateDisabled`) receives only well-formed rules.
 
 ---
 

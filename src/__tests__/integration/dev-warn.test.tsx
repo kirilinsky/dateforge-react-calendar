@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render } from "@testing-library/react";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
+import { CalendarYearsGrid } from "@/modules/years-grid";
 import { __resetWarnOnce } from "@/core/dev-warn";
 
 let warnSpy: ReturnType<typeof vi.spyOn>;
@@ -212,6 +213,38 @@ describe("dev-warn — defaultViewDate", () => {
     render(
       <Calendar defaultViewDate={new Date(2024, 5, 15)}>
         <CalendarDays />
+      </Calendar>,
+    );
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe("dev-warn — yearsPerPage", () => {
+  it("warns when yearsPerPage exceeds the 1..40 range", () => {
+    render(
+      <Calendar value={new Date(2024, 5, 15)}>
+        <CalendarYearsGrid yearsPerPage={999} />
+      </Calendar>,
+    );
+    expect(warnSpy).toHaveBeenCalled();
+    expect(lastMsg()).toContain("yearsPerPage");
+    expect(lastMsg()).toContain("Clamped to 40");
+  });
+
+  it("warns on a non-integer yearsPerPage", () => {
+    render(
+      <Calendar value={new Date(2024, 5, 15)}>
+        <CalendarYearsGrid yearsPerPage={3.5} />
+      </Calendar>,
+    );
+    expect(warnSpy).toHaveBeenCalled();
+    expect(lastMsg()).toContain("yearsPerPage");
+  });
+
+  it("does not warn on a valid value (e.g. 12)", () => {
+    render(
+      <Calendar value={new Date(2024, 5, 15)}>
+        <CalendarYearsGrid yearsPerPage={12} />
       </Calendar>,
     );
     expect(warnSpy).not.toHaveBeenCalled();
