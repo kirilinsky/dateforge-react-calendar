@@ -57,14 +57,14 @@
         "default": "./dist/modules/nav.cjs"
       }
     },
-    "./modules/months": {
+    "./modules/month-grid": {
       "import": {
-        "types": "./dist/modules/months.d.ts",
-        "default": "./dist/modules/months.mjs"
+        "types": "./dist/modules/month-grid.d.ts",
+        "default": "./dist/modules/month-grid.mjs"
       },
       "require": {
-        "types": "./dist/modules/months.d.cts",
-        "default": "./dist/modules/months.cjs"
+        "types": "./dist/modules/month-grid.d.cts",
+        "default": "./dist/modules/month-grid.cjs"
       }
     },
     "./modules/time": {

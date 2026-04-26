@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import styles from "./months.module.css";
+import styles from "./month-grid.module.css";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import { getMonthListData, setMonth } from "@/utils/date-utils";

@@ -18,7 +18,7 @@ export type { CalendarAppearance, CustomAppearance, AppearanceTokens } from "./t
 
 export type { CalendarNavProps } from "./modules/nav/index";
 export type { CalendarDaysTrackProps } from "./modules/days-track/index";
-export type { CalendarMonthGridProps } from "./modules/months/index";
+export type { CalendarMonthGridProps } from "./modules/month-grid/index";
 export type { CalendarMonthsTrackProps } from "./modules/months-track/index";
 export type { CalendarYearsGridProps } from "./modules/years-grid/index";
 export type { CalendarYearsTrackProps } from "./modules/years-track/index";

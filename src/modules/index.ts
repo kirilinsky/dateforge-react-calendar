@@ -1,6 +1,6 @@
 export { CalendarDays } from "./days";
 export { CalendarNav } from "./nav";
-export { CalendarMonthGrid } from "./months";
+export { CalendarMonthGrid } from "./month-grid";
 export { CalendarTimeGrid } from "./time";
 export { CalendarYearsGrid } from "./years-grid";
 export { CalendarPresets } from "./presets";

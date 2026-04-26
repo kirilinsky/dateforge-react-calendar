@@ -252,7 +252,7 @@ Use this table to decide which guarantees apply to your composition. A `<Calenda
 
 ### CalendarMonthGrid
 
-Full-page month picker grid (12 cells).
+Full-page **month navigation grid** (12 cells). Clicking a month sets `viewDate` to that month — it does **not** select a date and does **not** call `onChange`. Pair with `<CalendarDays>` (or another interactive module) for date selection.
 
 ```tsx
 <CalendarMonthGrid />
@@ -271,7 +271,7 @@ Full-page month picker grid (12 cells).
 
 ### CalendarYearsGrid
 
-Full-page year picker grid with pagination.
+Full-page **year navigation grid** with pagination. Clicking a year sets `viewDate` to that year — it does **not** select a date and does **not** call `onChange`. Pair with `<CalendarDays>` (or another interactive module) for date selection.
 
 ```tsx
 <CalendarYearsGrid yearsPerPage={12} />
