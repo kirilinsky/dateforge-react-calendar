@@ -13,6 +13,12 @@
 ![axe](https://img.shields.io/badge/axe-0%20critical%20violations-brightgreen)
 &nbsp;&nbsp;
 ![lighthouse](https://img.shields.io/badge/a11y-98%20Lighthouse-brightgreen)
+&nbsp;&nbsp;
+[![Storybook](https://cdn.jsdelivr.net/gh/storybookjs/brand@master/badge/badge-storybook.svg)](https://69edcfe5e2f1e060b1cce900-iprjksemvn.chromatic.com)
+&nbsp;&nbsp;
+[![Chromatic](https://img.shields.io/badge/chromatic-passing-brightgreen?logo=chromatic&style=flat-square)](https://www.chromatic.com/library?appId=69edcfe5e2f1e060b1cce900)
+&nbsp;&nbsp;
+[![Visual regression](https://img.shields.io/badge/visual%20regression-Chromatic-ff4785?style=flat-square&logo=chromatic)](https://www.chromatic.com/library?appId=69edcfe5e2f1e060b1cce900)
 
 </div>
 
