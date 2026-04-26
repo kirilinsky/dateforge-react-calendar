@@ -92,11 +92,11 @@ describe("Calendar — single mode click", () => {
     expect(onChange.mock.calls[1][0]).toBeNull();
   });
 
-  it("lockSelection prevents deselect of already-selected day", async () => {
+  it("lockDeselection prevents deselect of already-selected day", async () => {
     const onChange = vi.fn();
     const { container } = render(
       <Calendar value={new Date(2024, 5, 10)} onChange={onChange}>
-        <CalendarDays lockSelection />
+        <CalendarDays lockDeselection />
       </Calendar>,
     );
     const btn = findDayButton(container, 10);
@@ -104,11 +104,11 @@ describe("Calendar — single mode click", () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it("lockSelection still allows selecting different day", async () => {
+  it("lockDeselection still allows selecting different day", async () => {
     const onChange = vi.fn();
     const { container } = render(
       <Calendar value={new Date(2024, 5, 10)} onChange={onChange}>
-        <CalendarDays lockSelection />
+        <CalendarDays lockDeselection />
       </Calendar>,
     );
     const btn = findDayButton(container, 15);
@@ -192,7 +192,11 @@ describe("Calendar — min/maxDate disable", () => {
 
   it("days before minDate disabled", () => {
     const { container } = render(
-      <Calendar value={VIEW_DATE} defaultViewDate={VIEW_DATE} minDate={new Date(2024, 5, 10)}>
+      <Calendar
+        value={VIEW_DATE}
+        defaultViewDate={VIEW_DATE}
+        minDate={new Date(2024, 5, 10)}
+      >
         <CalendarDays />
       </Calendar>,
     );
@@ -211,7 +215,11 @@ describe("Calendar — keyboard", () => {
   it("ArrowRight then Enter → selects next day", () => {
     const onChange = vi.fn();
     const { container } = render(
-      <Calendar value={new Date(2024, 5, 10)} defaultViewDate={VIEW_DATE} onChange={onChange}>
+      <Calendar
+        value={new Date(2024, 5, 10)}
+        defaultViewDate={VIEW_DATE}
+        onChange={onChange}
+      >
         <CalendarDays />
       </Calendar>,
     );

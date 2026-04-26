@@ -173,11 +173,17 @@ const DayCell = React.memo(function DayCell({
     isPreviewMid;
 
   return (
-    <div role="gridcell" aria-selected={isSelected} aria-disabled={isDisabled || readOnly || undefined}>
+    <div
+      role="gridcell"
+      aria-selected={isSelected}
+      aria-disabled={isDisabled || readOnly || undefined}
+    >
       <button
         type="button"
         tabIndex={tabIndex}
-        onClick={() => !isDisabled && !readOnly && onSelect(fullDate, isDisabled)}
+        onClick={() =>
+          !isDisabled && !readOnly && onSelect(fullDate, isDisabled)
+        }
         onMouseEnter={() => onMouseEnter(fullDate)}
         onKeyDown={(e) => onKeyDown(e, fullDate)}
         aria-label={ariaLabel}
@@ -204,7 +210,10 @@ const DayCell = React.memo(function DayCell({
           range && rangeEndpointClass,
           range && rangeBridgeClass,
           range && isInRange && !isDisabled && styles.rIn,
-          range && (isInRange || isPreviewMid) && isDisabled && styles.rInDisabled,
+          range &&
+            (isInRange || isPreviewMid) &&
+            isDisabled &&
+            styles.rInDisabled,
           previewClass,
           previewBridgeClass,
           isToday && styles.todayItem,
@@ -233,7 +242,7 @@ export interface CalendarDaysProps {
   highlightToday?: boolean;
   swipe?: boolean;
   hideOutOfRange?: boolean;
-  lockSelection?: boolean;
+  lockDeselection?: boolean;
   fixedRows?: boolean;
   blockNavigation?: boolean;
 }
@@ -250,7 +259,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   highlightToday = true,
   swipe = true,
   hideOutOfRange = false,
-  lockSelection = false,
+  lockDeselection = false,
   fixedRows = true,
   blockNavigation = false,
 }) => {
@@ -286,10 +295,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   );
   // NaN-Date never matches isSameDay (since NaN !== NaN), so until todayClient
   // resolves no day cell is wrongly highlighted as "today".
-  const today = useMemo(
-    () => todayClient ?? new Date(NaN),
-    [todayClient],
-  );
+  const today = useMemo(() => todayClient ?? new Date(NaN), [todayClient]);
 
   const startT = useMemo(
     () =>
@@ -393,7 +399,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
     (targetDate: Date, isDisabled: boolean) => {
       if (isDisabled || readOnly) return;
       if (
-        (lockSelection || daysTrackActive) &&
+        (lockDeselection || daysTrackActive) &&
         selectedDates.some((d) => isSameDay(d, targetDate))
       )
         return;
@@ -426,7 +432,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
       date,
       minDate,
       maxDate,
-      lockSelection,
+      lockDeselection,
       daysTrackActive,
       selectedDates,
       readOnly,
@@ -494,8 +500,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
 
   const initialFocusDate = useMemo(() => {
     const inMonth = selectedDates.find(
-      (d) =>
-        d.getMonth() === currentMonth && d.getFullYear() === currentYear,
+      (d) => d.getMonth() === currentMonth && d.getFullYear() === currentYear,
     );
     if (inMonth) return inMonth;
     if (
@@ -564,7 +569,9 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
             <div
               key={wIndex}
               role={isVisuallyEmpty ? "presentation" : "row"}
-              aria-label={isVisuallyEmpty ? undefined : `Week ${week.weekNumber}`}
+              aria-label={
+                isVisuallyEmpty ? undefined : `Week ${week.weekNumber}`
+              }
               className={styles.weekRow}
             >
               {weekNumbers && (
