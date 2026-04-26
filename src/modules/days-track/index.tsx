@@ -125,15 +125,21 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
   const currentIdx = ((Math.round(position) % days) + days) % days;
   const minIdx = minIndex ?? 0;
   const maxIdx = maxIndex ?? days - 1;
-  const fullDateLabel = useMemo(
-    () =>
-      new Intl.DateTimeFormat(locale, {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      }).format(new Date(year, month, currentIdx + 1)),
-    [locale, year, month, currentIdx],
-  );
+  const fullDateLabel = useMemo(() => {
+    if (
+      !Number.isFinite(year) ||
+      !Number.isFinite(month) ||
+      !Number.isFinite(currentIdx)
+    )
+      return "";
+    const d = new Date(year, month, currentIdx + 1);
+    if (isNaN(d.getTime())) return "";
+    return new Intl.DateTimeFormat(locale, {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).format(d);
+  }, [locale, year, month, currentIdx]);
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     let delta = 0;

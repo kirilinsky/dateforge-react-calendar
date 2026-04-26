@@ -27,7 +27,7 @@ The library is built around a strict two-layer model:
 
 ### Layer 1 — `<Calendar>` wrapper
 
-`<Calendar>` is a **headless container**. By itself it renders effectively nothing visible — a positioning wrapper, theme/appearance attributes, and an inline-size container. It exists to hold:
+`<Calendar>` is a **stateful composition wrapper** — sometimes loosely called "mostly headless". It does not render any calendar UI of its own (no day cells, no nav, no inputs), but it is not strictly headless either: the root element carries a positioning wrapper, `data-theme` / `data-appearance` / `data-readonly` attributes, an inline-size container, and the CSS grid that places child modules. The wrapper exists to hold:
 
 - React contexts (config, navigation, selection, UI)
 - Reducer state for selected dates / range / view date
@@ -51,7 +51,18 @@ A **module** is a self-contained React component that:
 - Combined with any other modules in any order.
 - Repeated — the same module can appear multiple times with different props (e.g. several `<CalendarDays offset={n} />` in a multi-month layout).
 
-This is the central design promise: **any subset and any combination of modules must work**. The wrapper does not assume any particular module is present.
+This is the central design promise — with a small honesty clause:
+
+> **Any subset of modules renders without crashing. Not every subset is a complete UX.**
+
+The wrapper does not assume any particular module is present. Composition is pushed onto the consumer: deciding what makes sense as a UI is part of designing your calendar. Some examples that render fine but are not very useful by themselves:
+
+- `<Calendar mode="range"><CalendarDaysTrack bound="from" /></Calendar>` — user can set `from` but never `to`.
+- `<Calendar mode="multiple"><CalendarTimeGrid /></Calendar>` — there is no unambiguous date for the time to attach to (see "Time editing semantics").
+- `<Calendar><CalendarSelectedDates /></Calendar>` — chips display whatever you pass via `value`, but there is no way to pick anything.
+- `<Calendar><CalendarNav clear /></Calendar>` — you can clear a selection that nothing in the UI lets you create.
+
+Within the boundaries of physics, our modules will try to make any composition you can dream up come to life — in exchange for some of your hardware's CPU cycles. We'll do our part; please bring the part where the result has to make sense to a human.
 
 ---
 

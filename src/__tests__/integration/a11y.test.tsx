@@ -23,7 +23,15 @@ function renderDays(
 ) {
   return render(
     <CalendarProvider
-      value={props.value ?? VIEW_DATE}
+      value={
+        props.value !== undefined
+          ? props.value
+          : props.mode === "range"
+            ? ({ from: VIEW_DATE, to: null } as never)
+            : props.mode === "multiple"
+              ? ([VIEW_DATE] as never)
+              : VIEW_DATE
+      }
       mode={props.mode ?? "single"}
       minDate={props.minDate}
       maxDate={props.maxDate}
