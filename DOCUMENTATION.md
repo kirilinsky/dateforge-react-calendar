@@ -28,6 +28,7 @@ The root component. All other components must be placed as its children.
 
 ```tsx
 import { Calendar } from "@dateforge/react-calendar";
+import { CalendarNav, CalendarDays } from "@dateforge/react-calendar/modules";
 
 <Calendar mode="single" onChange={(v) => console.log(v)}>
   <CalendarNav />
@@ -587,7 +588,8 @@ Two entry forms are supported:
 Import `basicPresets` for the classic pack.
 
 ```tsx
-import { CalendarPresets, basicPresets } from "@dateforge/react-calendar";
+import { basicPresets } from "@dateforge/react-calendar";
+import { CalendarPresets } from "@dateforge/react-calendar/modules";
 
 // empty — renders nothing
 <CalendarPresets />
