@@ -231,28 +231,8 @@ describe("HOVER", () => {
   });
 });
 
-// ─── OPEN_POPUP / CLOSE_POPUP ────────────────────────────────────────────────
-
-describe("OPEN_POPUP / CLOSE_POPUP", () => {
-  it("OPEN_POPUP sets openPopup", () => {
-    const next = calendarReducer(baseState, { type: "OPEN_POPUP", popup: "time" });
-    expect(next.openPopup).toBe("time");
-  });
-
-  it("OPEN_POPUP month", () => {
-    expect(calendarReducer(baseState, { type: "OPEN_POPUP", popup: "month" }).openPopup).toBe("month");
-  });
-
-  it("OPEN_POPUP year", () => {
-    expect(calendarReducer(baseState, { type: "OPEN_POPUP", popup: "year" }).openPopup).toBe("year");
-  });
-
-  it("CLOSE_POPUP clears openPopup", () => {
-    const state = { ...baseState, openPopup: "time" as const };
-    const next = calendarReducer(state, { type: "CLOSE_POPUP" });
-    expect(next.openPopup).toBeNull();
-  });
-});
+// Popup state lives in provider's useState now (see UIContext.showTimePopup
+// etc.). It is exercised by integration tests for Nav popups.
 
 // ─── CHANGE_TIME ─────────────────────────────────────────────────────────────
 

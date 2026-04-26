@@ -159,8 +159,10 @@ The wrapper exposes four contexts to modules. Each has a clear responsibility:
 |---|---|---|
 | `ConfigContext` | locale, timezone, mode, min/maxDate, disabled, hour12, minRangeDays, maxRangeDays, readOnly | (none — config is fixed per render) |
 | `NavigationContext` | viewDate | `navigateTo(date)` |
-| `SelectionContext` | selectedDates, rangeStart, rangeEnd, hoverDate, openPopup | `onChangeDate`, `onRangeSet`, `onDatesSet`, `onChangeTime`, `setHoverDate`, `setOpenPopup` |
-| `UIContext` | containerRef, containerWidth, popups visibility, daysTrackActive | toggleTheme, popup open/close setters |
+| `SelectionContext` (split into `State`, `Actions`, `Hover` providers) | selectedDate, selectedDates, rangeStart, rangeEnd, hoverDate | `onChangeDate`, `onRangeSet`, `onDatesSet`, `onRangeBoundSet`, `onChangeTime`, `setHoverDate` |
+| `UIContext` | containerRef, containerWidth, `showTimePopup` / `showMonthPopup` / `showYearPopup`, daysTrackActive, popupAnchorEl, navShowSeconds | `toggleTheme`, `setShowTimePopup` / `setShowMonthPopup` / `setShowYearPopup`, `setDaysTrackActive`, `setPopupAnchorEl`, `setNavShowSeconds` |
+
+**Popup state ownership.** Popup open/close (`showTimePopup`, `showMonthPopup`, `showYearPopup`) is **pure UI state** and lives in a `useState` inside `CalendarProvider`, exposed via `UIContext`. It is intentionally **not** part of the reducer — popup transitions never need to be atomic with selection changes, and keeping the reducer focused on selection / view data avoids the "one giant store" anti-pattern. Only one popup can be open at a time.
 
 **Rules:**
 - Navigational modules touch only `NavigationContext` (writes) and `ConfigContext` (reads).

@@ -232,22 +232,22 @@ export function CalendarProvider<M extends CalendarMode = "single">({
     dispatch({ type: "HOVER", date: d });
   }, []);
 
+  // Popup open state is pure UI — kept outside the reducer to keep that store
+  // focused on selection / view data. Only one popup can be open at a time.
+  const [openPopup, setOpenPopup] = useState<
+    "time" | "month" | "year" | null
+  >(null);
+
   const setShowTimePopup = useCallback((v: boolean) => {
-    dispatch(
-      v ? { type: "OPEN_POPUP", popup: "time" } : { type: "CLOSE_POPUP" },
-    );
+    setOpenPopup(v ? "time" : null);
   }, []);
 
   const setShowMonthPopup = useCallback((v: boolean) => {
-    dispatch(
-      v ? { type: "OPEN_POPUP", popup: "month" } : { type: "CLOSE_POPUP" },
-    );
+    setOpenPopup(v ? "month" : null);
   }, []);
 
   const setShowYearPopup = useCallback((v: boolean) => {
-    dispatch(
-      v ? { type: "OPEN_POPUP", popup: "year" } : { type: "CLOSE_POPUP" },
-    );
+    setOpenPopup(v ? "year" : null);
   }, []);
 
   const selectedDate = range
@@ -346,11 +346,11 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       toggleTheme: toggleTheme ?? (() => {}),
       containerWidth,
       containerRef,
-      showTimePopup: state.openPopup === "time",
+      showTimePopup: openPopup === "time",
       setShowTimePopup,
-      showMonthPopup: state.openPopup === "month",
+      showMonthPopup: openPopup === "month",
       setShowMonthPopup,
-      showYearPopup: state.openPopup === "year",
+      showYearPopup: openPopup === "year",
       setShowYearPopup,
       daysTrackActive,
       setDaysTrackActive,
@@ -363,7 +363,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
     [
       toggleTheme,
       containerWidth,
-      state.openPopup,
+      openPopup,
       daysTrackActive,
       popupAnchorEl,
       navShowSeconds,

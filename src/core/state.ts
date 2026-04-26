@@ -7,7 +7,6 @@ interface CalendarState {
   rangeStart: Date | null;
   rangeEnd: Date | null;
   hoverDate: Date | null;
-  openPopup: "time" | "month" | "year" | null;
   notifySeq: number;
 }
 
@@ -25,8 +24,6 @@ type CalendarAction =
   | { type: "NAVIGATE"; date: Date }
   | { type: "SELECT"; date: Date | null; config: SelectConfig }
   | { type: "HOVER"; date: Date | null }
-  | { type: "OPEN_POPUP"; popup: "time" | "month" | "year" }
-  | { type: "CLOSE_POPUP" }
   | { type: "CHANGE_TIME"; date: Date; config: SelectConfig }
   | { type: "SET_DATES"; dates: Date[] }
   | { type: "SET_RANGE"; from: Date | null; to: Date | null }
@@ -140,12 +137,6 @@ export function calendarReducer(
 
     case "HOVER":
       return { ...state, hoverDate: action.date };
-
-    case "OPEN_POPUP":
-      return { ...state, openPopup: action.popup };
-
-    case "CLOSE_POPUP":
-      return { ...state, openPopup: null };
 
     case "CHANGE_TIME": {
       const { date, config } = action;
@@ -303,7 +294,6 @@ export function buildInitialState(params: {
       rangeStart,
       rangeEnd,
       hoverDate: null,
-      openPopup: null,
       notifySeq: 0,
     };
   }
@@ -322,7 +312,6 @@ export function buildInitialState(params: {
     rangeStart: null,
     rangeEnd: null,
     hoverDate: null,
-    openPopup: null,
     notifySeq: 0,
   };
 }
