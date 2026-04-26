@@ -147,6 +147,46 @@ In production all of the above silently fall back to a safe default; no warning 
 
 Warnings are silenced when `process.env.NODE_ENV === "production"`.
 
+### Server-side rendering
+
+`<Calendar>` is **SSR-safe** and works out of the box with Next.js (App Router and Pages), Remix, TanStack Start, and other React server-rendering setups. Server-rendered HTML matches the first client render, so React does not emit a hydration warning.
+
+What you can rely on:
+
+- Drop `<Calendar>` into a server component / `getServerSideProps` page / Remix loader-driven route — no `"use client"` plumbing required at the server boundary.
+- `theme="auto"` and `timeZone="auto"` (the defaults) detect the user's preferences after hydration. The first server render uses neutral defaults (`light` theme, no timezone) so the markup is deterministic.
+- The live clock (`<CalendarNav showNowTime />`) renders an empty time slot on the server and starts ticking after hydration.
+- `highlightToday` is intentionally inactive on the server render — the highlight appears on the client once `today` is resolved in the user's timezone. This avoids the classic "server highlights yesterday because it's UTC, client expected today" bug.
+
+For deterministic SSR snapshots (e.g. visual regression testing) pass `defaultViewDate` so the displayed month does not depend on either side's clock.
+
+CI runs `react-dom/server` `renderToString` and `hydrateRoot` against representative compositions to gate this contract — see `integration/ssr.test.tsx` and `integration/hydration.test.tsx`.
+
+### Accessibility
+
+The library is **inclusive-first** — keyboard, screen reader, and reduced-motion users are first-class. Every interactive module ships with the ARIA attributes, focus management, and keyboard handlers described below; CI runs `jest-axe` against representative compositions and fails on any violation.
+
+**Day grid** follows the [WAI-ARIA grid pattern](https://www.w3.org/WAI/ARIA/apg/patterns/grid/):
+
+- `role="grid"` with `aria-label` (localized month + year).
+- Weekday headers use `role="columnheader"`; day cells use `role="gridcell"` with `aria-selected` / `aria-disabled` / `aria-current="date"`.
+- Roving `tabindex` — the focused day is `tabindex="0"`, others are `-1`.
+- Keyboard: Arrow keys (day / week), Home / End (week edges), Page Up / Down (month), Shift + Page Up / Down (year), Enter / Space (select).
+
+**Time picker, Tracks** use `role="spinbutton"` with `aria-valuenow` / `aria-valuemin` / `aria-valuemax` / `aria-valuetext`. Arrow keys step by one; Home / End jump to bounds.
+
+**Popups** (month / year / time) are `role="dialog"` + `aria-modal="true"` with focus trapping; `Escape` closes.
+
+**Live region.** The root mounts an off-screen `role="status" aria-live="polite"` element that announces the most recently committed date — selecting a day or applying a range is audible without re-reading the grid.
+
+**`readOnly`.** Adds `data-readonly` + `aria-readonly="true"` to the root, and disables every state-changing button / input visually and semantically.
+
+**Known limitations.**
+- `prefers-reduced-motion` is not yet honored. Drum flip, month slide, and chip fade animations run regardless of the OS setting. Tracked as a TODO in `ARCHITECTURE.md → Accessibility`.
+- `hideOutOfRange` removes hidden cells from the AT tree but keyboard arrow navigation still computes by date math; pair with `blockNavigation` for full traversal predictability (see "`hideOutOfRange` accessibility").
+
+If you find an a11y regression, open an issue — these are treated as bugs, not enhancements.
+
 ### `readOnly` contract
 
 When `readOnly` is `true`:

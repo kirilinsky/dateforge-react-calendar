@@ -5,17 +5,14 @@ import { useItemWidth } from "@/hooks/use-item-width";
 
 type ROCallback = (entries: ResizeObserverEntry[]) => void;
 let roCallback: ROCallback | null = null;
-let observedEl: Element | null = null;
 
 const MockResizeObserver = vi.fn(function (cb: ROCallback) {
   return {
-    observe: vi.fn((el: Element) => {
+    observe: vi.fn(() => {
       roCallback = cb;
-      observedEl = el;
     }),
     disconnect: vi.fn(() => {
       roCallback = null;
-      observedEl = null;
     }),
   };
 });
@@ -23,7 +20,6 @@ const MockResizeObserver = vi.fn(function (cb: ROCallback) {
 beforeEach(() => {
   vi.stubGlobal("ResizeObserver", MockResizeObserver);
   roCallback = null;
-  observedEl = null;
 });
 
 afterEach(() => {

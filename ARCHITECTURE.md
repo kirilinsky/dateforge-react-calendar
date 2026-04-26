@@ -214,6 +214,144 @@ New validators belong in this module and follow the same dedupe-by-key conventio
 
 ---
 
+## SSR / hydration
+
+`react-calendar-datetime` is **SSR-safe**. Server-rendered HTML matches the first client render, no hydration warnings, works in Next.js (App Router and Pages), Remix, TanStack Start, and Astro server islands. The pattern below is enforced everywhere a value depends on the browser environment.
+
+### The rule
+
+Any value that comes from a browser-only API — `new Date()`, `Intl.DateTimeFormat().resolvedOptions()`, `window.matchMedia(...)`, `navigator.*` — is not consumed during the initial render. It is filled in after mount via `useEffect`.
+
+### The hook
+
+`src/hooks/use-client-value.ts` codifies the pattern:
+
+```ts
+function useClientValue<T>(getter: () => T, fallback: T): T {
+  const [value, setValue] = useState<T>(fallback);
+  useEffect(() => { setValue(getter()); }, []);
+  return value;
+}
+```
+
+Used by:
+
+- `Calendar` — `systemTheme` (`prefers-color-scheme` lookup) defaults to `"light"` until mount.
+- `CalendarNav` — `today` (used for "Go to current month" button) starts `null`; "live time" string (`showNowTime`) starts empty.
+- `CalendarDays` — `today` (used for `highlightToday` and keyboard initial focus) starts as a NaN-Date so `isSameDay` fails universally; gets the real value post-mount.
+- `CalendarProvider` — `resolvedTimeZone` from `Intl.DateTimeFormat().resolvedOptions().timeZone` (see "Timezone resolution").
+
+### Specifically handled cases
+
+| Source                                  | Risk                                                                | Mitigation                                                       |
+| --------------------------------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `prefers-color-scheme`                  | server defaults to "light", client may be "dark" → wrong `data-theme` on hydrate | `useClientValue` + `matchMedia` change subscription               |
+| `Intl.DateTimeFormat().resolvedOptions().timeZone` | server's TZ ≠ client's TZ → wrong "today" cell, wrong chip text | Auto-resolved via effect (see "Timezone resolution")             |
+| `new Date()` for "today"                | server clock ≠ client clock around midnight                         | `useClientValue(() => new Date(), null|NaN-Date)`                |
+| Live clock (`showNowTime`)              | every second tick depends on client time                            | Initial state is empty string; `setInterval` starts post-mount   |
+| `window.matchMedia` change events       | server has no API                                                   | Subscription only inside `useEffect`                             |
+| Reducer `useReducer` initializer        | runs on both server and client; `new Date()` fallback for view date | Acceptable for typical sub-second SSR turnaround. Pass `defaultViewDate` for strict cases. |
+
+### Test coverage
+
+- `src/__tests__/integration/ssr.test.tsx` — runs `renderToString` on representative compositions, asserts the markup is valid (correct ARIA roles, no `NaN` / `undefined` text leaking into the DOM).
+- `src/__tests__/integration/hydration.test.tsx` — runs the SSR HTML through `hydrateRoot` and asserts no React hydration warnings (`console.error` content scanned for "did not match" / "Hydration"). Covers Calendar + Days, Nav with `showNowTime`, `theme="auto"`, `timeZone="auto"`, and TimeGrid.
+
+### Known SSR caveats
+
+- The `Calendar` initial seed for `viewDate` falls back to `new Date()` when neither `value`, `defaultValue`, nor `defaultViewDate` is provided. In sub-second SSR-to-hydrate flows this is identical between server and client; near a midnight boundary it can briefly show a different month on first paint. **Mitigation:** pass `defaultViewDate` for strict deterministic SSR.
+- Animations (drum flip, month slide) start on mount; SSR HTML contains the static "settled" frame.
+- `prefers-reduced-motion` is not yet honored (see Accessibility → Known limitations).
+
+---
+
+## Accessibility
+
+`react-calendar-datetime` is built **inclusive-first**. The library is meant to be usable by people who navigate with keyboards, screen readers, switch devices, voice control, and people who simply prefer larger touch targets or reduced motion. The contract below is enforceable — every public module ships with the ARIA attributes, keyboard handlers, and structural roles required to be operable by assistive technology out of the box. Tests in `src/__tests__/integration/a11y.test.tsx` use [`jest-axe`](https://github.com/nickcolley/jest-axe) to gate the contract on CI.
+
+### Day grid (`<CalendarDays>`)
+
+ARIA grid pattern (https://www.w3.org/WAI/ARIA/apg/patterns/grid/):
+
+| Element                                     | Role          | ARIA / DOM                                                                                |
+| ------------------------------------------- | ------------- | ----------------------------------------------------------------------------------------- |
+| Outer grid container                        | `grid`        | `aria-label` = localized month + year (e.g. "June 2024")                                  |
+| Weekday header row                          | `row`         | —                                                                                         |
+| Each weekday header                         | `columnheader`| `aria-label` = full weekday name; visible text may be the abbreviation                    |
+| Week row                                    | `row`         | `aria-label="Week N"` (ISO week number)                                                   |
+| Week number cell (when `weekNumbers`)       | `rowheader`   | `aria-label="Week N"`                                                                     |
+| Day cell                                    | `gridcell`    | `aria-selected` for selected; `aria-disabled` for disabled or `readOnly`                  |
+| Day button (inside cell)                    | (button)      | `aria-label` = full localized date + state suffix ("today", "selected", "disabled", …)    |
+| Today's button                              | (button)      | `aria-current="date"`                                                                     |
+| Hidden out-of-range cell (`hideOutOfRange`) | `presentation`| Not exposed to AT; preserves grid layout only                                              |
+| Empty week row (all cells hidden)           | `presentation`| Whole row dropped from AT                                                                  |
+
+Keyboard map (focused day button, see `use-calendar-keyboard.ts`):
+
+| Key                  | Action                                |
+| -------------------- | ------------------------------------- |
+| Arrow Left / Right   | Move focus by one day                 |
+| Arrow Up / Down      | Move focus by one week                |
+| Home / End           | First / last day of the focused week  |
+| Page Up / Page Down  | Previous / next month                 |
+| Shift + Page Up/Down | Previous / next year                  |
+| Enter or Space       | Select the focused day                |
+
+Roving tabindex: only the focused day has `tabindex="0"`; all others are `tabindex="-1"`. Focus follows the user across months — `moveFocus` calls `navigateTo` when crossing month boundaries (unless `blockNavigation` is set).
+
+### Time picker (`<CalendarTimeGrid>` and `<TimeTrack>` inside the Nav popup)
+
+Each drum (hour / minute / second) is a `role="spinbutton"` with `aria-label`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, and `aria-valuetext`. AM/PM buttons use `aria-pressed`. Under `readOnly` the spinbutton gets `aria-disabled="true"` and all keyboard / scroll / click handlers no-op.
+
+Keyboard map:
+
+| Key                | Action                              |
+| ------------------ | ----------------------------------- |
+| Arrow Up / Down    | Decrement / increment by one        |
+| Home / End         | Jump to min / max value             |
+
+### Tracks (`<CalendarDaysTrack>`, `<CalendarMonthsTrack>`, `<CalendarYearsTrack>`)
+
+Same `role="spinbutton"` pattern as the time drums, with values reflecting the highlighted item.
+
+| Key                | Action                              |
+| ------------------ | ----------------------------------- |
+| Arrow Left / Right | Step backwards / forwards by one    |
+| Page Up / Down     | Jump 7 items at a time (DaysTrack)  |
+| Home / End         | Jump to first / last allowed item   |
+
+### Popups (`MonthPopup`, `YearPopup`, `TimePopup`)
+
+`role="dialog"` + `aria-modal="true"` + `aria-label` ("Select month" / "Select year" / "Select time"). Focus is trapped inside while open (`useFocusTrap`) and `Escape` closes the popup.
+
+### Calendar root and `readOnly`
+
+The root wrapper element gets `data-readonly` and `aria-readonly="true"` when the `readOnly` prop is set. Every interactive module additionally renders its UI as `disabled` / `aria-disabled` so screen reader announcements stay consistent. See "`readOnly` contract" for the full disable matrix.
+
+### Live region for selection changes
+
+`CalendarLayout` mounts a single off-screen `<div role="status" aria-live="polite" aria-atomic="true">` that announces the most recently committed date in the configured locale. This makes range/selection updates audible without forcing the screen reader user to re-read the entire grid.
+
+### Selected dates / chips (`<CalendarSelectedDates>`)
+
+Chips are real `<button>`s with localized text content; clicking navigates the view (`navigateTo`). The clear-all button has `aria-label="Clear"` and is disabled under `readOnly`.
+
+### Manual input (`<CalendarManualSelect>`)
+
+The masked input is a regular `<input type="text" inputMode="numeric">` — it inherits the platform's IME / a11y behavior. Under `readOnly` the HTML `readOnly` attribute is applied. Apply / clear buttons use `aria-label`. Invalid input flips a red wrapper class (visual only); the rejected commit policy is documented in the `<CalendarManualSelect>` "When `onChange` fires" table.
+
+### Reduced motion
+
+Not yet implemented as an explicit guard. Animations (drum flip in `AnimatedTime`, month slide on navigation, chip fade-in/out) currently run regardless of user preference. **TODO:** honor `prefers-reduced-motion: reduce` — wrap animation classes behind a media query, or expose a `reducedMotion` prop / context flag. Tracked in `DOCUMENTATION.md → Accessibility → Known limitations`.
+
+### Testing
+
+`src/__tests__/integration/a11y.test.tsx` runs `jest-axe` on representative module compositions (default Days, with selection, with min/max, in range mode, with `hideOutOfRange`, with `currentMonthOnly`, on TimeGrid). Any axe violation fails CI. New modules MUST land with their own axe test cases.
+
+Manual SR coverage: NVDA (Windows), VoiceOver (macOS / iOS), and TalkBack (Android) are the supported targets. Bug reports against other AT are welcome but not gating.
+
+---
+
 ## Hidden day cells (a11y)
 
 `<CalendarDays hideOutOfRange>` and `<CalendarDays currentMonthOnly>` replace skipped cells with `<div role="presentation" />` placeholders. These placeholders preserve the grid layout (so `fixedRows` and column alignment still work) but are removed from the accessibility tree — screen readers see only real `gridcell`s.

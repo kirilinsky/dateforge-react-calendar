@@ -9,13 +9,6 @@ export const getDrumValue = (
   return val < 0 ? val + max : val;
 };
 
-const addTime = (date: Date, amount: number, unit: "h" | "m") => {
-  const n = new Date(date.getTime());
-  if (unit === "h") n.setHours(getDrumValue(n.getHours(), amount, 24));
-  else n.setMinutes(getDrumValue(n.getMinutes(), amount, 60));
-  return n;
-};
-
 export const getTimeString = (date: Date, hour12 = false, showSeconds = false): string =>
   new Intl.DateTimeFormat("en", {
     hour: "numeric",

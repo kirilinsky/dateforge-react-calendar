@@ -105,6 +105,21 @@ describe("CalendarDays — axe", () => {
 
 // ─── ARIA roles ───────────────────────────────────────────────────────────────
 
+describe("Calendar — live region", () => {
+  it("mounts a polite status live region for selection announcements", async () => {
+    const { Calendar } = await import("@/components/calendar/calendar");
+    const { container } = render(
+      <Calendar value={VIEW_DATE}>
+        <CalendarDays />
+      </Calendar>,
+    );
+    const live = container.querySelector('[role="status"]');
+    expect(live).not.toBeNull();
+    expect(live!.getAttribute("aria-live")).toBe("polite");
+    expect(live!.getAttribute("aria-atomic")).toBe("true");
+  });
+});
+
 describe("CalendarDays — ARIA roles", () => {
   it("grid role present", () => {
     const { getByRole } = renderDays();

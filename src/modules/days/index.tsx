@@ -20,6 +20,7 @@ import WeekDays from "./week-days";
 import { StartOfWeek } from "@/types/calendar";
 import { useGridSlot } from "@/hooks/use-grid-slot";
 import { useCalendarKeyboard } from "@/hooks/use-calendar-keyboard";
+import { useClientValue } from "@/hooks/use-client-value";
 
 function buildCellLabel(args: {
   fullDate: Date;
@@ -276,9 +277,18 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   const { onChangeDate, setHoverDate } = useSelectionActions();
   const { hoverDate } = useSelectionHover();
 
-  const today = useMemo(
+  // Defer today computation to post-mount so the server-rendered HTML doesn't
+  // depend on the server's clock or system timezone (would cause hydration
+  // mismatch on day boundaries / cross-timezone deploys).
+  const todayClient = useClientValue<Date | null>(
     () => (timeZone ? getTodayInTimezone(timeZone) : new Date()),
-    [timeZone],
+    null,
+  );
+  // NaN-Date never matches isSameDay (since NaN !== NaN), so until todayClient
+  // resolves no day cell is wrongly highlighted as "today".
+  const today = useMemo(
+    () => todayClient ?? new Date(NaN),
+    [todayClient],
   );
 
   const startT = useMemo(

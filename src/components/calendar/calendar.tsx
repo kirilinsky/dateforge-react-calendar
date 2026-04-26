@@ -6,6 +6,7 @@ import { CustomAppearance, CUSTOM_APPEARANCE_BRAND } from "@/types/appearances";
 import { CalendarProvider } from "@/core/provider";
 import { CalendarLayout } from "@/core/layout";
 import { validateTheme } from "@/core/dev-warn";
+import { useClientValue } from "@/hooks/use-client-value";
 
 const isCustomTheme = (t: unknown): t is CustomTheme =>
   typeof t === "object" && t !== null && CUSTOM_THEME_BRAND in (t as object);
@@ -48,12 +49,19 @@ export function Calendar<M extends CalendarMode = "single">({
 
   const [isToggled, setIsToggled] = useState(false);
 
-  const [systemTheme, setSystemTheme] = useState<"light" | "dark">(() =>
-    typeof window !== "undefined" &&
-    window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light",
+  // Initial render uses "light" on both server and client so SSR HTML matches
+  // the first client render. The actual preference is read after mount.
+  const initialSystemTheme = useClientValue<"light" | "dark">(
+    () =>
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light",
+    "light",
   );
+  const [systemTheme, setSystemTheme] = useState<"light" | "dark">("light");
+  useEffect(() => {
+    setSystemTheme(initialSystemTheme);
+  }, [initialSystemTheme]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
