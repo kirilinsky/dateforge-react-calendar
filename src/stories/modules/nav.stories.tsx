@@ -127,7 +127,35 @@ export const WithClearAndHome: Story = {
 WithClearAndHome.storyName = "With clear and home";
 
 export const WithThemeToggle: Story = {
-  args: { showMonthPicker: true, showYearPicker: true, themeToggle: true },
+  args: { showMonthPicker: true, compactYears: true, themeToggle: true },
+  render: (args, ctx) => {
+    const [date, setDate] = useState<Date | null>(FIXED_DATE);
+    return (
+      <Calendar
+        value={date}
+        onChange={setDate}
+        theme="auto"
+        appearance={resolveStoryAppearance(ctx.globals.appearance)}
+      >
+        <CalendarNav
+          label={args.label}
+          showMonthPicker={args.showMonthPicker}
+          compactMonths={args.compactMonths}
+          showYearPicker={args.showYearPicker}
+          compactYears={args.compactYears}
+          animateTime={args.animateTime}
+          monthLabel={args.monthLabel}
+          yearLabel={args.yearLabel}
+          showTime={args.showTime}
+          showNowTime={args.showNowTime}
+          seconds={args.seconds}
+          home={args.home}
+          clear={args.clear}
+          themeToggle={args.themeToggle}
+        />
+      </Calendar>
+    );
+  },
 };
 WithThemeToggle.storyName = "With theme toggle";
 

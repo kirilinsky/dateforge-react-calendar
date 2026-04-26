@@ -10,7 +10,10 @@ import type { CalendarAppearance } from "@/types/appearances";
 import { FIXED_DATE } from "../_constants";
 
 const themeEntries = Object.entries(themes) as [string, CalendarTheme][];
-const appearanceEntries = Object.entries(appearances) as [string, CalendarAppearance][];
+const appearanceEntries = Object.entries(appearances) as [
+  string,
+  CalendarAppearance,
+][];
 
 const meta: Meta = {
   title: "Theming/Matrix",
@@ -20,15 +23,26 @@ export default meta;
 
 type Story = StoryObj;
 
-const Cell: React.FC<{ theme: CalendarTheme; appearance?: CalendarAppearance; label: string }> = ({
-  theme,
-  appearance,
-  label,
-}) => {
+const Cell: React.FC<{
+  theme: CalendarTheme;
+  appearance?: CalendarAppearance;
+  label: string;
+}> = ({ theme, appearance, label }) => {
   const [date, setDate] = useState<Date | null>(FIXED_DATE);
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6, width: 305 }}>
-      <span style={{ fontFamily: "monospace", fontSize: 11, color: "inherit", opacity: 0.7 }}>{label}</span>
+    <div
+      style={{ display: "flex", flexDirection: "column", gap: 6, width: 305 }}
+    >
+      <span
+        style={{
+          fontFamily: "monospace",
+          fontSize: 11,
+          color: "inherit",
+          opacity: 0.7,
+        }}
+      >
+        {label}
+      </span>
       <Calendar
         value={date}
         onChange={setDate}
@@ -58,45 +72,23 @@ export const AppearancesOverview: Story = {
   parameters: { storyWidth: "auto" },
   render: () => (
     <div style={{ display: "flex", flexWrap: "wrap", gap: 24 }}>
-      {(["default", ...appearanceEntries.map(([n]) => n)] as const).map((name) => {
-        const appearance =
-          name === "default"
-            ? undefined
-            : appearanceEntries.find(([n]) => n === name)?.[1];
-        return <Cell key={name} theme="auto" appearance={appearance} label={name} />;
-      })}
+      {(["default", ...appearanceEntries.map(([n]) => n)] as const).map(
+        (name) => {
+          const appearance =
+            name === "default"
+              ? undefined
+              : appearanceEntries.find(([n]) => n === name)?.[1];
+          return (
+            <Cell
+              key={name}
+              theme="auto"
+              appearance={appearance}
+              label={name}
+            />
+          );
+        },
+      )}
     </div>
   ),
 };
 AppearancesOverview.storyName = "All appearances (default theme)";
-
-export const Matrix: Story = {
-  // Heavy: 33 themes × 6 appearances = 198 cells. Skip in addon-vitest test runner
-  // and Chromatic's default; render only in interactive Storybook.
-  tags: ["!test"],
-  parameters: { storyWidth: "auto", chromatic: { disable: true } },
-  render: () => (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: `repeat(${appearanceEntries.length + 1}, 305px)`,
-        gap: 24,
-      }}
-    >
-      {themeEntries.map(([themeName, theme]) => (
-        <Fragment key={themeName}>
-          <Cell theme={theme} label={`${themeName} × default`} />
-          {appearanceEntries.map(([appName, appearance]) => (
-            <Cell
-              key={`${themeName}-${appName}`}
-              theme={theme}
-              appearance={appearance}
-              label={`${themeName} × ${appName}`}
-            />
-          ))}
-        </Fragment>
-      ))}
-    </div>
-  ),
-};
-Matrix.storyName = "Theme × Appearance matrix";
