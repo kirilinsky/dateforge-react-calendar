@@ -97,7 +97,9 @@ describe("getMonthListData", () => {
   it("ru: returns 12 items with label strings", () => {
     const data = getMonthListData("ru", 2024);
     expect(data).toHaveLength(12);
-    data.forEach((m) => expect(typeof m.label).toBe("string"));
+    data.forEach((m) => {
+      expect(typeof m.label).toBe("string");
+    });
   });
 
   it("ru: first label contains янв", () => {

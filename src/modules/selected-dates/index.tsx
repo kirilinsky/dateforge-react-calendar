@@ -67,6 +67,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
   });
 
   const hasContent = range ? !!rangeStart : selectedDates.length > 0;
+  const gridSlot = useGridSlot(col);
 
   if (!animated && !hasContent) return null;
 
@@ -77,7 +78,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
     [
       styles.chip,
       shared.interactive,
-      shared.hoverable,
+      shared.hovered,
       isCurrentMonth(d) && allowNavigate
         ? shared.activeItem
         : styles.inactiveChip,
@@ -89,7 +90,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
     <button
       type="button"
       aria-label="Clear"
-      className={`${styles.clearBtn} ${shared.interactive} ${shared.hoverable}`}
+      className={`${styles.clearBtn} ${shared.interactive} ${shared.hovered}`}
       onClick={() => onChangeDate(null)}
       disabled={readOnly}
     >
@@ -133,7 +134,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
           className={[
             styles.chip,
             shared.interactive,
-            shared.hoverable,
+            shared.hovered,
             isActive ? shared.activeItem : styles.inactiveChip,
             isActive ? styles.activeChip : "",
           ]
@@ -156,7 +157,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
         .filter(Boolean)
         .join(" ")}
       data-area="selected-dates"
-      style={useGridSlot(col)}
+      style={gridSlot}
     >
       <div className={styles.inner}>
         <div

@@ -73,7 +73,7 @@ export const CalendarMonthsGrid: React.FC<CalendarMonthsGridProps> = ({
             className={[
               styles.item,
               shared.interactive,
-              shared.hoverable,
+              shared.hovered,
               isCurrent ? shared.activeItem : "",
             ]
               .filter(Boolean)

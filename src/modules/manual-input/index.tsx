@@ -347,7 +347,7 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
     <button
       type="button"
       aria-label="Clear"
-      className={`${styles.clearBtn} ${shared.interactive} ${shared.hoverable}`}
+      className={`${styles.clearBtn} ${shared.interactive} ${shared.hovered}`}
       onClick={() => {
         if (readOnly) return;
         if (range) {

@@ -50,6 +50,7 @@ export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
       ),
     [presets, viewDate, locale, range, minDate, maxDate, disabled],
   );
+  const gridSlot = useGridSlot(col);
 
   if (!resolved.length) return null;
 
@@ -58,7 +59,7 @@ export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
       className={styles.presetsContainer}
       data-area="presets"
       data-count={resolved.length}
-      style={useGridSlot(col)}
+      style={gridSlot}
     >
       {resolved.map((p) => {
         const isActive = p.isRange
@@ -75,7 +76,7 @@ export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
             className={[
               styles.presetItem,
               shared.interactive,
-              shared.hoverable,
+              shared.hovered,
               isActive ? shared.activeItem : styles.inactiveItem,
             ]
               .filter(Boolean)

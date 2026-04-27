@@ -24,6 +24,8 @@ jobs:
 
       - run: npm run typecheck
 
+      - run: npm run check
+
       - run: npm run knip
 
       - run: npx playwright install --with-deps chromium

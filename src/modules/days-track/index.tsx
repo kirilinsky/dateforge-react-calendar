@@ -213,7 +213,7 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
       {isMulti && (
         <button
           type="button"
-          className={`${styles.confirmBtn} ${shared.interactive} ${shared.hoverable} ${matchesExisting ? styles.removeBtn : ""}`}
+          className={`${styles.confirmBtn} ${shared.interactive} ${shared.hovered} ${matchesExisting ? styles.removeBtn : ""}`}
           aria-label={
             matchesExisting ? "Remove selected date" : "Save selected date"
           }

@@ -201,7 +201,7 @@ const DayCell = React.memo(function DayCell({
         className={[
           styles.dayItem,
           shared.interactive,
-          shared.hoverable,
+          shared.hovered,
           !range && isSelected && shared.activeItem,
           !range && connectLeft && connectRight && styles.rangeMid,
           !range && connectLeft && !connectRight && styles.rangeEnd,

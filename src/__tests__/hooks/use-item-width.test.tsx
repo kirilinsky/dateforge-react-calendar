@@ -6,7 +6,6 @@ import { useItemWidth } from "@/hooks/use-item-width";
 type ROCallback = (entries: ResizeObserverEntry[]) => void;
 let roCallback: ROCallback | null = null;
 
-// biome-ignore lint/complexity/useArrowFunction: vi.fn() in vitest 4 needs constructable function for `new ResizeObserver(...)`
 const MockResizeObserver = vi.fn(function (cb: ROCallback) {
   return {
     observe: vi.fn(() => {

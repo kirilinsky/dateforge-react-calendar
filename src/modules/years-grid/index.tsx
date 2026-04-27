@@ -154,7 +154,7 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
       >
         <button
           type="button"
-          className={[shared.interactive, shared.hoverable].join(" ")}
+          className={[shared.interactive, shared.hovered].join(" ")}
           disabled={page <= 0}
           aria-label="Previous years"
           onClick={() => navigate(-1)}
@@ -166,7 +166,7 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
         </span>
         <button
           type="button"
-          className={[shared.interactive, shared.hoverable].join(" ")}
+          className={[shared.interactive, shared.hovered].join(" ")}
           disabled={page >= totalPages - 1}
           aria-label="Next years"
           onClick={() => navigate(1)}
@@ -196,7 +196,7 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
               className={[
                 styles.item,
                 shared.interactive,
-                shared.hoverable,
+                shared.hovered,
                 isCurrent ? shared.activeItem : "",
               ]
                 .filter(Boolean)

@@ -1,61 +1,59 @@
 @layer cal-base {
-
-.flexCenter {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.interactive {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: transparent;
-  color: var(--c-c);
-  transition: all var(--cal-transition, 0.2s) ease;
-  cursor: pointer;
-  user-select: none;
-  height: 2.1em;
-  border-radius: var(--cal-radius, 0.5em);
-}
-
-.hoverable:hover:not([disabled]):not([aria-disabled="true"]) {
-  background: var(--hover-bg, var(--c-t));
-  color: var(--hover-color, inherit);
-  box-shadow: var(--hover-shadow, 0 0.1em 0.3em var(--c-x));
-  outline: var(--hover-outline, none);
-}
-
-.interactive[disabled],
-.interactive[aria-disabled="true"] {
-  cursor: not-allowed;
-  opacity: 0.9;
-  color: var(--c-d);
-}
-
-.interactive svg {
-  width: 1.2em;
-  height: 1.2em;
-  fill: currentColor;
-  flex-shrink: 0;
-}
-
-.activeItem {
-  background: var(--c-h) !important;
-  color: var(--c-a) !important;
-  box-shadow: var(--active-shadow, 0 0.2em 0.6em var(--c-x));
-}
-
-.otherItem {
-  opacity: 0.3;
-  &:hover {
-    opacity: 0.8;
+  .flexCenter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-}
 
-.selectedOtherItem {
-  opacity: 0.9;
-}
+  .interactive {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: var(--c-c);
+    transition: all var(--cal-transition, 0.2s) ease;
+    cursor: pointer;
+    user-select: none;
+    height: 2.1em;
+    border-radius: var(--cal-radius, 0.5em);
+  }
 
+  .hovered:hover:not([disabled]):not([aria-disabled="true"]) {
+    background: var(--hover-bg, var(--c-t));
+    color: var(--hover-color, inherit);
+    box-shadow: var(--hover-shadow, 0 0.1em 0.3em var(--c-x));
+    outline: var(--hover-outline, none);
+  }
+
+  .interactive[disabled],
+  .interactive[aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.9;
+    color: var(--c-d);
+  }
+
+  .interactive svg {
+    width: 1.2em;
+    height: 1.2em;
+    fill: currentColor;
+    flex-shrink: 0;
+  }
+
+  .activeItem {
+    background: var(--c-h) !important;
+    color: var(--c-a) !important;
+    box-shadow: var(--active-shadow, 0 0.2em 0.6em var(--c-x));
+  }
+
+  .otherItem {
+    opacity: 0.3;
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  .selectedOtherItem {
+    opacity: 0.9;
+  }
 }

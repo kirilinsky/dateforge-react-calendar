@@ -54,7 +54,14 @@
         "useArrowFunction": "off"
       },
       "a11y": {
-        "recommended": true
+        "recommended": true,
+        "useSemanticElements": "warn",
+        "useFocusableInteractive": "warn",
+        "noSvgWithoutTitle": "warn",
+        "useKeyWithClickEvents": "warn",
+        "noStaticElementInteractions": "warn",
+        "useButtonType": "warn",
+        "useAriaPropsSupportedByRole": "warn"
       }
     }
   },

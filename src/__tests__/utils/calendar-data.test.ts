@@ -55,7 +55,9 @@ describe("getCalendarData", () => {
 
   it("each week has 7 days", () => {
     const data = getCalendarData(2024, 0, offset, []);
-    data.forEach((week) => expect(week.days).toHaveLength(7));
+    data.forEach((week) => {
+      expect(week.days).toHaveLength(7);
+    });
   });
 
   it("first day of Jan 2024 grid is 1st (offset=0, startOfWeek=Mon)", () => {
