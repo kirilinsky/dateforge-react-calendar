@@ -167,13 +167,13 @@ export const MultiMonthOffset: Story = {
       <Calendar
         value={date}
         onChange={setDate}
-        cols={2}
+        cols={4}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
       >
         <CalendarDays
           offset={0}
-          col={1}
+          col={2}
           startOfWeek={args.startOfWeek}
           currentMonthOnly={args.currentMonthOnly}
           highlightWeekends={args.highlightWeekends}

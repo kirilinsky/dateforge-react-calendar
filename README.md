@@ -5,7 +5,7 @@
 [![bundle size](https://img.shields.io/bundlephobia/minzip/@dateforge/react-calendar?style=flat-square)](https://bundlephobia.com/package/@dateforge/react-calendar)
 &nbsp;&nbsp;
 [![downloads](https://img.shields.io/npm/dm/@dateforge/react-calendar?style=flat-square)](https://www.npmjs.com/package/@dateforge/react-calendar)
- &nbsp;&nbsp;
+&nbsp;&nbsp;
 [![license](https://img.shields.io/npm/l/@dateforge/react-calendar.svg?style=flat-square)](https://github.com/kirilinsky/dateforge-react-calendar/blob/main/LICENSE)
 
 ![zero deps](https://img.shields.io/badge/dependencies-0-brightgreen?style=flat-square)
