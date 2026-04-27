@@ -16,11 +16,14 @@ comment:
   require_changes: true
 
 ignore:
+  - "src/stories/**"
   - "src/**/*.stories.*"
   - "src/styles/**"
   - "src/global/**"
   - "src/**/*.module.css"
   - "src/index.ts"
+  - "src/Icons/**"
+  - "src/types/**"
   - "src/__tests__/**"
   - "scripts/**"
   - ".storybook/**"
