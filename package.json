@@ -205,6 +205,7 @@
     "knip": "knip",
     "build": "tsdown --dts && npx tsx scripts/generate-theme.ts && npx tsx scripts/generate-appearance.ts",
     "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

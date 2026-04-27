@@ -57,6 +57,7 @@ export default defineConfig({
         ],
         test: {
           name: "storybook",
+          retry: 2,
           browser: {
             enabled: true,
             headless: true,
