@@ -9,7 +9,7 @@ const D = (y: number, m: number, d: number) => new Date(y, m, d);
 describe("CalendarSelectedDates — single mode", () => {
   it("renders nothing when no value and animated=false", () => {
     const { container } = render(
-      <Calendar mode="single" animated={false}>
+      <Calendar mode="single">
         <CalendarSelectedDates animated={false} />
       </Calendar>,
     );
@@ -146,7 +146,7 @@ describe("CalendarSelectedDates — multiple mode", () => {
 
   it("empty array → no chips, but Clear hidden when no content", () => {
     const { container } = render(
-      <Calendar mode="multiple" animated={false}>
+      <Calendar mode="multiple">
         <CalendarSelectedDates animated={false} />
       </Calendar>,
     );
@@ -157,7 +157,7 @@ describe("CalendarSelectedDates — multiple mode", () => {
 describe("CalendarSelectedDates — range mode", () => {
   it("renders nothing when no rangeStart and animated=false", () => {
     const { container } = render(
-      <Calendar mode="range" animated={false}>
+      <Calendar mode="range">
         <CalendarSelectedDates animated={false} />
       </Calendar>,
     );
