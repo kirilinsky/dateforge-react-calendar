@@ -1,10 +1,10 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
+import { __resetWarnOnce } from "@/core/dev-warn";
 import { CalendarPresets } from "@/modules/presets";
 import { basicPresets } from "@/modules/presets/presets-pack";
-import { __resetWarnOnce } from "@/core/dev-warn";
 
 const buttonsByLabel = (container: HTMLElement, label: string): Element[] =>
   Array.from(container.querySelectorAll("button")).filter(
@@ -38,9 +38,7 @@ describe("Presets — combinations with basicPresets", () => {
     );
     const buttons = Array.from(container.querySelectorAll("button"));
     expect(buttons.length).toBeGreaterThan(basicPresets.length - 2);
-    expect(
-      buttons.some((b) => b.textContent?.trim() === "My X"),
-    ).toBe(true);
+    expect(buttons.some((b) => b.textContent?.trim() === "My X")).toBe(true);
   });
 });
 
@@ -88,10 +86,7 @@ describe("Presets — defensive handling of bad input", () => {
     const { container } = render(
       <Calendar mode="single">
         <CalendarPresets
-          presets={[
-            null as never,
-            { id: "ok", label: "OK", value: 0 },
-          ]}
+          presets={[null as never, { id: "ok", label: "OK", value: 0 }]}
         />
       </Calendar>,
     );

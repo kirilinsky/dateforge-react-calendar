@@ -1,6 +1,6 @@
 import { TOKEN_TO_VAR } from "../../themes/themes";
+import type { CustomTheme, ThemeTokens } from "../types/themes";
 import { CUSTOM_THEME_BRAND } from "../types/themes";
-import type { ThemeTokens, CustomTheme } from "../types/themes";
 
 /**
  * create custom theme from prop tokens

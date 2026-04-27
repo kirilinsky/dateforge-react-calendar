@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { renderHook, act } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 import { useBoundDateView } from "@/hooks/use-bound-date-view";
 
 const d = (y: number, m: number, day: number) => new Date(y, m - 1, day);
@@ -88,7 +88,9 @@ describe("useBoundDateView", () => {
     );
     expect(result.current.localView.getTime()).toBe(start.getTime());
 
-    act(() => { rangeStart = newStart; });
+    act(() => {
+      rangeStart = newStart;
+    });
     rerender();
 
     expect(result.current.localView.getTime()).toBe(newStart.getTime());

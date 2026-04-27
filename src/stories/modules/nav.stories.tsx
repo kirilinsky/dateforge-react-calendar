@@ -1,11 +1,11 @@
-import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarNav } from "@/modules/nav";
 import { FIXED_DATE } from "../_constants";
 import {
-  resolveStoryTheme,
   resolveStoryAppearance,
+  resolveStoryTheme,
 } from "../_helpers/resolve-globals";
 
 type NavArgs = {
@@ -122,7 +122,12 @@ export const AmbiguousMonthCombo: Story = {
 AmbiguousMonthCombo.storyName = "Ambiguous month combo (dev warn fires)";
 
 export const WithClearAndHome: Story = {
-  args: { showMonthPicker: true, showYearPicker: true, home: true, clear: true },
+  args: {
+    showMonthPicker: true,
+    showYearPicker: true,
+    home: true,
+    clear: true,
+  },
 };
 WithClearAndHome.storyName = "With clear and home";
 

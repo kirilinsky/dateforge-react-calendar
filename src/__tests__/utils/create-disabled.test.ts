@@ -1,12 +1,12 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { createDisabled } from "@/utils/create-disabled";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { __resetWarnOnce } from "@/core/dev-warn";
+import { createDisabled } from "@/utils/create-disabled";
 
 const d = (y: number, m: number, day: number) => new Date(y, m - 1, day);
 
 describe("createDisabled", () => {
   it("returns correct __type", () => {
-    expect(createDisabled({}).  __type).toBe("disabled-config");
+    expect(createDisabled({}).__type).toBe("disabled-config");
   });
 
   it("empty init → empty rules", () => {
@@ -85,14 +85,20 @@ describe("createDisabled — defensive handling", () => {
   });
 
   it("non-object init returns empty config + warn", () => {
-    const cfg = createDisabled(null as unknown as Parameters<typeof createDisabled>[0]);
+    const cfg = createDisabled(
+      null as unknown as Parameters<typeof createDisabled>[0],
+    );
     expect(cfg.rules).toHaveLength(0);
     expect(warnSpy).toHaveBeenCalled();
   });
 
   it("invalid before drops the rule + warn", () => {
     const cfg = createDisabled({ before: new Date("nope") });
-    expect(cfg.rules.find((r) => typeof r === "object" && r !== null && "before" in r)).toBeUndefined();
+    expect(
+      cfg.rules.find(
+        (r) => typeof r === "object" && r !== null && "before" in r,
+      ),
+    ).toBeUndefined();
     expect(warnSpy).toHaveBeenCalled();
   });
 

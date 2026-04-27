@@ -1,10 +1,11 @@
-import React, { useMemo } from "react";
-import styles from "./months-grid.module.css";
+import type React from "react";
+import { useMemo } from "react";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
-import { getMonthListData, setMonth } from "@/utils/date-utils";
-import { useGridSlot } from "@/hooks/use-grid-slot";
 import shared from "@/global/global.module.css";
+import { useGridSlot } from "@/hooks/use-grid-slot";
+import { getMonthListData, setMonth } from "@/utils/date-utils";
+import styles from "./months-grid.module.css";
 
 export interface CalendarMonthsGridProps {
   short?: boolean;

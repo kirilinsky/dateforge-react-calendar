@@ -1,13 +1,13 @@
-import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarPresets } from "@/modules/presets";
 import { basicPresets } from "@/modules/presets/presets-pack";
 import type { PresetEntry } from "@/types/presets";
 import { FIXED_DATE } from "../_constants";
 import {
-  resolveStoryTheme,
   resolveStoryAppearance,
+  resolveStoryTheme,
 } from "../_helpers/resolve-globals";
 
 const meta: Meta = {
@@ -70,7 +70,11 @@ export const WithRangeMode: Story = {
     const rangePresets: PresetEntry[] = [
       { label: "Last 7 days", value: -6, range: 6 },
       { label: "Last 30 days", value: -29, range: 29 },
-      { label: "This month", value: new Date(FIXED_DATE.getFullYear(), FIXED_DATE.getMonth(), 1), range: FIXED_DATE.getDate() - 1 },
+      {
+        label: "This month",
+        value: new Date(FIXED_DATE.getFullYear(), FIXED_DATE.getMonth(), 1),
+        range: FIXED_DATE.getDate() - 1,
+      },
     ];
     return (
       <Calendar

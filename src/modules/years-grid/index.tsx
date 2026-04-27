@@ -1,11 +1,12 @@
-import React, { useMemo, useState, useEffect } from "react";
-import styles from "./years-grid.module.css";
+import type React from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
-import { DisabledConfig } from "@/types/calendar";
-import { useGridSlot } from "@/hooks/use-grid-slot";
-import shared from "@/global/global.module.css";
 import { warnOnce } from "@/core/dev-warn";
+import shared from "@/global/global.module.css";
+import { useGridSlot } from "@/hooks/use-grid-slot";
+import type { DisabledConfig } from "@/types/calendar";
+import styles from "./years-grid.module.css";
 
 const MIN_YEAR = 1900;
 const MAX_YEAR = 2100;
@@ -146,7 +147,11 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
       aria-label={`Select year, showing ${startYear} to ${endYear}`}
       style={useGridSlot(col)}
     >
-      <div className={styles.nav} role="group" aria-label="Year page navigation">
+      <div
+        className={styles.nav}
+        role="group"
+        aria-label="Year page navigation"
+      >
         <button
           type="button"
           className={[shared.interactive, shared.hoverable].join(" ")}

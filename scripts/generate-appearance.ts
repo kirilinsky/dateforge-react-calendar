@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, mkdirSync, readdirSync } from "fs";
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "fs";
 
 const srcDir = "./appearances";
 const distDir = "./dist/appearances";
@@ -38,7 +38,9 @@ const names = parsed.map((p) => p.name);
 // ── Per-appearance JS ─────────────────────────────────────────────────────────
 
 for (const { name, vars } of parsed) {
-  const varsStr = Object.entries(vars).map(([k, v]) => `"${k}":"${v}"`).join(",");
+  const varsStr = Object.entries(vars)
+    .map(([k, v]) => `"${k}":"${v}"`)
+    .join(",");
 
   writeFileSync(
     `${distDir}/${name}.mjs`,
@@ -65,10 +67,13 @@ writeFileSync(
 writeFileSync(
   `${distDir}/index.cjs`,
   `"use strict";Object.defineProperty(exports,"__esModule",{value:true});\n` +
-    names.map((n) => `var _${n}=require("./${n}.cjs");exports.${n}=_${n}.${n};`).join(""),
+    names
+      .map((n) => `var _${n}=require("./${n}.cjs");exports.${n}=_${n}.${n};`)
+      .join(""),
 );
 
-const barrelDts = names.map((n) => `export{${n}}from"./${n}.js";`).join("\n") + "\n";
+const barrelDts =
+  names.map((n) => `export{${n}}from"./${n}.js";`).join("\n") + "\n";
 writeFileSync(`${distDir}/index.d.ts`, barrelDts);
 writeFileSync(`${distDir}/index.d.cts`, barrelDts);
 
@@ -80,7 +85,9 @@ const srcIndex = [
   `import type { CustomAppearance } from "../src/types/appearances";`,
   ``,
   ...parsed.map(({ name, vars }) => {
-    const varsStr = Object.entries(vars).map(([k, v]) => `"${k}": "${v}"`).join(", ");
+    const varsStr = Object.entries(vars)
+      .map(([k, v]) => `"${k}": "${v}"`)
+      .join(", ");
     return `export const ${name}: CustomAppearance = { [CUSTOM_APPEARANCE_BRAND]: true, vars: { ${varsStr} } };`;
   }),
   ``,

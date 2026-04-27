@@ -1,6 +1,6 @@
-import React from "react";
-import { CalendarTheme } from "./themes";
-import { CalendarAppearance } from "./appearances";
+import type React from "react";
+import type { CalendarAppearance } from "./appearances";
+import type { CalendarTheme } from "./themes";
 
 export type StartOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -23,10 +23,11 @@ export type DateRange = {
 
 export type CalendarMode = "single" | "multiple" | "range";
 
-export type CalendarValue<M extends CalendarMode> =
-  M extends "range" ? DateRange :
-  M extends "multiple" ? Date[] :
-  Date | null;
+export type CalendarValue<M extends CalendarMode> = M extends "range"
+  ? DateRange
+  : M extends "multiple"
+    ? Date[]
+    : Date | null;
 
 export interface CalendarProps<M extends CalendarMode = "single"> {
   children?: React.ReactNode;

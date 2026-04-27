@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
-import { renderHook, act } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import { useCalendarKeyboard } from "@/hooks/use-calendar-keyboard";
 
 const d = (y: number, m: number, day: number) => new Date(y, m - 1, day);
@@ -25,7 +25,9 @@ function makeKeyEvent(key: string, extra?: Partial<KeyboardEvent>) {
 describe("useCalendarKeyboard", () => {
   it("initialises focusedDate from initialFocusDate", () => {
     const { result } = renderHook(() => useCalendarKeyboard({ ...base }));
-    expect(result.current.focusedDate.getTime()).toBe(base.initialFocusDate.getTime());
+    expect(result.current.focusedDate.getTime()).toBe(
+      base.initialFocusDate.getTime(),
+    );
   });
 
   it("ArrowRight moves +1 day", () => {
@@ -62,7 +64,9 @@ describe("useCalendarKeyboard", () => {
 
   it("Enter calls onSelect with the date", () => {
     const onSelect = vi.fn();
-    const { result } = renderHook(() => useCalendarKeyboard({ ...base, onSelect }));
+    const { result } = renderHook(() =>
+      useCalendarKeyboard({ ...base, onSelect }),
+    );
     const date = d(2024, 6, 15);
     act(() => {
       result.current.handleKeyDown(makeKeyEvent("Enter"), date);
@@ -72,7 +76,9 @@ describe("useCalendarKeyboard", () => {
 
   it("Space calls onSelect with the date", () => {
     const onSelect = vi.fn();
-    const { result } = renderHook(() => useCalendarKeyboard({ ...base, onSelect }));
+    const { result } = renderHook(() =>
+      useCalendarKeyboard({ ...base, onSelect }),
+    );
     const date = d(2024, 6, 15);
     act(() => {
       result.current.handleKeyDown(makeKeyEvent(" "), date);
@@ -141,7 +147,9 @@ describe("useCalendarKeyboard", () => {
       useCalendarKeyboard({ ...base, syncDate }),
     );
     const newDate = d(2024, 8, 5);
-    act(() => { syncDate = newDate; });
+    act(() => {
+      syncDate = newDate;
+    });
     rerender();
     expect(result.current.focusedDate.getTime()).toBe(newDate.getTime());
   });

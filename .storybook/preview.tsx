@@ -1,6 +1,6 @@
 import type { Preview } from "@storybook/react-vite";
-import * as themes from "../themes/index";
 import * as appearances from "../appearances/index";
+import * as themes from "../themes/index";
 import "../dist/style.css";
 
 const themeNames = ["auto", "light", "dark", ...Object.keys(themes)];

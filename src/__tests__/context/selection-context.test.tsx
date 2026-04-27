@@ -1,18 +1,20 @@
-import { describe, it, expect, vi } from "vitest";
-import { renderHook, act } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import React from "react";
-import { CalendarProvider } from "@/core/provider";
+import { describe, expect, it, vi } from "vitest";
 import {
-  useSelectionValue,
+  useSelection,
   useSelectionActions,
   useSelectionHover,
-  useSelection,
+  useSelectionValue,
 } from "@/context/selection-context";
+import { CalendarProvider } from "@/core/provider";
 
 const d = (y: number, m: number, day: number) => new Date(y, m - 1, day);
 
 const wrap =
-  (props: Omit<React.ComponentProps<typeof CalendarProvider>, "children"> = {}) =>
+  (
+    props: Omit<React.ComponentProps<typeof CalendarProvider>, "children"> = {},
+  ) =>
   ({ children }: { children: React.ReactNode }) =>
     React.createElement(CalendarProvider, { ...props, children });
 
@@ -20,12 +22,16 @@ const wrap =
 
 describe("useSelectionValue — initial state", () => {
   it("selectedDates empty by default", () => {
-    const { result } = renderHook(() => useSelectionValue(), { wrapper: wrap() });
+    const { result } = renderHook(() => useSelectionValue(), {
+      wrapper: wrap(),
+    });
     expect(result.current.selectedDates).toHaveLength(0);
   });
 
   it("rangeStart/rangeEnd null by default", () => {
-    const { result } = renderHook(() => useSelectionValue(), { wrapper: wrap() });
+    const { result } = renderHook(() => useSelectionValue(), {
+      wrapper: wrap(),
+    });
     expect(result.current.rangeStart).toBeNull();
     expect(result.current.rangeEnd).toBeNull();
   });
@@ -130,7 +136,9 @@ describe("useSelectionValue — uncontrolled mode", () => {
 
 describe("useSelectionHover", () => {
   it("hoverDate initially null", () => {
-    const { result } = renderHook(() => useSelectionHover(), { wrapper: wrap() });
+    const { result } = renderHook(() => useSelectionHover(), {
+      wrapper: wrap(),
+    });
     expect(result.current.hoverDate).toBeNull();
   });
 

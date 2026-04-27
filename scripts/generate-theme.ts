@@ -1,5 +1,5 @@
-import { TOKEN_TO_VAR, THEMES_DATA, type ThemeTokens } from "../themes/themes";
-import { writeFileSync, mkdirSync } from "fs";
+import { mkdirSync, writeFileSync } from "fs";
+import { THEMES_DATA, type ThemeTokens, TOKEN_TO_VAR } from "../themes/themes";
 
 const distDir = "./dist/themes";
 mkdirSync(distDir, { recursive: true });
@@ -46,10 +46,13 @@ writeFileSync(
 writeFileSync(
   `${distDir}/index.cjs`,
   `"use strict";Object.defineProperty(exports,"__esModule",{value:true});\n` +
-    names.map((n) => `var _${n}=require("./${n}.cjs");exports.${n}=_${n}.${n};`).join(""),
+    names
+      .map((n) => `var _${n}=require("./${n}.cjs");exports.${n}=_${n}.${n};`)
+      .join(""),
 );
 
-const barrelDts = names.map((n) => `export{${n}}from"./${n}.js";`).join("\n") + "\n";
+const barrelDts =
+  names.map((n) => `export{${n}}from"./${n}.js";`).join("\n") + "\n";
 writeFileSync(`${distDir}/index.d.ts`, barrelDts);
 writeFileSync(`${distDir}/index.d.cts`, barrelDts);
 

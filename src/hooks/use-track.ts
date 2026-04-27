@@ -223,7 +223,10 @@ export function useTrack({
   // Reason: relying on React's onPointerMove/Up on the element itself loses
   // events the moment the cursor leaves the element bounds — leaving isDragging
   // stuck at true. Window listeners catch the pointerup wherever it happens.
-  const handlers = useRef<{ move: (e: PointerEvent) => void; up: () => void } | null>(null);
+  const handlers = useRef<{
+    move: (e: PointerEvent) => void;
+    up: () => void;
+  } | null>(null);
   if (!handlers.current) {
     handlers.current = {
       move: (e: PointerEvent) => {

@@ -20,29 +20,40 @@ export interface SelectionHover {
   hoverDate: Date | null;
 }
 
-export type CalendarSelection = SelectionState & SelectionActions & SelectionHover;
+export type CalendarSelection = SelectionState &
+  SelectionActions &
+  SelectionHover;
 
-export const SelectionStateContext = createContext<SelectionState | undefined>(undefined);
-export const SelectionActionsContext = createContext<SelectionActions | undefined>(undefined);
-export const SelectionHoverContext = createContext<SelectionHover | undefined>(undefined);
+export const SelectionStateContext = createContext<SelectionState | undefined>(
+  undefined,
+);
+export const SelectionActionsContext = createContext<
+  SelectionActions | undefined
+>(undefined);
+export const SelectionHoverContext = createContext<SelectionHover | undefined>(
+  undefined,
+);
 
 const DEV_MSG = "must be used within CalendarProvider";
 
 export const useSelectionValue = (): SelectionState => {
   const ctx = useContext(SelectionStateContext);
-  if (process.env.NODE_ENV !== "production" && !ctx) throw new Error(`useSelectionValue ${DEV_MSG}`);
+  if (process.env.NODE_ENV !== "production" && !ctx)
+    throw new Error(`useSelectionValue ${DEV_MSG}`);
   return ctx as SelectionState;
 };
 
 export const useSelectionActions = (): SelectionActions => {
   const ctx = useContext(SelectionActionsContext);
-  if (process.env.NODE_ENV !== "production" && !ctx) throw new Error(`useSelectionActions ${DEV_MSG}`);
+  if (process.env.NODE_ENV !== "production" && !ctx)
+    throw new Error(`useSelectionActions ${DEV_MSG}`);
   return ctx as SelectionActions;
 };
 
 export const useSelectionHover = (): SelectionHover => {
   const ctx = useContext(SelectionHoverContext);
-  if (process.env.NODE_ENV !== "production" && !ctx) throw new Error(`useSelectionHover ${DEV_MSG}`);
+  if (process.env.NODE_ENV !== "production" && !ctx)
+    throw new Error(`useSelectionHover ${DEV_MSG}`);
   return ctx as SelectionHover;
 };
 

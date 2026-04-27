@@ -1,13 +1,13 @@
-import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarManualInput } from "@/modules/manual-input";
 import { FIXED_DATE } from "../_constants";
-import {
-  resolveStoryTheme,
-  resolveStoryAppearance,
-} from "../_helpers/resolve-globals";
 import { debugStyle, fmtDate, fmtRange } from "../_helpers/debug";
+import {
+  resolveStoryAppearance,
+  resolveStoryTheme,
+} from "../_helpers/resolve-globals";
 
 type ManualInputArgs = {
   allowClear?: boolean;
@@ -72,11 +72,16 @@ export const SingleEnterEscape: Story = {
     const [calls, setCalls] = useState(0);
     return (
       <>
-        <p style={{ ...debugStyle, marginBottom: 4 }}>value: {date ? fmtDate(date) : "null"}</p>
+        <p style={{ ...debugStyle, marginBottom: 4 }}>
+          value: {date ? fmtDate(date) : "null"}
+        </p>
         <p style={debugStyle}>onChange calls: {calls}</p>
         <Calendar
           value={date}
-          onChange={(v) => { setDate(v as Date | null); setCalls((c) => c + 1); }}
+          onChange={(v) => {
+            setDate(v as Date | null);
+            setCalls((c) => c + 1);
+          }}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
         >
@@ -94,14 +99,21 @@ export const SingleInvalidDate: Story = {
     const [calls, setCalls] = useState(0);
     return (
       <>
-        <p style={{ ...debugStyle, marginBottom: 4 }}>value: {date ? fmtDate(date) : "null"}</p>
-        <p style={{ ...debugStyle, marginBottom: 4 }}>onChange calls: {calls}</p>
+        <p style={{ ...debugStyle, marginBottom: 4 }}>
+          value: {date ? fmtDate(date) : "null"}
+        </p>
+        <p style={{ ...debugStyle, marginBottom: 4 }}>
+          onChange calls: {calls}
+        </p>
         <p style={{ ...debugStyle, marginBottom: 8, opacity: 0.6 }}>
           Type "32.13.2024" then Enter — no commit, red wrapper
         </p>
         <Calendar
           value={date}
-          onChange={(v) => { setDate(v as Date | null); setCalls((c) => c + 1); }}
+          onChange={(v) => {
+            setDate(v as Date | null);
+            setCalls((c) => c + 1);
+          }}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
         >
@@ -119,14 +131,21 @@ export const SingleOutsideMinMax: Story = {
     const [calls, setCalls] = useState(0);
     return (
       <>
-        <p style={{ ...debugStyle, marginBottom: 4 }}>value: {date ? fmtDate(date) : "null"}</p>
-        <p style={{ ...debugStyle, marginBottom: 4 }}>onChange calls: {calls}</p>
+        <p style={{ ...debugStyle, marginBottom: 4 }}>
+          value: {date ? fmtDate(date) : "null"}
+        </p>
+        <p style={{ ...debugStyle, marginBottom: 4 }}>
+          onChange calls: {calls}
+        </p>
         <p style={{ ...debugStyle, marginBottom: 8, opacity: 0.6 }}>
           Allowed: 03.02.2016 – 20.02.2016. Outside → red, no commit.
         </p>
         <Calendar
           value={date}
-          onChange={(v) => { setDate(v as Date | null); setCalls((c) => c + 1); }}
+          onChange={(v) => {
+            setDate(v as Date | null);
+            setCalls((c) => c + 1);
+          }}
           minDate={new Date(2016, 1, 3)}
           maxDate={new Date(2016, 1, 20)}
           theme={resolveStoryTheme(ctx.globals.theme)}
@@ -138,11 +157,15 @@ export const SingleOutsideMinMax: Story = {
     );
   },
 };
-SingleOutsideMinMax.storyName = "Single — outside minDate/maxDate (invalid, no commit)";
+SingleOutsideMinMax.storyName =
+  "Single — outside minDate/maxDate (invalid, no commit)";
 
 export const RangeBothEmpty: Story = {
   render: (_args, ctx) => {
-    const [range, setRange] = useState<{ from: Date | null; to: Date | null }>({ from: null, to: null });
+    const [range, setRange] = useState<{ from: Date | null; to: Date | null }>({
+      from: null,
+      to: null,
+    });
     return (
       <>
         <p style={debugStyle}>{fmtRange(range)}</p>
@@ -163,7 +186,10 @@ RangeBothEmpty.storyName = "Range — both empty";
 
 export const RangeOnlyFromFilled: Story = {
   render: (_args, ctx) => {
-    const [range, setRange] = useState<{ from: Date | null; to: Date | null }>({ from: FIXED_DATE, to: null });
+    const [range, setRange] = useState<{ from: Date | null; to: Date | null }>({
+      from: FIXED_DATE,
+      to: null,
+    });
     return (
       <>
         <p style={debugStyle}>{fmtRange(range)}</p>
@@ -232,7 +258,9 @@ export const MultipleCapped: Story = {
     const [dates, setDates] = useState<Date[]>([FIXED_DATE]);
     return (
       <>
-        <p style={debugStyle}>selected ({dates.length}/3): [{dates.map(fmtDate).join(", ")}]</p>
+        <p style={debugStyle}>
+          selected ({dates.length}/3): [{dates.map(fmtDate).join(", ")}]
+        </p>
         <Calendar
           mode="multiple"
           value={dates}
@@ -247,7 +275,8 @@ export const MultipleCapped: Story = {
     );
   },
 };
-MultipleCapped.storyName = "Multiple — capped (maxDates=3, add input hidden when full)";
+MultipleCapped.storyName =
+  "Multiple — capped (maxDates=3, add input hidden when full)";
 
 export const NoTopLevelClear: Story = {
   render: (_args, ctx) => {
@@ -289,7 +318,8 @@ export const ReadOnly: Story = {
     return (
       <>
         <p style={{ ...debugStyle, marginBottom: 8, opacity: 0.6 }}>
-          readOnly — input HTML readOnly, all clears disabled, onChange never fires
+          readOnly — input HTML readOnly, all clears disabled, onChange never
+          fires
         </p>
         <Calendar
           value={date}

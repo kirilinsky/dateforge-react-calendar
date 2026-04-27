@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
-import { calendarReducer, buildInitialState } from "@/core/state";
+import { describe, expect, it } from "vitest";
 import type { SelectConfig } from "@/core/state";
+import { buildInitialState, calendarReducer } from "@/core/state";
 import type { DisabledConfig } from "@/types/calendar";
 
 const d = (y: number, m: number, day: number) => new Date(y, m - 1, day);
@@ -40,7 +40,10 @@ describe("NAVIGATE", () => {
 
   it("does not touch selectedDates", () => {
     const state = { ...baseState, selectedDates: [d(2024, 1, 1)] };
-    const next = calendarReducer(state, { type: "NAVIGATE", date: d(2025, 1, 1) });
+    const next = calendarReducer(state, {
+      type: "NAVIGATE",
+      date: d(2025, 1, 1),
+    });
     expect(next.selectedDates).toBe(state.selectedDates);
   });
 });
@@ -50,7 +53,11 @@ describe("NAVIGATE", () => {
 describe("SELECT single", () => {
   it("selects date, updates viewDate", () => {
     const date = d(2024, 6, 15);
-    const next = calendarReducer(baseState, { type: "SELECT", date, config: singleCfg() });
+    const next = calendarReducer(baseState, {
+      type: "SELECT",
+      date,
+      config: singleCfg(),
+    });
     expect(next.selectedDates).toHaveLength(1);
     expect(next.selectedDates[0]).toBe(date);
     expect(next.viewDate).toBe(date);
@@ -59,24 +66,40 @@ describe("SELECT single", () => {
   it("selecting same day deselects (toggle)", () => {
     const date = d(2024, 6, 15);
     const state = { ...baseState, selectedDates: [date] };
-    const next = calendarReducer(state, { type: "SELECT", date, config: singleCfg() });
+    const next = calendarReducer(state, {
+      type: "SELECT",
+      date,
+      config: singleCfg(),
+    });
     expect(next.selectedDates).toHaveLength(0);
   });
 
   it("null date clears selection", () => {
     const state = { ...baseState, selectedDates: [d(2024, 6, 15)] };
-    const next = calendarReducer(state, { type: "SELECT", date: null, config: singleCfg() });
+    const next = calendarReducer(state, {
+      type: "SELECT",
+      date: null,
+      config: singleCfg(),
+    });
     expect(next.selectedDates).toHaveLength(0);
   });
 
   it("increments notifySeq on change", () => {
     const date = d(2024, 6, 15);
-    const next = calendarReducer(baseState, { type: "SELECT", date, config: singleCfg() });
+    const next = calendarReducer(baseState, {
+      type: "SELECT",
+      date,
+      config: singleCfg(),
+    });
     expect(next.notifySeq).toBe(baseState.notifySeq + 1);
   });
 
   it("same state ref returned when nothing changes (toggle already empty)", () => {
-    const next = calendarReducer(baseState, { type: "SELECT", date: null, config: singleCfg() });
+    const next = calendarReducer(baseState, {
+      type: "SELECT",
+      date: null,
+      config: singleCfg(),
+    });
     // selectedDates is already [] — notifySeq still increments (null clears)
     expect(next.selectedDates).toHaveLength(0);
   });
@@ -88,15 +111,31 @@ describe("SELECT multiselect", () => {
   it("adds multiple dates", () => {
     const a = d(2024, 6, 1);
     const b = d(2024, 6, 2);
-    let state = calendarReducer(baseState, { type: "SELECT", date: a, config: multiCfg(true) });
-    state = calendarReducer(state, { type: "SELECT", date: b, config: multiCfg(true) });
+    let state = calendarReducer(baseState, {
+      type: "SELECT",
+      date: a,
+      config: multiCfg(true),
+    });
+    state = calendarReducer(state, {
+      type: "SELECT",
+      date: b,
+      config: multiCfg(true),
+    });
     expect(state.selectedDates).toHaveLength(2);
   });
 
   it("toggles existing date off", () => {
     const date = d(2024, 6, 1);
-    let state = calendarReducer(baseState, { type: "SELECT", date, config: multiCfg(true) });
-    state = calendarReducer(state, { type: "SELECT", date, config: multiCfg(true) });
+    let state = calendarReducer(baseState, {
+      type: "SELECT",
+      date,
+      config: multiCfg(true),
+    });
+    state = calendarReducer(state, {
+      type: "SELECT",
+      date,
+      config: multiCfg(true),
+    });
     expect(state.selectedDates).toHaveLength(0);
   });
 
@@ -104,10 +143,22 @@ describe("SELECT multiselect", () => {
     const a = d(2024, 6, 1);
     const b = d(2024, 6, 2);
     const c = d(2024, 6, 3);
-    let state = calendarReducer(baseState, { type: "SELECT", date: a, config: multiCfg(2) });
-    state = calendarReducer(state, { type: "SELECT", date: b, config: multiCfg(2) });
+    let state = calendarReducer(baseState, {
+      type: "SELECT",
+      date: a,
+      config: multiCfg(2),
+    });
+    state = calendarReducer(state, {
+      type: "SELECT",
+      date: b,
+      config: multiCfg(2),
+    });
     const before = state.notifySeq;
-    state = calendarReducer(state, { type: "SELECT", date: c, config: multiCfg(2) });
+    state = calendarReducer(state, {
+      type: "SELECT",
+      date: c,
+      config: multiCfg(2),
+    });
     expect(state.selectedDates).toHaveLength(2);
     expect(state.notifySeq).toBe(before); // state unchanged → no notify
   });
@@ -115,9 +166,21 @@ describe("SELECT multiselect", () => {
   it("state ref unchanged when at max and adding new", () => {
     const a = d(2024, 6, 1);
     const b = d(2024, 6, 2);
-    let state = calendarReducer(baseState, { type: "SELECT", date: a, config: multiCfg(2) });
-    state = calendarReducer(state, { type: "SELECT", date: b, config: multiCfg(2) });
-    const result = calendarReducer(state, { type: "SELECT", date: d(2024, 6, 3), config: multiCfg(2) });
+    let state = calendarReducer(baseState, {
+      type: "SELECT",
+      date: a,
+      config: multiCfg(2),
+    });
+    state = calendarReducer(state, {
+      type: "SELECT",
+      date: b,
+      config: multiCfg(2),
+    });
+    const result = calendarReducer(state, {
+      type: "SELECT",
+      date: d(2024, 6, 3),
+      config: multiCfg(2),
+    });
     expect(result).toBe(state);
   });
 });
@@ -127,7 +190,11 @@ describe("SELECT multiselect", () => {
 describe("SELECT range", () => {
   it("first click sets rangeStart, clears rangeEnd", () => {
     const date = d(2024, 6, 1);
-    const next = calendarReducer(baseState, { type: "SELECT", date, config: rangeCfg() });
+    const next = calendarReducer(baseState, {
+      type: "SELECT",
+      date,
+      config: rangeCfg(),
+    });
     expect(next.rangeStart).toBe(date);
     expect(next.rangeEnd).toBeNull();
   });
@@ -135,8 +202,16 @@ describe("SELECT range", () => {
   it("second click (later) sets rangeEnd, orders start < end", () => {
     const start = d(2024, 6, 1);
     const end = d(2024, 6, 15);
-    let state = calendarReducer(baseState, { type: "SELECT", date: start, config: rangeCfg() });
-    state = calendarReducer(state, { type: "SELECT", date: end, config: rangeCfg() });
+    let state = calendarReducer(baseState, {
+      type: "SELECT",
+      date: start,
+      config: rangeCfg(),
+    });
+    state = calendarReducer(state, {
+      type: "SELECT",
+      date: end,
+      config: rangeCfg(),
+    });
     expect(state.rangeStart!.getTime()).toBe(start.getTime());
     expect(state.rangeEnd!.getTime()).toBe(end.getTime());
   });
@@ -144,16 +219,32 @@ describe("SELECT range", () => {
   it("second click (earlier) auto-swaps start/end", () => {
     const first = d(2024, 6, 15);
     const second = d(2024, 6, 1);
-    let state = calendarReducer(baseState, { type: "SELECT", date: first, config: rangeCfg() });
-    state = calendarReducer(state, { type: "SELECT", date: second, config: rangeCfg() });
+    let state = calendarReducer(baseState, {
+      type: "SELECT",
+      date: first,
+      config: rangeCfg(),
+    });
+    state = calendarReducer(state, {
+      type: "SELECT",
+      date: second,
+      config: rangeCfg(),
+    });
     expect(state.rangeStart!.getTime()).toBe(second.getTime());
     expect(state.rangeEnd!.getTime()).toBe(first.getTime());
   });
 
   it("click same day as rangeStart clears range", () => {
     const date = d(2024, 6, 10);
-    let state = calendarReducer(baseState, { type: "SELECT", date, config: rangeCfg() });
-    state = calendarReducer(state, { type: "SELECT", date, config: rangeCfg() });
+    let state = calendarReducer(baseState, {
+      type: "SELECT",
+      date,
+      config: rangeCfg(),
+    });
+    state = calendarReducer(state, {
+      type: "SELECT",
+      date,
+      config: rangeCfg(),
+    });
     expect(state.rangeStart).toBeNull();
     expect(state.rangeEnd).toBeNull();
   });
@@ -162,17 +253,37 @@ describe("SELECT range", () => {
     const a = d(2024, 6, 1);
     const b = d(2024, 6, 10);
     const c = d(2024, 6, 20);
-    let state = calendarReducer(baseState, { type: "SELECT", date: a, config: rangeCfg() });
-    state = calendarReducer(state, { type: "SELECT", date: b, config: rangeCfg() });
-    state = calendarReducer(state, { type: "SELECT", date: c, config: rangeCfg() });
+    let state = calendarReducer(baseState, {
+      type: "SELECT",
+      date: a,
+      config: rangeCfg(),
+    });
+    state = calendarReducer(state, {
+      type: "SELECT",
+      date: b,
+      config: rangeCfg(),
+    });
+    state = calendarReducer(state, {
+      type: "SELECT",
+      date: c,
+      config: rangeCfg(),
+    });
     expect(state.rangeStart!.getTime()).toBe(c.getTime());
     expect(state.rangeEnd).toBeNull();
   });
 
   it("null date clears range", () => {
     const start = d(2024, 6, 1);
-    let state = calendarReducer(baseState, { type: "SELECT", date: start, config: rangeCfg() });
-    state = calendarReducer(state, { type: "SELECT", date: null, config: rangeCfg() });
+    let state = calendarReducer(baseState, {
+      type: "SELECT",
+      date: start,
+      config: rangeCfg(),
+    });
+    state = calendarReducer(state, {
+      type: "SELECT",
+      date: null,
+      config: rangeCfg(),
+    });
     expect(state.rangeStart).toBeNull();
     expect(state.rangeEnd).toBeNull();
   });
@@ -180,18 +291,34 @@ describe("SELECT range", () => {
   it("minRangeDays — range too short → state unchanged", () => {
     const start = d(2024, 6, 1);
     const end = d(2024, 6, 2); // 2 days, min=5
-    let state = calendarReducer(baseState, { type: "SELECT", date: start, config: rangeCfg({ minRangeDays: 5 }) });
+    let state = calendarReducer(baseState, {
+      type: "SELECT",
+      date: start,
+      config: rangeCfg({ minRangeDays: 5 }),
+    });
     const before = state;
-    state = calendarReducer(state, { type: "SELECT", date: end, config: rangeCfg({ minRangeDays: 5 }) });
+    state = calendarReducer(state, {
+      type: "SELECT",
+      date: end,
+      config: rangeCfg({ minRangeDays: 5 }),
+    });
     expect(state).toBe(before);
   });
 
   it("maxRangeDays — range too long → state unchanged", () => {
     const start = d(2024, 6, 1);
     const end = d(2024, 6, 20); // 20 days, max=5
-    let state = calendarReducer(baseState, { type: "SELECT", date: start, config: rangeCfg({ maxRangeDays: 5 }) });
+    let state = calendarReducer(baseState, {
+      type: "SELECT",
+      date: start,
+      config: rangeCfg({ maxRangeDays: 5 }),
+    });
     const before = state;
-    state = calendarReducer(state, { type: "SELECT", date: end, config: rangeCfg({ maxRangeDays: 5 }) });
+    state = calendarReducer(state, {
+      type: "SELECT",
+      date: end,
+      config: rangeCfg({ maxRangeDays: 5 }),
+    });
     expect(state).toBe(before);
   });
 
@@ -199,7 +326,11 @@ describe("SELECT range", () => {
     const start = d(2024, 6, 1);
     const end = d(2024, 6, 15);
     const cfg = rangeCfg({ disabled: disabled(d(2024, 6, 10)) });
-    let state = calendarReducer(baseState, { type: "SELECT", date: start, config: cfg });
+    let state = calendarReducer(baseState, {
+      type: "SELECT",
+      date: start,
+      config: cfg,
+    });
     const before = state;
     state = calendarReducer(state, { type: "SELECT", date: end, config: cfg });
     expect(state).toBe(before);
@@ -208,8 +339,16 @@ describe("SELECT range", () => {
   it("clean range with no disabled → completes normally", () => {
     const start = d(2024, 6, 1);
     const end = d(2024, 6, 5);
-    let state = calendarReducer(baseState, { type: "SELECT", date: start, config: rangeCfg() });
-    state = calendarReducer(state, { type: "SELECT", date: end, config: rangeCfg() });
+    let state = calendarReducer(baseState, {
+      type: "SELECT",
+      date: start,
+      config: rangeCfg(),
+    });
+    state = calendarReducer(state, {
+      type: "SELECT",
+      date: end,
+      config: rangeCfg(),
+    });
     expect(state.rangeStart).not.toBeNull();
     expect(state.rangeEnd).not.toBeNull();
   });
@@ -436,17 +575,29 @@ describe("SET_RANGE", () => {
 
   it("updates viewDate to from", () => {
     const from = d(2024, 3, 5);
-    const next = calendarReducer(baseState, { type: "SET_RANGE", from, to: null });
+    const next = calendarReducer(baseState, {
+      type: "SET_RANGE",
+      from,
+      to: null,
+    });
     expect(next.viewDate).toBe(from);
   });
 
   it("null from → viewDate stays unchanged", () => {
-    const next = calendarReducer(baseState, { type: "SET_RANGE", from: null, to: null });
+    const next = calendarReducer(baseState, {
+      type: "SET_RANGE",
+      from: null,
+      to: null,
+    });
     expect(next.viewDate).toBe(baseState.viewDate);
   });
 
   it("increments notifySeq", () => {
-    const next = calendarReducer(baseState, { type: "SET_RANGE", from: null, to: null });
+    const next = calendarReducer(baseState, {
+      type: "SET_RANGE",
+      from: null,
+      to: null,
+    });
     expect(next.notifySeq).toBe(baseState.notifySeq + 1);
   });
 });
@@ -456,26 +607,46 @@ describe("SET_RANGE", () => {
 describe("SET_RANGE_BOUND", () => {
   it("bound=from sets rangeStart", () => {
     const date = d(2024, 3, 1);
-    const next = calendarReducer(baseState, { type: "SET_RANGE_BOUND", bound: "from", date });
+    const next = calendarReducer(baseState, {
+      type: "SET_RANGE_BOUND",
+      bound: "from",
+      date,
+    });
     expect(next.rangeStart).toBe(date);
   });
 
   it("bound=to sets rangeEnd", () => {
     const date = d(2024, 3, 31);
-    const next = calendarReducer(baseState, { type: "SET_RANGE_BOUND", bound: "to", date });
+    const next = calendarReducer(baseState, {
+      type: "SET_RANGE_BOUND",
+      bound: "to",
+      date,
+    });
     expect(next.rangeEnd).toBe(date);
   });
 
   it("auto-swaps when from > to", () => {
     const from = d(2024, 3, 20);
     const to = d(2024, 3, 5);
-    let state = calendarReducer(baseState, { type: "SET_RANGE_BOUND", bound: "to", date: to });
-    state = calendarReducer(state, { type: "SET_RANGE_BOUND", bound: "from", date: from });
+    let state = calendarReducer(baseState, {
+      type: "SET_RANGE_BOUND",
+      bound: "to",
+      date: to,
+    });
+    state = calendarReducer(state, {
+      type: "SET_RANGE_BOUND",
+      bound: "from",
+      date: from,
+    });
     expect(state.rangeStart!.getTime()).toBeLessThan(state.rangeEnd!.getTime());
   });
 
   it("increments notifySeq", () => {
-    const next = calendarReducer(baseState, { type: "SET_RANGE_BOUND", bound: "from", date: d(2024, 1, 1) });
+    const next = calendarReducer(baseState, {
+      type: "SET_RANGE_BOUND",
+      bound: "from",
+      date: d(2024, 1, 1),
+    });
     expect(next.notifySeq).toBe(baseState.notifySeq + 1);
   });
 });
@@ -537,7 +708,10 @@ describe("buildInitialState", () => {
   it("range=true with {from, to} → rangeStart/rangeEnd", () => {
     const from = d(2024, 3, 1);
     const to = d(2024, 3, 31);
-    const state = buildInitialState({ range: true, externalValue: { from, to } });
+    const state = buildInitialState({
+      range: true,
+      externalValue: { from, to },
+    });
     expect(state.rangeStart!.getTime()).toBe(from.getTime());
     expect(state.rangeEnd!.getTime()).toBe(to.getTime());
   });

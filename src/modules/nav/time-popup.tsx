@@ -1,6 +1,6 @@
-import { useState, useRef } from "react";
-import { TimeTrack } from "@/components/time-track/time-track";
+import { useRef, useState } from "react";
 import { Popup } from "@/components/popup/popup";
+import { TimeTrack } from "@/components/time-track/time-track";
 
 interface TimePopupProps {
   date: Date;
@@ -28,8 +28,18 @@ export const TimePopup = ({
   };
 
   return (
-    <Popup label="Select time" onConfirm={() => onConfirm(currentRef.current)} onClose={onClose}>
-      <TimeTrack date={current} hour12={hour12} showSeconds={showSeconds} readOnly={readOnly} onChange={handleChange} />
+    <Popup
+      label="Select time"
+      onConfirm={() => onConfirm(currentRef.current)}
+      onClose={onClose}
+    >
+      <TimeTrack
+        date={current}
+        hour12={hour12}
+        showSeconds={showSeconds}
+        readOnly={readOnly}
+        onChange={handleChange}
+      />
     </Popup>
   );
 };

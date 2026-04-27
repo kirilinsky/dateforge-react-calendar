@@ -1,14 +1,14 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+import type { DisabledConfig } from "@/types/calendar";
 import {
-  isSameDay,
-  setMonth,
   addDate,
-  setYear,
-  toLimitTimestamp,
   checkIsDateDisabled,
   hasDisabledInRange,
+  isSameDay,
+  setMonth,
+  setYear,
+  toLimitTimestamp,
 } from "@/utils/date-core";
-import type { DisabledConfig } from "@/types/calendar";
 
 const d = (year: number, month: number, day: number) =>
   new Date(year, month - 1, day);
@@ -21,11 +21,16 @@ const disabled = (...rules: DisabledConfig["rules"]): DisabledConfig => ({
 // ─── isSameDay ───────────────────────────────────────────────────────────────
 
 describe("isSameDay", () => {
-  it("same day", () => expect(isSameDay(d(2024, 1, 15), d(2024, 1, 15))).toBe(true));
-  it("different day", () => expect(isSameDay(d(2024, 1, 15), d(2024, 1, 16))).toBe(false));
-  it("different month", () => expect(isSameDay(d(2024, 1, 15), d(2024, 2, 15))).toBe(false));
-  it("different year", () => expect(isSameDay(d(2023, 1, 15), d(2024, 1, 15))).toBe(false));
-  it("cross-year same date", () => expect(isSameDay(d(2024, 12, 31), d(2025, 12, 31))).toBe(false));
+  it("same day", () =>
+    expect(isSameDay(d(2024, 1, 15), d(2024, 1, 15))).toBe(true));
+  it("different day", () =>
+    expect(isSameDay(d(2024, 1, 15), d(2024, 1, 16))).toBe(false));
+  it("different month", () =>
+    expect(isSameDay(d(2024, 1, 15), d(2024, 2, 15))).toBe(false));
+  it("different year", () =>
+    expect(isSameDay(d(2023, 1, 15), d(2024, 1, 15))).toBe(false));
+  it("cross-year same date", () =>
+    expect(isSameDay(d(2024, 12, 31), d(2025, 12, 31))).toBe(false));
   it("different times same day", () => {
     const a = new Date(2024, 0, 15, 9, 0, 0);
     const b = new Date(2024, 0, 15, 23, 59, 59);
@@ -37,7 +42,8 @@ describe("isSameDay", () => {
 
 describe("toLimitTimestamp", () => {
   it("null input → null", () => expect(toLimitTimestamp(null)).toBeNull());
-  it("undefined input → null", () => expect(toLimitTimestamp(undefined)).toBeNull());
+  it("undefined input → null", () =>
+    expect(toLimitTimestamp(undefined)).toBeNull());
   it("min boundary sets 00:00:00.000", () => {
     const ts = toLimitTimestamp(d(2024, 3, 10));
     expect(new Date(ts!).getHours()).toBe(0);
@@ -112,7 +118,8 @@ describe("addDate", () => {
 // ─── setYear ─────────────────────────────────────────────────────────────────
 
 describe("setYear", () => {
-  it("sets year", () => expect(setYear(d(2024, 6, 15), 2030).getFullYear()).toBe(2030));
+  it("sets year", () =>
+    expect(setYear(d(2024, 6, 15), 2030).getFullYear()).toBe(2030));
   it("does not mutate input", () => {
     const orig = d(2024, 6, 15);
     const ts = orig.getTime();
@@ -129,53 +136,107 @@ describe("checkIsDateDisabled", () => {
   });
 
   it("boolean true rule → true", () => {
-    expect(checkIsDateDisabled(d(2024, 6, 15), null, null, disabled(true))).toBe(true);
+    expect(
+      checkIsDateDisabled(d(2024, 6, 15), null, null, disabled(true)),
+    ).toBe(true);
   });
 
   it("boolean false rule → false", () => {
-    expect(checkIsDateDisabled(d(2024, 6, 15), null, null, disabled(false))).toBe(false);
+    expect(
+      checkIsDateDisabled(d(2024, 6, 15), null, null, disabled(false)),
+    ).toBe(false);
   });
 
   it("Date rule matches same day", () => {
-    expect(checkIsDateDisabled(d(2024, 6, 15), null, null, disabled(d(2024, 6, 15)))).toBe(true);
+    expect(
+      checkIsDateDisabled(d(2024, 6, 15), null, null, disabled(d(2024, 6, 15))),
+    ).toBe(true);
   });
 
   it("Date rule different day → false", () => {
-    expect(checkIsDateDisabled(d(2024, 6, 15), null, null, disabled(d(2024, 6, 16)))).toBe(false);
+    expect(
+      checkIsDateDisabled(d(2024, 6, 15), null, null, disabled(d(2024, 6, 16))),
+    ).toBe(false);
   });
 
   it("dayOfWeek rule matches", () => {
     const sunday = d(2024, 6, 16); // Sunday = 0
-    expect(checkIsDateDisabled(sunday, null, null, disabled({ dayOfWeek: [0] }))).toBe(true);
+    expect(
+      checkIsDateDisabled(sunday, null, null, disabled({ dayOfWeek: [0] })),
+    ).toBe(true);
   });
 
   it("dayOfWeek rule no match", () => {
     const monday = d(2024, 6, 17);
-    expect(checkIsDateDisabled(monday, null, null, disabled({ dayOfWeek: [0] }))).toBe(false);
+    expect(
+      checkIsDateDisabled(monday, null, null, disabled({ dayOfWeek: [0] })),
+    ).toBe(false);
   });
 
   it("from/to range: inside → true", () => {
-    expect(checkIsDateDisabled(d(2024, 6, 15), null, null, disabled({ from: d(2024, 6, 10), to: d(2024, 6, 20) }))).toBe(true);
+    expect(
+      checkIsDateDisabled(
+        d(2024, 6, 15),
+        null,
+        null,
+        disabled({ from: d(2024, 6, 10), to: d(2024, 6, 20) }),
+      ),
+    ).toBe(true);
   });
 
   it("from/to range: boundary start → true", () => {
-    expect(checkIsDateDisabled(d(2024, 6, 10), null, null, disabled({ from: d(2024, 6, 10), to: d(2024, 6, 20) }))).toBe(true);
+    expect(
+      checkIsDateDisabled(
+        d(2024, 6, 10),
+        null,
+        null,
+        disabled({ from: d(2024, 6, 10), to: d(2024, 6, 20) }),
+      ),
+    ).toBe(true);
   });
 
   it("from/to range: outside → false", () => {
-    expect(checkIsDateDisabled(d(2024, 6, 5), null, null, disabled({ from: d(2024, 6, 10), to: d(2024, 6, 20) }))).toBe(false);
+    expect(
+      checkIsDateDisabled(
+        d(2024, 6, 5),
+        null,
+        null,
+        disabled({ from: d(2024, 6, 10), to: d(2024, 6, 20) }),
+      ),
+    ).toBe(false);
   });
 
   it("before rule: date before threshold → true", () => {
-    expect(checkIsDateDisabled(d(2024, 1, 1), null, null, disabled({ before: d(2024, 6, 1) }))).toBe(true);
+    expect(
+      checkIsDateDisabled(
+        d(2024, 1, 1),
+        null,
+        null,
+        disabled({ before: d(2024, 6, 1) }),
+      ),
+    ).toBe(true);
   });
 
   it("before rule: date after threshold → false", () => {
-    expect(checkIsDateDisabled(d(2024, 12, 1), null, null, disabled({ before: d(2024, 6, 1) }))).toBe(false);
+    expect(
+      checkIsDateDisabled(
+        d(2024, 12, 1),
+        null,
+        null,
+        disabled({ before: d(2024, 6, 1) }),
+      ),
+    ).toBe(false);
   });
 
   it("after rule: date after threshold → true", () => {
-    expect(checkIsDateDisabled(d(2024, 12, 1), null, null, disabled({ after: d(2024, 6, 1) }))).toBe(true);
+    expect(
+      checkIsDateDisabled(
+        d(2024, 12, 1),
+        null,
+        null,
+        disabled({ after: d(2024, 6, 1) }),
+      ),
+    ).toBe(true);
   });
 
   it("startDate window: before min → true", () => {
@@ -187,11 +248,20 @@ describe("checkIsDateDisabled", () => {
   });
 
   it("endDate window: after max → true", () => {
-    expect(checkIsDateDisabled(d(2024, 12, 31), null, d(2024, 6, 1))).toBe(true);
+    expect(checkIsDateDisabled(d(2024, 12, 31), null, d(2024, 6, 1))).toBe(
+      true,
+    );
   });
 
   it("combined rules: rule matches → true even if date in window", () => {
-    expect(checkIsDateDisabled(d(2024, 6, 15), d(2024, 1, 1), d(2024, 12, 31), disabled(d(2024, 6, 15)))).toBe(true);
+    expect(
+      checkIsDateDisabled(
+        d(2024, 6, 15),
+        d(2024, 1, 1),
+        d(2024, 12, 31),
+        disabled(d(2024, 6, 15)),
+      ),
+    ).toBe(true);
   });
 });
 
@@ -204,19 +274,37 @@ describe("hasDisabledInRange", () => {
 
   it("disabled day in middle of range → true", () => {
     expect(
-      hasDisabledInRange(d(2024, 6, 1), d(2024, 6, 30), null, null, disabled(d(2024, 6, 15)))
+      hasDisabledInRange(
+        d(2024, 6, 1),
+        d(2024, 6, 30),
+        null,
+        null,
+        disabled(d(2024, 6, 15)),
+      ),
     ).toBe(true);
   });
 
   it("disabled day at range start → true", () => {
     expect(
-      hasDisabledInRange(d(2024, 6, 1), d(2024, 6, 10), null, null, disabled(d(2024, 6, 1)))
+      hasDisabledInRange(
+        d(2024, 6, 1),
+        d(2024, 6, 10),
+        null,
+        null,
+        disabled(d(2024, 6, 1)),
+      ),
     ).toBe(true);
   });
 
   it("disabled day at range end → true", () => {
     expect(
-      hasDisabledInRange(d(2024, 6, 1), d(2024, 6, 10), null, null, disabled(d(2024, 6, 10)))
+      hasDisabledInRange(
+        d(2024, 6, 1),
+        d(2024, 6, 10),
+        null,
+        null,
+        disabled(d(2024, 6, 10)),
+      ),
     ).toBe(true);
   });
 
@@ -226,26 +314,44 @@ describe("hasDisabledInRange", () => {
 
   it("range of 1 day, disabled → true", () => {
     expect(
-      hasDisabledInRange(d(2024, 6, 15), d(2024, 6, 15), null, null, disabled(d(2024, 6, 15)))
+      hasDisabledInRange(
+        d(2024, 6, 15),
+        d(2024, 6, 15),
+        null,
+        null,
+        disabled(d(2024, 6, 15)),
+      ),
     ).toBe(true);
   });
 
   it("disabled outside range → false", () => {
     expect(
-      hasDisabledInRange(d(2024, 6, 1), d(2024, 6, 10), null, null, disabled(d(2024, 6, 20)))
+      hasDisabledInRange(
+        d(2024, 6, 1),
+        d(2024, 6, 10),
+        null,
+        null,
+        disabled(d(2024, 6, 20)),
+      ),
     ).toBe(false);
   });
 
   it("endDate boundary cuts the range → true when range exceeds endDate", () => {
     expect(
-      hasDisabledInRange(d(2024, 6, 1), d(2024, 6, 30), null, d(2024, 6, 15))
+      hasDisabledInRange(d(2024, 6, 1), d(2024, 6, 30), null, d(2024, 6, 15)),
     ).toBe(true);
   });
 
   it("dayOfWeek in range → true", () => {
     // 2024-06-01 is Saturday (6), 2024-06-02 is Sunday (0)
     expect(
-      hasDisabledInRange(d(2024, 6, 1), d(2024, 6, 7), null, null, disabled({ dayOfWeek: [0] }))
+      hasDisabledInRange(
+        d(2024, 6, 1),
+        d(2024, 6, 7),
+        null,
+        null,
+        disabled({ dayOfWeek: [0] }),
+      ),
     ).toBe(true);
   });
 });

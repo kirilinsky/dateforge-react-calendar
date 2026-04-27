@@ -1,12 +1,17 @@
-import { describe, it, expect } from "vitest";
-import { getCalendarData, getFirstDayOffset, getWeekdaysNames } from "@/utils/calendar-data";
+import { describe, expect, it } from "vitest";
+import {
+  getCalendarData,
+  getFirstDayOffset,
+  getWeekdaysNames,
+} from "@/utils/calendar-data";
 
 const d = (y: number, m: number, day: number) => new Date(y, m - 1, day);
 
 // ─── getWeekdaysNames ─────────────────────────────────────────────────────────
 
 describe("getWeekdaysNames", () => {
-  it("returns 7 names", () => expect(getWeekdaysNames("en", 1)).toHaveLength(7));
+  it("returns 7 names", () =>
+    expect(getWeekdaysNames("en", 1)).toHaveLength(7));
   it("Mon start (1): first name is Mon variant", () => {
     const names = getWeekdaysNames("en", 1);
     expect(names[0].toLowerCase()).toContain("mon");
@@ -78,7 +83,9 @@ describe("getCalendarData", () => {
   it("disabled date via endDate marked isDisabled", () => {
     const end = d(2024, 1, 10);
     const data = getCalendarData(2024, 0, offset, [], null, end);
-    const day15 = data.flatMap((w) => w.days).find((d) => d.fullDate.getDate() === 15 && d.fullDate.getMonth() === 0);
+    const day15 = data
+      .flatMap((w) => w.days)
+      .find((d) => d.fullDate.getDate() === 15 && d.fullDate.getMonth() === 0);
     expect(day15!.isDisabled).toBe(true);
   });
 
@@ -120,7 +127,9 @@ describe("getCalendarData", () => {
     });
     const allDays = data.flatMap((w) => w.days);
     // day 11 is only 2 days away → should be rangeLimitDisabled
-    const day11 = allDays.find((d) => d.fullDate.getDate() === 11 && d.fullDate.getMonth() === 0);
+    const day11 = allDays.find(
+      (d) => d.fullDate.getDate() === 11 && d.fullDate.getMonth() === 0,
+    );
     expect(day11!.isRangeLimitDisabled).toBe(true);
   });
 
@@ -131,7 +140,9 @@ describe("getCalendarData", () => {
       maxRangeDays: 3,
     });
     const allDays = data.flatMap((w) => w.days);
-    const day10 = allDays.find((d) => d.fullDate.getDate() === 10 && d.fullDate.getMonth() === 0);
+    const day10 = allDays.find(
+      (d) => d.fullDate.getDate() === 10 && d.fullDate.getMonth() === 0,
+    );
     expect(day10!.isRangeLimitDisabled).toBe(true);
   });
 });

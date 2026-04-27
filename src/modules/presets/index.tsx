@@ -1,13 +1,17 @@
-import React, { useMemo } from "react";
-import styles from "./presets.module.css";
+import type React from "react";
+import { useMemo } from "react";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
-import { useSelectionValue, useSelectionActions } from "@/context/selection-context";
+import {
+  useSelectionActions,
+  useSelectionValue,
+} from "@/context/selection-context";
+import shared from "@/global/global.module.css";
+import { useGridSlot } from "@/hooks/use-grid-slot";
+import type { PresetEntry } from "@/types/presets";
 import { isSameDay } from "@/utils/date-core";
 import { getResolvedPresets } from "./preset-utils";
-import { useGridSlot } from "@/hooks/use-grid-slot";
-import shared from "@/global/global.module.css";
-import { PresetEntry } from "@/types/presets";
+import styles from "./presets.module.css";
 
 export interface CalendarPresetsProps {
   /**
@@ -34,7 +38,16 @@ export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
   const { onChangeDate, onRangeSet } = useSelectionActions();
 
   const resolved = useMemo(
-    () => getResolvedPresets(presets, viewDate, locale, range, minDate, maxDate, disabled),
+    () =>
+      getResolvedPresets(
+        presets,
+        viewDate,
+        locale,
+        range,
+        minDate,
+        maxDate,
+        disabled,
+      ),
     [presets, viewDate, locale, range, minDate, maxDate, disabled],
   );
 

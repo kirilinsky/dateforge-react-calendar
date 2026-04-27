@@ -1,13 +1,13 @@
-import {
+import { warnOnce } from "@/core/dev-warn";
+import type { DisabledConfig } from "@/types/calendar";
+import type {
   AdvancedPresetDef,
   PresetContext,
   PresetEntry,
   PresetRangeValue,
   SimplePresetDef,
 } from "@/types/presets";
-import { DisabledConfig } from "@/types/calendar";
 import { checkIsDateDisabled } from "@/utils/date-core";
-import { warnOnce } from "@/core/dev-warn";
 
 const isValidDate = (d: unknown): d is Date =>
   d instanceof Date && !isNaN(d.getTime());
@@ -48,9 +48,15 @@ const applyTimeFromSource = (target: Date, source: Date): Date => {
   return r;
 };
 
-const clampTime = (d: Date, minDate?: Date | null, maxDate?: Date | null): Date => {
-  if (minDate && d.getTime() < minDate.getTime()) return applyTimeFromSource(d, minDate);
-  if (maxDate && d.getTime() > maxDate.getTime()) return applyTimeFromSource(d, maxDate);
+const clampTime = (
+  d: Date,
+  minDate?: Date | null,
+  maxDate?: Date | null,
+): Date => {
+  if (minDate && d.getTime() < minDate.getTime())
+    return applyTimeFromSource(d, minDate);
+  if (maxDate && d.getTime() > maxDate.getTime())
+    return applyTimeFromSource(d, maxDate);
   return d;
 };
 
@@ -99,7 +105,8 @@ export const getResolvedPresets = (
   maxDate?: Date | null,
   disabled?: DisabledConfig,
 ): ResolvedPreset[] => {
-  const isValid = (d: Date) => !checkIsDateDisabled(d, minDate, maxDate, disabled);
+  const isValid = (d: Date) =>
+    !checkIsDateDisabled(d, minDate, maxDate, disabled);
   const now = new Date();
   now.setHours(
     viewDate.getHours(),

@@ -16,15 +16,21 @@ export function useScrollAccumulator(
   }: UseScrollAccumulatorOptions = {},
 ): void {
   const stepRef = useRef(onStep);
-  useEffect(() => { stepRef.current = onStep; }, [onStep]);
+  useEffect(() => {
+    stepRef.current = onStep;
+  }, [onStep]);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     const isHovered = { current: false };
 
-    const onEnter = () => { isHovered.current = true; };
-    const onLeave = () => { isHovered.current = false; };
+    const onEnter = () => {
+      isHovered.current = true;
+    };
+    const onLeave = () => {
+      isHovered.current = false;
+    };
     if (requireHover) {
       el.addEventListener("mouseenter", onEnter);
       el.addEventListener("mouseleave", onLeave);
@@ -77,6 +83,6 @@ export function useScrollAccumulator(
       el.removeEventListener("touchmove", onTouchMove);
       el.removeEventListener("touchend", onTouchEnd);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref]);
 }

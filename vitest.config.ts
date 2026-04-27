@@ -1,9 +1,10 @@
-import { defineConfig } from "vitest/config";
-import { resolve } from "path";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
 import { playwright } from "@vitest/browser-playwright";
+import { resolve } from "path";
+import { defineConfig } from "vitest/config";
+
 const dirname =
   typeof __dirname !== "undefined"
     ? __dirname

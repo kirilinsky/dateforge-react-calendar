@@ -1,11 +1,11 @@
-import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarTimeGrid } from "@/modules/time";
 import { FIXED_DATE } from "../_constants";
 import {
-  resolveStoryTheme,
   resolveStoryAppearance,
+  resolveStoryTheme,
 } from "../_helpers/resolve-globals";
 
 type TimeGridArgs = {

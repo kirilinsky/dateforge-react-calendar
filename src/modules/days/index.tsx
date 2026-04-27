@@ -1,26 +1,26 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import styles from "./days.module.css";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import {
-  useSelectionValue,
   useSelectionActions,
   useSelectionHover,
+  useSelectionValue,
 } from "@/context/selection-context";
 import { useUI } from "@/context/ui-context";
+import shared from "@/global/global.module.css";
+import { useCalendarKeyboard } from "@/hooks/use-calendar-keyboard";
+import { useClientValue } from "@/hooks/use-client-value";
+import { useGridSlot } from "@/hooks/use-grid-slot";
+import type { StartOfWeek } from "@/types/calendar";
 import {
+  getCalendarData,
   getFirstDayOffset,
   getNextMonthFromSwipe,
-  getCalendarData,
   isSameDay,
 } from "@/utils/date-utils";
 import { getTodayInTimezone, toTZMidnight } from "@/utils/tz-utils";
-import shared from "@/global/global.module.css";
+import styles from "./days.module.css";
 import WeekDays from "./week-days";
-import { StartOfWeek } from "@/types/calendar";
-import { useGridSlot } from "@/hooks/use-grid-slot";
-import { useCalendarKeyboard } from "@/hooks/use-calendar-keyboard";
-import { useClientValue } from "@/hooks/use-client-value";
 
 function buildCellLabel(args: {
   fullDate: Date;

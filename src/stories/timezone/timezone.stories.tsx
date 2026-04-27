@@ -1,15 +1,15 @@
-import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
+import { useConfig } from "@/context/config-context";
 import { CalendarDays } from "@/modules/days";
 import { CalendarNav } from "@/modules/nav";
-import { useConfig } from "@/context/config-context";
 import { FIXED_DATE } from "../_constants";
-import {
-  resolveStoryTheme,
-  resolveStoryAppearance,
-} from "../_helpers/resolve-globals";
 import { debugStyle } from "../_helpers/debug";
+import {
+  resolveStoryAppearance,
+  resolveStoryTheme,
+} from "../_helpers/resolve-globals";
 
 // Probe component reads the resolved timeZone from ConfigContext so the user
 // can see what value reached the calendar internals.
@@ -18,9 +18,7 @@ const TzProbe: React.FC<{ value: Date | null }> = ({ value }) => {
   return (
     <>
       <p style={debugStyle}>resolved timeZone: {timeZone ?? "(unresolved)"}</p>
-      <p style={debugStyle}>
-        value: {value ? value.toISOString() : "null"}
-      </p>
+      <p style={debugStyle}>value: {value ? value.toISOString() : "null"}</p>
     </>
   );
 };
@@ -148,7 +146,8 @@ export const InvalidTimezone: Story = {
     return (
       <>
         <p style={{ ...debugStyle, marginBottom: 8, opacity: 0.6 }}>
-          timeZone="Europe/Wrongville" → falls back to auto-detect (dev warn fires)
+          timeZone="Europe/Wrongville" → falls back to auto-detect (dev warn
+          fires)
         </p>
         <Calendar
           value={date}

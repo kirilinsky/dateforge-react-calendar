@@ -1,11 +1,11 @@
-import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
 import { FIXED_DATE } from "../_constants";
 import {
-  resolveStoryTheme,
   resolveStoryAppearance,
+  resolveStoryTheme,
 } from "../_helpers/resolve-globals";
 
 type DaysArgs = {
@@ -26,7 +26,10 @@ type DaysArgs = {
 const meta: Meta<DaysArgs> = {
   title: "Modules/Days",
   argTypes: {
-    startOfWeek: { control: { type: "select" }, options: [0, 1, 2, 3, 4, 5, 6] },
+    startOfWeek: {
+      control: { type: "select" },
+      options: [0, 1, 2, 3, 4, 5, 6],
+    },
     currentMonthOnly: { control: "boolean" },
     highlightWeekends: { control: "boolean" },
     boldWeekends: { control: "boolean" },

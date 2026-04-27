@@ -1,4 +1,4 @@
-import { PresetEntry } from "@/types/presets";
+import type { PresetEntry } from "@/types/presets";
 import { getRelativeLabel } from "./preset-utils";
 
 const addMonths = (d: Date, n: number) => {
@@ -30,16 +30,40 @@ const addYears = (d: Date, n: number) => {
  * ]} />
  */
 export const basicPresets: PresetEntry[] = [
-  { id: "lastYear",    label: (l) => getRelativeLabel(l, -1, "year"),  getValue: ({ now }) => addYears(now, -1) },
-  { id: "lastMonth",   label: (l) => getRelativeLabel(l, -1, "month"), getValue: ({ now }) => addMonths(now, -1) },
-  { id: "twoWeeksAgo", label: (l) => getRelativeLabel(l, -2, "week"),  value: -14 },
-  { id: "lastWeek",    label: (l) => getRelativeLabel(l, -1, "week"),  value: -7 },
-  { id: "yesterday",   label: (l) => getRelativeLabel(l, -1, "day"),   value: -1 },
-  { id: "today",       label: (l) => getRelativeLabel(l,  0, "day"),   value:  0 },
-  { id: "tomorrow",    label: (l) => getRelativeLabel(l,  1, "day"),   value:  1 },
-  { id: "nextWeek",    label: (l) => getRelativeLabel(l,  1, "week"),  value:  7 },
-  { id: "inTwoWeeks",  label: (l) => getRelativeLabel(l,  2, "week"),  value:  14 },
-  { id: "nextMonth",   label: (l) => getRelativeLabel(l,  1, "month"), getValue: ({ now }) => addMonths(now, 1) },
-  { id: "inTwoMonths", label: (l) => getRelativeLabel(l,  2, "month"), getValue: ({ now }) => addMonths(now, 2) },
-  { id: "nextYear",    label: (l) => getRelativeLabel(l,  1, "year"),  getValue: ({ now }) => addYears(now, 1) },
+  {
+    id: "lastYear",
+    label: (l) => getRelativeLabel(l, -1, "year"),
+    getValue: ({ now }) => addYears(now, -1),
+  },
+  {
+    id: "lastMonth",
+    label: (l) => getRelativeLabel(l, -1, "month"),
+    getValue: ({ now }) => addMonths(now, -1),
+  },
+  {
+    id: "twoWeeksAgo",
+    label: (l) => getRelativeLabel(l, -2, "week"),
+    value: -14,
+  },
+  { id: "lastWeek", label: (l) => getRelativeLabel(l, -1, "week"), value: -7 },
+  { id: "yesterday", label: (l) => getRelativeLabel(l, -1, "day"), value: -1 },
+  { id: "today", label: (l) => getRelativeLabel(l, 0, "day"), value: 0 },
+  { id: "tomorrow", label: (l) => getRelativeLabel(l, 1, "day"), value: 1 },
+  { id: "nextWeek", label: (l) => getRelativeLabel(l, 1, "week"), value: 7 },
+  { id: "inTwoWeeks", label: (l) => getRelativeLabel(l, 2, "week"), value: 14 },
+  {
+    id: "nextMonth",
+    label: (l) => getRelativeLabel(l, 1, "month"),
+    getValue: ({ now }) => addMonths(now, 1),
+  },
+  {
+    id: "inTwoMonths",
+    label: (l) => getRelativeLabel(l, 2, "month"),
+    getValue: ({ now }) => addMonths(now, 2),
+  },
+  {
+    id: "nextYear",
+    label: (l) => getRelativeLabel(l, 1, "year"),
+    getValue: ({ now }) => addYears(now, 1),
+  },
 ];

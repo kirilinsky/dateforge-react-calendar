@@ -1,23 +1,24 @@
 // TODO: split MaskedDateInput and DateSlot into separate files — three components in one file is getting hard to navigate
-import React, { useEffect, useState } from "react";
-import styles from "./manual-input.module.css";
-import shared from "@/global/global.module.css";
-import { Check, Clear } from "@/Icons";
+import type React from "react";
+import { useEffect, useState } from "react";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import {
-  useSelectionValue,
   useSelectionActions,
+  useSelectionValue,
 } from "@/context/selection-context";
-import { checkIsDateDisabled, isSameDay } from "@/utils/date-core";
+import shared from "@/global/global.module.css";
 import { useGridSlot } from "@/hooks/use-grid-slot";
+import { Check, Clear } from "@/Icons";
+import { checkIsDateDisabled, isSameDay } from "@/utils/date-core";
 import {
   applyMask,
   dateToMask,
   maskToDate,
   validatePartialMask,
 } from "@/utils/date-mask";
-import { alignToJustify, AlignValue } from "@/utils/layout-utils";
+import { type AlignValue, alignToJustify } from "@/utils/layout-utils";
+import styles from "./manual-input.module.css";
 
 interface MaskedDateInputProps {
   value: Date | null;
@@ -296,7 +297,6 @@ const DateSlot: React.FC<DateSlotProps> = ({
   );
 };
 
-
 export interface CalendarManualInputProps {
   allowClear?: boolean;
   align?: AlignValue;
@@ -308,7 +308,8 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
   align = "left",
   col,
 }) => {
-  const { range, multiselect, disabled, minDate, maxDate, readOnly } = useConfig();
+  const { range, multiselect, disabled, minDate, maxDate, readOnly } =
+    useConfig();
   const { viewDate: date } = useNavigation();
   const { rangeStart, rangeEnd, selectedDates } = useSelectionValue();
   const { onChangeDate, onRangeSet, onDatesSet } = useSelectionActions();

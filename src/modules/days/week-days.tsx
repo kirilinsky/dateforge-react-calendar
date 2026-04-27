@@ -1,8 +1,8 @@
-import { getWeekdaysNames } from "@/utils/date-utils";
 import { useMemo } from "react";
-import { StartOfWeek } from "@/types/calendar";
-import styles from "./weekdays.module.css";
+import type { StartOfWeek } from "@/types/calendar";
+import { getWeekdaysNames } from "@/utils/date-utils";
 import daysStyles from "./days.module.css";
+import styles from "./weekdays.module.css";
 
 interface WeekDaysProps {
   locale: string;
@@ -12,7 +12,13 @@ interface WeekDaysProps {
   hideWeekdays: boolean;
 }
 
-const WeekDays = ({ locale, startOfWeek, highlightWeekends, weekNumbers, hideWeekdays }: WeekDaysProps) => {
+const WeekDays = ({
+  locale,
+  startOfWeek,
+  highlightWeekends,
+  weekNumbers,
+  hideWeekdays,
+}: WeekDaysProps) => {
   const wDays = useMemo(
     () => getWeekdaysNames(locale, startOfWeek),
     [locale, startOfWeek],

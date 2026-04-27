@@ -1,13 +1,13 @@
 import { useRef, useState } from "react";
+import { Popup } from "@/components/popup/popup";
 import { useScrollAccumulator } from "@/hooks/use-scroll-accumulator";
-import styles from "./month-year-track.module.css";
 import {
-  getDrumValue,
-  getMonthListData,
   setMonth as applyMonth,
   setYear as applyYear,
+  getDrumValue,
+  getMonthListData,
 } from "@/utils/date-utils";
-import { Popup } from "@/components/popup/popup";
+import styles from "./month-year-track.module.css";
 
 const OFFSETS = Array.from({ length: 7 }, (_, i) => i - 3);
 

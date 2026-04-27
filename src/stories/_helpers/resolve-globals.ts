@@ -1,7 +1,7 @@
-import * as themes from "../../../themes/index";
 import * as appearances from "../../../appearances/index";
-import type { CalendarTheme } from "../../types/themes";
+import * as themes from "../../../themes/index";
 import type { CalendarAppearance } from "../../types/appearances";
+import type { CalendarTheme } from "../../types/themes";
 
 export const resolveStoryTheme = (key: unknown): CalendarTheme | undefined => {
   if (key === "auto" || key === "light" || key === "dark") return key;

@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
 import { act } from "react";
-import { renderToString } from "react-dom/server";
 import { hydrateRoot } from "react-dom/client";
+import { renderToString } from "react-dom/server";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
 import { CalendarNav } from "@/modules/nav";

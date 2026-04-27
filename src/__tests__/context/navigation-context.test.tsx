@@ -1,13 +1,15 @@
-import { describe, it, expect } from "vitest";
-import { renderHook, act } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import React from "react";
-import { CalendarProvider } from "@/core/provider";
+import { describe, expect, it } from "vitest";
 import { useNavigation } from "@/context/navigation-context";
+import { CalendarProvider } from "@/core/provider";
 
 const d = (y: number, m: number, day: number) => new Date(y, m - 1, day);
 
 const wrap =
-  (props: Omit<React.ComponentProps<typeof CalendarProvider>, "children"> = {}) =>
+  (
+    props: Omit<React.ComponentProps<typeof CalendarProvider>, "children"> = {},
+  ) =>
   ({ children }: { children: React.ReactNode }) =>
     React.createElement(CalendarProvider, { ...props, children });
 

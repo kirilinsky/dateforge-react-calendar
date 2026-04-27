@@ -1,9 +1,9 @@
-import { useRef, useLayoutEffect, useState } from "react";
+import type { CSSProperties, ReactNode } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import type { ReactNode, CSSProperties } from "react";
-import { Check } from "@/Icons";
-import { useFocusTrap } from "@/hooks/use-focus-trap";
 import { useUI } from "@/context/ui-context";
+import { useFocusTrap } from "@/hooks/use-focus-trap";
+import { Check } from "@/Icons";
 import styles from "./popup.module.css";
 
 interface PopupProps {
@@ -13,7 +13,12 @@ interface PopupProps {
   label?: string;
 }
 
-export const Popup = ({ children, onConfirm, onClose, label = "Dialog" }: PopupProps) => {
+export const Popup = ({
+  children,
+  onConfirm,
+  onClose,
+  label = "Dialog",
+}: PopupProps) => {
   const { popupAnchorEl, setPopupAnchorEl, containerRef } = useUI();
   const backdropRef = useRef<HTMLDivElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
@@ -42,7 +47,10 @@ export const Popup = ({ children, onConfirm, onClose, label = "Dialog" }: PopupP
       const spaceAbove = aRect.top - bRect.top - GAP;
       const goUp = spaceBelow < panelH && spaceAbove > spaceBelow;
 
-      left = Math.max(GAP, Math.min(aRect.left - bRect.left, bRect.width - panelW - GAP));
+      left = Math.max(
+        GAP,
+        Math.min(aRect.left - bRect.left, bRect.width - panelW - GAP),
+      );
 
       if (goUp) {
         bottom = bRect.bottom - aRect.top + GAP;

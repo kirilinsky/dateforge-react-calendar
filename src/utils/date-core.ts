@@ -1,4 +1,4 @@
-import { DisabledConfig, DisabledRule } from "@/types/calendar";
+import type { DisabledConfig, DisabledRule } from "@/types/calendar";
 
 const daysInMonth = (year: number, month: number) =>
   new Date(year, month + 1, 0).getDate();
@@ -9,7 +9,10 @@ const mutate = (d: Date, fn: (n: Date) => void): Date => {
   return n;
 };
 
-export const toLimitTimestamp = (d?: Date | null, isMax?: boolean): number | null =>
+export const toLimitTimestamp = (
+  d?: Date | null,
+  isMax?: boolean,
+): number | null =>
   d
     ? new Date(d).setHours(
         isMax ? 23 : 0,
@@ -41,7 +44,10 @@ export const addDate = (
   endDate?: Date | null,
 ) =>
   mutate(date, (d) => {
-    const h = d.getHours(), m = d.getMinutes(), s = d.getSeconds(), ms = d.getMilliseconds();
+    const h = d.getHours(),
+      m = d.getMinutes(),
+      s = d.getSeconds(),
+      ms = d.getMilliseconds();
     if (unit === "month") {
       const targetMonth = d.getMonth() + v;
       const max = daysInMonth(d.getFullYear(), targetMonth);
@@ -81,7 +87,8 @@ export const checkIsDateDisabled = (
   disabled?: DisabledConfig,
 ): boolean => {
   if (disabled?.rules.length) {
-    if (disabled.rules.some((rule) => checkDisabledRule(viewDate, rule))) return true;
+    if (disabled.rules.some((rule) => checkDisabledRule(viewDate, rule)))
+      return true;
   }
   if (!startDate && !endDate) return false;
   const t = viewDate.getTime();
@@ -195,4 +202,3 @@ export const isYearFixed = (
     endDate.getMonth() === curMonth
   );
 };
-

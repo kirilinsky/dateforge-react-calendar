@@ -1,40 +1,40 @@
 import {
-  ReactNode,
-  useReducer,
+  type ReactNode,
+  useCallback,
   useEffect,
   useLayoutEffect,
-  useRef,
   useMemo,
-  useCallback,
+  useReducer,
+  useRef,
   useState,
 } from "react";
+import { type CalendarConfig, ConfigContext } from "@/context/config-context";
+import { NavigationContext } from "@/context/navigation-context";
 import {
-  CalendarMode,
-  CalendarProps,
-  CalendarValue,
-  DateRange,
-} from "@/types/calendar";
-import {
-  calendarReducer,
-  buildInitialState,
-  toValidDateOrNull,
-  SelectConfig,
-} from "@/core/state";
-import { isSameDay } from "@/utils/date-core";
+  SelectionActionsContext,
+  SelectionHoverContext,
+  SelectionStateContext,
+} from "@/context/selection-context";
+import { UIContext } from "@/context/ui-context";
 import {
   validateCalendarValue,
   validateDateProp,
   validateMinMax,
   validateTimeZone,
 } from "@/core/dev-warn";
-import { ConfigContext, CalendarConfig } from "@/context/config-context";
-import { NavigationContext } from "@/context/navigation-context";
 import {
-  SelectionStateContext,
-  SelectionActionsContext,
-  SelectionHoverContext,
-} from "@/context/selection-context";
-import { UIContext } from "@/context/ui-context";
+  buildInitialState,
+  calendarReducer,
+  type SelectConfig,
+  toValidDateOrNull,
+} from "@/core/state";
+import type {
+  CalendarMode,
+  CalendarProps,
+  CalendarValue,
+  DateRange,
+} from "@/types/calendar";
+import { isSameDay } from "@/utils/date-core";
 
 const isDateRange = (v: unknown): v is import("@/types/calendar").DateRange =>
   v !== null &&
@@ -109,8 +109,24 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   }, [timeZone, isAutoTZ]);
 
   const selectConfig = useMemo<SelectConfig>(
-    () => ({ range, multiselect, minRangeDays, maxRangeDays, minDate, maxDate, disabled }),
-    [range, multiselect, minRangeDays, maxRangeDays, minDate, maxDate, disabled],
+    () => ({
+      range,
+      multiselect,
+      minRangeDays,
+      maxRangeDays,
+      minDate,
+      maxDate,
+      disabled,
+    }),
+    [
+      range,
+      multiselect,
+      minRangeDays,
+      maxRangeDays,
+      minDate,
+      maxDate,
+      disabled,
+    ],
   );
 
   const isControlled = externalValue !== undefined;
@@ -269,9 +285,9 @@ export function CalendarProvider<M extends CalendarMode = "single">({
 
   // Popup open state is pure UI — kept outside the reducer to keep that store
   // focused on selection / view data. Only one popup can be open at a time.
-  const [openPopup, setOpenPopup] = useState<
-    "time" | "month" | "year" | null
-  >(null);
+  const [openPopup, setOpenPopup] = useState<"time" | "month" | "year" | null>(
+    null,
+  );
 
   const setShowTimePopup = useCallback((v: boolean) => {
     setOpenPopup(v ? "time" : null);

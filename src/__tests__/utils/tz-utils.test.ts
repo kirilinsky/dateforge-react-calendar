@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { getTodayInTimezone, toTZMidnight } from "@/utils/tz-utils";
 
 // ─── getTodayInTimezone ───────────────────────────────────────────────────────
@@ -48,7 +48,8 @@ describe("toTZMidnight", () => {
       month: "numeric",
       day: "numeric",
     }).formatToParts(result);
-    const get = (type: string) => parseInt(parts.find((p) => p.type === type)!.value);
+    const get = (type: string) =>
+      parseInt(parts.find((p) => p.type === type)!.value);
     expect(get("year")).toBe(2024);
     expect(get("month")).toBe(6);
     expect(get("day")).toBe(15);

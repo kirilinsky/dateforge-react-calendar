@@ -1,5 +1,5 @@
-import { isSameDay, hasDisabledInRange } from "@/utils/date-utils";
-import { DisabledConfig } from "@/types/calendar";
+import type { DisabledConfig } from "@/types/calendar";
+import { hasDisabledInRange, isSameDay } from "@/utils/date-utils";
 
 interface CalendarState {
   viewDate: Date;
@@ -36,10 +36,7 @@ type CalendarAction =
       rangeEnd: Date | null;
     };
 
-function selectSingle(
-  state: CalendarState,
-  date: Date | null,
-): CalendarState {
+function selectSingle(state: CalendarState, date: Date | null): CalendarState {
   if (!date) {
     return { ...state, selectedDates: [] };
   }
@@ -96,7 +93,9 @@ function selectRange(
   if (config.maxRangeDays !== undefined && diffDays > config.maxRangeDays) {
     return state;
   }
-  if (hasDisabledInRange(s, e, config.minDate, config.maxDate, config.disabled)) {
+  if (
+    hasDisabledInRange(s, e, config.minDate, config.maxDate, config.disabled)
+  ) {
     return state;
   }
 
@@ -200,7 +199,11 @@ export function calendarReducer(
     }
 
     case "SET_DATES":
-      return { ...state, selectedDates: action.dates, notifySeq: state.notifySeq + 1 };
+      return {
+        ...state,
+        selectedDates: action.dates,
+        notifySeq: state.notifySeq + 1,
+      };
 
     case "SET_RANGE":
       return {

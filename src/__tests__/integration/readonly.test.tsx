@@ -1,15 +1,15 @@
-import { describe, it, expect, vi } from "vitest";
 import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
-import { CalendarNav } from "@/modules/nav";
-import { CalendarSelectedDates } from "@/modules/selected-dates";
-import { CalendarManualInput } from "@/modules/manual-input";
-import { CalendarPresets } from "@/modules/presets";
 import { CalendarDays } from "@/modules/days";
 import { CalendarDaysTrack } from "@/modules/days-track";
-import { CalendarTimeGrid } from "@/modules/time";
+import { CalendarManualInput } from "@/modules/manual-input";
+import { CalendarNav } from "@/modules/nav";
+import { CalendarPresets } from "@/modules/presets";
 import { basicPresets } from "@/modules/presets/presets-pack";
+import { CalendarSelectedDates } from "@/modules/selected-dates";
+import { CalendarTimeGrid } from "@/modules/time";
 
 const D = new Date(2024, 5, 15);
 
@@ -178,9 +178,9 @@ describe("readOnly — Days", () => {
       </Calendar>,
     );
     const grid = within(container).getByRole("grid");
-    const cells = within(grid).getAllByRole("gridcell").filter(
-      (c) => c.getAttribute("aria-hidden") !== "true",
-    );
+    const cells = within(grid)
+      .getAllByRole("gridcell")
+      .filter((c) => c.getAttribute("aria-hidden") !== "true");
     expect(cells.length).toBeGreaterThan(0);
     for (const cell of cells) {
       expect(cell.getAttribute("aria-disabled")).toBe("true");

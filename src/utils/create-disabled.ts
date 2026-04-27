@@ -1,5 +1,5 @@
-import { DisabledConfig, DisabledRule } from "../types/calendar";
 import { warnOnce } from "../core/dev-warn";
+import type { DisabledConfig, DisabledRule } from "../types/calendar";
 
 interface CreateDisabledInit {
   all?: boolean;

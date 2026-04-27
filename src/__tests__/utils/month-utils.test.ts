@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
-import { getMonthNames, getMonthListData } from "@/utils/month-utils";
+import { describe, expect, it } from "vitest";
 import type { DisabledConfig } from "@/types/calendar";
+import { getMonthListData, getMonthNames } from "@/utils/month-utils";
 
 const d = (y: number, m: number, day: number) => new Date(y, m - 1, day);
 const disabled = (...rules: DisabledConfig["rules"]): DisabledConfig => ({
@@ -81,7 +81,15 @@ describe("getMonthListData", () => {
   });
 
   it("disableLimited=false → limited but not disabled", () => {
-    const data = getMonthListData("en", 2024, d(2024, 7, 1), null, false, undefined, false);
+    const data = getMonthListData(
+      "en",
+      2024,
+      d(2024, 7, 1),
+      null,
+      false,
+      undefined,
+      false,
+    );
     expect(data[0].limited).toBe(true);
     expect(data[0].disabled).toBe(false);
   });

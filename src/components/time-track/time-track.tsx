@@ -1,7 +1,7 @@
 import { useRef } from "react";
-import styles from "./time-track.module.css";
-import { getDrumValue, padTime } from "@/utils/date-utils";
 import { useScrollAccumulator } from "@/hooks/use-scroll-accumulator";
+import { getDrumValue, padTime } from "@/utils/date-utils";
+import styles from "./time-track.module.css";
 
 interface TimeTrackProps {
   date: Date;
@@ -91,9 +91,16 @@ const Drum = ({
   );
 };
 
-const makeUnitFormatter = (locale: string, unit: "hour" | "minute" | "second") => {
+const makeUnitFormatter = (
+  locale: string,
+  unit: "hour" | "minute" | "second",
+) => {
   try {
-    const fmt = new Intl.NumberFormat(locale, { style: "unit", unit, unitDisplay: "long" });
+    const fmt = new Intl.NumberFormat(locale, {
+      style: "unit",
+      unit,
+      unitDisplay: "long",
+    });
     return (v: number) => fmt.format(v);
   } catch {
     return (v: number) => String(v);
@@ -151,13 +158,38 @@ export const TimeTrack = ({
         </div>
       )}
       <div className={styles.drums}>
-        <Drum val={hours} max={hourMax} onMove={moveHours} label="Hours" getValueText={hourText} readOnly={readOnly} />
-        <span className={styles.colon} aria-hidden>:</span>
-        <Drum val={minutes} max={60} onMove={moveMinutes} label="Minutes" getValueText={minuteText} readOnly={readOnly} />
+        <Drum
+          val={hours}
+          max={hourMax}
+          onMove={moveHours}
+          label="Hours"
+          getValueText={hourText}
+          readOnly={readOnly}
+        />
+        <span className={styles.colon} aria-hidden>
+          :
+        </span>
+        <Drum
+          val={minutes}
+          max={60}
+          onMove={moveMinutes}
+          label="Minutes"
+          getValueText={minuteText}
+          readOnly={readOnly}
+        />
         {showSeconds && (
           <>
-            <span className={styles.colon} aria-hidden>:</span>
-            <Drum val={seconds} max={60} onMove={moveSeconds} label="Seconds" getValueText={secondText} readOnly={readOnly} />
+            <span className={styles.colon} aria-hidden>
+              :
+            </span>
+            <Drum
+              val={seconds}
+              max={60}
+              onMove={moveSeconds}
+              label="Seconds"
+              getValueText={secondText}
+              readOnly={readOnly}
+            />
           </>
         )}
       </div>

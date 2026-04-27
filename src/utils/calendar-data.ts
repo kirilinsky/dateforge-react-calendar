@@ -1,4 +1,4 @@
-import { StartOfWeek } from "@/types/calendar";
+import type { StartOfWeek } from "@/types/calendar";
 import { checkIsDateDisabled } from "./date-core";
 
 interface RangeOptions {
@@ -33,15 +33,21 @@ export const getWeekdaysNames = (
   if (!days) {
     const fmt = new Intl.DateTimeFormat(locale, { weekday: "short" }).format;
     const base = new Date(2024, 0, 1);
-    days = cacheSet(baseKey, Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(base);
-      d.setDate(base.getDate() + i);
-      return fmt(d);
-    }));
+    days = cacheSet(
+      baseKey,
+      Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(base);
+        d.setDate(base.getDate() + i);
+        return fmt(d);
+      }),
+    );
   }
 
   const shift = startOfWeek === 0 ? 6 : startOfWeek - 1;
-  return cacheSet(key, shift === 0 ? days : [...days.slice(shift), ...days.slice(0, shift)]);
+  return cacheSet(
+    key,
+    shift === 0 ? days : [...days.slice(shift), ...days.slice(0, shift)],
+  );
 };
 
 export const getFirstDayOffset = (

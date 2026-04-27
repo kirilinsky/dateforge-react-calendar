@@ -1,4 +1,4 @@
-import { DisabledConfig } from "@/types/calendar";
+import type { DisabledConfig } from "@/types/calendar";
 import { navBoundsFromDisabled } from "./date-core";
 
 export const getNextMonthFromSwipe = (

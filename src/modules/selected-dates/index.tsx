@@ -1,15 +1,15 @@
-import React from "react";
-import styles from "./selected-dates.module.css";
-import shared from "@/global/global.module.css";
+import type React from "react";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import {
-  useSelectionValue,
   useSelectionActions,
+  useSelectionValue,
 } from "@/context/selection-context";
+import shared from "@/global/global.module.css";
 import { useGridSlot } from "@/hooks/use-grid-slot";
-import { alignToJustify, AlignValue } from "@/utils/layout-utils";
 import { isSameDay } from "@/utils/date-core";
+import { type AlignValue, alignToJustify } from "@/utils/layout-utils";
+import styles from "./selected-dates.module.css";
 
 const getRangeSep = (
   fmt: Intl.DateTimeFormat,
@@ -32,7 +32,6 @@ const getRangeSep = (
     return " – ";
   }
 };
-
 
 // TODO: per-chip remove (× icon on each chip). Useful in mode="multiple" to drop one
 // date without wiping the whole selection, and in mode="range" to clear from/to

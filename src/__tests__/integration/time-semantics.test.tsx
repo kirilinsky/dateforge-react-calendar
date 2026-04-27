@@ -1,8 +1,8 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, fireEvent } from "@testing-library/react";
+import { fireEvent, render } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
-import { CalendarTimeGrid } from "@/modules/time";
 import { CalendarDays } from "@/modules/days";
+import { CalendarTimeGrid } from "@/modules/time";
 
 const ARROW_DOWN = { key: "ArrowDown" };
 

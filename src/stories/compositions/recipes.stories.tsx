@@ -1,20 +1,20 @@
-import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
-import { CalendarNav } from "@/modules/nav";
-import { CalendarTimeGrid } from "@/modules/time";
-import { CalendarSelectedDates } from "@/modules/selected-dates";
-import { CalendarPresets } from "@/modules/presets";
-import { CalendarManualInput } from "@/modules/manual-input";
 import { CalendarDaysTrack } from "@/modules/days-track";
+import { CalendarManualInput } from "@/modules/manual-input";
 import { CalendarMonthsTrack } from "@/modules/months-track";
-import { CalendarYearsTrack } from "@/modules/years-track";
+import { CalendarNav } from "@/modules/nav";
+import { CalendarPresets } from "@/modules/presets";
 import { basicPresets } from "@/modules/presets/presets-pack";
+import { CalendarSelectedDates } from "@/modules/selected-dates";
+import { CalendarTimeGrid } from "@/modules/time";
+import { CalendarYearsTrack } from "@/modules/years-track";
 import { FIXED_DATE } from "../_constants";
 import {
-  resolveStoryTheme,
   resolveStoryAppearance,
+  resolveStoryTheme,
 } from "../_helpers/resolve-globals";
 
 type RangeValue = { from: Date | null; to: Date | null };
@@ -58,7 +58,12 @@ export const FeedbackAndClear: Story = {
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
       >
-        <CalendarNav label="Selection feedback" showMonthPicker compactYears clear />
+        <CalendarNav
+          label="Selection feedback"
+          showMonthPicker
+          compactYears
+          clear
+        />
         <CalendarDays />
         <CalendarSelectedDates />
       </Calendar>
@@ -100,7 +105,12 @@ export const RangeWithShortcuts: Story = {
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
       >
-        <CalendarNav label="Range + presets" showMonthPicker compactYears clear />
+        <CalendarNav
+          label="Range + presets"
+          showMonthPicker
+          compactYears
+          clear
+        />
         <CalendarPresets presets={basicPresets} />
         <CalendarDays />
         <CalendarSelectedDates />

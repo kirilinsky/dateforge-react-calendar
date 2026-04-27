@@ -9,7 +9,11 @@ export const getDrumValue = (
   return val < 0 ? val + max : val;
 };
 
-export const getTimeString = (date: Date, hour12 = false, showSeconds = false): string =>
+export const getTimeString = (
+  date: Date,
+  hour12 = false,
+  showSeconds = false,
+): string =>
   new Intl.DateTimeFormat("en", {
     hour: "numeric",
     minute: "2-digit",

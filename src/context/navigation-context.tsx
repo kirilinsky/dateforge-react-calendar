@@ -5,10 +5,13 @@ export interface CalendarNavigation {
   navigateTo: (date: Date) => void;
 }
 
-export const NavigationContext = createContext<CalendarNavigation | undefined>(undefined);
+export const NavigationContext = createContext<CalendarNavigation | undefined>(
+  undefined,
+);
 
 export const useNavigation = (): CalendarNavigation => {
   const ctx = useContext(NavigationContext);
-  if (process.env.NODE_ENV !== "production" && !ctx) throw new Error("useNavigation must be used within CalendarProvider");
+  if (process.env.NODE_ENV !== "production" && !ctx)
+    throw new Error("useNavigation must be used within CalendarProvider");
   return ctx as CalendarNavigation;
 };

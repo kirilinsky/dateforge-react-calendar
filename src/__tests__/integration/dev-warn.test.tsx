@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
+import { __resetWarnOnce } from "@/core/dev-warn";
 import { CalendarDays } from "@/modules/days";
 import { CalendarYearsGrid } from "@/modules/years-grid";
-import { __resetWarnOnce } from "@/core/dev-warn";
 
 let warnSpy: ReturnType<typeof vi.spyOn>;
 
@@ -81,10 +81,7 @@ describe("dev-warn — invalid Date", () => {
 describe("dev-warn — minDate vs maxDate", () => {
   it("warns when minDate is later than maxDate", () => {
     render(
-      <Calendar
-        minDate={new Date(2024, 5, 20)}
-        maxDate={new Date(2024, 5, 1)}
-      >
+      <Calendar minDate={new Date(2024, 5, 20)} maxDate={new Date(2024, 5, 1)}>
         <CalendarDays />
       </Calendar>,
     );
@@ -94,10 +91,7 @@ describe("dev-warn — minDate vs maxDate", () => {
 
   it("does not warn for valid minDate <= maxDate", () => {
     render(
-      <Calendar
-        minDate={new Date(2024, 5, 1)}
-        maxDate={new Date(2024, 5, 20)}
-      >
+      <Calendar minDate={new Date(2024, 5, 1)} maxDate={new Date(2024, 5, 20)}>
         <CalendarDays />
       </Calendar>,
     );

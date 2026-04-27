@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from "vitest";
 import { renderHook } from "@testing-library/react";
 import { useRef } from "react";
+import { describe, expect, it, vi } from "vitest";
 import { useFocusTrap } from "@/hooks/use-focus-trap";
 
 function makeContainer(...buttonCount: number[]) {
@@ -16,11 +16,20 @@ function makeContainer(...buttonCount: number[]) {
 }
 
 function tabKey(shiftKey = false) {
-  return new KeyboardEvent("keydown", { key: "Tab", shiftKey, bubbles: true, cancelable: true });
+  return new KeyboardEvent("keydown", {
+    key: "Tab",
+    shiftKey,
+    bubbles: true,
+    cancelable: true,
+  });
 }
 
 function escKey() {
-  return new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true });
+  return new KeyboardEvent("keydown", {
+    key: "Escape",
+    bubbles: true,
+    cancelable: true,
+  });
 }
 
 describe("useFocusTrap", () => {
@@ -28,7 +37,9 @@ describe("useFocusTrap", () => {
     const container = makeContainer(3);
     const buttons = container.querySelectorAll("button");
     renderHook(() => {
-      const ref = useRef<HTMLDivElement>(container as unknown as HTMLDivElement);
+      const ref = useRef<HTMLDivElement>(
+        container as unknown as HTMLDivElement,
+      );
       useFocusTrap(ref, { onEscape: vi.fn() });
     });
     expect(document.activeElement).toBe(buttons[0]);
@@ -39,7 +50,9 @@ describe("useFocusTrap", () => {
     const container = makeContainer(2);
     const onEscape = vi.fn();
     renderHook(() => {
-      const ref = useRef<HTMLDivElement>(container as unknown as HTMLDivElement);
+      const ref = useRef<HTMLDivElement>(
+        container as unknown as HTMLDivElement,
+      );
       useFocusTrap(ref, { onEscape });
     });
     document.dispatchEvent(escKey());
@@ -51,7 +64,9 @@ describe("useFocusTrap", () => {
     const container = makeContainer(3);
     const buttons = Array.from(container.querySelectorAll("button"));
     renderHook(() => {
-      const ref = useRef<HTMLDivElement>(container as unknown as HTMLDivElement);
+      const ref = useRef<HTMLDivElement>(
+        container as unknown as HTMLDivElement,
+      );
       useFocusTrap(ref, { onEscape: vi.fn() });
     });
     buttons[buttons.length - 1].focus();
@@ -65,7 +80,9 @@ describe("useFocusTrap", () => {
     const container = makeContainer(3);
     const buttons = Array.from(container.querySelectorAll("button"));
     renderHook(() => {
-      const ref = useRef<HTMLDivElement>(container as unknown as HTMLDivElement);
+      const ref = useRef<HTMLDivElement>(
+        container as unknown as HTMLDivElement,
+      );
       useFocusTrap(ref, { onEscape: vi.fn() });
     });
     buttons[0].focus();
@@ -78,7 +95,9 @@ describe("useFocusTrap", () => {
     const container = makeContainer(2);
     const removeSpy = vi.spyOn(document, "removeEventListener");
     const { unmount } = renderHook(() => {
-      const ref = useRef<HTMLDivElement>(container as unknown as HTMLDivElement);
+      const ref = useRef<HTMLDivElement>(
+        container as unknown as HTMLDivElement,
+      );
       useFocusTrap(ref, { onEscape: vi.fn() });
     });
     unmount();

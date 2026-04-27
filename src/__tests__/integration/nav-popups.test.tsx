@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
-import { CalendarNav } from "@/modules/nav";
 import { __resetWarnOnce } from "@/core/dev-warn";
+import { CalendarNav } from "@/modules/nav";
 
 let warnSpy: ReturnType<typeof vi.spyOn>;
 
@@ -41,7 +41,9 @@ describe("Nav popups — open/close via UI state", () => {
     expect(queryByLabelText("Select month")).toBeNull();
     const labelBtn = getByLabelText(/Change month/);
     await userEvent.click(labelBtn);
-    expect(container.querySelector('[aria-label="Select month"]')).not.toBeNull();
+    expect(
+      container.querySelector('[aria-label="Select month"]'),
+    ).not.toBeNull();
   });
 
   it("clicking the year label (showYearPicker) opens the year popup", async () => {
@@ -53,7 +55,9 @@ describe("Nav popups — open/close via UI state", () => {
     expect(queryByLabelText("Select year")).toBeNull();
     const labelBtn = getByLabelText(/Change year/);
     await userEvent.click(labelBtn);
-    expect(container.querySelector('[aria-label="Select year"]')).not.toBeNull();
+    expect(
+      container.querySelector('[aria-label="Select year"]'),
+    ).not.toBeNull();
   });
 
   it("compactMonths button opens the same month popup", async () => {
@@ -64,7 +68,9 @@ describe("Nav popups — open/close via UI state", () => {
     );
     const btn = getByLabelText(/Change month/);
     await userEvent.click(btn);
-    expect(container.querySelector('[aria-label="Select month"]')).not.toBeNull();
+    expect(
+      container.querySelector('[aria-label="Select month"]'),
+    ).not.toBeNull();
   });
 
   it("opening time popup does not affect selection state", async () => {

@@ -1,19 +1,20 @@
-import React, { useEffect, useMemo, useRef } from "react";
-import { useItemWidth } from "@/hooks/use-item-width";
-import { useBoundDateView } from "@/hooks/use-bound-date-view";
-import styles from "./days-track.module.css";
+import type React from "react";
+import { useEffect, useMemo, useRef } from "react";
+import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import {
-  useSelectionValue,
   useSelectionActions,
+  useSelectionValue,
 } from "@/context/selection-context";
-import { useConfig } from "@/context/config-context";
 import { useUI } from "@/context/ui-context";
-import { useTrack } from "@/hooks/use-track";
-import { useGridSlot } from "@/hooks/use-grid-slot";
-import { isSameDay } from "@/utils/date-core";
 import shared from "@/global/global.module.css";
+import { useBoundDateView } from "@/hooks/use-bound-date-view";
+import { useGridSlot } from "@/hooks/use-grid-slot";
+import { useItemWidth } from "@/hooks/use-item-width";
+import { useTrack } from "@/hooks/use-track";
 import { Check, Clear } from "@/Icons";
+import { isSameDay } from "@/utils/date-core";
+import styles from "./days-track.module.css";
 
 const HALF = 5;
 const OFFSETS = Array.from({ length: HALF * 2 + 1 }, (_, i) => i - HALF);
@@ -37,7 +38,8 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
   const { selectedDate, selectedDates, rangeStart, rangeEnd } =
     useSelectionValue();
   const { onChangeDate, onRangeBoundSet } = useSelectionActions();
-  const { minDate, maxDate, locale, range, multiselect, readOnly } = useConfig();
+  const { minDate, maxDate, locale, range, multiselect, readOnly } =
+    useConfig();
   const { setDaysTrackActive } = useUI();
   const isMulti = !!multiselect;
 
@@ -46,7 +48,13 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
     return () => setDaysTrackActive(false);
   }, [setDaysTrackActive]);
 
-  const { isBound, boundDate, setLocalView, refDate } = useBoundDateView({ bound, range, rangeStart, rangeEnd, viewDate });
+  const { isBound, boundDate, setLocalView, refDate } = useBoundDateView({
+    bound,
+    range,
+    rangeStart,
+    rangeEnd,
+    viewDate,
+  });
 
   const refDate_year = refDate.getFullYear();
   const refDate_month = refDate.getMonth();

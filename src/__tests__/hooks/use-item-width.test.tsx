@@ -1,11 +1,12 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import { useRef } from "react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useItemWidth } from "@/hooks/use-item-width";
 
 type ROCallback = (entries: ResizeObserverEntry[]) => void;
 let roCallback: ROCallback | null = null;
 
+// biome-ignore lint/complexity/useArrowFunction: vi.fn() in vitest 4 needs constructable function for `new ResizeObserver(...)`
 const MockResizeObserver = vi.fn(function (cb: ROCallback) {
   return {
     observe: vi.fn(() => {
@@ -32,7 +33,10 @@ function makeContainer(itemWidth?: number) {
   if (itemWidth !== undefined) {
     const item = document.createElement("div");
     item.setAttribute("data-item", "");
-    Object.defineProperty(item, "offsetWidth", { value: itemWidth, configurable: true });
+    Object.defineProperty(item, "offsetWidth", {
+      value: itemWidth,
+      configurable: true,
+    });
     container.appendChild(item);
   }
   document.body.appendChild(container);
@@ -43,7 +47,9 @@ describe("useItemWidth", () => {
   it("returns initialWidth before ResizeObserver fires", () => {
     const container = makeContainer();
     const { result } = renderHook(() => {
-      const ref = useRef<HTMLDivElement>(container as unknown as HTMLDivElement);
+      const ref = useRef<HTMLDivElement>(
+        container as unknown as HTMLDivElement,
+      );
       return useItemWidth(ref, 44);
     });
     expect(result.current).toBe(44);
@@ -53,7 +59,9 @@ describe("useItemWidth", () => {
   it("updates when ResizeObserver fires with [data-item] child", () => {
     const container = makeContainer(80);
     const { result } = renderHook(() => {
-      const ref = useRef<HTMLDivElement>(container as unknown as HTMLDivElement);
+      const ref = useRef<HTMLDivElement>(
+        container as unknown as HTMLDivElement,
+      );
       return useItemWidth(ref, 44);
     });
 
@@ -68,7 +76,9 @@ describe("useItemWidth", () => {
   it("no [data-item] child → stays at initialWidth", () => {
     const container = makeContainer(); // no item child
     const { result } = renderHook(() => {
-      const ref = useRef<HTMLDivElement>(container as unknown as HTMLDivElement);
+      const ref = useRef<HTMLDivElement>(
+        container as unknown as HTMLDivElement,
+      );
       return useItemWidth(ref, 52);
     });
 
@@ -84,7 +94,9 @@ describe("useItemWidth", () => {
     vi.stubGlobal("ResizeObserver", undefined);
     const container = makeContainer(80);
     const { result } = renderHook(() => {
-      const ref = useRef<HTMLDivElement>(container as unknown as HTMLDivElement);
+      const ref = useRef<HTMLDivElement>(
+        container as unknown as HTMLDivElement,
+      );
       return useItemWidth(ref, 44);
     });
     expect(result.current).toBe(44);
@@ -95,16 +107,23 @@ describe("useItemWidth", () => {
     const container = document.createElement("div");
     const item = document.createElement("div");
     item.setAttribute("data-custom", "");
-    Object.defineProperty(item, "offsetWidth", { value: 100, configurable: true });
+    Object.defineProperty(item, "offsetWidth", {
+      value: 100,
+      configurable: true,
+    });
     container.appendChild(item);
     document.body.appendChild(container);
 
     const { result } = renderHook(() => {
-      const ref = useRef<HTMLDivElement>(container as unknown as HTMLDivElement);
+      const ref = useRef<HTMLDivElement>(
+        container as unknown as HTMLDivElement,
+      );
       return useItemWidth(ref, 44, "[data-custom]");
     });
 
-    act(() => { roCallback?.([]); });
+    act(() => {
+      roCallback?.([]);
+    });
 
     expect(result.current).toBe(100);
     document.body.removeChild(container);
@@ -113,7 +132,9 @@ describe("useItemWidth", () => {
   it("disconnects ResizeObserver on unmount", () => {
     const container = makeContainer();
     const { unmount } = renderHook(() => {
-      const ref = useRef<HTMLDivElement>(container as unknown as HTMLDivElement);
+      const ref = useRef<HTMLDivElement>(
+        container as unknown as HTMLDivElement,
+      );
       return useItemWidth(ref, 44);
     });
     const instance = MockResizeObserver.mock.results[0]?.value;

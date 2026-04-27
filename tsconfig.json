@@ -14,15 +14,12 @@
     "isolatedModules": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitReturns": true, 
+    "noImplicitReturns": true,
     "paths": {
       "@/*": ["./src/*"],
       "@dateforge/react-calendar": ["./src/index.ts"]
     }
   },
   "include": ["src/**/*", "global.d.ts", "themes/themes.ts", ".storybook/**/*"],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "exclude": ["node_modules", "dist"]
 }

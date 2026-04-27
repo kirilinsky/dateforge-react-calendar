@@ -1,12 +1,12 @@
-import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
 import { CalendarNav } from "@/modules/nav";
-import * as themes from "../../../themes/index";
-import * as appearances from "../../../appearances/index";
-import type { CalendarTheme } from "@/types/themes";
 import type { CalendarAppearance } from "@/types/appearances";
+import type { CalendarTheme } from "@/types/themes";
+import * as appearances from "../../../appearances/index";
+import * as themes from "../../../themes/index";
 import { FIXED_DATE } from "../_constants";
 
 const themeEntries = Object.entries(themes) as [string, CalendarTheme][];

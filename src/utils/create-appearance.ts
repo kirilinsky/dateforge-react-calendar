@@ -1,5 +1,8 @@
-import { APPEARANCE_TOKEN_TO_VAR, CUSTOM_APPEARANCE_BRAND } from "../types/appearances";
 import type { AppearanceTokens, CustomAppearance } from "../types/appearances";
+import {
+  APPEARANCE_TOKEN_TO_VAR,
+  CUSTOM_APPEARANCE_BRAND,
+} from "../types/appearances";
 
 /**
  * create custom appearance from shape/shadow tokens.
@@ -9,7 +12,9 @@ import type { AppearanceTokens, CustomAppearance } from "../types/appearances";
  * const myAppearance = createAppearance({ radius: "0.26em", border: "3px", spacing... });
  * <Calendar appearance={myAppearance} />
  */
-export function createAppearance(tokens: Partial<AppearanceTokens>): CustomAppearance {
+export function createAppearance(
+  tokens: Partial<AppearanceTokens>,
+): CustomAppearance {
   const vars: Record<string, string> = {};
   for (const [key, value] of Object.entries(tokens)) {
     const cssVar = APPEARANCE_TOKEN_TO_VAR[key as keyof AppearanceTokens];

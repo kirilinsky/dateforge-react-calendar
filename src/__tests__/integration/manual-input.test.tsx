@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from "vitest";
 import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarManualInput } from "@/modules/manual-input";
 
@@ -131,13 +131,19 @@ describe("ManualInput — per-chip remove (multiple mode)", () => {
     const { container } = render(
       <Calendar
         mode="multiple"
-        value={[new Date(2024, 5, 1), new Date(2024, 5, 2), new Date(2024, 5, 3)]}
+        value={[
+          new Date(2024, 5, 1),
+          new Date(2024, 5, 2),
+          new Date(2024, 5, 3),
+        ]}
         onChange={onChange}
       >
         <CalendarManualInput />
       </Calendar>,
     );
-    const removeButtons = container.querySelectorAll('button[aria-label="Remove"]');
+    const removeButtons = container.querySelectorAll(
+      'button[aria-label="Remove"]',
+    );
     expect(removeButtons.length).toBe(3);
     await userEvent.click(removeButtons[1] as HTMLElement);
     expect(onChange).toHaveBeenCalledTimes(1);
@@ -149,11 +155,17 @@ describe("ManualInput — per-chip remove (multiple mode)", () => {
 
   it("× button does not enter edit mode", async () => {
     const { container } = render(
-      <Calendar mode="multiple" value={[new Date(2024, 5, 1)]} onChange={() => {}}>
+      <Calendar
+        mode="multiple"
+        value={[new Date(2024, 5, 1)]}
+        onChange={() => {}}
+      >
         <CalendarManualInput />
       </Calendar>,
     );
-    const removeBtn = container.querySelector('button[aria-label="Remove"]') as HTMLElement;
+    const removeBtn = container.querySelector(
+      'button[aria-label="Remove"]',
+    ) as HTMLElement;
     await userEvent.click(removeBtn);
     // No <input> should appear since the chip was removed, not opened for editing.
     expect(container.querySelectorAll("input").length).toBeLessThanOrEqual(1);
@@ -161,11 +173,18 @@ describe("ManualInput — per-chip remove (multiple mode)", () => {
 
   it("× button is disabled when readOnly", () => {
     const { container } = render(
-      <Calendar mode="multiple" value={[new Date(2024, 5, 1)]} onChange={() => {}} readOnly>
+      <Calendar
+        mode="multiple"
+        value={[new Date(2024, 5, 1)]}
+        onChange={() => {}}
+        readOnly
+      >
         <CalendarManualInput />
       </Calendar>,
     );
-    const removeBtn = container.querySelector('button[aria-label="Remove"]') as HTMLButtonElement;
+    const removeBtn = container.querySelector(
+      'button[aria-label="Remove"]',
+    ) as HTMLButtonElement;
     expect(removeBtn.disabled).toBe(true);
   });
 });

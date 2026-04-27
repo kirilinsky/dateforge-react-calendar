@@ -1,9 +1,9 @@
-import { describe, it, expect } from "vitest";
 import { render, within } from "@testing-library/react";
 import { axe, toHaveNoViolations } from "jest-axe";
+import { describe, expect, it } from "vitest";
+import { CalendarProvider } from "@/core/provider";
 import { CalendarDays } from "@/modules/days";
 import { CalendarTimeGrid } from "@/modules/time";
-import { CalendarProvider } from "@/core/provider";
 
 expect.extend(toHaveNoViolations);
 

@@ -1,17 +1,23 @@
-import React, { useEffect, useRef, useState } from "react";
+import type React from "react";
+import { useEffect, useRef, useState } from "react";
 import "@/styles/layers.css";
-import { CalendarMode, CalendarProps } from "@/types/calendar";
-import { CustomTheme, CUSTOM_THEME_BRAND } from "@/types/themes";
-import { CustomAppearance, CUSTOM_APPEARANCE_BRAND } from "@/types/appearances";
-import { CalendarProvider } from "@/core/provider";
-import { CalendarLayout } from "@/core/layout";
 import { validateTheme } from "@/core/dev-warn";
+import { CalendarLayout } from "@/core/layout";
+import { CalendarProvider } from "@/core/provider";
+import {
+  CUSTOM_APPEARANCE_BRAND,
+  type CustomAppearance,
+} from "@/types/appearances";
+import type { CalendarMode, CalendarProps } from "@/types/calendar";
+import { CUSTOM_THEME_BRAND, type CustomTheme } from "@/types/themes";
 
 const isCustomTheme = (t: unknown): t is CustomTheme =>
   typeof t === "object" && t !== null && CUSTOM_THEME_BRAND in (t as object);
 
 const isCustomAppearance = (a: unknown): a is CustomAppearance =>
-  typeof a === "object" && a !== null && CUSTOM_APPEARANCE_BRAND in (a as object);
+  typeof a === "object" &&
+  a !== null &&
+  CUSTOM_APPEARANCE_BRAND in (a as object);
 
 export function Calendar<M extends CalendarMode = "single">({
   width = "100%",
@@ -64,7 +70,9 @@ export function Calendar<M extends CalendarMode = "single">({
   }, []);
 
   const customTheme = isCustomTheme(themeProp) ? themeProp : undefined;
-  const rawThemeKey = customTheme ? undefined : (themeProp as string | undefined);
+  const rawThemeKey = customTheme
+    ? undefined
+    : (themeProp as string | undefined);
   const themeKey =
     rawThemeKey === "auto" ||
     rawThemeKey === "light" ||
@@ -75,8 +83,9 @@ export function Calendar<M extends CalendarMode = "single">({
   const isAutoTheme = !themeKey || themeKey === "auto";
   // baseTheme used only when systemTheme is resolved (post-mount) or theme is
   // explicit. Pre-mount auto skips this branch via activeTheme === "auto".
-  const baseTheme: "light" | "dark" =
-    isAutoTheme ? (systemTheme ?? "light") : (themeKey as "light" | "dark");
+  const baseTheme: "light" | "dark" = isAutoTheme
+    ? (systemTheme ?? "light")
+    : (themeKey as "light" | "dark");
 
   useEffect(() => {
     setIsToggled(false);
@@ -89,20 +98,25 @@ export function Calendar<M extends CalendarMode = "single">({
     : isAutoTheme && systemTheme === null && !isToggled
       ? "auto"
       : isToggled
-        ? (isBaseDark ? "light" : "dark")
+        ? isBaseDark
+          ? "light"
+          : "dark"
         : baseTheme;
   const toggleTheme = () => setIsToggled((v) => !v);
 
-  const customAppearance = isCustomAppearance(appearanceProp) ? appearanceProp : undefined;
+  const customAppearance = isCustomAppearance(appearanceProp)
+    ? appearanceProp
+    : undefined;
   const customThemeVars = customTheme?.vars as React.CSSProperties | undefined;
-  const customAppearanceVars = customAppearance?.vars as React.CSSProperties | undefined;
+  const customAppearanceVars = customAppearance?.vars as
+    | React.CSSProperties
+    | undefined;
 
   return (
     <CalendarProvider
       locale={locale}
       hour12={hour12}
       gradient={gradient}
-
       width={width}
       mode={mode}
       maxDates={maxDates}

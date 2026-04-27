@@ -1,4 +1,4 @@
-import { DisabledConfig } from "../types/calendar";
+import type { DisabledConfig } from "../types/calendar";
 import { toLimitTimestamp } from "./date-core";
 
 const MONTH_CACHE_MAX = 32;
@@ -25,7 +25,10 @@ const isMonthFullyDisabled = (
     if (rule instanceof Date) return false;
     if ("dayOfWeek" in rule) return false;
     if ("from" in rule) return firstDay >= rule.from && lastDay <= rule.to;
-    return (rule.before ? lastDay < rule.before : false) || (rule.after ? firstDay > rule.after : false);
+    return (
+      (rule.before ? lastDay < rule.before : false) ||
+      (rule.after ? firstDay > rule.after : false)
+    );
   });
 };
 
@@ -37,7 +40,10 @@ export const getMonthNames = (locale: string, short?: boolean): string[] => {
     month: short ? "short" : "long",
   }).format;
   const y = new Date().getFullYear();
-  return cacheSet(key, Array.from({ length: 12 }, (_, i) => fmt(new Date(y, i, 1))));
+  return cacheSet(
+    key,
+    Array.from({ length: 12 }, (_, i) => fmt(new Date(y, i, 1))),
+  );
 };
 
 export const getMonthListData = (
@@ -58,7 +64,8 @@ export const getMonthListData = (
     const outOfRange =
       (minT !== null && lastDay.getTime() < minT) ||
       (maxT !== null && firstDay.getTime() > maxT);
-    const fullyDisabled = !outOfRange && isMonthFullyDisabled(year, i, disabled);
+    const fullyDisabled =
+      !outOfRange && isMonthFullyDisabled(year, i, disabled);
     const limited = outOfRange || fullyDisabled;
     return {
       label,

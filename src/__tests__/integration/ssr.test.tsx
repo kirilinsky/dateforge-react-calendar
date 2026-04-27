@@ -1,8 +1,9 @@
 /**
  * @vitest-environment node
  */
-import { describe, it, expect } from "vitest";
+
 import { renderToString } from "react-dom/server";
+import { describe, expect, it } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
 import { CalendarNav } from "@/modules/nav";

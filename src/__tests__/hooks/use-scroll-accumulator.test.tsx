@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook } from "@testing-library/react";
 import { useRef } from "react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useScrollAccumulator } from "@/hooks/use-scroll-accumulator";
 
 function makeEl() {
@@ -10,32 +10,42 @@ function makeEl() {
 }
 
 function fireWheel(el: Element, deltaY: number) {
-  el.dispatchEvent(new WheelEvent("wheel", { deltaY, bubbles: true, cancelable: true }));
+  el.dispatchEvent(
+    new WheelEvent("wheel", { deltaY, bubbles: true, cancelable: true }),
+  );
 }
 
 function fireTouchStart(el: Element, clientY: number) {
-  el.dispatchEvent(new TouchEvent("touchstart", {
-    touches: [{ clientY } as Touch],
-    bubbles: true,
-    cancelable: true,
-  }));
+  el.dispatchEvent(
+    new TouchEvent("touchstart", {
+      touches: [{ clientY } as Touch],
+      bubbles: true,
+      cancelable: true,
+    }),
+  );
 }
 
 function fireTouchMove(el: Element, clientY: number) {
-  el.dispatchEvent(new TouchEvent("touchmove", {
-    touches: [{ clientY } as Touch],
-    bubbles: true,
-    cancelable: true,
-  }));
+  el.dispatchEvent(
+    new TouchEvent("touchmove", {
+      touches: [{ clientY } as Touch],
+      bubbles: true,
+      cancelable: true,
+    }),
+  );
 }
 
 function fireTouchEnd(el: Element) {
-  el.dispatchEvent(new TouchEvent("touchend", { bubbles: true, cancelable: true }));
+  el.dispatchEvent(
+    new TouchEvent("touchend", { bubbles: true, cancelable: true }),
+  );
 }
 
 describe("useScrollAccumulator", () => {
   let el: HTMLDivElement;
-  beforeEach(() => { el = makeEl(); });
+  beforeEach(() => {
+    el = makeEl();
+  });
 
   it("wheel delta below threshold → no step", () => {
     const onStep = vi.fn();
@@ -86,7 +96,10 @@ describe("useScrollAccumulator", () => {
     const onStep = vi.fn();
     renderHook(() => {
       const ref = useRef<HTMLDivElement>(el);
-      useScrollAccumulator(ref, onStep, { wheelThreshold: 40, requireHover: true });
+      useScrollAccumulator(ref, onStep, {
+        wheelThreshold: 40,
+        requireHover: true,
+      });
     });
     fireWheel(el, 100);
     expect(onStep).not.toHaveBeenCalled();
@@ -97,7 +110,10 @@ describe("useScrollAccumulator", () => {
     const onStep = vi.fn();
     renderHook(() => {
       const ref = useRef<HTMLDivElement>(el);
-      useScrollAccumulator(ref, onStep, { wheelThreshold: 40, requireHover: true });
+      useScrollAccumulator(ref, onStep, {
+        wheelThreshold: 40,
+        requireHover: true,
+      });
     });
     el.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
     fireWheel(el, 100);

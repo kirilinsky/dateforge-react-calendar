@@ -1,14 +1,14 @@
-import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
 import { CalendarNav } from "@/modules/nav";
 import { FIXED_DATE } from "../_constants";
-import {
-  resolveStoryTheme,
-  resolveStoryAppearance,
-} from "../_helpers/resolve-globals";
 import { debugStyle, fmtDate } from "../_helpers/debug";
+import {
+  resolveStoryAppearance,
+  resolveStoryTheme,
+} from "../_helpers/resolve-globals";
 
 const meta: Meta = {
   title: "Patterns/Uncontrolled",
@@ -26,8 +26,8 @@ export const Uncontrolled: Story = {
       <>
         <p style={debugStyle}>Last onChange: {last ? fmtDate(last) : "—"}</p>
         <p style={{ ...debugStyle, marginBottom: 8, opacity: 0.6 }}>
-          Reset clicks: {resetTick} — calendar must NOT change
-          (defaultValue read once on mount).
+          Reset clicks: {resetTick} — calendar must NOT change (defaultValue
+          read once on mount).
         </p>
         <button
           type="button"

@@ -1,14 +1,14 @@
-import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
 import { CalendarNav } from "@/modules/nav";
 import { FIXED_DATE } from "../_constants";
-import {
-  resolveStoryTheme,
-  resolveStoryAppearance,
-} from "../_helpers/resolve-globals";
 import { debugStyle, fmtDate } from "../_helpers/debug";
+import {
+  resolveStoryAppearance,
+  resolveStoryTheme,
+} from "../_helpers/resolve-globals";
 
 const meta: Meta = {
   title: "Modes/Multiple",
