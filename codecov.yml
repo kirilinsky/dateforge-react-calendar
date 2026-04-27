@@ -1,0 +1,26 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 80%
+        threshold: 1%
+        if_ci_failed: error
+    patch:
+      default:
+        target: 80%
+        threshold: 5%
+
+comment:
+  layout: "diff, flags, files"
+  behavior: default
+  require_changes: true
+
+ignore:
+  - "src/**/*.stories.*"
+  - "src/styles/**"
+  - "src/global/**"
+  - "src/**/*.module.css"
+  - "src/index.ts"
+  - "src/__tests__/**"
+  - "scripts/**"
+  - ".storybook/**"
