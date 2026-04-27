@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createAppearance } from "@/utils/create-appearance";
 import { CUSTOM_APPEARANCE_BRAND } from "@/types/appearances";
+import { createAppearance } from "@/utils/create-appearance";
 
 describe("createAppearance", () => {
   it("returns object with brand symbol set to true", () => {
@@ -36,11 +36,10 @@ describe("createAppearance", () => {
   });
 
   it("ignores keys not present in APPEARANCE_TOKEN_TO_VAR", () => {
-    const a = createAppearance({
-      radius: "0.5em",
-      // biome-ignore lint/suspicious/noExplicitAny: testing unknown key path
-      bogus: "x",
-    } as any);
+    const tokens = { radius: "0.5em", bogus: "x" } as unknown as Parameters<
+      typeof createAppearance
+    >[0];
+    const a = createAppearance(tokens);
     expect(a.vars["--cal-radius"]).toBe("0.5em");
     expect(Object.keys(a.vars)).toHaveLength(1);
   });

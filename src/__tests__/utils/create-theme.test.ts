@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createTheme } from "@/utils/create-theme";
 import { CUSTOM_THEME_BRAND } from "@/types/themes";
+import { createTheme } from "@/utils/create-theme";
 
 describe("createTheme", () => {
   it("returns object with brand symbol set to true", () => {
@@ -36,11 +36,10 @@ describe("createTheme", () => {
   });
 
   it("ignores keys not present in TOKEN_TO_VAR", () => {
-    const theme = createTheme({
-      accent: "#fff",
-      // biome-ignore lint/suspicious/noExplicitAny: testing unknown key path
-      bogus: "x",
-    } as any);
+    const tokens = { accent: "#fff", bogus: "x" } as unknown as Parameters<
+      typeof createTheme
+    >[0];
+    const theme = createTheme(tokens);
     expect(theme.vars["--c-a"]).toBe("#fff");
     expect(Object.keys(theme.vars)).toHaveLength(1);
   });
