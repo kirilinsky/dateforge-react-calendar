@@ -70,16 +70,34 @@ describe("getNextMonthFromSwipe", () => {
   });
 
   it("respects disabled.rules `before` bound", () => {
-    const r = getNextMonthFromSwipe(-60, D(2024, 5), undefined, undefined, 50, {
+    const disabled = {
+      __type: "disabled-config",
       rules: [{ before: D(2024, 5, 1) }],
-    });
+    } as unknown as Parameters<typeof getNextMonthFromSwipe>[5];
+    const r = getNextMonthFromSwipe(
+      -60,
+      D(2024, 5),
+      undefined,
+      undefined,
+      50,
+      disabled,
+    );
     expect(r).toBeNull();
   });
 
   it("respects disabled.rules `after` bound", () => {
-    const r = getNextMonthFromSwipe(60, D(2024, 5), undefined, undefined, 50, {
+    const disabled = {
+      __type: "disabled-config",
       rules: [{ after: D(2024, 5, 28) }],
-    });
+    } as unknown as Parameters<typeof getNextMonthFromSwipe>[5];
+    const r = getNextMonthFromSwipe(
+      60,
+      D(2024, 5),
+      undefined,
+      undefined,
+      50,
+      disabled,
+    );
     expect(r).toBeNull();
   });
 
