@@ -1,7 +1,5 @@
 <div align="center">
 
-[![npm version](https://img.shields.io/npm/v/@dateforge/react-calendar?style=flat-square)](https://www.npmjs.com/package/@dateforge/react-calendar)
-&nbsp;&nbsp;
 [![bundle size](https://img.shields.io/bundlephobia/minzip/@dateforge/react-calendar?style=flat-square)](https://bundlephobia.com/package/@dateforge/react-calendar)
 &nbsp;&nbsp;
 [![downloads](https://img.shields.io/npm/dm/@dateforge/react-calendar?style=flat-square)](https://www.npmjs.com/package/@dateforge/react-calendar)
@@ -9,10 +7,12 @@
 [![license](https://img.shields.io/npm/l/@dateforge/react-calendar.svg?style=flat-square)](https://github.com/kirilinsky/dateforge-react-calendar/blob/main/LICENSE)
 &nbsp;&nbsp;
 [![codecov](https://codecov.io/gh/kirilinsky/dateforge-react-calendar/branch/main/graph/badge.svg)](https://app.codecov.io/gh/kirilinsky/dateforge-react-calendar)
-
+&nbsp;&nbsp;
+[![publint](https://img.shields.io/github/actions/workflow/status/kirilinsky/dateforge-react-calendar/publint.yml?label=publint&style=flat-square)](https://github.com/kirilinsky/dateforge-react-calendar/actions/workflows/publint.yml)
+&nbsp;&nbsp;
 ![zero deps](https://img.shields.io/badge/dependencies-0-brightgreen?style=flat-square)
 &nbsp;&nbsp;
-[![SSR safe](https://img.shields.io/github/actions/workflow/status/kirilinsky/dateforge-react-calendar/ci.yml?label=SSR%20safe&style=flat-square)](https://github.com/kirilinsky/dateforge-react-calendar/blob/main/src/__tests__/integration/ssr.test.tsx)
+[![SSR safe](https://img.shields.io/github/actions/workflow/status/kirilinsky/dateforge-react-calendar/ssr.yml?label=SSR%20safe&style=flat-square)](https://github.com/kirilinsky/dateforge-react-calendar/actions/workflows/ssr.yml)
 &nbsp;&nbsp;
 [![Socket](https://badge.socket.dev/npm/package/@dateforge/react-calendar/1.0.0)](https://badge.socket.dev/npm/package/@dateforge/react-calendar/1.0.0)
 &nbsp;&nbsp;

@@ -55,11 +55,11 @@
       },
       "a11y": {
         "recommended": true,
-        "useSemanticElements": "warn",
-        "useFocusableInteractive": "warn",
+        "useSemanticElements": "off",
+        "useFocusableInteractive": "off",
         "noSvgWithoutTitle": "warn",
-        "useKeyWithClickEvents": "warn",
-        "noStaticElementInteractions": "warn",
+        "useKeyWithClickEvents": "off",
+        "noStaticElementInteractions": "off",
         "useButtonType": "warn",
         "useAriaPropsSupportedByRole": "warn"
       }

@@ -565,15 +565,14 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
 
           const isVisuallyEmpty = allHidden || (!fixedRows && allOutOfMonth);
 
+          const rowA11y = isVisuallyEmpty
+            ? { role: "presentation" as const }
+            : {
+                role: "row" as const,
+                "aria-label": `Week ${week.weekNumber}`,
+              };
           return (
-            <div
-              key={wIndex}
-              role={isVisuallyEmpty ? "presentation" : "row"}
-              aria-label={
-                isVisuallyEmpty ? undefined : `Week ${week.weekNumber}`
-              }
-              className={styles.weekRow}
-            >
+            <div key={wIndex} {...rowA11y} className={styles.weekRow}>
               {weekNumbers && (
                 <div
                   role="rowheader"

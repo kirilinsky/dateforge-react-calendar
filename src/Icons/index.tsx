@@ -1,5 +1,12 @@
 const I = (d: string) => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden="true"
+    focusable="false"
+  >
     <path d={d} />
   </svg>
 );

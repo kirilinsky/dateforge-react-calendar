@@ -147,6 +147,7 @@ export const TimeTrack = ({
           {(["AM", "PM"] as const).map((p) => (
             <button
               key={p}
+              type="button"
               className={`${styles.periodBtn} ${period === p ? styles.periodActive : ""}`}
               aria-pressed={period === p}
               onClick={() => emit(hours, minutes, seconds, p)}
