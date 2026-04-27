@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Calendar only (canary, no modules)",
+    "import": { "./dist/index.mjs": "{ Calendar }" },
+    "limit": "6 KB",
+    "ignore": ["react", "react-dom"]
+  },
+  {
+    "name": "Calendar + Days only (minimal viable)",
+    "import": {
+      "./dist/index.mjs": "{ Calendar }",
+      "./dist/modules/days.mjs": "{ CalendarDays }"
+    },
+    "limit": "15 KB",
+    "ignore": ["react", "react-dom"]
+  },
+  {
+    "name": "Calendar + Nav + Days",
+    "import": {
+      "./dist/index.mjs": "{ Calendar }",
+      "./dist/modules/nav.mjs": "{ CalendarNav }",
+      "./dist/modules/days.mjs": "{ CalendarDays }"
+    },
+    "limit": "20 KB",
+    "ignore": ["react", "react-dom"]
+  },
+  {
+    "name": "Calendar + Days + Dracula theme + Compact appearance",
+    "import": {
+      "./dist/index.mjs": "{ Calendar }",
+      "./dist/modules/days.mjs": "{ CalendarDays }",
+      "./dist/themes/dracula.mjs": "{ dracula }",
+      "./dist/appearances/compact.mjs": "{ compact }"
+    },
+    "limit": "15 KB",
+    "ignore": ["react", "react-dom"]
+  }
+]
