@@ -48,6 +48,8 @@ jobs:
 
       - run: npm run build
 
+      - run: npm run check:exports
+
       - name: Run tests (Node 20)
         if: matrix.node == 20
         run: npm test
