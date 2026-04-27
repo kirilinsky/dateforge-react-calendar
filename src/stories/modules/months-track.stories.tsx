@@ -46,6 +46,9 @@ export const FullNames: Story = {
 FullNames.storyName = "Full month names";
 
 export const RangeBounds: Story = {
+  parameters: {
+    chromatic: { delay: 1000, pauseAnimationAtEnd: true },
+  },
   render: (args, ctx) => {
     const [range, setRange] = useState<{ from: Date | null; to: Date | null }>({
       from: FIXED_DATE,
