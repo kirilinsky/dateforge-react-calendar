@@ -49,7 +49,7 @@ describe("toTZMidnight", () => {
       day: "numeric",
     }).formatToParts(result);
     const get = (type: string) =>
-      parseInt(parts.find((p) => p.type === type)!.value);
+      parseInt(parts.find((p) => p.type === type)!.value, 10);
     expect(get("year")).toBe(2024);
     expect(get("month")).toBe(6);
     expect(get("day")).toBe(15);

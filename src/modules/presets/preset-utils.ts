@@ -10,7 +10,7 @@ import type {
 import { checkIsDateDisabled } from "@/utils/date-core";
 
 const isValidDate = (d: unknown): d is Date =>
-  d instanceof Date && !isNaN(d.getTime());
+  d instanceof Date && !Number.isNaN(d.getTime());
 
 const isPlainObject = (v: unknown): v is Record<string, unknown> =>
   typeof v === "object" && v !== null && !Array.isArray(v);

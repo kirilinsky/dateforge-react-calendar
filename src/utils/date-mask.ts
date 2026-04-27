@@ -14,9 +14,9 @@ export const dateToMask = (d: Date | null): string => {
 export const maskToDate = (raw: string): Date | null => {
   const digits = raw.replace(/\D/g, "");
   if (digits.length !== 8) return null;
-  const d = parseInt(digits.slice(0, 2));
-  const m = parseInt(digits.slice(2, 4));
-  const y = parseInt(digits.slice(4, 8));
+  const d = parseInt(digits.slice(0, 2), 10);
+  const m = parseInt(digits.slice(2, 4), 10);
+  const y = parseInt(digits.slice(4, 8), 10);
   if (m < 1 || m > 12 || d < 1 || d > 31 || y < 1000) return null;
   const date = new Date(y, m - 1, d);
   // Round-trip check rejects calendrically impossible dates (Feb 31, Apr 31, etc.) —
@@ -52,20 +52,20 @@ export const validatePartialMask = (raw: string): boolean => {
 
   // Day segment complete (2 digits)
   if (digits.length >= 2) {
-    const d = parseInt(digits.slice(0, 2));
+    const d = parseInt(digits.slice(0, 2), 10);
     if (d < 1 || d > 31) return true;
   }
 
   // Month segment complete (4 digits)
   if (digits.length >= 4) {
-    const m = parseInt(digits.slice(2, 4));
+    const m = parseInt(digits.slice(2, 4), 10);
     if (m < 1 || m > 12) return true;
   }
 
   // Day/month combo — flag impossible day for the month even before year is typed
   if (digits.length >= 4) {
-    const d = parseInt(digits.slice(0, 2));
-    const m = parseInt(digits.slice(2, 4));
+    const d = parseInt(digits.slice(0, 2), 10);
+    const m = parseInt(digits.slice(2, 4), 10);
     const maxDay = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][m - 1];
     if (d > maxDay) return true;
   }

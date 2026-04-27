@@ -141,7 +141,7 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
     )
       return "";
     const d = new Date(year, month, currentIdx + 1);
-    if (isNaN(d.getTime())) return "";
+    if (Number.isNaN(d.getTime())) return "";
     return new Intl.DateTimeFormat(locale, {
       day: "numeric",
       month: "long",

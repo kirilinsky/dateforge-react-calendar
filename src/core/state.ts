@@ -254,7 +254,7 @@ export function calendarReducer(
 export const toValidDateOrNull = (d?: Date | null): Date | null => {
   if (!d) return null;
   const parsed = new Date(d);
-  return isNaN(parsed.getTime()) ? null : parsed;
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
 
 export function buildInitialState(params: {

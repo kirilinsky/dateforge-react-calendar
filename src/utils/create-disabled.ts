@@ -12,7 +12,7 @@ interface CreateDisabledInit {
 }
 
 const isValidDate = (d: unknown): d is Date =>
-  d instanceof Date && !isNaN(d.getTime());
+  d instanceof Date && !Number.isNaN(d.getTime());
 
 const sanitizeDate = (d: unknown, field: string): Date | undefined => {
   if (d == null) return undefined;

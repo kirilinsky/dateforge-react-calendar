@@ -1,4 +1,4 @@
-import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "fs";
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const srcDir = "./appearances";
 const distDir = "./dist/appearances";
@@ -72,8 +72,7 @@ writeFileSync(
       .join(""),
 );
 
-const barrelDts =
-  names.map((n) => `export{${n}}from"./${n}.js";`).join("\n") + "\n";
+const barrelDts = `${names.map((n) => `export{${n}}from"./${n}.js";`).join("\n")}\n`;
 writeFileSync(`${distDir}/index.d.ts`, barrelDts);
 writeFileSync(`${distDir}/index.d.cts`, barrelDts);
 

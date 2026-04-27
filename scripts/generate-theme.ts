@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { THEMES_DATA, type ThemeTokens, TOKEN_TO_VAR } from "../themes/themes";
 
 const distDir = "./dist/themes";
@@ -51,8 +51,7 @@ writeFileSync(
       .join(""),
 );
 
-const barrelDts =
-  names.map((n) => `export{${n}}from"./${n}.js";`).join("\n") + "\n";
+const barrelDts = `${names.map((n) => `export{${n}}from"./${n}.js";`).join("\n")}\n`;
 writeFileSync(`${distDir}/index.d.ts`, barrelDts);
 writeFileSync(`${distDir}/index.d.cts`, barrelDts);
 

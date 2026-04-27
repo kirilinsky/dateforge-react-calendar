@@ -22,7 +22,7 @@ export function __resetWarnOnce(): void {
 }
 
 const isInvalidDate = (d: unknown): d is Date =>
-  d instanceof Date && isNaN(d.getTime());
+  d instanceof Date && Number.isNaN(d.getTime());
 
 const isRangeShape = (
   v: unknown,
@@ -135,7 +135,7 @@ export function validateDateProp(
   propName: string,
 ): Date | undefined {
   if (value == null) return undefined;
-  if (value instanceof Date && !isNaN(value.getTime())) return value;
+  if (value instanceof Date && !Number.isNaN(value.getTime())) return value;
   warnOnce(
     `date-prop:invalid:${propName}`,
     `${propName} must be a valid Date instance. Received: ${
