@@ -6,8 +6,16 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
+import { CalendarDaysTrack } from "@/modules/days-track";
+import { CalendarManualInput } from "@/modules/manual-input";
+import { CalendarMonthsGrid } from "@/modules/months-grid";
+import { CalendarMonthsTrack } from "@/modules/months-track";
 import { CalendarNav } from "@/modules/nav";
+import { CalendarPresets } from "@/modules/presets";
+import { CalendarSelectedDates } from "@/modules/selected-dates";
 import { CalendarTimeGrid } from "@/modules/time";
+import { CalendarYearsGrid } from "@/modules/years-grid";
+import { CalendarYearsTrack } from "@/modules/years-track";
 
 const D = new Date(2024, 5, 15);
 
@@ -80,5 +88,77 @@ describe("SSR — renderToString", () => {
     );
     expect(html).not.toMatch(/>NaN</);
     expect(html).not.toMatch(/>undefined</);
+  });
+
+  it("renders MonthsGrid without crashing", () => {
+    const html = renderToString(
+      <Calendar value={D}>
+        <CalendarMonthsGrid />
+      </Calendar>,
+    );
+    expect(html).toContain("data-area");
+  });
+
+  it("renders MonthsTrack without crashing", () => {
+    const html = renderToString(
+      <Calendar value={D}>
+        <CalendarMonthsTrack />
+      </Calendar>,
+    );
+    expect(html).toContain("data-area");
+  });
+
+  it("renders YearsGrid without crashing", () => {
+    const html = renderToString(
+      <Calendar value={D}>
+        <CalendarYearsGrid />
+      </Calendar>,
+    );
+    expect(html).toContain("data-area");
+  });
+
+  it("renders YearsTrack without crashing", () => {
+    const html = renderToString(
+      <Calendar value={D}>
+        <CalendarYearsTrack />
+      </Calendar>,
+    );
+    expect(html).toContain("data-area");
+  });
+
+  it("renders DaysTrack without crashing", () => {
+    const html = renderToString(
+      <Calendar value={D}>
+        <CalendarDaysTrack />
+      </Calendar>,
+    );
+    expect(html).toContain("data-area");
+  });
+
+  it("renders SelectedDates without crashing", () => {
+    const html = renderToString(
+      <Calendar value={D}>
+        <CalendarSelectedDates />
+      </Calendar>,
+    );
+    expect(typeof html).toBe("string");
+  });
+
+  it("renders ManualInput without crashing", () => {
+    const html = renderToString(
+      <Calendar value={D}>
+        <CalendarManualInput />
+      </Calendar>,
+    );
+    expect(html).toContain("data-area");
+  });
+
+  it("renders Presets without crashing", () => {
+    const html = renderToString(
+      <Calendar value={D}>
+        <CalendarPresets presets={[]} />
+      </Calendar>,
+    );
+    expect(typeof html).toBe("string");
   });
 });

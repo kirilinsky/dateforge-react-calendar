@@ -12,7 +12,7 @@
 
 ![zero deps](https://img.shields.io/badge/dependencies-0-brightgreen?style=flat-square)
 &nbsp;&nbsp;
-![SSR safe](https://img.shields.io/badge/SSR-safe-green?style=flat-square)
+[![SSR safe](https://img.shields.io/github/actions/workflow/status/kirilinsky/dateforge-react-calendar/ci.yml?label=SSR%20safe&style=flat-square)](https://github.com/kirilinsky/dateforge-react-calendar/blob/main/src/__tests__/integration/ssr.test.tsx)
 &nbsp;&nbsp;
 [![Socket](https://badge.socket.dev/npm/package/@dateforge/react-calendar/1.0.0)](https://badge.socket.dev/npm/package/@dateforge/react-calendar/1.0.0)
 &nbsp;&nbsp;
