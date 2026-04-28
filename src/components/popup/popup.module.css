@@ -49,14 +49,16 @@
     background: var(--c-h);
     color: var(--c-a);
     border: none;
+    display: flex;
+    justify-content: center;
     border-radius: calc(var(--cal-radius, 0.5em) * 99);
-    padding: 0.45em;
+    padding: 0.40em;
     width: 100%;
     font-size: 1em;
     font-weight: 700;
     cursor: pointer;
     transition: opacity var(--cal-transition, 0.2s);
-    box-shadow: var(--cal-shadow-md, 0 0.2em 0.6em var(--c-x));
+    box-shadow: var(--cal-shadow-md, 0 0.22em 0.6em var(--c-x));
     flex-shrink: 0;
   }
 
