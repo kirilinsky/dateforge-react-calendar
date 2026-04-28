@@ -196,4 +196,12 @@
   animation: slideInLeft 0.31s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
+.maxReachedTarget {
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--c-e) 12%, transparent) !important;
+    color: var(--c-e) !important;
+    cursor: not-allowed;
+  }
+}
+
 }

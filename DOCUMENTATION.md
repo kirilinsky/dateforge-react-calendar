@@ -152,18 +152,18 @@ For purely local single-user CRUD without SSR, the default `"auto"` is the right
 
 **Dev warnings.** The library never throws on bad input. In development a deduped `console.warn` is emitted; in production the same fallback runs silently. The complete list of validated cases:
 
-| Source                                                                                                                  | Behavior                                                       |
-| ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| `value` / `defaultValue` shape does not match `mode`                                                                    | Best-effort normalization (e.g. `Date` in range mode → `from`) |
+| Source                                                                                                                  | Behavior                                                                                                                                                  |
+| ----------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `value` / `defaultValue` shape does not match `mode`                                                                    | Best-effort normalization (e.g. `Date` in range mode → `from`)                                                                                            |
 | `value` / `defaultValue` contains `Invalid Date`                                                                        | Invalid entries dropped (single → no selection; multiple → filtered; range → bound nulled). View date falls back to `defaultViewDate` or today. Dev warn. |
-| `defaultViewDate` not a valid Date                                                                                      | Treated as omitted                                             |
-| `minDate > maxDate`                                                                                                     | No date selectable; warn                                       |
-| `timeZone` not a valid IANA / `UTC±N`                                                                                   | Falls back to auto-detect                                      |
-| `theme` string outside `"auto" \| "light" \| "dark"`                                                                    | Falls back to system theme                                     |
-| `<CalendarYearsGrid yearsPerPage>` outside 1..40 / non-integer                                                          | Clamped to 1..40                                               |
-| `<CalendarNav>` with both `showMonthPicker` + `compactMonths` (or year equivalents)                                     | Both UI variants render; warn                                  |
-| `<CalendarPresets>` entry: not an object / missing `label` / duplicate `id` / throwing `getValue` / Invalid Date result | Entry skipped                                                  |
-| `createDisabled()` bad input (non-object init, invalid Dates, malformed ranges, weekdays out of 0..6)                   | Bad pieces dropped, valid kept                                 |
+| `defaultViewDate` not a valid Date                                                                                      | Treated as omitted                                                                                                                                        |
+| `minDate > maxDate`                                                                                                     | No date selectable; warn                                                                                                                                  |
+| `timeZone` not a valid IANA / `UTC±N`                                                                                   | Falls back to auto-detect                                                                                                                                 |
+| `theme` string outside `"auto" \| "light" \| "dark"`                                                                    | Falls back to system theme                                                                                                                                |
+| `<CalendarYearsGrid yearsPerPage>` outside 1..40 / non-integer                                                          | Clamped to 1..40                                                                                                                                          |
+| `<CalendarNav>` with both `showMonthPicker` + `compactMonths` (or year equivalents)                                     | Both UI variants render; warn                                                                                                                             |
+| `<CalendarPresets>` entry: not an object / missing `label` / duplicate `id` / throwing `getValue` / Invalid Date result | Entry skipped                                                                                                                                             |
+| `createDisabled()` bad input (non-object init, invalid Dates, malformed ranges, weekdays out of 0..6)                   | Bad pieces dropped, valid kept                                                                                                                            |
 
 `process.env.NODE_ENV === "production"` short-circuits the `console.warn`. The fallback behavior is identical in both modes.
 
@@ -877,6 +877,7 @@ const myAppearance = createAppearance({ radius: "0", spacing: "0.4em" });
 | `disabled`  | `--c-d`      | Color for disabled / out-of-range date cells.                                                                        |
 | `weekend`   | `--c-we`     | Accent color applied to weekend day labels (Saturday / Sunday).                                                      |
 | `range`     | `--c-r`      | Background tint for days that fall inside a selected date range.                                                     |
+| `error`     | `--c-e`      | Error / destructive signal.                                                                                          |
 
 ---
 

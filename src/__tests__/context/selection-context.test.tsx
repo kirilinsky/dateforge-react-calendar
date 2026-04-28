@@ -90,7 +90,7 @@ describe("useSelectionActions — onChange fires on select", () => {
     const from = d(2024, 6, 1);
     const to = d(2024, 6, 30);
     const { result } = renderHook(() => useSelectionActions(), {
-      wrapper: wrap({ mode: "range", onChange } as any),
+      wrapper: wrap({ mode: "range", onChange } as Parameters<typeof wrap>[0]),
     });
     act(() => result.current.onRangeSet(from, to));
     expect(onChange).toHaveBeenCalledWith({ from, to });
@@ -100,7 +100,9 @@ describe("useSelectionActions — onChange fires on select", () => {
     const onChange = vi.fn();
     const dates = [d(2024, 1, 1), d(2024, 2, 1)];
     const { result } = renderHook(() => useSelectionActions(), {
-      wrapper: wrap({ mode: "multiple", onChange } as any),
+      wrapper: wrap({ mode: "multiple", onChange } as Parameters<
+        typeof wrap
+      >[0]),
     });
     act(() => result.current.onDatesSet(dates));
     expect(onChange).toHaveBeenCalledWith(dates);

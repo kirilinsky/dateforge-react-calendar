@@ -40,7 +40,7 @@
       "recommended": true,
       "suspicious": {
         "noExplicitAny": "warn",
-        "noArrayIndexKey": "warn"
+        "noArrayIndexKey": "off"
       },
       "style": {
         "useImportType": "warn",

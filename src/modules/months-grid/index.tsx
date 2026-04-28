@@ -68,7 +68,7 @@ export const CalendarMonthsGrid: React.FC<CalendarMonthsGridProps> = ({
           (isDisabled && !isHidden ? ", limited" : "");
         return (
           <button
-            key={i}
+            key={`${currentYear}-${n.label}`}
             type="button"
             className={[
               styles.item,
