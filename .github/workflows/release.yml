@@ -22,9 +22,12 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
           registry-url: https://registry.npmjs.org
+
+      - name: Upgrade npm to latest (Trusted Publishing requires 11.5.1+)
+        run: npm install -g npm@latest
 
       - run: npm ci
 
@@ -33,10 +36,9 @@ jobs:
       - name: Create Release Pull Request or Publish
         uses: changesets/action@v1
         with:
-          publish: npm publish --provenance --access public
+          publish: npm publish --loglevel verbose
           version: npx changeset version
           commit: "chore: version packages"
           title: "chore: version packages"
         env:
           GITHUB_TOKEN: ${{ secrets.CHANGESETS_TOKEN || secrets.GITHUB_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
