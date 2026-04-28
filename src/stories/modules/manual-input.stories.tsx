@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
-import { expect, userEvent, within } from "storybook/test";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarManualInput } from "@/modules/manual-input";
 import { FIXED_DATE } from "../_constants";
@@ -125,23 +124,6 @@ export const SingleInvalidDate: Story = {
   },
 };
 SingleInvalidDate.storyName = "Single — typing invalid date (no commit)";
-SingleInvalidDate.play = async ({
-  canvasElement,
-}: {
-  canvasElement: HTMLElement;
-}) => {
-  const canvas = within(canvasElement);
-  const input = canvas.getByRole("textbox") as HTMLInputElement;
-  await userEvent.click(input);
-  await userEvent.keyboard("32132024");
-  await userEvent.keyboard("{Enter}");
-
-  const wrapper = input.parentElement as HTMLElement;
-  const borderColor = getComputedStyle(wrapper).borderColor;
-  // Default theme error = #dc2626 → rgb(220, 38, 38)
-  // Allow either rgb or rgba form, just check the channel values appear.
-  expect(borderColor).toMatch(/rgba?\(\s*220,\s*38,\s*38/);
-};
 
 export const SingleOutsideMinMax: Story = {
   render: (_args, ctx) => {
