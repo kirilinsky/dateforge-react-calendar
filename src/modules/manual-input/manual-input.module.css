@@ -54,8 +54,8 @@
   .inputWrapperInvalid,
   .inputWrapperInvalid:hover,
   .inputWrapperInvalid:focus-within {
-    border-color: var(--c-we);
-    box-shadow: 0 0 0 0.15em color-mix(in srgb, var(--c-we) 25%, transparent);
+    border-color: var(--c-e);
+    box-shadow: 0 0 0 0.15em color-mix(in srgb, var(--c-e) 25%, transparent);
   }
 
   .inputBare {
@@ -87,10 +87,10 @@
   }
 
   .saveBtnInvalid {
-    color: var(--c-we);
+    color: var(--c-e);
 
     &:hover {
-      background: color-mix(in srgb, var(--c-we) 12%, transparent);
+      background: color-mix(in srgb, var(--c-e) 12%, transparent);
     }
   }
 
@@ -182,8 +182,8 @@
     }
 
     &:hover:not([disabled]) {
-      background: color-mix(in srgb, var(--c-we) 12%, transparent);
-      color: var(--c-we);
+      background: color-mix(in srgb, var(--c-e) 12%, transparent);
+      color: var(--c-e);
     }
 
     &[disabled] {

@@ -217,6 +217,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:ssr": "vitest run src/__tests__/integration/ssr.test.tsx",
+    "verify": "npm run typecheck && npm run check && npm run knip && npm run build && npm run check:exports && npm run size && npm run test",
     "storybook": "storybook dev -p 6006 --no-open",
     "build-storybook": "storybook build",
     "chromatic": "node --env-file=.env.local node_modules/.bin/chromatic"

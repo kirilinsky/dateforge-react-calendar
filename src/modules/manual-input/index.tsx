@@ -1,6 +1,6 @@
 // TODO: split MaskedDateInput and DateSlot into separate files — three components in one file is getting hard to navigate
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import {
@@ -47,6 +47,7 @@ const MaskedDateInput: React.FC<MaskedDateInputProps> = ({
   placeholder = "DD.MM.YYYY",
   readOnly,
 }) => {
+  const inputId = useId();
   const [text, setText] = useState(() => dateToMask(value));
   const [invalid, setInvalid] = useState(false);
 
@@ -99,6 +100,7 @@ const MaskedDateInput: React.FC<MaskedDateInputProps> = ({
 
   return (
     <input
+      id={inputId}
       type="text"
       inputMode="numeric"
       className={[className, invalid && classNameInvalid]

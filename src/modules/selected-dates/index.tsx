@@ -17,8 +17,10 @@ const getRangeSep = (
   end: Date,
 ): string => {
   try {
-    const parts = fmt.formatRangeToParts(start, end);
-    const sources = parts.map((p) => (p as any).source as string);
+    const parts = fmt.formatRangeToParts(start, end) as Array<
+      Intl.DateTimeFormatPart & { source: "startRange" | "endRange" | "shared" }
+    >;
+    const sources = parts.map((p) => p.source);
     const afterStart = sources.lastIndexOf("startRange") + 1;
     const beforeEnd = sources.indexOf("endRange");
     if (afterStart > 0 && beforeEnd > afterStart) {
@@ -123,11 +125,11 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
       </>
     ) : null
   ) : (
-    selectedDates.map((d, i) => {
+    selectedDates.map((d) => {
       const isActive = isSameDay(d, date);
       return (
         <button
-          key={i}
+          key={d.getTime()}
           type="button"
           data-active={isActive || undefined}
           onClick={() => allowNavigate && navigateTo(d)}

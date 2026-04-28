@@ -46,7 +46,9 @@ describe("useNavigation", () => {
     const from = d(2024, 3, 10);
     const to = d(2024, 3, 25);
     const { result } = renderHook(() => useNavigation(), {
-      wrapper: wrap({ mode: "range", value: { from, to } } as any),
+      wrapper: wrap({ mode: "range", value: { from, to } } as Parameters<
+        typeof wrap
+      >[0]),
     });
     expect(result.current.viewDate.getMonth()).toBe(2); // March = 2
   });

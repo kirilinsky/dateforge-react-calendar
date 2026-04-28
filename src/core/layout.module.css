@@ -11,6 +11,7 @@
     --c-d: #a0a0a2;
     --c-we: #e32825;
     --c-r: #4a90d9;
+    --c-e: #dc2626;
   }
 
   :global([data-theme="dark"]) {
@@ -24,6 +25,7 @@
     --c-d: #555558;
     --c-we: #e32825;
     --c-r: #4a90d9;
+    --c-e: #ef4444;
   }
 
   /* CSS-native auto: when no JS-resolved theme is set, follow the OS
@@ -41,6 +43,7 @@
       --c-d: #555558;
       --c-we: #e32825;
       --c-r: #4a90d9;
+      --c-e: #ef4444;
     }
   }
 }

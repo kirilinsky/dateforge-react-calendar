@@ -73,6 +73,7 @@ interface DayCellProps {
   ariaLabel: string;
   tabIndex: number;
   readOnly: boolean;
+  isMaxReachedTarget: boolean;
   onSelect: (date: Date, isDisabled: boolean) => void;
   onMouseEnter: (date: Date) => void;
   onKeyDown: (e: React.KeyboardEvent, date: Date) => void;
@@ -104,6 +105,7 @@ const DayCell = React.memo(function DayCell({
   ariaLabel,
   tabIndex,
   readOnly,
+  isMaxReachedTarget,
   onSelect,
   onMouseEnter,
   onKeyDown,
@@ -181,9 +183,10 @@ const DayCell = React.memo(function DayCell({
       <button
         type="button"
         tabIndex={tabIndex}
-        onClick={() =>
-          !isDisabled && !readOnly && onSelect(fullDate, isDisabled)
-        }
+        onClick={() => {
+          if (readOnly) return;
+          onSelect(fullDate, isDisabled);
+        }}
         onMouseEnter={() => onMouseEnter(fullDate)}
         onKeyDown={(e) => onKeyDown(e, fullDate)}
         aria-label={ariaLabel}
@@ -198,10 +201,12 @@ const DayCell = React.memo(function DayCell({
         data-range-end={isRangeEnd || undefined}
         data-weekend={isWeekend || undefined}
         data-other-month={isOtherMonth || undefined}
+        data-max-reached={isMaxReachedTarget || undefined}
         className={[
           styles.dayItem,
           shared.interactive,
           shared.hovered,
+          isMaxReachedTarget && styles.maxReachedTarget,
           !range && isSelected && shared.activeItem,
           !range && connectLeft && connectRight && styles.rangeMid,
           !range && connectLeft && !connectRight && styles.rangeEnd,
@@ -274,6 +279,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
     locale,
     timeZone,
     readOnly,
+    multiselect,
   } = useConfig();
 
   const { viewDate: rawDate, navigateTo } = useNavigation();
@@ -285,6 +291,14 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   const { selectedDates, rangeStart, rangeEnd } = useSelectionValue();
   const { onChangeDate, setHoverDate } = useSelectionActions();
   const { hoverDate } = useSelectionHover();
+
+  const maxDates =
+    typeof multiselect === "number" ? multiselect : Number.POSITIVE_INFINITY;
+  const isMultipleMaxReached =
+    multiselect !== undefined &&
+    multiselect !== false &&
+    !range &&
+    selectedDates.length >= maxDates;
 
   // Defer today computation to post-mount so the server-rendered HTML doesn't
   // depend on the server's clock or system timezone (would cause hydration
@@ -397,12 +411,13 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
 
   const handleSetDay = useCallback(
     (targetDate: Date, isDisabled: boolean) => {
-      if (isDisabled || readOnly) return;
-      if (
-        (lockDeselection || daysTrackActive) &&
-        selectedDates.some((d) => isSameDay(d, targetDate))
-      )
-        return;
+      if (readOnly) return;
+      const alreadySelected = selectedDates.some((d) =>
+        isSameDay(d, targetDate),
+      );
+      if (isDisabled) return;
+      if (isMultipleMaxReached && !alreadySelected) return;
+      if ((lockDeselection || daysTrackActive) && alreadySelected) return;
       const next = timeZone
         ? new Date(
             toTZMidnight(targetDate, timeZone).getTime() +
@@ -437,6 +452,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
       selectedDates,
       readOnly,
       timeZone,
+      isMultipleMaxReached,
     ],
   );
 
@@ -659,6 +675,12 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
                       })}
                       tabIndex={isSameDay(fullDate, focusedDate) ? 0 : -1}
                       readOnly={readOnly}
+                      isMaxReachedTarget={
+                        isMultipleMaxReached &&
+                        !isSelected &&
+                        !isDisabled &&
+                        isCurrentMonth
+                      }
                       onSelect={handleSetDay}
                       onMouseEnter={handleMouseEnter}
                       onKeyDown={handleKeyDown}
