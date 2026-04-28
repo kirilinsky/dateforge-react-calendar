@@ -38,7 +38,11 @@ export default meta;
 
 type Story = StoryObj<DaysTrackArgs>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  parameters: {
+    chromatic: { delay: 1000, pauseAnimationAtEnd: true },
+  },
+};
 Default.storyName = "Horizontal interactive";
 
 export const WithMonthLabel: Story = {
