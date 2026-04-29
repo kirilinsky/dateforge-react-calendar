@@ -25,12 +25,21 @@ export function useBoundDateView({
 }: UseBoundDateViewParams): UseBoundDateViewResult {
   const isBound = !!(range && bound);
   const boundDate = isBound ? (bound === "from" ? rangeStart : rangeEnd) : null;
+  const oppositeDate = isBound
+    ? bound === "from"
+      ? rangeEnd
+      : rangeStart
+    : null;
 
-  const [localView, setLocalView] = useState<Date>(() => boundDate ?? viewDate);
+  const [localView, setLocalView] = useState<Date>(
+    () => boundDate ?? oppositeDate ?? viewDate,
+  );
 
   useEffect(() => {
-    if (isBound && boundDate) setLocalView(boundDate);
-  }, [isBound, boundDate?.getTime()]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (!isBound) return;
+    if (boundDate) setLocalView(boundDate);
+    else if (oppositeDate) setLocalView(oppositeDate);
+  }, [isBound, boundDate?.getTime(), oppositeDate?.getTime()]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const refDate = isBound ? localView : viewDate;
 

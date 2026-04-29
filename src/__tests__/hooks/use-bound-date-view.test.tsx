@@ -96,6 +96,52 @@ describe("useBoundDateView", () => {
     expect(result.current.localView.getTime()).toBe(newStart.getTime());
   });
 
+  it("falls back to opposite bound (rangeEnd) for `from` when own null", () => {
+    const end = d(2024, 6, 20);
+    const { result } = renderHook(() =>
+      useBoundDateView({ ...base, bound: "from", rangeEnd: end }),
+    );
+    expect(result.current.localView.getTime()).toBe(end.getTime());
+  });
+
+  it("falls back to opposite bound (rangeStart) for `to` when own null", () => {
+    const start = d(2024, 6, 5);
+    const { result } = renderHook(() =>
+      useBoundDateView({ ...base, bound: "to", rangeStart: start }),
+    );
+    expect(result.current.localView.getTime()).toBe(start.getTime());
+  });
+
+  it("opposite-bound change syncs localView when own bound still null", () => {
+    let rangeStart: Date | null = null;
+    const { result, rerender } = renderHook(() =>
+      useBoundDateView({ ...base, bound: "to", rangeStart }),
+    );
+    expect(result.current.localView.getTime()).toBe(base.viewDate.getTime());
+
+    const newStart = d(2024, 9, 1);
+    act(() => {
+      rangeStart = newStart;
+    });
+    rerender();
+
+    expect(result.current.localView.getTime()).toBe(newStart.getTime());
+  });
+
+  it("own boundDate takes precedence over opposite", () => {
+    const start = d(2024, 6, 5);
+    const end = d(2024, 6, 20);
+    const { result } = renderHook(() =>
+      useBoundDateView({
+        ...base,
+        bound: "to",
+        rangeStart: start,
+        rangeEnd: end,
+      }),
+    );
+    expect(result.current.localView.getTime()).toBe(end.getTime());
+  });
+
   it("setLocalView updates localView", () => {
     const { result } = renderHook(() =>
       useBoundDateView({ ...base, bound: "from", rangeStart: d(2024, 6, 5) }),
