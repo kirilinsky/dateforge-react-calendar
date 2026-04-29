@@ -229,3 +229,119 @@ describe("CalendarDaysTrack — keyboard nav", () => {
     expect(track).toBeTruthy();
   });
 });
+
+describe("Range bound — track field limits via aria", () => {
+  it("days-track bound=to clamps min day to rangeStart day in same month", () => {
+    const { container } = render(
+      <Calendar
+        mode="range"
+        value={{ from: D(2024, 5, 15), to: null }}
+        defaultViewDate={D(2024, 5, 15)}
+      >
+        <CalendarDaysTrack bound="to" />
+      </Calendar>,
+    );
+    const track = findTrack(container, "days-track");
+    expect(track.getAttribute("aria-valuemin")).toBe("15");
+  });
+
+  it("days-track bound=to no constraint when month is after rangeStart month", () => {
+    const { container } = render(
+      <Calendar
+        mode="range"
+        value={{ from: D(2024, 5, 15), to: D(2024, 7, 10) }}
+        defaultViewDate={D(2024, 7, 10)}
+      >
+        <CalendarDaysTrack bound="to" />
+      </Calendar>,
+    );
+    const track = findTrack(container, "days-track");
+    expect(track.getAttribute("aria-valuemin")).toBe("1");
+  });
+
+  it("days-track bound=from clamps max day to rangeEnd day in same month", () => {
+    const { container } = render(
+      <Calendar
+        mode="range"
+        value={{ from: null, to: D(2024, 5, 15) }}
+        defaultViewDate={D(2024, 5, 15)}
+      >
+        <CalendarDaysTrack bound="from" />
+      </Calendar>,
+    );
+    const track = findTrack(container, "days-track");
+    expect(track.getAttribute("aria-valuemax")).toBe("15");
+  });
+
+  it("months-track bound=to: same year, refDay >= fd → min month = fm", () => {
+    const { container } = render(
+      <Calendar
+        mode="range"
+        value={{ from: D(2024, 5, 15), to: D(2024, 5, 20) }}
+        defaultViewDate={D(2024, 5, 20)}
+      >
+        <CalendarMonthsTrack bound="to" />
+      </Calendar>,
+    );
+    const track = findTrack(container, "months-track");
+    expect(track.getAttribute("aria-valuemin")).toBe("6");
+  });
+
+  it("months-track bound=to: same year, refDay < fd → min month = fm+1", () => {
+    const { container } = render(
+      <Calendar
+        mode="range"
+        value={{ from: D(2024, 5, 15), to: D(2024, 5, 10) }}
+        defaultViewDate={D(2024, 5, 10)}
+      >
+        <CalendarMonthsTrack bound="to" />
+      </Calendar>,
+    );
+    const track = findTrack(container, "months-track");
+    expect(track.getAttribute("aria-valuemin")).toBe("7");
+  });
+
+  it("years-track bound=to: refDate before rangeStart → year min = fy+1", () => {
+    const { container } = render(
+      <Calendar
+        mode="range"
+        value={{ from: D(2024, 5, 15), to: D(2023, 0, 1) }}
+        defaultViewDate={D(2023, 0, 1)}
+      >
+        <CalendarYearsTrack bound="to" />
+      </Calendar>,
+    );
+    const track = findTrack(container, "years-track");
+    expect(track.getAttribute("aria-valuemin")).toBe("2025");
+  });
+
+  it("years-track bound=from: refDate after rangeEnd → year max = ty-1", () => {
+    const { container } = render(
+      <Calendar
+        mode="range"
+        value={{ from: D(2025, 7, 1), to: D(2024, 5, 15) }}
+        defaultViewDate={D(2025, 7, 1)}
+      >
+        <CalendarYearsTrack bound="from" />
+      </Calendar>,
+    );
+    const track = findTrack(container, "years-track");
+    expect(track.getAttribute("aria-valuemax")).toBe("2023");
+  });
+
+  it("absolute minDate combines with bound limit (max wins)", () => {
+    const { container } = render(
+      <Calendar
+        mode="range"
+        value={{ from: D(2024, 5, 15), to: null }}
+        minDate={D(2024, 5, 10)}
+        defaultViewDate={D(2024, 5, 15)}
+      >
+        <CalendarDaysTrack bound="to" />
+      </Calendar>,
+    );
+    const track = findTrack(container, "days-track");
+    // bound min = 15, abs min = 10 → effective 15
+    expect(track.getAttribute("aria-valuemin")).toBe("15");
+  });
+});

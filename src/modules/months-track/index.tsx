@@ -10,6 +10,10 @@ import { useBoundDateView } from "@/hooks/use-bound-date-view";
 import { useGridSlot } from "@/hooks/use-grid-slot";
 import { useItemWidth } from "@/hooks/use-item-width";
 import { useTrack } from "@/hooks/use-track";
+import {
+  clampBoundDate,
+  computeBoundLimits,
+} from "@/utils/clamp-bound-date";
 import { getMonthNames } from "@/utils/month-utils";
 import styles from "./months-track.module.css";
 
@@ -41,10 +45,30 @@ export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({
   const year = refDate.getFullYear();
   const currentIndex = refDate.getMonth();
   const MONTHS = getMonthNames(locale, short);
-  const minIndex =
+
+  const daysInRefMonth = new Date(year, currentIndex + 1, 0).getDate();
+  const boundLimits = computeBoundLimits({
+    bound,
+    rangeStart,
+    rangeEnd,
+    refYear: year,
+    refMonth: currentIndex,
+    refDay: refDate.getDate(),
+    daysInRefMonth,
+  });
+
+  const minFromAbs =
     minDate && minDate.getFullYear() === year ? minDate.getMonth() : undefined;
-  const maxIndex =
+  const maxFromAbs =
     maxDate && maxDate.getFullYear() === year ? maxDate.getMonth() : undefined;
+  const minCandidates = [minFromAbs, boundLimits.monthMin].filter(
+    (v): v is number => Number.isFinite(v as number),
+  );
+  const maxCandidates = [maxFromAbs, boundLimits.monthMax].filter(
+    (v): v is number => Number.isFinite(v as number),
+  );
+  const minIndex = minCandidates.length ? Math.max(...minCandidates) : undefined;
+  const maxIndex = maxCandidates.length ? Math.min(...maxCandidates) : undefined;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const itemWidth = useItemWidth(containerRef, 52);
@@ -69,8 +93,9 @@ export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({
       const next = new Date(refDate);
       next.setMonth(index);
       if (isBound) {
-        setLocalView(next);
-        if (!readOnly) onRangeBoundSet(bound!, next);
+        const clamped = clampBoundDate(next, bound!, rangeStart, rangeEnd);
+        setLocalView(clamped);
+        if (!readOnly) onRangeBoundSet(bound!, clamped);
       } else {
         navigateTo(next);
       }
