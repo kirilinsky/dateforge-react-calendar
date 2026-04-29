@@ -218,12 +218,18 @@ export function calendarReducer(
       const { bound, date } = action;
       let nextStart = state.rangeStart;
       let nextEnd = state.rangeEnd;
-      if (bound === "from") nextStart = date;
-      else nextEnd = date;
-      if (nextStart && nextEnd && nextStart.getTime() > nextEnd.getTime()) {
-        const swap = nextStart;
-        nextStart = nextEnd;
-        nextEnd = swap;
+      if (bound === "from") {
+        if (date && nextEnd && date.getTime() > nextEnd.getTime()) {
+          nextStart = nextEnd;
+        } else {
+          nextStart = date;
+        }
+      } else {
+        if (date && nextStart && date.getTime() < nextStart.getTime()) {
+          nextEnd = nextStart;
+        } else {
+          nextEnd = date;
+        }
       }
       return {
         ...state,

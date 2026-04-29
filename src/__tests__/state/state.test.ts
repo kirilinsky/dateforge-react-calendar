@@ -625,7 +625,7 @@ describe("SET_RANGE_BOUND", () => {
     expect(next.rangeEnd).toBe(date);
   });
 
-  it("auto-swaps when from > to", () => {
+  it("clamps from to rangeEnd when from would cross to (no swap)", () => {
     const from = d(2024, 3, 20);
     const to = d(2024, 3, 5);
     let state = calendarReducer(baseState, {
@@ -638,7 +638,26 @@ describe("SET_RANGE_BOUND", () => {
       bound: "from",
       date: from,
     });
-    expect(state.rangeStart!.getTime()).toBeLessThan(state.rangeEnd!.getTime());
+    // from collapsed to rangeEnd; identity preserved (rangeEnd unchanged)
+    expect(state.rangeStart!.getTime()).toBe(to.getTime());
+    expect(state.rangeEnd!.getTime()).toBe(to.getTime());
+  });
+
+  it("clamps to to rangeStart when to would cross from (no swap)", () => {
+    const from = d(2024, 3, 20);
+    const to = d(2024, 3, 5);
+    let state = calendarReducer(baseState, {
+      type: "SET_RANGE_BOUND",
+      bound: "from",
+      date: from,
+    });
+    state = calendarReducer(state, {
+      type: "SET_RANGE_BOUND",
+      bound: "to",
+      date: to,
+    });
+    expect(state.rangeStart!.getTime()).toBe(from.getTime());
+    expect(state.rangeEnd!.getTime()).toBe(from.getTime());
   });
 
   it("increments notifySeq", () => {
