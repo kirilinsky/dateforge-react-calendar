@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  clampBoundDate,
-  computeBoundLimits,
-} from "@/utils/clamp-bound-date";
+import { clampBoundDate, computeBoundLimits } from "@/utils/clamp-bound-date";
 
 const d = (y: number, m: number, day: number) => new Date(y, m - 1, day);
 

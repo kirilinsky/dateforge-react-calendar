@@ -13,10 +13,7 @@ import { useGridSlot } from "@/hooks/use-grid-slot";
 import { useItemWidth } from "@/hooks/use-item-width";
 import { useTrack } from "@/hooks/use-track";
 import { Check, Clear } from "@/Icons";
-import {
-  clampBoundDate,
-  computeBoundLimits,
-} from "@/utils/clamp-bound-date";
+import { clampBoundDate, computeBoundLimits } from "@/utils/clamp-bound-date";
 import { isSameDay } from "@/utils/date-core";
 import styles from "./days-track.module.css";
 
@@ -104,8 +101,12 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
   const maxCandidates = [maxFromAbs, boundLimits.dayMax].filter(
     (v): v is number => Number.isFinite(v as number),
   );
-  const minIndex = minCandidates.length ? Math.max(...minCandidates) : undefined;
-  const maxIndex = maxCandidates.length ? Math.min(...maxCandidates) : undefined;
+  const minIndex = minCandidates.length
+    ? Math.max(...minCandidates)
+    : undefined;
+  const maxIndex = maxCandidates.length
+    ? Math.min(...maxCandidates)
+    : undefined;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const itemWidth = useItemWidth(containerRef, 44);

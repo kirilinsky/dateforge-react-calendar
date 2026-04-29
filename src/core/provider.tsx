@@ -152,6 +152,37 @@ export function CalendarProvider<M extends CalendarMode = "single">({
     onChangeRef.current = onChange;
   });
 
+  const stateRef = useRef(state);
+  stateRef.current = state;
+  const isControlledRef = useRef(isControlled);
+  isControlledRef.current = isControlled;
+
+  const deriveValue = useCallback(
+    (s: typeof state): DateRange | Date[] | Date | null => {
+      if (range) return { from: s.rangeStart, to: s.rangeEnd };
+      if (multiselect) return s.selectedDates;
+      return s.selectedDates[0] ?? null;
+    },
+    [range, multiselect],
+  );
+
+  const commitSelection = useCallback(
+    (action: Parameters<typeof calendarReducer>[1]) => {
+      if (!isControlledRef.current) {
+        dispatch(action);
+        return;
+      }
+      const next = calendarReducer(stateRef.current, action);
+      if (next === stateRef.current) return;
+      const nextValue = deriveValue(next);
+      onChangeRef.current?.(nextValue as CalendarValue<M>);
+      if (next.viewDate !== stateRef.current.viewDate) {
+        dispatch({ type: "NAVIGATE", date: next.viewDate });
+      }
+    },
+    [deriveValue],
+  );
+
   const externalKey = serializeValue(
     externalValue as DateRange | Date[] | Date | null | undefined,
   );
@@ -234,41 +265,41 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   const handleChangeDate = useCallback(
     (d: Date | null) => {
       if (readOnly) return;
-      dispatch({ type: "SELECT", date: d, config: selectConfig });
+      commitSelection({ type: "SELECT", date: d, config: selectConfig });
     },
-    [selectConfig, readOnly],
+    [selectConfig, readOnly, commitSelection],
   );
 
   const handleChangeTime = useCallback(
     (d: Date) => {
       if (readOnly) return;
-      dispatch({ type: "CHANGE_TIME", date: d, config: selectConfig });
+      commitSelection({ type: "CHANGE_TIME", date: d, config: selectConfig });
     },
-    [readOnly, selectConfig],
+    [readOnly, selectConfig, commitSelection],
   );
 
   const handleDatesSet = useCallback(
     (dates: Date[]) => {
       if (readOnly) return;
-      dispatch({ type: "SET_DATES", dates });
+      commitSelection({ type: "SET_DATES", dates });
     },
-    [readOnly],
+    [readOnly, commitSelection],
   );
 
   const handleRangeSet = useCallback(
     (from: Date | null, to: Date | null) => {
       if (readOnly) return;
-      dispatch({ type: "SET_RANGE", from, to });
+      commitSelection({ type: "SET_RANGE", from, to });
     },
-    [readOnly],
+    [readOnly, commitSelection],
   );
 
   const handleRangeBoundSet = useCallback(
     (bound: "from" | "to", date: Date | null) => {
       if (readOnly) return;
-      dispatch({ type: "SET_RANGE_BOUND", bound, date });
+      commitSelection({ type: "SET_RANGE_BOUND", bound, date });
     },
-    [readOnly],
+    [readOnly, commitSelection],
   );
 
   const navigateTo = useCallback((d: Date) => {

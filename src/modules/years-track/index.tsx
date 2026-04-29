@@ -10,10 +10,7 @@ import { useBoundDateView } from "@/hooks/use-bound-date-view";
 import { useGridSlot } from "@/hooks/use-grid-slot";
 import { useItemWidth } from "@/hooks/use-item-width";
 import { useTrack } from "@/hooks/use-track";
-import {
-  clampBoundDate,
-  computeBoundLimits,
-} from "@/utils/clamp-bound-date";
+import { clampBoundDate, computeBoundLimits } from "@/utils/clamp-bound-date";
 import styles from "./years-track.module.css";
 
 const MIN_YEAR = 1900;
@@ -82,8 +79,12 @@ export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({
   const maxCandidates = [maxFromAbs, maxFromBound].filter(
     (v): v is number => v !== undefined,
   );
-  const minIndex = minCandidates.length ? Math.max(...minCandidates) : undefined;
-  const maxIndex = maxCandidates.length ? Math.min(...maxCandidates) : undefined;
+  const minIndex = minCandidates.length
+    ? Math.max(...minCandidates)
+    : undefined;
+  const maxIndex = maxCandidates.length
+    ? Math.min(...maxCandidates)
+    : undefined;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const itemWidth = useItemWidth(containerRef, 52);

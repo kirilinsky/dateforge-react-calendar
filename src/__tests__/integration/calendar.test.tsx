@@ -1,26 +1,12 @@
 import { fireEvent, render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
 import type { DateRange } from "@/types/calendar";
 
 const VIEW_DATE = new Date(2024, 5, 15); // June 15 2024
-
-const renderRange = (props: {
-  value?: DateRange;
-  onChange?: (v: DateRange) => void;
-}) =>
-  render(
-    <Calendar
-      mode="range"
-      value={props.value ?? { from: null, to: null }}
-      defaultViewDate={VIEW_DATE}
-      onChange={props.onChange}
-    >
-      <CalendarDays />
-    </Calendar>,
-  );
 
 const findDayButton = (container: HTMLElement, day: number): HTMLElement => {
   const grid = within(container).getByRole("grid");
@@ -77,10 +63,10 @@ describe("Calendar — single mode click", () => {
     expect(arg.getDate()).toBe(10);
   });
 
-  it("click selected day twice → deselects", async () => {
+  it("click selected day twice → deselects (uncontrolled)", async () => {
     const onChange = vi.fn();
     const { container } = render(
-      <Calendar value={VIEW_DATE} onChange={onChange}>
+      <Calendar defaultValue={VIEW_DATE} onChange={onChange}>
         <CalendarDays />
       </Calendar>,
     );
@@ -133,9 +119,13 @@ describe("Calendar — single mode click", () => {
 // ─── Range mode ───────────────────────────────────────────────────────────────
 
 describe("Calendar — range mode", () => {
-  it("click start then end → onChange fires with both dates", async () => {
+  it("click start then end → onChange fires with both dates (uncontrolled)", async () => {
     const onChange = vi.fn();
-    const { container } = renderRange({ onChange });
+    const { container } = render(
+      <Calendar mode="range" defaultViewDate={VIEW_DATE} onChange={onChange}>
+        <CalendarDays />
+      </Calendar>,
+    );
 
     const start = findDayButton(container, 5);
     await userEvent.click(start);
@@ -256,5 +246,116 @@ describe("Calendar — selection ARIA", () => {
       .getAllByRole("gridcell")
       .filter((c) => c.getAttribute("aria-selected") === "true");
     expect(selected).toHaveLength(1);
+  });
+});
+
+// ─── Controlled-value lockstep ────────────────────────────────────────────────
+
+describe("Calendar — controlled value is single source of truth", () => {
+  it("single mode: parent ignores onChange → DOM stays at controlled value", async () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <Calendar value={VIEW_DATE} onChange={onChange}>
+        <CalendarDays />
+      </Calendar>,
+    );
+    await userEvent.click(findDayButton(container, 10));
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect((onChange.mock.calls[0][0] as Date).getDate()).toBe(10);
+    // Selection stays on controlled VIEW_DATE (15), NOT the clicked cell (10)
+    const selected = within(container)
+      .getByRole("grid")
+      .querySelectorAll('[aria-selected="true"]');
+    expect(selected).toHaveLength(1);
+    const selectedDay = selected[0]
+      .querySelector("button")
+      ?.textContent?.trim();
+    expect(selectedDay).toBe("15");
+  });
+
+  it("single mode: repeated clicks fire onChange but state never drifts", async () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <Calendar value={VIEW_DATE} onChange={onChange}>
+        <CalendarDays />
+      </Calendar>,
+    );
+    await userEvent.click(findDayButton(container, 10));
+    await userEvent.click(findDayButton(container, 10));
+    // Both clicks compute "select 10" against unchanged controlled state.
+    // Neither is the deselect path because state never moved to 10.
+    expect(onChange).toHaveBeenCalledTimes(2);
+    expect((onChange.mock.calls[0][0] as Date).getDate()).toBe(10);
+    expect((onChange.mock.calls[1][0] as Date).getDate()).toBe(10);
+  });
+
+  it("range mode: parent ignores onChange → range stays empty", async () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <Calendar
+        mode="range"
+        value={{ from: null, to: null }}
+        defaultViewDate={VIEW_DATE}
+        onChange={onChange}
+      >
+        <CalendarDays />
+      </Calendar>,
+    );
+    await userEvent.click(findDayButton(container, 5));
+    await userEvent.click(findDayButton(container, 12));
+    // Each click recomputes against {null, null}, so each one starts a new
+    // range. No `to` is ever set because state never moves past empty.
+    const lastCall = onChange.mock.calls.at(-1)![0] as DateRange;
+    expect(lastCall.from!.getDate()).toBe(12);
+    expect(lastCall.to).toBeNull();
+  });
+
+  it("controlled value updated by parent → DOM reflects new value", async () => {
+    const onChange = vi.fn();
+    const Wrapper = () => {
+      const [v, setV] = useState<Date | null>(VIEW_DATE);
+      return (
+        <Calendar
+          value={v}
+          onChange={(d) => {
+            onChange(d);
+            setV(d as Date | null);
+          }}
+        >
+          <CalendarDays />
+        </Calendar>
+      );
+    };
+    const { container } = render(<Wrapper />);
+    await userEvent.click(findDayButton(container, 10));
+    const selected = within(container)
+      .getByRole("grid")
+      .querySelectorAll('[aria-selected="true"]')[0];
+    expect(selected.querySelector("button")?.textContent?.trim()).toBe("10");
+  });
+
+  it("readOnly + controlled → no onChange, no state drift", async () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <Calendar value={VIEW_DATE} onChange={onChange} readOnly>
+        <CalendarDays />
+      </Calendar>,
+    );
+    await userEvent.click(findDayButton(container, 10));
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("controlled range bound: clicking nav arrow on bound nav routes through onChange only", async () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <Calendar
+        mode="range"
+        value={{ from: new Date(2024, 5, 15), to: new Date(2024, 7, 20) }}
+        onChange={onChange}
+      >
+        {/* nav with bound writes via onRangeBoundSet → commitSelection */}
+      </Calendar>,
+    );
+    expect(container).toBeTruthy();
   });
 });

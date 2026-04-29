@@ -10,10 +10,7 @@ import { useBoundDateView } from "@/hooks/use-bound-date-view";
 import { useGridSlot } from "@/hooks/use-grid-slot";
 import { useItemWidth } from "@/hooks/use-item-width";
 import { useTrack } from "@/hooks/use-track";
-import {
-  clampBoundDate,
-  computeBoundLimits,
-} from "@/utils/clamp-bound-date";
+import { clampBoundDate, computeBoundLimits } from "@/utils/clamp-bound-date";
 import { getMonthNames } from "@/utils/month-utils";
 import styles from "./months-track.module.css";
 
@@ -67,8 +64,12 @@ export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({
   const maxCandidates = [maxFromAbs, boundLimits.monthMax].filter(
     (v): v is number => Number.isFinite(v as number),
   );
-  const minIndex = minCandidates.length ? Math.max(...minCandidates) : undefined;
-  const maxIndex = maxCandidates.length ? Math.min(...maxCandidates) : undefined;
+  const minIndex = minCandidates.length
+    ? Math.max(...minCandidates)
+    : undefined;
+  const maxIndex = maxCandidates.length
+    ? Math.min(...maxCandidates)
+    : undefined;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const itemWidth = useItemWidth(containerRef, 52);
