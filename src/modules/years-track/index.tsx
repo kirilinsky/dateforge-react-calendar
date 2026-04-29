@@ -10,6 +10,10 @@ import { useBoundDateView } from "@/hooks/use-bound-date-view";
 import { useGridSlot } from "@/hooks/use-grid-slot";
 import { useItemWidth } from "@/hooks/use-item-width";
 import { useTrack } from "@/hooks/use-track";
+import {
+  clampBoundDate,
+  computeBoundLimits,
+} from "@/utils/clamp-bound-date";
 import styles from "./years-track.module.css";
 
 const MIN_YEAR = 1900;
@@ -45,12 +49,41 @@ export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({
     0,
     Math.min(YEARS.length - 1, refDate.getFullYear() - MIN_YEAR),
   );
-  const minIndex = minDate
+
+  const refYear = refDate.getFullYear();
+  const refMonth = refDate.getMonth();
+  const daysInRefMonth = new Date(refYear, refMonth + 1, 0).getDate();
+  const boundLimits = computeBoundLimits({
+    bound,
+    rangeStart,
+    rangeEnd,
+    refYear,
+    refMonth,
+    refDay: refDate.getDate(),
+    daysInRefMonth,
+  });
+
+  const minFromAbs = minDate
     ? Math.max(0, minDate.getFullYear() - MIN_YEAR)
     : undefined;
-  const maxIndex = maxDate
+  const maxFromAbs = maxDate
     ? Math.min(YEARS.length - 1, maxDate.getFullYear() - MIN_YEAR)
     : undefined;
+  const minFromBound = Number.isFinite(boundLimits.yearMin)
+    ? Math.max(0, boundLimits.yearMin - MIN_YEAR)
+    : undefined;
+  const maxFromBound = Number.isFinite(boundLimits.yearMax)
+    ? Math.min(YEARS.length - 1, boundLimits.yearMax - MIN_YEAR)
+    : undefined;
+
+  const minCandidates = [minFromAbs, minFromBound].filter(
+    (v): v is number => v !== undefined,
+  );
+  const maxCandidates = [maxFromAbs, maxFromBound].filter(
+    (v): v is number => v !== undefined,
+  );
+  const minIndex = minCandidates.length ? Math.max(...minCandidates) : undefined;
+  const maxIndex = maxCandidates.length ? Math.min(...maxCandidates) : undefined;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const itemWidth = useItemWidth(containerRef, 52);
@@ -74,8 +107,9 @@ export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({
       const next = new Date(refDate);
       next.setFullYear(YEARS[index]);
       if (isBound) {
-        setLocalView(next);
-        if (!readOnly) onRangeBoundSet(bound!, next);
+        const clamped = clampBoundDate(next, bound!, rangeStart, rangeEnd);
+        setLocalView(clamped);
+        if (!readOnly) onRangeBoundSet(bound!, clamped);
       } else {
         navigateTo(next);
       }

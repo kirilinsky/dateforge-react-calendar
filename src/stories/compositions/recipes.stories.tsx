@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
 import { CalendarDaysTrack } from "@/modules/days-track";
@@ -11,7 +11,9 @@ import { basicPresets } from "@/modules/presets/presets-pack";
 import { CalendarSelectedDates } from "@/modules/selected-dates";
 import { CalendarTimeGrid } from "@/modules/time";
 import { CalendarYearsTrack } from "@/modules/years-track";
+import { createDisabled } from "@/utils/create-disabled";
 import { FIXED_DATE } from "../_constants";
+import { debugStyle, fmtRange } from "../_helpers/debug";
 import {
   resolveStoryAppearance,
   resolveStoryTheme,
@@ -306,3 +308,44 @@ export const WithGradient: Story = {
   },
 };
 WithGradient.storyName = "With gradient (gradient prop on selected cells)";
+
+export const FlightTracks: Story = {
+  render: (_args, ctx) => {
+    const [flightRange, setFlightRange] = useState<RangeValue>({
+      from: null,
+      to: null,
+    });
+    const noPast = useMemo(() => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return createDisabled({ before: today });
+    }, []);
+    return (
+      <>
+        <p style={debugStyle}>{fmtRange(flightRange)}</p>
+        <Calendar
+          mode="range"
+          value={flightRange}
+          onChange={setFlightRange}
+          disabled={noPast}
+          width="100%"
+          cols={2}
+          theme={resolveStoryTheme(ctx.globals.theme)}
+          appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        >
+          <CalendarNav col={1} label="Departure" monthLabel />
+          <CalendarNav col={1} label="Return" monthLabel clear />
+          <CalendarYearsTrack col={1} bound="from" />
+          <CalendarYearsTrack col={1} bound="to" />
+          <CalendarMonthsTrack col={1} bound="from" />
+          <CalendarMonthsTrack col={1} bound="to" />
+          <CalendarDaysTrack col={1} bound="from" />
+          <CalendarDaysTrack col={1} bound="to" />
+          <CalendarSelectedDates animated />
+        </Calendar>
+      </>
+    );
+  },
+};
+FlightTracks.storyName = "Flight tracks (two-bound range, tracks only)";
+FlightTracks.parameters = { storyWidth: 720 };

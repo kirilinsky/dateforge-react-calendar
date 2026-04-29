@@ -13,6 +13,10 @@ import { useGridSlot } from "@/hooks/use-grid-slot";
 import { useItemWidth } from "@/hooks/use-item-width";
 import { useTrack } from "@/hooks/use-track";
 import { Check, Clear } from "@/Icons";
+import {
+  clampBoundDate,
+  computeBoundLimits,
+} from "@/utils/clamp-bound-date";
 import { isSameDay } from "@/utils/date-core";
 import styles from "./days-track.module.css";
 
@@ -75,14 +79,33 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
       ? selectionDate.getDate() - 1
       : refDate.getDate() - 1;
 
-  const minIndex =
+  const boundLimits = computeBoundLimits({
+    bound,
+    rangeStart,
+    rangeEnd,
+    refYear: year,
+    refMonth: month,
+    refDay: refDate.getDate(),
+    daysInRefMonth: days,
+  });
+
+  const minFromAbs =
     minDate && minDate.getFullYear() === year && minDate.getMonth() === month
       ? minDate.getDate() - 1
       : undefined;
-  const maxIndex =
+  const maxFromAbs =
     maxDate && maxDate.getFullYear() === year && maxDate.getMonth() === month
       ? maxDate.getDate() - 1
       : undefined;
+
+  const minCandidates = [minFromAbs, boundLimits.dayMin].filter(
+    (v): v is number => Number.isFinite(v as number),
+  );
+  const maxCandidates = [maxFromAbs, boundLimits.dayMax].filter(
+    (v): v is number => Number.isFinite(v as number),
+  );
+  const minIndex = minCandidates.length ? Math.max(...minCandidates) : undefined;
+  const maxIndex = maxCandidates.length ? Math.min(...maxCandidates) : undefined;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const itemWidth = useItemWidth(containerRef, 44);
@@ -111,8 +134,9 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
       if (isMulti) {
         setLocalView(next);
       } else if (isBound) {
-        setLocalView(next);
-        if (!readOnly) onRangeBoundSet(bound!, next);
+        const clamped = clampBoundDate(next, bound!, rangeStart, rangeEnd);
+        setLocalView(clamped);
+        if (!readOnly) onRangeBoundSet(bound!, clamped);
       } else {
         navigateTo(next);
         if (!range && !readOnly) onChangeDate(next);
