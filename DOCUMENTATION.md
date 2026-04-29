@@ -86,7 +86,7 @@ const [date, setDate] = useState<Date | null>(null);
 </Calendar>;
 ```
 
-External changes to `value` are synced into internal state on every change.
+External changes to `value` are synced into internal state on every change. **Selection is single-source-of-truth in controlled mode**: user actions (clicks, range bounds, time edits) only fire `onChange` with the would-be-next value — they never mutate internal selection state. If the parent ignores `onChange` (or sets the same `value` back), the rendered selection stays put. Only `viewDate` updates locally, so the user's view follows the action regardless. To keep the calendar in sync, the parent must accept `onChange` and pass the new value back via `value`.
 
 **Uncontrolled** — `value` is `undefined`. Optional `defaultValue` seeds the initial selection:
 
@@ -503,6 +503,7 @@ Navigation header with configurable controls.
 | `themeToggle`     | `boolean`          | `false` | Show a light/dark theme toggle button. Has no effect when a custom theme (`createTheme()` or pre-built palette) is passed to `<Calendar theme={...} />`                                                        |
 | `offset`          | `number`           | `0`     | Month offset relative to `viewDate`. Use to render two synced nav headers in `cols={2}` layouts (`<CalendarNav offset={1} />`)                                                                                 |
 | `col`             | `number \| string` | —       | CSS grid `grid-column` value                                                                                                                                                                                   |
+| `bound`           | `"from" \| "to"`   | —       | In range mode binds the nav to a range boundary. Header reflects that bound's date; arrows / popups / `home` / `clear` write to that bound only. Falls back to opposite bound when own bound is null            |
 
 ### Behavior matrix
 
@@ -514,7 +515,7 @@ Navigation header with configurable controls.
 | `home`                                                           | `navigateTo(today)`                             | no                | n/a — navigation                                  |
 | `monthLabel` / `yearLabel` / `showNowTime`                       | display only                                    | no                | n/a                                               |
 | `themeToggle`                                                    | toggles UI theme via `UIContext.toggleTheme`    | no                | yes — UI not blocked                              |
-| `clear`                                                          | `onChangeDate(null)` — clears current selection | yes               | yes — button disabled when `readOnly`             |
+| `clear`                                                          | `onChangeDate(null)` — clears current selection. With `bound` clears that boundary only via `onRangeBoundSet(bound, null)` | yes               | yes — button disabled when `readOnly`             |
 | `showTime`                                                       | opens time popup; confirm calls `onChangeTime`  | yes (on confirm)  | yes — drums and confirm read-only when `readOnly` |
 
 Use this table to decide which guarantees apply to your composition. A `<CalendarNav>` without `clear` and without `showTime` is purely navigational and never fires `onChange`.
@@ -725,6 +726,14 @@ In `mode="multiple"` the track automatically renders a save / remove button. Ite
   <CalendarDaysTrack bound="to" />
 </Calendar>
 ```
+
+#### Bound coordination
+
+When two `bound` modules (Tracks or `<CalendarNav bound>`) coexist:
+
+- The `to`-bound module never moves before `rangeStart`, and the `from`-bound module never moves past `rangeEnd`. Per-field min/max on each track is recomputed each render from the opposite bound + the track's own other fields.
+- Crossing is clamped (no swap): writing a `from > to` (or `to < from`) collapses the moving bound onto the opposite. Identity stays stable mid-drag.
+- A bound module whose own date is `null` mirrors the opposite as starting reference (so the `to` track lands at `from` once `from` is set).
 
 ---
 

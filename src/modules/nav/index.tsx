@@ -16,9 +16,11 @@ import {
 import { useUI } from "@/context/ui-context";
 import { warnOnce } from "@/core/dev-warn";
 import shared from "@/global/global.module.css";
+import { useBoundDateView } from "@/hooks/use-bound-date-view";
 import { useClientValue } from "@/hooks/use-client-value";
 import { useGridSlot } from "@/hooks/use-grid-slot";
 import { Clear, Down, Home, ThemeToggle } from "@/Icons";
+import { clampBoundDate } from "@/utils/clamp-bound-date";
 import {
   addDate,
   checkYearNavigation,
@@ -107,6 +109,7 @@ export interface CalendarNavProps {
   themeToggle?: boolean;
   label?: string;
   col?: number | string;
+  bound?: "from" | "to";
 }
 
 export const CalendarNav: React.FC<CalendarNavProps> = ({
@@ -126,6 +129,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
   themeToggle = false,
   label,
   col,
+  bound,
 }) => {
   if (showMonthPicker && compactMonths) {
     warnOnce(
@@ -141,8 +145,19 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
   }
 
   const safeLabel = useMemo(() => (label ? sanitizeLabel(label) : ""), [label]);
-  const { minDate, maxDate, locale, hour12, disabled, readOnly } = useConfig();
-  const { viewDate: rawDate, navigateTo } = useNavigation();
+  const { minDate, maxDate, locale, hour12, disabled, readOnly, range } =
+    useConfig();
+  const { viewDate, navigateTo } = useNavigation();
+  const { selectedDates, rangeStart, rangeEnd } = useSelectionValue();
+  const { onChangeDate, onChangeTime, onRangeBoundSet } = useSelectionActions();
+  const { isBound, boundDate, setLocalView, refDate } = useBoundDateView({
+    bound,
+    range,
+    rangeStart,
+    rangeEnd,
+    viewDate,
+  });
+  const rawDate = isBound ? refDate : viewDate;
   const date = offset
     ? new Date(
         rawDate.getFullYear(),
@@ -154,8 +169,16 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
         rawDate.getMilliseconds(),
       )
     : rawDate;
-  const { selectedDates } = useSelectionValue();
-  const { onChangeDate, onChangeTime } = useSelectionActions();
+
+  const navigateBoundOrView = (next: Date) => {
+    if (isBound) {
+      const clamped = clampBoundDate(next, bound!, rangeStart, rangeEnd);
+      setLocalView(clamped);
+      if (!readOnly) onRangeBoundSet(bound!, clamped);
+    } else {
+      navigateTo(next);
+    }
+  };
   const {
     setShowTimePopup,
     setShowMonthPopup,
@@ -224,9 +247,9 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
   }).format(date);
 
   const ch = (v: number) =>
-    navigateTo(addDate(rawDate, v, "year", minDate, maxDate));
+    navigateBoundOrView(addDate(rawDate, v, "year", minDate, maxDate));
   const cm = (v: number) =>
-    navigateTo(addDate(rawDate, v, "month", minDate, maxDate));
+    navigateBoundOrView(addDate(rawDate, v, "month", minDate, maxDate));
 
   const visible =
     !!safeLabel ||
@@ -422,7 +445,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
               aria-label="Go to current month"
               onClick={() =>
                 today &&
-                navigateTo(
+                navigateBoundOrView(
                   new Date(
                     today.getFullYear(),
                     today.getMonth(),
@@ -441,10 +464,18 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           {clear && (
             <button
               type="button"
-              className={`${styles.homeButton} ${shared.interactive} ${shared.hovered} ${selectedDates.length === 0 || readOnly ? styles.homeButtonDisabled : ""}`}
-              disabled={selectedDates.length === 0 || readOnly}
+              className={`${styles.homeButton} ${shared.interactive} ${shared.hovered} ${
+                (isBound ? !boundDate : selectedDates.length === 0) || readOnly
+                  ? styles.homeButtonDisabled
+                  : ""
+              }`}
+              disabled={
+                (isBound ? !boundDate : selectedDates.length === 0) || readOnly
+              }
               aria-label="Clear selection"
-              onClick={() => onChangeDate(null)}
+              onClick={() =>
+                isBound ? onRangeBoundSet(bound!, null) : onChangeDate(null)
+              }
             >
               <Clear />
             </button>
@@ -471,7 +502,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           minDate={minDate}
           maxDate={maxDate}
           onConfirm={(newDate) => {
-            navigateTo(newDate);
+            navigateBoundOrView(newDate);
             setShowMonthPopup(false);
           }}
           onClose={() => setShowMonthPopup(false)}
@@ -483,7 +514,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           minDate={minDate}
           maxDate={maxDate}
           onConfirm={(newDate) => {
-            navigateTo(newDate);
+            navigateBoundOrView(newDate);
             setShowYearPopup(false);
           }}
           onClose={() => setShowYearPopup(false)}

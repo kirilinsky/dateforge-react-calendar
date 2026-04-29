@@ -333,8 +333,8 @@ export const FlightTracks: Story = {
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
         >
-          <CalendarNav col={1} label="Departure" monthLabel />
-          <CalendarNav col={1} label="Return" monthLabel clear />
+          <CalendarNav col={1} label="Departure" bound="from" monthLabel />
+          <CalendarNav col={1} label="Return" bound="to" monthLabel />
           <CalendarYearsTrack col={1} bound="from" />
           <CalendarYearsTrack col={1} bound="to" />
           <CalendarMonthsTrack col={1} bound="from" />

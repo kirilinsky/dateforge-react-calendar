@@ -16,7 +16,7 @@ interface BoundLimitsInput {
   daysInRefMonth: number;
 }
 
-export interface BoundLimits {
+interface BoundLimits {
   yearMin: number;
   yearMax: number;
   monthMin: number;
