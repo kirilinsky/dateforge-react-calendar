@@ -41,7 +41,7 @@ export const BasicDatePicker: Story = {
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
       >
-        <CalendarNav label="Pick a date" showMonthPicker compactYears />
+        <CalendarNav showTime showMonthPicker compactYears />
         <CalendarDays />
       </Calendar>
     );

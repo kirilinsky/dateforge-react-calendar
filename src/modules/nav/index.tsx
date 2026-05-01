@@ -24,6 +24,7 @@ import { clampBoundDate } from "@/utils/clamp-bound-date";
 import {
   addDate,
   checkYearNavigation,
+  getMonthNames,
   getTimeString,
   isYearFixed,
 } from "@/utils/date-utils";
@@ -80,6 +81,48 @@ const AnimatedTime = memo(
             </span>
           ),
         )}
+      </span>
+    );
+  },
+);
+
+const longestBy = (arr: string[]) =>
+  arr.reduce((a, b) => (b.length > a.length ? b : a), "");
+
+const MonthLabel = memo(
+  ({
+    locale,
+    longName,
+    shortName,
+  }: {
+    locale: string;
+    longName: string;
+    shortName: string;
+  }) => {
+    const longestLong = useMemo(
+      () => longestBy(getMonthNames(locale, false)),
+      [locale],
+    );
+    const longestShort = useMemo(
+      () => longestBy(getMonthNames(locale, true)),
+      [locale],
+    );
+    return (
+      <span className={styles.monthSlot}>
+        <span
+          className={`${styles.monthNameLong} ${styles.monthSizer}`}
+          aria-hidden
+        >
+          {longestLong}
+        </span>
+        <span
+          className={`${styles.monthNameShort} ${styles.monthSizer}`}
+          aria-hidden
+        >
+          {longestShort}
+        </span>
+        <span className={styles.monthNameLong}>{longName}</span>
+        <span className={styles.monthNameShort}>{shortName}</span>
       </span>
     );
   },
@@ -308,8 +351,11 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
             onClick={monthFixed ? undefined : openPopup(setShowMonthPopup)}
           >
             <Down />{" "}
-            <span className={styles.monthNameLong}>{monthNameLong}</span>
-            <span className={styles.monthNameShort}>{monthNameShort}</span>
+            <MonthLabel
+              locale={locale}
+              longName={monthNameLong}
+              shortName={monthNameShort}
+            />
           </button>
         )}
 
@@ -340,8 +386,11 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
               aria-expanded={monthFixed ? undefined : showMonthPopup}
               aria-disabled={monthFixed || undefined}
             >
-              <span className={styles.monthNameLong}>{monthNameLong}</span>
-              <span className={styles.monthNameShort}>{monthNameShort}</span>
+              <MonthLabel
+                locale={locale}
+                longName={monthNameLong}
+                shortName={monthNameShort}
+              />
             </button>
             {canGoNextMonth && (
               <button
@@ -413,8 +462,11 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           <span
             className={`${styles.currentYear} ${styles.staticButton} ${shared.flexCenter}`}
           >
-            <span className={styles.monthNameLong}>{monthNameLong}</span>
-            <span className={styles.monthNameShort}>{monthNameShort}</span>
+            <MonthLabel
+              locale={locale}
+              longName={monthNameLong}
+              shortName={monthNameShort}
+            />
           </span>
         )}
 
