@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1
+
+### Patch Changes
+
+- [#22](https://github.com/kirilinsky/dateforge-react-calendar/pull/22) [`ec5e0e2`](https://github.com/kirilinsky/dateforge-react-calendar/commit/ec5e0e27838b2f284d728300a84aba8550ffe1be) Thanks [@kirilinsky](https://github.com/kirilinsky)! - Fix nav header overflow and stabilize month picker width via hidden longest-month sizer.
+
 ## 1.2.0
 
 ### Minor Changes
