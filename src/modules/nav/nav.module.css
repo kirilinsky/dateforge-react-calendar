@@ -26,10 +26,8 @@
   }
 
   .yearsSelector {
-    flex-grow: 1;
-    flex-shrink: 0;
-    flex-basis: 8em;
-    min-width: 0;
+    flex: 1 0 auto;
+    min-width: max-content;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -41,12 +39,10 @@
     font-size: 1.05em;
     font-weight: 800;
     line-height: 1;
-    flex-shrink: 0;
-    width: max-content;
+    flex: 1 0 auto;
     margin: 0 0.3em;
     height: 2.3em;
     white-space: nowrap;
-    flex-grow: 1;
     &:active {
       transform: scale(0.96);
     }
@@ -54,9 +50,8 @@
 
   .arrow {
     width: 2.2em;
-    min-width: 1.4em;
     height: 2.3em;
-    flex-shrink: 1;
+    flex: 0 0 auto;
     padding: 0;
   }
 
@@ -222,6 +217,22 @@
 
   .monthNameShort {
     display: none;
+  }
+
+  .monthSlot {
+    display: inline-grid;
+    grid-template-areas: "stack";
+    align-items: center;
+    justify-items: center;
+  }
+
+  .monthSlot > * {
+    grid-area: stack;
+  }
+
+  .monthSizer {
+    visibility: hidden;
+    pointer-events: none;
   }
 
   @container (max-width: 16.25em) {

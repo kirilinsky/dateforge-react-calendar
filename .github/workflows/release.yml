@@ -36,9 +36,10 @@ jobs:
       - name: Create Release Pull Request or Publish
         uses: changesets/action@v1
         with:
-          publish: npm publish --loglevel verbose
+          publish: npx changeset publish
           version: npx changeset version
           commit: "chore: version packages"
           title: "chore: version packages"
+          createGithubReleases: true
         env:
           GITHUB_TOKEN: ${{ secrets.CHANGESETS_TOKEN || secrets.GITHUB_TOKEN }}

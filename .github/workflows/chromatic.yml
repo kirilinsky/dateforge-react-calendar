@@ -8,6 +8,7 @@ on:
 
 jobs:
   chromatic:
+    if: github.head_ref != 'changeset-release/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

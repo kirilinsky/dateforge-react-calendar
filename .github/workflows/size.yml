@@ -6,6 +6,7 @@ on:
 
 jobs:
   size:
+    if: github.head_ref != 'changeset-release/main'
     runs-on: ubuntu-latest
     permissions:
       contents: read
