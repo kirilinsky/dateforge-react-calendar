@@ -348,4 +348,7 @@ export const FlightTracks: Story = {
   },
 };
 FlightTracks.storyName = "Flight tracks (two-bound range, tracks only)";
-FlightTracks.parameters = { storyWidth: 720 };
+FlightTracks.parameters = {
+  storyWidth: 720,
+  chromatic: { delay: 1000, pauseAnimationAtEnd: true },
+};
