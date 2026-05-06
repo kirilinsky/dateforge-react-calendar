@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { SelectConfig } from "@/core/state";
-import { buildInitialState, calendarReducer } from "@/core/state";
+import {
+  buildInitialState,
+  calendarReducer,
+  toValidDateOrNull,
+} from "@/core/state";
 import type { DisabledConfig } from "@/types/calendar";
 
 const d = (y: number, m: number, day: number) => new Date(y, m - 1, day);
@@ -795,6 +799,22 @@ describe("SYNC_EXTERNAL", () => {
       rangeEnd: null,
     });
     expect(next.notifySeq).toBe(baseState.notifySeq);
+  });
+});
+
+// ─── fallback helpers ───────────────────────────────────────────────────────
+
+describe("fallback helpers", () => {
+  it("returns the same state for unknown reducer actions", () => {
+    const next = calendarReducer(baseState, {
+      type: "UNKNOWN",
+    } as never);
+    expect(next).toBe(baseState);
+  });
+
+  it("toValidDateOrNull drops nullish input", () => {
+    expect(toValidDateOrNull(null)).toBeNull();
+    expect(toValidDateOrNull(undefined)).toBeNull();
   });
 });
 
