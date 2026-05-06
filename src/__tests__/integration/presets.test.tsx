@@ -252,6 +252,50 @@ describe("Presets — mode filtering", () => {
     expect(last).toHaveProperty("to");
   });
 
+  it("range preset is filtered when shorter than minRangeDays", () => {
+    const { container } = render(
+      <Calendar mode="range" minRangeDays={3}>
+        <CalendarPresets
+          presets={[
+            {
+              id: "short",
+              label: "Too short",
+              value: new Date(2024, 5, 1),
+              range: 1,
+            },
+          ]}
+        />
+      </Calendar>,
+    );
+    expect(buttonsByLabel(container, "Too short")).toHaveLength(0);
+  });
+
+  it("range preset is filtered when it contains disabled dates", () => {
+    const { container } = render(
+      <Calendar
+        mode="range"
+        disabled={{
+          __type: "disabled-config",
+          rules: [new Date(2024, 5, 2)],
+        }}
+      >
+        <CalendarPresets
+          presets={[
+            {
+              id: "blocked",
+              label: "Blocked range",
+              getValue: () => ({
+                from: new Date(2024, 5, 1),
+                to: new Date(2024, 5, 3),
+              }),
+            },
+          ]}
+        />
+      </Calendar>,
+    );
+    expect(buttonsByLabel(container, "Blocked range")).toHaveLength(0);
+  });
+
   it("advanced range preset is filtered in single mode", () => {
     const { container } = render(
       <Calendar mode="single">

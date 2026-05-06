@@ -125,6 +125,34 @@ describe("ManualInput — multi mode cap", () => {
   });
 });
 
+describe("ManualInput — range constraints", () => {
+  it("does not commit a complete range shorter than minRangeDays", async () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <Calendar mode="range" minRangeDays={3} onChange={onChange}>
+        <CalendarManualInput />
+      </Calendar>,
+    );
+
+    await userEvent.click(container.querySelectorAll("input")[0]);
+    await userEvent.keyboard("01062024{Enter}");
+    const partial = onChange.mock.calls[0][0] as {
+      from: Date | null;
+      to: Date | null;
+    };
+    expect(partial.from?.getFullYear()).toBe(2024);
+    expect(partial.from?.getMonth()).toBe(5);
+    expect(partial.from?.getDate()).toBe(1);
+    expect(partial.to).toBeNull();
+
+    onChange.mockClear();
+    await userEvent.click(container.querySelectorAll("input")[0]);
+    await userEvent.keyboard("02062024{Enter}");
+
+    expect(onChange).not.toHaveBeenCalled();
+  });
+});
+
 describe("ManualInput — per-chip remove (multiple mode)", () => {
   it("renders × button per chip and removes only that date", async () => {
     const onChange = vi.fn();

@@ -75,6 +75,12 @@
     text-decoration: line-through;
     color: var(--c-h);
   }
+
+  &[data-other-month]:disabled,
+  &[data-other-month][aria-disabled="true"] {
+    color: var(--c-c) !important;
+    opacity: 0.3;
+  }
 }
 
 .rangeStart {

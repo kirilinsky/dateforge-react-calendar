@@ -72,6 +72,7 @@ export function useTrack({
     syncTarget: null as number | null,
     fromGesture: false,
   });
+  const rafId = useRef<number | null>(null);
 
   const getBounds = () => {
     const {
@@ -103,96 +104,126 @@ export function useTrack({
     }
   };
 
-  useEffect(() => {
-    const animate = () => {
-      if (!p.current.isDragging) {
-        const { lo, hi, isCircular, c, ppi } = getBounds();
+  const isOffsetSnapped = () => {
+    const { isCircular, c, ppi } = getBounds();
+    const target = resolveIdx(p.current.offset) * ppi;
+    const diff = Math.abs(target - p.current.offset);
+    if (!isCircular) return diff < SETTLE_PX;
+    const range = c * ppi;
+    return Math.min(diff, range - diff) < SETTLE_PX;
+  };
 
-        if (p.current.syncTarget !== null) {
-          const range = c * ppi;
-          let target = p.current.syncTarget;
-          if (isCircular) {
-            let diff = target - p.current.offset;
-            if (diff > range / 2) diff -= range;
-            if (diff < -range / 2) diff += range;
-            target = p.current.offset + diff;
-          }
-          const diff = target - p.current.offset;
-          p.current.offset += diff * 0.18;
-          p.current.velocity = 0;
-          if (isCircular) {
-            p.current.offset = ((p.current.offset % range) + range) % range;
-          }
-          if (Math.abs(diff) < SETTLE_PX) {
-            p.current.offset = isCircular
-              ? ((p.current.syncTarget % range) + range) % range
-              : p.current.syncTarget;
-            p.current.syncTarget = null;
-          }
-          p.current.snapped = resolveIdx(p.current.offset);
-          setPosition(p.current.offset / ppi);
-          rafId = requestAnimationFrame(animate);
-          return;
+  const shouldKeepAnimating = () =>
+    p.current.isDragging ||
+    p.current.syncTarget !== null ||
+    p.current.velocity !== 0 ||
+    !isOffsetSnapped();
+
+  const stopLoop = () => {
+    if (rafId.current === null) return;
+    cancelAnimationFrame(rafId.current);
+    rafId.current = null;
+  };
+
+  const animate = () => {
+    if (!p.current.isDragging) {
+      const { lo, hi, isCircular, c, ppi } = getBounds();
+
+      if (p.current.syncTarget !== null) {
+        const range = c * ppi;
+        let target = p.current.syncTarget;
+        if (isCircular) {
+          let diff = target - p.current.offset;
+          if (diff > range / 2) diff -= range;
+          if (diff < -range / 2) diff += range;
+          target = p.current.offset + diff;
         }
-        const minOffset = lo * ppi;
-        const maxOffset = hi * ppi;
-
-        p.current.velocity *= FRICTION;
-        p.current.offset += p.current.velocity;
-
-        if (!isCircular) {
-          if (p.current.offset < minOffset) {
-            p.current.velocity += (minOffset - p.current.offset) * RUBBER_K;
-            p.current.velocity *= RUBBER_DAMP;
-          } else if (p.current.offset > maxOffset) {
-            p.current.velocity += (maxOffset - p.current.offset) * RUBBER_K;
-            p.current.velocity *= RUBBER_DAMP;
-          } else if (Math.abs(p.current.velocity) < SNAP_THRESHOLD) {
-            const idx = clamp(Math.round(p.current.offset / ppi), lo, hi);
-            const target = idx * ppi;
-            const diff = target - p.current.offset;
-            p.current.velocity += diff * SPRING_K;
-            p.current.velocity *= SPRING_DAMP;
-            if (
-              Math.abs(diff) < SETTLE_PX &&
-              Math.abs(p.current.velocity) < SETTLE_PX
-            ) {
-              p.current.offset = target;
-              p.current.velocity = 0;
-            }
-          }
-        } else {
-          const range = c * ppi;
+        const diff = target - p.current.offset;
+        p.current.offset += diff * 0.18;
+        p.current.velocity = 0;
+        if (isCircular) {
           p.current.offset = ((p.current.offset % range) + range) % range;
-
-          if (Math.abs(p.current.velocity) < SNAP_THRESHOLD) {
-            const rawIdx = p.current.offset / ppi;
-            const idx = ((Math.round(rawIdx) % c) + c) % c;
-            const target = idx * ppi;
-            let diff = target - p.current.offset;
-            if (diff > range / 2) diff -= range;
-            if (diff < -range / 2) diff += range;
-            p.current.velocity += diff * SPRING_K;
-            p.current.velocity *= SPRING_DAMP;
-            if (
-              Math.abs(diff) < SETTLE_PX &&
-              Math.abs(p.current.velocity) < SETTLE_PX
-            ) {
-              p.current.offset = target;
-              p.current.velocity = 0;
-            }
-          }
         }
-
-        notifyIfChanged(p.current.offset);
-        setPosition(p.current.offset / opts.current.pixelsPerItem);
+        if (Math.abs(diff) < SETTLE_PX) {
+          p.current.offset = isCircular
+            ? ((p.current.syncTarget % range) + range) % range
+            : p.current.syncTarget;
+          p.current.syncTarget = null;
+        }
+        p.current.snapped = resolveIdx(p.current.offset);
+        setPosition(p.current.offset / ppi);
+        rafId.current = shouldKeepAnimating()
+          ? requestAnimationFrame(animate)
+          : null;
+        return;
       }
 
-      rafId = requestAnimationFrame(animate);
-    };
+      const minOffset = lo * ppi;
+      const maxOffset = hi * ppi;
 
-    let rafId = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(rafId);
+      p.current.velocity *= FRICTION;
+      p.current.offset += p.current.velocity;
+
+      if (!isCircular) {
+        if (p.current.offset < minOffset) {
+          p.current.velocity += (minOffset - p.current.offset) * RUBBER_K;
+          p.current.velocity *= RUBBER_DAMP;
+        } else if (p.current.offset > maxOffset) {
+          p.current.velocity += (maxOffset - p.current.offset) * RUBBER_K;
+          p.current.velocity *= RUBBER_DAMP;
+        } else if (Math.abs(p.current.velocity) < SNAP_THRESHOLD) {
+          const idx = clamp(Math.round(p.current.offset / ppi), lo, hi);
+          const target = idx * ppi;
+          const diff = target - p.current.offset;
+          p.current.velocity += diff * SPRING_K;
+          p.current.velocity *= SPRING_DAMP;
+          if (
+            Math.abs(diff) < SETTLE_PX &&
+            Math.abs(p.current.velocity) < SETTLE_PX
+          ) {
+            p.current.offset = target;
+            p.current.velocity = 0;
+          }
+        }
+      } else {
+        const range = c * ppi;
+        p.current.offset = ((p.current.offset % range) + range) % range;
+
+        if (Math.abs(p.current.velocity) < SNAP_THRESHOLD) {
+          const rawIdx = p.current.offset / ppi;
+          const idx = ((Math.round(rawIdx) % c) + c) % c;
+          const target = idx * ppi;
+          let diff = target - p.current.offset;
+          if (diff > range / 2) diff -= range;
+          if (diff < -range / 2) diff += range;
+          p.current.velocity += diff * SPRING_K;
+          p.current.velocity *= SPRING_DAMP;
+          if (
+            Math.abs(diff) < SETTLE_PX &&
+            Math.abs(p.current.velocity) < SETTLE_PX
+          ) {
+            p.current.offset = target;
+            p.current.velocity = 0;
+          }
+        }
+      }
+
+      notifyIfChanged(p.current.offset);
+      setPosition(p.current.offset / opts.current.pixelsPerItem);
+    }
+
+    rafId.current = shouldKeepAnimating()
+      ? requestAnimationFrame(animate)
+      : null;
+  };
+
+  const startLoop = () => {
+    if (rafId.current !== null) return;
+    rafId.current = requestAnimationFrame(animate);
+  };
+
+  useEffect(() => {
+    return stopLoop;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -207,6 +238,7 @@ export function useTrack({
     p.current.syncTarget = idx * ppi;
     p.current.velocity = 0;
     p.current.fromGesture = false;
+    startLoop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialIndex]);
 
@@ -217,6 +249,8 @@ export function useTrack({
     prevPpi.current = pixelsPerItem;
     p.current.offset = (p.current.offset / oldPpi) * pixelsPerItem;
     p.current.velocity = (p.current.velocity / oldPpi) * pixelsPerItem;
+    if (shouldKeepAnimating()) startLoop();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pixelsPerItem]);
 
   // Stable window-level handlers, set up once on mount.
@@ -258,6 +292,7 @@ export function useTrack({
         window.removeEventListener("pointermove", h.move);
         window.removeEventListener("pointerup", h.up);
         window.removeEventListener("pointercancel", h.up);
+        startLoop();
       },
     };
   }
@@ -288,6 +323,7 @@ export function useTrack({
     window.addEventListener("pointermove", h.move);
     window.addEventListener("pointerup", h.up);
     window.addEventListener("pointercancel", h.up);
+    startLoop();
   };
 
   const onPointerMove = () => {
@@ -306,6 +342,7 @@ export function useTrack({
     const targetOffset = idx * ppi;
     const diff = targetOffset - p.current.offset;
     p.current.velocity += clamp(diff * 0.15, -30, 30);
+    startLoop();
   };
 
   useEffect(() => {
@@ -342,6 +379,7 @@ export function useTrack({
 
       notifyIfChanged(p.current.offset);
       setPosition(p.current.offset / ppi);
+      startLoop();
     };
     el.addEventListener("wheel", handler, { passive: false });
     return () => el.removeEventListener("wheel", handler);
