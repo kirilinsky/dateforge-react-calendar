@@ -289,17 +289,22 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   const handleRangeSet = useCallback(
     (from: Date | null, to: Date | null) => {
       if (readOnly) return;
-      commitSelection({ type: "SET_RANGE", from, to });
+      commitSelection({ type: "SET_RANGE", from, to, config: selectConfig });
     },
-    [readOnly, commitSelection],
+    [readOnly, selectConfig, commitSelection],
   );
 
   const handleRangeBoundSet = useCallback(
     (bound: "from" | "to", date: Date | null) => {
       if (readOnly) return;
-      commitSelection({ type: "SET_RANGE_BOUND", bound, date });
+      commitSelection({
+        type: "SET_RANGE_BOUND",
+        bound,
+        date,
+        config: selectConfig,
+      });
     },
-    [readOnly, commitSelection],
+    [readOnly, selectConfig, commitSelection],
   );
 
   const navigateTo = useCallback((d: Date) => {

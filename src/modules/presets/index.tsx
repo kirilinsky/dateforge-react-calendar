@@ -32,7 +32,16 @@ export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
   presets = EMPTY,
   col,
 }) => {
-  const { minDate, maxDate, locale, disabled, range, readOnly } = useConfig();
+  const {
+    minDate,
+    maxDate,
+    locale,
+    disabled,
+    range,
+    minRangeDays,
+    maxRangeDays,
+    readOnly,
+  } = useConfig();
   const { viewDate } = useNavigation();
   const { selectedDate, rangeStart, rangeEnd } = useSelectionValue();
   const { onChangeDate, onRangeSet } = useSelectionActions();
@@ -47,8 +56,20 @@ export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
         minDate,
         maxDate,
         disabled,
+        minRangeDays,
+        maxRangeDays,
       ),
-    [presets, viewDate, locale, range, minDate, maxDate, disabled],
+    [
+      presets,
+      viewDate,
+      locale,
+      range,
+      minDate,
+      maxDate,
+      disabled,
+      minRangeDays,
+      maxRangeDays,
+    ],
   );
   const gridSlot = useGridSlot(col);
 

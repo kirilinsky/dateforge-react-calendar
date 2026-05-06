@@ -96,6 +96,36 @@ describe("useSelectionActions — onChange fires on select", () => {
     expect(onChange).toHaveBeenCalledWith({ from, to });
   });
 
+  it("onRangeSet rejects ranges that violate range constraints", () => {
+    const onChange = vi.fn();
+    const { result } = renderHook(() => useSelectionActions(), {
+      wrapper: wrap({
+        mode: "range",
+        minRangeDays: 3,
+        onChange,
+      } as Parameters<typeof wrap>[0]),
+    });
+    act(() => result.current.onRangeSet(d(2024, 6, 1), d(2024, 6, 2)));
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("onRangeBoundSet rejects ranges containing disabled dates", () => {
+    const onChange = vi.fn();
+    const { result } = renderHook(() => useSelectionActions(), {
+      wrapper: wrap({
+        mode: "range",
+        value: { from: d(2024, 6, 1), to: d(2024, 6, 2) },
+        disabled: {
+          __type: "disabled-config",
+          rules: [d(2024, 6, 2)],
+        },
+        onChange,
+      } as Parameters<typeof wrap>[0]),
+    });
+    act(() => result.current.onRangeBoundSet("to", d(2024, 6, 3)));
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
   it("onDatesSet → onChange called with Date[]", () => {
     const onChange = vi.fn();
     const dates = [d(2024, 1, 1), d(2024, 2, 1)];

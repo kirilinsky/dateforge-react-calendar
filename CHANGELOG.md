@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.2
+
+### Patch Changes
+
+- [#34](https://github.com/kirilinsky/dateforge-react-calendar/pull/34) [`844537e`](https://github.com/kirilinsky/dateforge-react-calendar/commit/844537e62c7899e107c0dd2a0b73e9c05ff14175) Thanks [@kirilinsky](https://github.com/kirilinsky)! - Improve track and range behavior.
+
+  - Stop `useTrack` animation frames when the track is idle, and restart them only for active movement.
+  - Validate range updates from manual input, presets, track bounds, and selection actions against min/max range length and disabled dates.
+  - Keep outside-month day styling dominant when a day is also disabled.
+
 ## 1.2.1
 
 ### Patch Changes
