@@ -1,4 +1,5 @@
 import { warnOnce } from "@/core/dev-warn";
+import { validateRange } from "@/core/state";
 import type { DisabledConfig } from "@/types/calendar";
 import type {
   AdvancedPresetDef,
@@ -104,6 +105,8 @@ export const getResolvedPresets = (
   minDate?: Date | null,
   maxDate?: Date | null,
   disabled?: DisabledConfig,
+  minRangeDays?: number,
+  maxRangeDays?: number,
 ): ResolvedPreset[] => {
   const isValid = (d: Date) =>
     !checkIsDateDisabled(d, minDate, maxDate, disabled);
@@ -197,12 +200,19 @@ export const getResolvedPresets = (
     if (!rangeMode) return;
     const from = applyTimeFromSource(result.from, viewDate);
     const to = applyTimeFromSource(result.to, viewDate);
-    if (!isValid(from) || !isValid(to)) return;
+    const range = validateRange(from, to, {
+      minRangeDays,
+      maxRangeDays,
+      minDate,
+      maxDate,
+      disabled,
+    });
+    if (!range?.from || !range.to) return;
     seenIds.add(id);
     out.push({
       id,
       label: resolveLabel(entry.label, locale),
-      value: { from, to },
+      value: { from: range.from, to: range.to },
       isRange: true,
     });
   });

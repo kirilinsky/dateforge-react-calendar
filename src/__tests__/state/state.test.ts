@@ -199,6 +199,16 @@ describe("SELECT range", () => {
     expect(next.rangeEnd).toBeNull();
   });
 
+  it("first click rejects disabled rangeStart", () => {
+    const date = d(2024, 6, 1);
+    const next = calendarReducer(baseState, {
+      type: "SELECT",
+      date,
+      config: rangeCfg({ disabled: disabled(date) }),
+    });
+    expect(next).toBe(baseState);
+  });
+
   it("second click (later) sets rangeEnd, orders start < end", () => {
     const start = d(2024, 6, 1);
     const end = d(2024, 6, 15);
@@ -568,7 +578,12 @@ describe("SET_RANGE", () => {
   it("sets rangeStart and rangeEnd", () => {
     const from = d(2024, 1, 1);
     const to = d(2024, 1, 31);
-    const next = calendarReducer(baseState, { type: "SET_RANGE", from, to });
+    const next = calendarReducer(baseState, {
+      type: "SET_RANGE",
+      from,
+      to,
+      config: rangeCfg(),
+    });
     expect(next.rangeStart).toBe(from);
     expect(next.rangeEnd).toBe(to);
   });
@@ -579,6 +594,7 @@ describe("SET_RANGE", () => {
       type: "SET_RANGE",
       from,
       to: null,
+      config: rangeCfg(),
     });
     expect(next.viewDate).toBe(from);
   });
@@ -588,6 +604,7 @@ describe("SET_RANGE", () => {
       type: "SET_RANGE",
       from: null,
       to: null,
+      config: rangeCfg(),
     });
     expect(next.viewDate).toBe(baseState.viewDate);
   });
@@ -597,8 +614,49 @@ describe("SET_RANGE", () => {
       type: "SET_RANGE",
       from: null,
       to: null,
+      config: rangeCfg(),
     });
     expect(next.notifySeq).toBe(baseState.notifySeq + 1);
+  });
+
+  it("rejects ranges shorter than minRangeDays", () => {
+    const next = calendarReducer(baseState, {
+      type: "SET_RANGE",
+      from: d(2024, 1, 1),
+      to: d(2024, 1, 2),
+      config: rangeCfg({ minRangeDays: 3 }),
+    });
+    expect(next).toBe(baseState);
+  });
+
+  it("rejects ranges longer than maxRangeDays", () => {
+    const next = calendarReducer(baseState, {
+      type: "SET_RANGE",
+      from: d(2024, 1, 1),
+      to: d(2024, 1, 6),
+      config: rangeCfg({ maxRangeDays: 5 }),
+    });
+    expect(next).toBe(baseState);
+  });
+
+  it("rejects ranges containing disabled dates", () => {
+    const next = calendarReducer(baseState, {
+      type: "SET_RANGE",
+      from: d(2024, 1, 1),
+      to: d(2024, 1, 3),
+      config: rangeCfg({ disabled: disabled(d(2024, 1, 2)) }),
+    });
+    expect(next).toBe(baseState);
+  });
+
+  it("rejects partial range endpoints outside allowed dates", () => {
+    const next = calendarReducer(baseState, {
+      type: "SET_RANGE",
+      from: d(2024, 1, 1),
+      to: null,
+      config: rangeCfg({ minDate: d(2024, 1, 2) }),
+    });
+    expect(next).toBe(baseState);
   });
 });
 
@@ -611,6 +669,7 @@ describe("SET_RANGE_BOUND", () => {
       type: "SET_RANGE_BOUND",
       bound: "from",
       date,
+      config: rangeCfg(),
     });
     expect(next.rangeStart).toBe(date);
   });
@@ -621,6 +680,7 @@ describe("SET_RANGE_BOUND", () => {
       type: "SET_RANGE_BOUND",
       bound: "to",
       date,
+      config: rangeCfg(),
     });
     expect(next.rangeEnd).toBe(date);
   });
@@ -632,11 +692,13 @@ describe("SET_RANGE_BOUND", () => {
       type: "SET_RANGE_BOUND",
       bound: "to",
       date: to,
+      config: rangeCfg(),
     });
     state = calendarReducer(state, {
       type: "SET_RANGE_BOUND",
       bound: "from",
       date: from,
+      config: rangeCfg(),
     });
     // from collapsed to rangeEnd; identity preserved (rangeEnd unchanged)
     expect(state.rangeStart!.getTime()).toBe(to.getTime());
@@ -650,11 +712,13 @@ describe("SET_RANGE_BOUND", () => {
       type: "SET_RANGE_BOUND",
       bound: "from",
       date: from,
+      config: rangeCfg(),
     });
     state = calendarReducer(state, {
       type: "SET_RANGE_BOUND",
       bound: "to",
       date: to,
+      config: rangeCfg(),
     });
     expect(state.rangeStart!.getTime()).toBe(from.getTime());
     expect(state.rangeEnd!.getTime()).toBe(from.getTime());
@@ -665,8 +729,39 @@ describe("SET_RANGE_BOUND", () => {
       type: "SET_RANGE_BOUND",
       bound: "from",
       date: d(2024, 1, 1),
+      config: rangeCfg(),
     });
     expect(next.notifySeq).toBe(baseState.notifySeq + 1);
+  });
+
+  it("rejects bound updates that violate minRangeDays", () => {
+    const state = {
+      ...baseState,
+      rangeStart: d(2024, 1, 1),
+      rangeEnd: d(2024, 1, 5),
+    };
+    const next = calendarReducer(state, {
+      type: "SET_RANGE_BOUND",
+      bound: "to",
+      date: d(2024, 1, 2),
+      config: rangeCfg({ minRangeDays: 3 }),
+    });
+    expect(next).toBe(state);
+  });
+
+  it("rejects bound updates that introduce disabled dates", () => {
+    const state = {
+      ...baseState,
+      rangeStart: d(2024, 1, 1),
+      rangeEnd: d(2024, 1, 2),
+    };
+    const next = calendarReducer(state, {
+      type: "SET_RANGE_BOUND",
+      bound: "to",
+      date: d(2024, 1, 3),
+      config: rangeCfg({ disabled: disabled(d(2024, 1, 2)) }),
+    });
+    expect(next).toBe(state);
   });
 });
 

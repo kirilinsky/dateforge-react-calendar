@@ -1,5 +1,9 @@
 import type { DisabledConfig } from "@/types/calendar";
-import { hasDisabledInRange, isSameDay } from "@/utils/date-utils";
+import {
+  checkIsDateDisabled,
+  hasDisabledInRange,
+  isSameDay,
+} from "@/utils/date-utils";
 
 interface CalendarState {
   viewDate: Date;
@@ -26,8 +30,18 @@ type CalendarAction =
   | { type: "HOVER"; date: Date | null }
   | { type: "CHANGE_TIME"; date: Date; config: SelectConfig }
   | { type: "SET_DATES"; dates: Date[] }
-  | { type: "SET_RANGE"; from: Date | null; to: Date | null }
-  | { type: "SET_RANGE_BOUND"; bound: "from" | "to"; date: Date | null }
+  | {
+      type: "SET_RANGE";
+      from: Date | null;
+      to: Date | null;
+      config: SelectConfig;
+    }
+  | {
+      type: "SET_RANGE_BOUND";
+      bound: "from" | "to";
+      date: Date | null;
+      config: SelectConfig;
+    }
   | {
       type: "SYNC_EXTERNAL";
       viewDate: Date;
@@ -35,6 +49,68 @@ type CalendarAction =
       rangeStart: Date | null;
       rangeEnd: Date | null;
     };
+
+interface ResolvedRange {
+  from: Date | null;
+  to: Date | null;
+}
+
+const isValidDate = (d: Date | null): d is Date =>
+  d instanceof Date && !Number.isNaN(d.getTime());
+
+const rangeLengthDays = (from: Date, to: Date) =>
+  Math.round((to.getTime() - from.getTime()) / 86400000) + 1;
+
+export function validateRange(
+  from: Date | null,
+  to: Date | null,
+  config: Pick<
+    SelectConfig,
+    "minRangeDays" | "maxRangeDays" | "minDate" | "maxDate" | "disabled"
+  >,
+): ResolvedRange | null {
+  if (!from && !to) return { from: null, to: null };
+  if ((from && !isValidDate(from)) || (to && !isValidDate(to))) return null;
+
+  if (from && !to) {
+    if (
+      checkIsDateDisabled(from, config.minDate, config.maxDate, config.disabled)
+    )
+      return null;
+    return { from, to: null };
+  }
+
+  if (!from && to) {
+    if (
+      checkIsDateDisabled(to, config.minDate, config.maxDate, config.disabled)
+    )
+      return null;
+    return { from: null, to };
+  }
+
+  if (!from || !to) return null;
+  const [start, end] = from <= to ? [from, to] : [to, from];
+  const diffDays = rangeLengthDays(start, end);
+  if (config.minRangeDays !== undefined && diffDays < config.minRangeDays) {
+    return null;
+  }
+  if (config.maxRangeDays !== undefined && diffDays > config.maxRangeDays) {
+    return null;
+  }
+  if (
+    hasDisabledInRange(
+      start,
+      end,
+      config.minDate,
+      config.maxDate,
+      config.disabled,
+    )
+  ) {
+    return null;
+  }
+
+  return { from: start, to: end };
+}
 
 function selectSingle(state: CalendarState, date: Date | null): CalendarState {
   if (!date) {
@@ -72,11 +148,13 @@ function selectRange(
   const { rangeStart, rangeEnd } = state;
 
   if (!rangeStart || (rangeStart && rangeEnd)) {
+    const range = validateRange(date, null, config);
+    if (!range) return state;
     return {
       ...state,
       viewDate: date,
-      rangeStart: date,
-      rangeEnd: null,
+      rangeStart: range.from,
+      rangeEnd: range.to,
       hoverDate: null,
     };
   }
@@ -85,25 +163,14 @@ function selectRange(
     return { ...state, rangeStart: null, rangeEnd: null, hoverDate: null };
   }
 
-  const [s, e] = date < rangeStart ? [date, rangeStart] : [rangeStart, date];
-  const diffDays = Math.round((e.getTime() - s.getTime()) / 86400000) + 1;
-  if (config.minRangeDays !== undefined && diffDays < config.minRangeDays) {
-    return state;
-  }
-  if (config.maxRangeDays !== undefined && diffDays > config.maxRangeDays) {
-    return state;
-  }
-  if (
-    hasDisabledInRange(s, e, config.minDate, config.maxDate, config.disabled)
-  ) {
-    return state;
-  }
+  const range = validateRange(rangeStart, date, config);
+  if (!range?.from || !range.to) return state;
 
   return {
     ...state,
-    viewDate: s,
-    rangeStart: s,
-    rangeEnd: e,
+    viewDate: range.from,
+    rangeStart: range.from,
+    rangeEnd: range.to,
     hoverDate: null,
   };
 }
@@ -205,14 +272,17 @@ export function calendarReducer(
         notifySeq: state.notifySeq + 1,
       };
 
-    case "SET_RANGE":
+    case "SET_RANGE": {
+      const range = validateRange(action.from, action.to, action.config);
+      if (!range) return state;
       return {
         ...state,
-        rangeStart: action.from,
-        rangeEnd: action.to,
-        viewDate: action.from ?? state.viewDate,
+        rangeStart: range.from,
+        rangeEnd: range.to,
+        viewDate: range.from ?? range.to ?? state.viewDate,
         notifySeq: state.notifySeq + 1,
       };
+    }
 
     case "SET_RANGE_BOUND": {
       const { bound, date } = action;
@@ -231,10 +301,12 @@ export function calendarReducer(
           nextEnd = date;
         }
       }
+      const range = validateRange(nextStart, nextEnd, action.config);
+      if (!range) return state;
       return {
         ...state,
-        rangeStart: nextStart,
-        rangeEnd: nextEnd,
+        rangeStart: range.from,
+        rangeEnd: range.to,
         viewDate: date ?? state.viewDate,
         notifySeq: state.notifySeq + 1,
       };
