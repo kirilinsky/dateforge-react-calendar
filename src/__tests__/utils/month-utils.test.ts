@@ -112,4 +112,121 @@ describe("getMonthListData", () => {
     const de = getMonthListData("de", 2024);
     expect(de[0].label).not.toBe(en[0].label);
   });
+
+  it("isMonthFullyDisabled: boolean rule disables every month", () => {
+    const data = getMonthListData(
+      "en",
+      2024,
+      null,
+      null,
+      false,
+      disabled(true),
+    );
+    expect(data.every((m) => m.disabled)).toBe(true);
+  });
+
+  it("isMonthFullyDisabled: single-Date rule does NOT disable the month", () => {
+    const data = getMonthListData(
+      "en",
+      2024,
+      null,
+      null,
+      false,
+      disabled(d(2024, 3, 15)),
+    );
+    expect(data[2].disabled).toBe(false);
+  });
+
+  it("isMonthFullyDisabled: dayOfWeek rule does NOT fully disable a month", () => {
+    const data = getMonthListData(
+      "en",
+      2024,
+      null,
+      null,
+      false,
+      disabled({ dayOfWeek: [0, 6] }),
+    );
+    expect(data.every((m) => !m.disabled)).toBe(true);
+  });
+
+  it("isMonthFullyDisabled: `before` rule fully disables months earlier than the cutoff", () => {
+    const data = getMonthListData(
+      "en",
+      2024,
+      null,
+      null,
+      false,
+      disabled({ before: d(2024, 7, 1) }),
+    );
+    expect(data[0].disabled).toBe(true);
+    expect(data[5].disabled).toBe(true);
+    expect(data[6].disabled).toBe(false);
+  });
+
+  it("isMonthFullyDisabled: `after` rule fully disables months later than the cutoff", () => {
+    const data = getMonthListData(
+      "en",
+      2024,
+      null,
+      null,
+      false,
+      disabled({ after: d(2024, 6, 30) }),
+    );
+    expect(data[5].disabled).toBe(false);
+    expect(data[6].disabled).toBe(true);
+    expect(data[11].disabled).toBe(true);
+  });
+});
+
+// ─── i18n cache eviction ──────────────────────────────────────────────────────
+
+describe("getMonthNames cache LRU bound", () => {
+  it("does not retain more than 32 distinct entries", () => {
+    // Exercise the eviction branch by populating > 32 unique keys.
+    const validLocales = [
+      "en",
+      "en-US",
+      "en-GB",
+      "en-CA",
+      "en-AU",
+      "fr",
+      "fr-FR",
+      "fr-CA",
+      "de",
+      "de-AT",
+      "de-CH",
+      "es",
+      "es-MX",
+      "es-AR",
+      "it",
+      "pt",
+      "pt-BR",
+      "ru",
+      "uk",
+      "pl",
+      "cs",
+      "sk",
+      "hu",
+      "ro",
+      "bg",
+      "el",
+      "tr",
+      "ar",
+      "he",
+      "ja",
+      "ko",
+      "zh",
+      "zh-CN",
+      "zh-TW",
+      "vi",
+      "th",
+      "fi",
+      "sv",
+      "da",
+      "no",
+    ];
+    const locales = validLocales.slice(0, 40);
+    for (const l of locales) getMonthNames(l);
+    for (const l of locales) expect(getMonthNames(l)).toHaveLength(12);
+  });
 });

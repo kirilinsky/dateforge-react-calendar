@@ -14,6 +14,7 @@ export interface CalendarConfig {
   gradient: boolean;
   timeZone?: string;
   readOnly: boolean;
+  timeStep?: { hour?: number; minute?: number; second?: number };
 }
 
 export const ConfigContext = createContext<CalendarConfig | undefined>(

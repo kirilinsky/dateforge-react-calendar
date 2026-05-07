@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { Popup } from "@/components/popup/popup";
 import { TimeTrack } from "@/components/time-track/time-track";
+import { useConfig } from "@/context/config-context";
 
 interface TimePopupProps {
   date: Date;
@@ -19,6 +20,7 @@ export const TimePopup = ({
   showSeconds = false,
   readOnly = false,
 }: TimePopupProps) => {
+  const { locale, timeStep } = useConfig();
   const [current, setCurrent] = useState(date);
   const currentRef = useRef(current);
 
@@ -36,8 +38,10 @@ export const TimePopup = ({
       <TimeTrack
         date={current}
         hour12={hour12}
+        locale={locale}
         showSeconds={showSeconds}
         readOnly={readOnly}
+        step={timeStep}
         onChange={handleChange}
       />
     </Popup>

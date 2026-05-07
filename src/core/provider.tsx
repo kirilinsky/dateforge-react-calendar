@@ -76,6 +76,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   disabled,
   timeZone,
   readOnly = false,
+  timeStep,
 }: CalendarProps<M> & {
   children: ReactNode;
   containerWidth?: number;
@@ -365,6 +366,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       gradient: gradient ?? false,
       timeZone: resolvedTimeZone,
       readOnly,
+      timeStep,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -380,6 +382,9 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       gradient,
       resolvedTimeZone,
       readOnly,
+      timeStep?.hour,
+      timeStep?.minute,
+      timeStep?.second,
     ],
   );
 
