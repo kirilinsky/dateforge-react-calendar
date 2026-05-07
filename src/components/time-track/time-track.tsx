@@ -1,7 +1,11 @@
-import { useRef } from "react";
-import { useScrollAccumulator } from "@/hooks/use-scroll-accumulator";
-import { getDrumValue, padTime } from "@/utils/date-utils";
+import { StepDrum } from "@/components/step-drum/step-drum";
 import styles from "./time-track.module.css";
+
+interface TimeStep {
+  hour?: number;
+  minute?: number;
+  second?: number;
+}
 
 interface TimeTrackProps {
   date: Date;
@@ -9,87 +13,9 @@ interface TimeTrackProps {
   locale?: string;
   showSeconds?: boolean;
   readOnly?: boolean;
+  step?: TimeStep;
   onChange: (date: Date) => void;
 }
-
-const OFFSETS = Array.from({ length: 7 }, (_, i) => i - 3);
-
-const Drum = ({
-  val,
-  max,
-  onMove,
-  label,
-  getValueText,
-  readOnly,
-}: {
-  val: number;
-  max: number;
-  onMove: (delta: number) => void;
-  label: string;
-  getValueText: (v: number) => string;
-  readOnly?: boolean;
-}) => {
-  const ref = useRef<HTMLDivElement>(null);
-
-  const guardedMove = (delta: number) => {
-    if (readOnly) return;
-    onMove(delta);
-  };
-
-  useScrollAccumulator(ref, guardedMove, { requireHover: true });
-
-  return (
-    <div
-      ref={ref}
-      className={styles.drum}
-      role="spinbutton"
-      tabIndex={0}
-      aria-label={label}
-      aria-valuenow={val}
-      aria-valuemin={0}
-      aria-valuemax={max - 1}
-      aria-valuetext={getValueText(val)}
-      aria-disabled={readOnly || undefined}
-      onKeyDown={(e) => {
-        if (e.key === "ArrowUp") {
-          e.preventDefault();
-          guardedMove(-1);
-        }
-        if (e.key === "ArrowDown") {
-          e.preventDefault();
-          guardedMove(1);
-        }
-        if (e.key === "Home") {
-          e.preventDefault();
-          guardedMove(-val);
-        }
-        if (e.key === "End") {
-          e.preventDefault();
-          guardedMove(max - 1 - val);
-        }
-      }}
-    >
-      <div className={styles.highlight} />
-      {OFFSETS.map((o) => {
-        const isActive = o === 0;
-        const dist = Math.abs(o);
-        const opacity =
-          dist === 0 ? 1 : dist === 1 ? 0.6 : dist === 2 ? 0.35 : 0.15;
-        return (
-          <div
-            key={o}
-            className={`${styles.item} ${isActive ? styles.active : ""}`}
-            style={!isActive ? { opacity } : undefined}
-            aria-hidden={!isActive}
-            onClick={isActive ? undefined : () => guardedMove(o)}
-          >
-            {padTime(getDrumValue(val, o, max))}
-          </div>
-        );
-      })}
-    </div>
-  );
-};
 
 const makeUnitFormatter = (
   locale: string,
@@ -113,6 +39,7 @@ export const TimeTrack = ({
   locale = "en",
   showSeconds = false,
   readOnly = false,
+  step,
   onChange,
 }: TimeTrackProps) => {
   const raw = date.getHours();
@@ -126,19 +53,16 @@ export const TimeTrack = ({
   const minuteText = makeUnitFormatter(locale, "minute");
   const secondText = makeUnitFormatter(locale, "second");
 
+  const hourStep = Math.max(1, step?.hour ?? 1);
+  const minuteStep = Math.max(1, step?.minute ?? 1);
+  const secondStep = Math.max(1, step?.second ?? 1);
+
   const emit = (h: number, m: number, s: number, p: "AM" | "PM") => {
     if (readOnly) return;
     const next = new Date(date);
     next.setHours(hour12 ? (p === "AM" ? h % 12 : (h % 12) + 12) : h, m, s, 0);
     onChange(next);
   };
-
-  const moveHours = (delta: number) =>
-    emit(getDrumValue(hours, delta, hourMax), minutes, seconds, period);
-  const moveMinutes = (delta: number) =>
-    emit(hours, getDrumValue(minutes, delta, 60), seconds, period);
-  const moveSeconds = (delta: number) =>
-    emit(hours, minutes, getDrumValue(seconds, delta, 60), period);
 
   return (
     <div className={styles.root} role="group" aria-label="Time picker">
@@ -159,37 +83,40 @@ export const TimeTrack = ({
         </div>
       )}
       <div className={styles.drums}>
-        <Drum
-          val={hours}
+        <StepDrum
+          value={hours}
           max={hourMax}
-          onMove={moveHours}
+          step={hourStep}
           label="Hours"
           getValueText={hourText}
           readOnly={readOnly}
+          onChange={(h) => emit(h, minutes, seconds, period)}
         />
         <span className={styles.colon} aria-hidden>
           :
         </span>
-        <Drum
-          val={minutes}
+        <StepDrum
+          value={minutes}
           max={60}
-          onMove={moveMinutes}
+          step={minuteStep}
           label="Minutes"
           getValueText={minuteText}
           readOnly={readOnly}
+          onChange={(m) => emit(hours, m, seconds, period)}
         />
         {showSeconds && (
           <>
             <span className={styles.colon} aria-hidden>
               :
             </span>
-            <Drum
-              val={seconds}
+            <StepDrum
+              value={seconds}
               max={60}
-              onMove={moveSeconds}
+              step={secondStep}
               label="Seconds"
               getValueText={secondText}
               readOnly={readOnly}
+              onChange={(s) => emit(hours, minutes, s, period)}
             />
           </>
         )}

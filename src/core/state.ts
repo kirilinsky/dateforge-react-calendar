@@ -206,36 +206,57 @@ export function calendarReducer(
 
     case "CHANGE_TIME": {
       const { date, config } = action;
-      // viewDate always reflects the current working time. Whether selection
-      // is committed depends on mode and whether viewDate's day matches an
-      // existing selected date / range boundary. Time-only picker for single
-      // mode auto-creates the selection from viewDate's day + new time.
+      // viewDate reflects the current working time only when the resulting
+      // selection (or pending selection in time-only mode) would be valid.
+      // If the new date violates min/max/disabled or invalidates a range
+      // endpoint, the action is a no-op — same contract as SELECT for
+      // disabled days.
       const baseUpdate: CalendarState = { ...state, viewDate: date };
+      const isInvalidPoint = checkIsDateDisabled(
+        date,
+        config.minDate,
+        config.maxDate,
+        config.disabled,
+      );
 
       if (config.range) {
         if (state.rangeStart && isSameDay(state.rangeStart, state.viewDate)) {
+          const range = validateRange(date, state.rangeEnd, config);
+          if (!range) return state;
           return {
             ...baseUpdate,
-            rangeStart: date,
+            rangeStart: range.from,
+            rangeEnd: range.to,
             notifySeq: state.notifySeq + 1,
           };
         }
         if (state.rangeEnd && isSameDay(state.rangeEnd, state.viewDate)) {
+          const range = validateRange(state.rangeStart, date, config);
+          if (!range) return state;
           return {
             ...baseUpdate,
-            rangeEnd: date,
+            rangeStart: range.from,
+            rangeEnd: range.to,
             notifySeq: state.notifySeq + 1,
           };
         }
+        if (isInvalidPoint) return state;
         return baseUpdate;
       }
 
       if (config.multiselect) {
-        if (state.selectedDates.length === 0) return baseUpdate;
+        if (state.selectedDates.length === 0) {
+          if (isInvalidPoint) return state;
+          return baseUpdate;
+        }
         const idx = state.selectedDates.findIndex((d) =>
           isSameDay(d, state.viewDate),
         );
-        if (idx < 0) return baseUpdate;
+        if (idx < 0) {
+          if (isInvalidPoint) return state;
+          return baseUpdate;
+        }
+        if (isInvalidPoint) return state;
         const nextDates = state.selectedDates.map((d, i) =>
           i === idx ? date : d,
         );
@@ -247,6 +268,7 @@ export function calendarReducer(
       }
 
       // single
+      if (isInvalidPoint) return state;
       const single = state.selectedDates[0];
       if (!single) {
         return {

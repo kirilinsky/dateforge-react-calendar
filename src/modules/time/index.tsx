@@ -16,7 +16,7 @@ export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
   col,
   seconds = false,
 }) => {
-  const { hour12, locale, readOnly } = useConfig();
+  const { hour12, locale, readOnly, timeStep } = useConfig();
   const { viewDate: date } = useNavigation();
   const { onChangeTime } = useSelectionActions();
 
@@ -32,6 +32,7 @@ export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
         locale={locale}
         showSeconds={seconds}
         readOnly={readOnly}
+        step={timeStep}
         onChange={onChangeTime}
       />
     </div>

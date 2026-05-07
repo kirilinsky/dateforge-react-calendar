@@ -54,6 +54,12 @@ export interface CalendarProps<M extends CalendarMode = "single"> {
   width?: string | number;
   hour12?: boolean;
   /**
+   * Step (granularity) for time drums. Hours/minutes/seconds. Default 1.
+   * Affects both inline TimeGrid and nav time popup.
+   * @example timeStep={{ minute: 5 }}
+   */
+  timeStep?: { hour?: number; minute?: number; second?: number };
+  /**
    * @example // default — no import needed, just omit the prop
    * @example import { loft } from "@dateforge/react-calendar/appearances"; <Calendar appearance={loft} />
    * @example import { compact } from "@dateforge/react-calendar/appearances/compact"; <Calendar appearance={compact} />

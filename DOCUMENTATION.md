@@ -50,6 +50,7 @@ import { CalendarNav, CalendarDays } from "@dateforge/react-calendar/modules";
 | `timeZone`        | `string \| "auto"`                  | `"auto"`   | IANA timezone (`"Europe/Paris"`, `"UTC"`), fixed offset (`"UTC+2"`, `"UTC-5"`), or `"auto"`. When `"auto"` (or omitted) the library detects the user's timezone via `Intl.DateTimeFormat().resolvedOptions().timeZone` after mount. Invalid values fall back to auto-detect with a dev warning. Affects today detection, emitted date midnight, and formatting                                |
 | `readOnly`        | `boolean`                           | `false`    | Disables all state-changing interactions (date/time selection). Navigation still works. Adds `data-readonly` on the root and `aria-disabled` on each interactive cell — the wrapper itself carries no ARIA state because plain `<div>` does not support `aria-readonly` per ARIA spec                                                                                                         |
 | `hour12`          | `boolean`                           | `false`    | Use 12-hour time format instead of 24-hour                                                                                                                                                                                                                                                                                                                                                    |
+| `timeStep`        | `{ hour?: number; minute?: number; second?: number }` | `{1,1,1}` | Granularity (step) for time drums. Affects both inline `CalendarTimeGrid` and `CalendarNav` time popup. Example: `timeStep={{ minute: 5 }}` snaps minutes to 0/5/10/.../55. Step values divide the unit range; `aria-valuemax`, keyboard `±step`, and scroll snap follow the step. Default `1` (no snapping)                                                                                  |
 | `theme`           | `CalendarTheme`                     | `"auto"`   | Base value (`"auto"` / `"light"` / `"dark"`), a pre-built theme object from `@dateforge/react-calendar/themes[/name]`, or a `CustomTheme` from `createTheme()`. Named string themes (e.g. `"midnight"`) are not supported — import the object instead.                                                                                                                                        |
 | `appearance`      | `CalendarAppearance`                | —          | Pre-built appearance object from `@dateforge/react-calendar/appearances[/name]`, or a `CustomAppearance` from `createAppearance()`. Omit the prop entirely for the default appearance.                                                                                                                                                                                                        |
 | `gradient`        | `boolean`                           | `false`    | Enable gradient backgrounds on selected cells                                                                                                                                                                                                                                                                                                                                                 |
@@ -567,6 +568,16 @@ Time picker — hours, minutes, optional seconds, AM/PM toggle when `hour12` is 
 ```tsx
 <CalendarTimeGrid seconds />
 ```
+
+Step granularity is configured via the `timeStep` prop on `<Calendar>` and applies to both this inline grid and the `CalendarNav` time popup:
+
+```tsx
+<Calendar timeStep={{ minute: 5 }}>
+  <CalendarTimeGrid />
+</Calendar>
+```
+
+With `minute: 5` the minute drum cycles `0, 5, 10, …, 55`; `minute: 30` cycles `0, 30`; `hour: 2` halves the hour range. `aria-valuemax`, keyboard `Arrow`/`Home`/`End`, and wheel/touch snapping all follow the configured step.
 
 ### Props
 
