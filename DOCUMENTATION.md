@@ -103,6 +103,31 @@ Internal state lives independently. `defaultValue` is read once on mount; subseq
 
 **Mode change at runtime.** Changing `mode` (e.g. `"single"` → `"range"`) does not migrate selection. The new mode reads internal state through its own shape: range mode looks for `from`/`to`, multiple looks for an array, single looks for a `Date`. Pass a compatible `value` together with the mode change if you need a clean transition.
 
+### SSR pitfall: never seed initial value with `new Date()`
+
+In Next.js / Remix / any SSR setup, evaluating `new Date()` returns a different timestamp on the server vs the client (and across midnight, even a different day). Seeding `useState(new Date())` for a controlled `<Calendar>` causes the SSR HTML to show one day cell active and the hydrated client render to show another — React logs a hydration mismatch and you may see two visually-selected day cells until React reconciles.
+
+**Don't:**
+
+```tsx
+const [date, setDate] = useState<Date | null>(new Date()); // ❌ hydration mismatch
+return <Calendar value={date} onChange={setDate}><CalendarDays /></Calendar>;
+```
+
+**Do — use the SSR-safe `useToday` hook exported by the package:**
+
+```tsx
+import { Calendar, useToday } from "@dateforge/react-calendar";
+
+const today = useToday();                                  // null on server, Date after mount
+const [date, setDate] = useState<Date | null>(null);
+return <Calendar value={date ?? today} onChange={setDate}><CalendarDays /></Calendar>;
+```
+
+That's it — `value` is `null` on the server (no day selected in SSR HTML), `today` after hydration. No mismatch, no ghost selection.
+
+`useToday()` is a thin wrapper around the internal `useClientValue` hook: it returns `null` on the first server-side and pre-hydration render and resolves to `new Date()` synchronously after mount (layout effect — no flash).
+
 ### Time semantics — when does time editing fire `onChange`?
 
 `CalendarTimeGrid` and `CalendarNav.showTime` both edit time. They share the same rules. The principle is:
