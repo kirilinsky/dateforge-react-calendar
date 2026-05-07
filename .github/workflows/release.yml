@@ -33,11 +33,13 @@ jobs:
 
       - run: npm run build
 
-      # Dry-run validates the tarball that `changesets/action` will later
-      # publish — also makes the packaging step detectable by OSSF Scorecard,
-      # which scans workflows for literal `npm publish` invocations.
-      - name: Verify npm publish artifact (dry-run)
-        run: npm publish --dry-run --access public
+      # Validates the tarball that `changesets/action` will later publish via
+      # `npm publish`. Uses `npm pack` (no registry call) to avoid the
+      # "cannot publish over previously published versions" error that
+      # `npm publish --dry-run` raises before changesets has bumped the
+      # version. Provides early packaging-failure detection.
+      - name: Verify package tarball (npm pack)
+        run: npm pack --dry-run
 
       - name: Create Release Pull Request or Publish
         uses: changesets/action@63a615b9cd06ba9a3e6d13796c7fbcb080a60a0b # v1
