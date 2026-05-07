@@ -156,7 +156,16 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
       getAriaValueNow={(i) => i + 1}
       getAriaValueMin={() => minIdx + 1}
       getAriaValueMax={() => maxIdx + 1}
-      getAriaValueText={(i) => fullDateFmt.format(new Date(year, month, i + 1))}
+      getAriaValueText={(i) => {
+        if (
+          !Number.isFinite(year) ||
+          !Number.isFinite(month) ||
+          !Number.isFinite(i)
+        )
+          return "";
+        const d = new Date(year, month, i + 1);
+        return Number.isNaN(d.getTime()) ? "" : fullDateFmt.format(d);
+      }}
       col={col}
       onChange={handleChange}
       renderItem={({ idx, isActive }) =>
