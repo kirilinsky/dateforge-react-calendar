@@ -9,6 +9,8 @@
     --c-s: #e8e8e8;
     --c-x: #1a1a1c14;
     --c-d: #a0a0a2;
+    --c-m: #6e6e6f;
+    --c-dt: #686869;
     --c-we: #e32825;
     --c-r: #4a90d9;
     --c-e: #dc2626;
@@ -23,6 +25,8 @@
     --c-s: #333333;
     --c-x: #ffffff16;
     --c-d: #555558;
+    --c-m: #969697;
+    --c-dt: #9c9c9d;
     --c-we: #e32825;
     --c-r: #4a90d9;
     --c-e: #ef4444;
@@ -41,6 +45,8 @@
       --c-s: #333333;
       --c-x: #ffffff16;
       --c-d: #555558;
+      --c-m: #969697;
+      --c-dt: #9c9c9d;
       --c-we: #e32825;
       --c-r: #4a90d9;
       --c-e: #ef4444;
@@ -124,16 +130,14 @@
   .emptyStateTitle {
     font-size: 1em;
     font-weight: 700;
-    color: var(--c-h);
-    opacity: 0.25;
+    color: var(--c-m, var(--c-c));
     letter-spacing: 0.06em;
     text-transform: uppercase;
   }
 
   .emptyStateHint {
     font-size: 0.78em;
-    color: var(--c-h);
-    opacity: 0.18;
+    color: var(--c-m, var(--c-c));
     line-height: 1.6;
     max-width: 22em;
 

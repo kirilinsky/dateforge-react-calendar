@@ -62,10 +62,9 @@
     height: 2.3em;
     font-size: 0.95em;
     background-color: var(--c-t) !important;
-    color: var(--c-h);
+    color: var(--c-c);
     font-weight: 700;
     gap: 0.4em;
-    opacity: 0.9;
     & svg {
       width: 1.3em;
       height: 1.3em;
@@ -101,7 +100,7 @@
   }
 
   .homeButtonDisabled {
-    opacity: 0.25;
+    color: var(--c-dt, var(--c-c));
     cursor: default;
     pointer-events: none;
   }
@@ -180,8 +179,7 @@
     height: 2.3em;
     font-size: 0.95em;
     flex: 0 0 auto;
-    color: var(--c-h);
-    opacity: 0.8;
+    color: var(--c-m, var(--c-c));
     user-select: none;
     pointer-events: none;
     font-variant-numeric: tabular-nums;
@@ -213,8 +211,7 @@
     white-space: nowrap;
     font-size: 0.95em;
     font-weight: 600;
-    color: var(--c-h);
-    opacity: 0.72;
+    color: var(--c-m, var(--c-c));
     padding: 0 0.32em;
     line-height: 2.3em;
   }

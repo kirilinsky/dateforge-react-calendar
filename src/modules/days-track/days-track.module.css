@@ -11,7 +11,7 @@
 .monthLabel {
   font-size: 0.72em;
   font-weight: 400;
-  opacity: 0.75;
+  color: var(--c-m, var(--c-c));
   text-transform: lowercase;
 }
 
@@ -35,8 +35,8 @@
 }
 
 .removeBtn {
-  background: var(--c-d);
-  color: var(--c-b);
+  background: var(--c-t);
+  color: var(--c-dt, var(--c-c));
 }
 
 }

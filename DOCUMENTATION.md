@@ -924,10 +924,14 @@ const myAppearance = createAppearance({ radius: "0", spacing: "0.4em" });
 | `text`      | `--c-c`      | Default text color for all labels and numbers.                                                                       |
 | `stroke`    | `--c-s`      | Border and separator color between cells and sections.                                                               |
 | `shadow`    | `--c-x`      | Drop-shadow color. Should include alpha (e.g. `"#6366f130"`).                                                        |
-| `disabled`  | `--c-d`      | Color for disabled / out-of-range date cells.                                                                        |
-| `weekend`   | `--c-we`     | Accent color applied to weekend day labels (Saturday / Sunday).                                                      |
+| `disabled`  | `--c-d`      | Decorative disabled surface color. Kept for non-text affordances; do not rely on it for readable disabled text.      |
+| `mutedText` | `--c-m`      | Secondary readable foreground: outside-month dates, week numbers, placeholders, separators.                          |
+| `disabledText` | `--c-dt` | Readable disabled / unavailable foreground. Built-in themes keep it at 4.5:1+ against `backdrop` and `tone`.         |
+| `weekend`   | `--c-we`     | Weekend accent applied to weekend day labels and bold weekend day numbers (Saturday / Sunday).                       |
 | `range`     | `--c-r`      | Background tint for days that fall inside a selected date range.                                                     |
 | `error`     | `--c-e`      | Error / destructive signal.                                                                                          |
+
+`disabled`, `mutedText`, and `disabledText` are intentionally separate: `disabled` can stay visually subtle as a surface/decorative token, while `mutedText` and `disabledText` carry text contrast for accessibility audits.
 
 ---
 
