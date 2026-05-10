@@ -8,13 +8,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  line-height: 1.1;
+  line-height: var(--cal-leading-tight);
   gap: 0.1em;
 }
 
 .yearLabel {
-  font-size: 0.72em;
-  font-weight: 400;
+  font-size: var(--cal-text-xs);
+  font-weight: var(--cal-weight-regular);
   color: var(--c-m, var(--c-c));
 }
 

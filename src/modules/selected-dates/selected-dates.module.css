@@ -47,7 +47,7 @@
     height: 2.1em;
     flex-shrink: 0;
     padding: 0 0.75em !important;
-    font-size: 0.78em !important;
+    font-size: var(--cal-text-sm) !important;
     white-space: nowrap;
   }
 
@@ -62,7 +62,7 @@
   .clearBtn {
     height: 2.1em;
     padding: 0 0.6em !important;
-    font-size: 0.9em !important;
+    font-size: var(--cal-text-base) !important;
     color: var(--c-m, var(--c-c));
     flex-shrink: 0;
   }
@@ -72,7 +72,7 @@
   }
 
   .rangeSep {
-    font-size: 0.8em;
+    font-size: var(--cal-text-sm);
     color: var(--c-m, var(--c-c));
     align-self: center;
     user-select: none;

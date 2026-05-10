@@ -55,7 +55,7 @@
     padding: 0.40em;
     width: 100%;
     font-size: 1em;
-    font-weight: 700;
+    font-weight: var(--cal-weight-bold);
     cursor: pointer;
     transition: opacity var(--cal-transition, 0.2s);
     box-shadow: var(--cal-shadow-md, 0 0.22em 0.6em var(--c-x));

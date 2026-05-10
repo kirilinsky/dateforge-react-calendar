@@ -9,15 +9,15 @@
   text-transform: uppercase;
   user-select: none;
   color: var(--c-m, var(--c-c));
-  font-size: 0.6em;
-  font-weight: 600;
+  font-size: var(--cal-text-2xs);
+  font-weight: var(--cal-weight-semibold);
   margin-bottom: 0.3em;
 }
 
 .weekendDark,
 .weekendLight {
   color: var(--c-we);
-  font-weight: 700;
+  font-weight: var(--cal-weight-bold);
 }
 
 }
