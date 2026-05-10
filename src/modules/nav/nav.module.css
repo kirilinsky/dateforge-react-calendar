@@ -196,7 +196,7 @@
 
   .timeButton {
     background: var(--c-h) !important;
-    color: var(--c-a) !important;
+    color: var(--c-at, var(--c-a)) !important;
     padding: 0 1em;
     height: 2.3em;
     font-size: 0.95em;

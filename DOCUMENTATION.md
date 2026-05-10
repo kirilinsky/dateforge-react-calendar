@@ -915,23 +915,24 @@ const myAppearance = createAppearance({ radius: "0", spacing: "0.4em" });
 
 ### `createTheme(tokens)`
 
-| Token       | CSS variable | Role                                                                                                                 |
-| ----------- | ------------ | -------------------------------------------------------------------------------------------------------------------- |
-| `highlight` | `--c-h`      | **Primary accent.** Background of the selected day cell, active buttons, nav accents. The most impactful token.      |
-| `accent`    | `--c-a`      | **Inverted container color.** Text/icon color _inside_ the selected day circle — usually the inverse of `highlight`. |
-| `backdrop`  | `--c-b`      | Main calendar background.                                                                                            |
-| `tone`      | `--c-t`      | Secondary / muted background for rows, tracks, and hover states.                                                     |
-| `text`      | `--c-c`      | Default text color for all labels and numbers.                                                                       |
-| `stroke`    | `--c-s`      | Border and separator color between cells and sections.                                                               |
-| `shadow`    | `--c-x`      | Drop-shadow color. Should include alpha (e.g. `"#6366f130"`).                                                        |
-| `disabled`  | `--c-d`      | Decorative disabled surface color. Kept for non-text affordances; do not rely on it for readable disabled text.      |
-| `mutedText` | `--c-m`      | Secondary readable foreground: outside-month dates, week numbers, placeholders, separators.                          |
-| `disabledText` | `--c-dt` | Readable disabled / unavailable foreground. Built-in themes keep it at 4.5:1+ against `backdrop` and `tone`.         |
-| `weekend`   | `--c-we`     | Weekend accent applied to weekend day labels and bold weekend day numbers (Saturday / Sunday).                       |
-| `range`     | `--c-r`      | Background tint for days that fall inside a selected date range.                                                     |
-| `error`     | `--c-e`      | Error / destructive signal.                                                                                          |
+| Token          | CSS variable | Role                                                                                                            |
+| -------------- | ------------ | --------------------------------------------------------------------------------------------------------------- |
+| `highlight`    | `--c-h`      | **Primary accent.** Background of the selected day cell, active buttons, nav accents. The most impactful token. |
+| `activeText`   | `--c-at`     | Readable text/icon color on top of `highlight`. Built-in themes keep it at 4.5:1+ against `highlight`.         |
+| `accent`       | `--c-a`      | Inverted/accent surface color for secondary month labels and decorative active outlines.                        |
+| `backdrop`     | `--c-b`      | Main calendar background.                                                                                       |
+| `tone`         | `--c-t`      | Secondary / muted background for rows, tracks, and hover states.                                                |
+| `text`         | `--c-c`      | Default text color for all labels and numbers.                                                                  |
+| `stroke`       | `--c-s`      | Border and separator color between cells and sections.                                                          |
+| `shadow`       | `--c-x`      | Drop-shadow color. Should include alpha (e.g. `"#6366f130"`).                                                   |
+| `disabled`     | `--c-d`      | Decorative disabled surface color. Kept for non-text affordances; do not rely on it for readable disabled text. |
+| `mutedText`    | `--c-m`      | Secondary readable foreground: outside-month dates, week numbers, placeholders, separators.                     |
+| `disabledText` | `--c-dt`     | Readable disabled / unavailable foreground. Built-in themes keep it at 4.5:1+ against `backdrop` and `tone`.    |
+| `weekend`      | `--c-we`     | Weekend text accent for weekend day labels and bold weekend day numbers. Built-in themes keep it at 4.5:1+ against `backdrop` and `tone`. |
+| `range`        | `--c-r`      | Background tint for days that fall inside a selected date range.                                                |
+| `error`        | `--c-e`      | Error / destructive signal.                                                                                     |
 
-`disabled`, `mutedText`, and `disabledText` are intentionally separate: `disabled` can stay visually subtle as a surface/decorative token, while `mutedText` and `disabledText` carry text contrast for accessibility audits.
+`activeText`, `mutedText`, `disabledText`, and `weekend` are intentionally contrast-aware text tokens, while `accent` and `disabled` can stay more expressive as surface/decorative colors.
 
 ---
 

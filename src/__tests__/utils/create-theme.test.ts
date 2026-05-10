@@ -11,11 +11,13 @@ describe("createTheme", () => {
   it("maps known tokens to css var keys", () => {
     const theme = createTheme({
       accent: "#ff6600",
+      activeText: "#111111",
       backdrop: "#000",
       mutedText: "#667085",
       disabledText: "#7a8190",
     });
     expect(theme.vars["--c-a"]).toBe("#ff6600");
+    expect(theme.vars["--c-at"]).toBe("#111111");
     expect(theme.vars["--c-b"]).toBe("#000");
     expect(theme.vars["--c-m"]).toBe("#667085");
     expect(theme.vars["--c-dt"]).toBe("#7a8190");

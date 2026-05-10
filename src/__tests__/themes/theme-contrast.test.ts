@@ -2,6 +2,20 @@ import { describe, expect, it } from "vitest";
 import { THEMES_DATA, type ThemeTokens } from "../../../themes/themes";
 
 const MIN_NORMAL_TEXT_CONTRAST = 4.5;
+const WEEKEND_BACKGROUNDS = ["backdrop", "tone"] as const;
+
+const BASE_THEME_WEEKENDS = {
+  light: {
+    weekend: "#c62828",
+    backdrop: "#ffffff",
+    tone: "#f4f4f4",
+  },
+  dark: {
+    weekend: "#ff6b6b",
+    backdrop: "#1a1a1c",
+    tone: "#2d2d2d",
+  },
+};
 
 function hexToRgb(hex: string): [number, number, number] {
   const value = hex.replace("#", "").slice(0, 6);
@@ -49,10 +63,43 @@ describe("built-in theme contrast tokens", () => {
     }
   });
 
+  it.each(
+    Object.entries(THEMES_DATA),
+  )("%s active text passes normal text contrast", (_name, theme) => {
+    expect(
+      contrastRatio(theme.activeText, theme.highlight),
+      "activeText on highlight",
+    ).toBeGreaterThanOrEqual(MIN_NORMAL_TEXT_CONTRAST);
+  });
+
+  it.each(
+    Object.entries(THEMES_DATA),
+  )("%s weekend text passes normal text contrast", (_name, theme) => {
+    for (const background of WEEKEND_BACKGROUNDS) {
+      expect(
+        contrastRatio(theme.weekend, theme[background]),
+        `weekend on ${background}`,
+      ).toBeGreaterThanOrEqual(MIN_NORMAL_TEXT_CONTRAST);
+    }
+  });
+
+  it.each(
+    Object.entries(BASE_THEME_WEEKENDS),
+  )("%s base weekend text passes normal text contrast", (_name, theme) => {
+    for (const background of WEEKEND_BACKGROUNDS) {
+      expect(
+        contrastRatio(theme.weekend, theme[background]),
+        `weekend on ${background}`,
+      ).toBeGreaterThanOrEqual(MIN_NORMAL_TEXT_CONTRAST);
+    }
+  });
+
   it("covers every built-in theme with the new a11y tokens", () => {
     for (const theme of Object.values(THEMES_DATA) as ThemeTokens[]) {
+      expect(theme.activeText).toMatch(/^#[0-9a-f]{6}$/i);
       expect(theme.mutedText).toMatch(/^#[0-9a-f]{6}$/i);
       expect(theme.disabledText).toMatch(/^#[0-9a-f]{6}$/i);
+      expect(theme.weekend).toMatch(/^#[0-9a-f]{6}$/i);
     }
   });
 });
