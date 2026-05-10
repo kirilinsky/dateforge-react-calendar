@@ -461,104 +461,7 @@ Used by:
 
 ## Accessibility
 
-`@dateforge/react-calendar` is built **inclusive-first**. The library is meant to be usable by people who navigate with keyboards, screen readers, switch devices, voice control, and people who simply prefer larger touch targets or reduced motion. The contract below is enforceable — every public module ships with the ARIA attributes, keyboard handlers, and structural roles required to be operable by assistive technology out of the box. Tests in `src/__tests__/integration/a11y.test.tsx` use [`jest-axe`](https://github.com/nickcolley/jest-axe) to gate the contract on CI.
-
-### Day grid (`<CalendarDays>`)
-
-ARIA grid pattern (https://www.w3.org/WAI/ARIA/apg/patterns/grid/):
-
-| Element                                     | Role           | ARIA / DOM                                                                             |
-| ------------------------------------------- | -------------- | -------------------------------------------------------------------------------------- |
-| Outer grid container                        | `grid`         | `aria-label` = localized month + year (e.g. "June 2024")                               |
-| Weekday header row                          | `row`          | —                                                                                      |
-| Each weekday header                         | `columnheader` | `aria-label` = full weekday name; visible text may be the abbreviation                 |
-| Week row                                    | `row`          | `aria-label="Week N"` (ISO week number)                                                |
-| Week number cell (when `weekNumbers`)       | `rowheader`    | `aria-label="Week N"`                                                                  |
-| Day cell                                    | `gridcell`     | `aria-selected` for selected; `aria-disabled` for disabled or `readOnly`               |
-| Day button (inside cell)                    | (button)       | `aria-label` = full localized date + state suffix ("today", "selected", "disabled", …) |
-| Today's button                              | (button)       | `aria-current="date"`                                                                  |
-| Hidden out-of-range cell (`hideOutOfRange`) | `presentation` | Not exposed to AT; preserves grid layout only                                          |
-| Empty week row (all cells hidden)           | `presentation` | Whole row dropped from AT                                                              |
-
-Keyboard map (focused day button, see `use-calendar-keyboard.ts`):
-
-| Key                  | Action                               |
-| -------------------- | ------------------------------------ |
-| Arrow Left / Right   | Move focus by one day                |
-| Arrow Up / Down      | Move focus by one week               |
-| Home / End           | First / last day of the focused week |
-| Page Up / Page Down  | Previous / next month                |
-| Shift + Page Up/Down | Previous / next year                 |
-| Enter or Space       | Select the focused day               |
-
-Roving tabindex: only the focused day has `tabindex="0"`; all others are `tabindex="-1"`. Focus follows the user across months — `moveFocus` calls `navigateTo` when crossing month boundaries (unless `blockNavigation` is set).
-
-### Time picker (`<CalendarTimeGrid>` and `<TimeTrack>` inside the Nav popup)
-
-Each drum (hour / minute / second) is a `role="spinbutton"` with `aria-label`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, and `aria-valuetext`. AM/PM buttons use `aria-pressed`. Under `readOnly` the spinbutton gets `aria-disabled="true"` and all keyboard / scroll / click handlers no-op.
-
-Keyboard map:
-
-| Key             | Action                       |
-| --------------- | ---------------------------- |
-| Arrow Up / Down | Decrement / increment by one |
-| Home / End      | Jump to min / max value      |
-
-### Tracks (`<CalendarDaysTrack>`, `<CalendarMonthsTrack>`, `<CalendarYearsTrack>`)
-
-Same `role="spinbutton"` pattern as the time drums, with values reflecting the highlighted item.
-
-| Key                | Action                             |
-| ------------------ | ---------------------------------- |
-| Arrow Left / Right | Step backwards / forwards by one   |
-| Page Up / Down     | Jump 7 items at a time (DaysTrack) |
-| Home / End         | Jump to first / last allowed item  |
-
-### Popups (`MonthPopup`, `YearPopup`, `TimePopup`)
-
-`role="dialog"` + `aria-modal="true"` + `aria-label` ("Select month" / "Select year" / "Select time"). Focus is trapped inside while open (`useFocusTrap`) and `Escape` closes the popup.
-
-### Calendar root and `readOnly`
-
-The root wrapper element gets `data-readonly` and `aria-readonly="true"` when the `readOnly` prop is set. Every interactive module additionally renders its UI as `disabled` / `aria-disabled` so screen reader announcements stay consistent. See "`readOnly` contract" for the full disable matrix.
-
-### Live region for selection changes
-
-`CalendarLayout` mounts a single off-screen `<div role="status" aria-live="polite" aria-atomic="true">` that announces the most recently committed date in the configured locale. This makes range/selection updates audible without forcing the screen reader user to re-read the entire grid.
-
-### Selected dates / chips (`<CalendarSelectedDates>`)
-
-Chips are real `<button>`s with localized text content; clicking navigates the view (`navigateTo`). The clear-all button has `aria-label="Clear"` and is disabled under `readOnly`.
-
-### Manual input (`<CalendarManualInput>`)
-
-The masked input is a regular `<input type="text" inputMode="numeric">` — it inherits the platform's IME / a11y behavior. Under `readOnly` the HTML `readOnly` attribute is applied. Apply / clear buttons use `aria-label`. Invalid input flips a red wrapper class (visual only); the rejected commit policy is documented in the `<CalendarManualInput>` "When `onChange` fires" table.
-
-### Reduced motion
-
-Not yet implemented as an explicit guard. Animations (drum flip in `AnimatedTime`, month slide on navigation, chip fade-in/out) currently run regardless of user preference. **TODO:** honor `prefers-reduced-motion: reduce` — wrap animation classes behind a media query, or expose a `reducedMotion` prop / context flag. Tracked in `DOCUMENTATION.md → Accessibility → Known limitations`.
-
-### Testing
-
-`src/__tests__/integration/a11y.test.tsx` runs `jest-axe` on representative module compositions (default Days, with selection, with min/max, in range mode, with `hideOutOfRange`, with `currentMonthOnly`, on TimeGrid). Any axe violation fails CI. New modules MUST land with their own axe test cases.
-
-Manual SR coverage: NVDA (Windows), VoiceOver (macOS / iOS), and TalkBack (Android) are the supported targets. Bug reports against other AT are welcome but not gating.
-
----
-
-## Hidden day cells (a11y)
-
-`<CalendarDays hideOutOfRange>` and `<CalendarDays currentMonthOnly>` replace skipped cells with `<div role="presentation" />` placeholders. These placeholders preserve the grid layout (so `fixedRows` and column alignment still work) but are removed from the accessibility tree — screen readers see only real `gridcell`s.
-
-Disabled-but-visible cells follow the standard ARIA grid pattern: `role="gridcell"` + `aria-disabled="true"` on the cell, an `aria-label` describing why (e.g. "16 June 2024, disabled"). They remain reachable by keyboard so users do not silently lose positions.
-
-The decision tree for any out-of-range date:
-
-1. Default — render as gridcell with `aria-disabled="true"`.
-2. `hideOutOfRange` enabled — render as `role="presentation"` placeholder. AT skips it.
-3. Whole row of placeholders — outer row also becomes `role="presentation"`.
-
-Keyboard navigation does not currently skip over hidden positions (computed by date math, not visibility). When `hideOutOfRange` is desired together with full keyboard traversal, consumers should add `blockNavigation` to constrain arrows to the visible month. This is documented in `DOCUMENTATION.md` and exercised by `a11y.test.tsx`.
+ARIA roles, keyboard maps, focus management, live region, hidden-cell rules, and the reduced-motion TODO live in [`DESIGN.md → Accessibility`](./DESIGN.md#accessibility). The reducer-side guarantees (e.g. `readOnly` blocking selection writes) are described in "`readOnly` contract" below.
 
 ---
 
@@ -640,20 +543,7 @@ When adding a new module that writes selection, it MUST read `readOnly` and gate
 
 ## Themes and appearances
 
-Themes and appearances are independent dimensions of styling.
-
-- **Theme** = palette (colors). Applied via `data-theme` attribute and CSS custom properties on the wrapper element. Three string values are accepted (`"auto"`, `"light"`, `"dark"`); everything else must be a `CustomTheme` object — either an exported named theme (e.g. `midnight`, `scarlet`) imported from `@dateforge/react-calendar/themes/<name>`, or a user-built one from `createTheme()`. Named theme **names are module export names, not accepted string values** — passing the string `"midnight"` is invalid and emits a dev warning.
-- **Appearance** = structure (radii, sizing, density, border styles). Applied via `data-appearance` attribute. Custom appearances via `createAppearance()`.
-
-A library consumer can mix any theme with any appearance freely. This combinatorial space is the primary target for visual regression testing (Chromatic).
-
-CSS layering enforces that user styles override library defaults predictably:
-
-```
-@layer cal-base, cal-components, cal-modules, themes, appearances, user;
-```
-
-User styles win over `themes` and `appearances`, which win over the base layers.
+Theme/appearance dimensions, token catalog, named theme list, appearance characters, and CSS layering live in [`DESIGN.md`](./DESIGN.md). The architectural facts: both apply via `data-theme` / `data-appearance` attributes on the wrapper; toggles re-render the root once and modules read tokens from CSS variables (no JS re-derivation).
 
 ---
 
@@ -684,8 +574,9 @@ Tree-shaking stays correct because pack files are pure (no top-level side effect
 ## Reading order for new contributors
 
 1. This file (`ARCHITECTURE.md`) — conceptual model.
-2. `DOCUMENTATION.md` — prop reference per component.
-3. `plans/testing-strategy.md` — what to test and why.
-4. `plans/storybook-strategy.md` — how stories are organized.
-5. `src/core/state.ts` — the reducer (single source of truth for selection logic).
-6. `src/core/provider.tsx` — how state is wired to the four contexts.
+2. `DESIGN.md` — design tokens, themes/appearances, motion, a11y.
+3. `DOCUMENTATION.md` — prop reference per component.
+4. `plans/testing-strategy.md` — what to test and why.
+5. `plans/storybook-strategy.md` — how stories are organized.
+6. `src/core/state.ts` — the reducer (single source of truth for selection logic).
+7. `src/core/provider.tsx` — how state is wired to the four contexts.
