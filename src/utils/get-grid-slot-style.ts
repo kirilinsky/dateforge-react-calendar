@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 
-export const useGridSlot = (
+export const getGridSlotStyle = (
   col?: number | string,
 ): CSSProperties | undefined =>
   col === undefined

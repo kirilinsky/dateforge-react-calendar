@@ -10,7 +10,6 @@ import { useUI } from "@/context/ui-context";
 import shared from "@/global/global.module.css";
 import { useCalendarKeyboard } from "@/hooks/use-calendar-keyboard";
 import { useClientValue } from "@/hooks/use-client-value";
-import { useGridSlot } from "@/hooks/use-grid-slot";
 import type { StartOfWeek } from "@/types/calendar";
 import {
   getCalendarData,
@@ -18,6 +17,7 @@ import {
   getNextMonthFromSwipe,
   isSameDay,
 } from "@/utils/date-utils";
+import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { getTodayInTimezone, toTZMidnight } from "@/utils/tz-utils";
 import styles from "./days.module.css";
 import WeekDays from "./week-days";
@@ -544,7 +544,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
       onTouchEnd={handleTouchEnd}
       onTouchStart={handleTouchStart}
       onMouseLeave={handleMouseLeave}
-      style={useGridSlot(col)}
+      style={getGridSlotStyle(col)}
     >
       <div
         ref={gridRef}

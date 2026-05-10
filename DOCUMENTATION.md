@@ -783,11 +783,12 @@ A horizontal scrollable strip of month names for the current year.
 
 ### Props
 
-| Prop    | Type               | Default | Description                                       |
-| ------- | ------------------ | ------- | ------------------------------------------------- |
-| `short` | `boolean`          | `true`  | Use abbreviated month names                       |
-| `bound` | `"from" \| "to"`   | —       | In range mode binds the track to a range boundary |
-| `col`   | `number \| string` | —       | CSS grid `grid-column` value                      |
+| Prop            | Type               | Default | Description                                       |
+| --------------- | ------------------ | ------- | ------------------------------------------------- |
+| `short`         | `boolean`          | `true`  | Use abbreviated month names                       |
+| `showYearLabel` | `boolean`          | `false` | Show the year under the active month item         |
+| `bound`         | `"from" \| "to"`   | —       | In range mode binds the track to a range boundary |
+| `col`           | `number \| string` | —       | CSS grid `grid-column` value                      |
 
 ---
 

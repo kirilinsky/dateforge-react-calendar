@@ -280,7 +280,7 @@ export const DaysAndMonthsTrack: Story = {
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
       >
-        <CalendarMonthsTrack />
+        <CalendarMonthsTrack showYearLabel />
         <CalendarDays />
       </Calendar>
     );

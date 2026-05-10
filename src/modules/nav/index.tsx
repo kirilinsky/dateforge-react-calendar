@@ -18,7 +18,6 @@ import { warnOnce } from "@/core/dev-warn";
 import shared from "@/global/global.module.css";
 import { useBoundDateView } from "@/hooks/use-bound-date-view";
 import { useClientValue } from "@/hooks/use-client-value";
-import { useGridSlot } from "@/hooks/use-grid-slot";
 import { Clear, Down, Home, ThemeToggle } from "@/Icons";
 import { clampBoundDate } from "@/utils/clamp-bound-date";
 import {
@@ -28,11 +27,12 @@ import {
   getTimeString,
   isYearFixed,
 } from "@/utils/date-utils";
+import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { MonthPopup, YearPopup } from "./month-year-track";
 import styles from "./nav.module.css";
 import { TimePopup } from "./time-popup";
 
-const DRUM_MS = 200;
+const DRUM_MS = 240;
 
 const DrumChar = ({ char }: { char: string }) => {
   const [{ curr, prev, key }, set] = useState({
@@ -307,7 +307,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
     home ||
     clear ||
     themeToggle;
-  const gridSlot = useGridSlot(col);
+  const gridSlot = getGridSlotStyle(col);
 
   if (!visible) return null;
 

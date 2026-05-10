@@ -11,14 +11,16 @@ import {
 
 type MonthsTrackArgs = {
   short?: boolean;
+  showYearLabel?: boolean;
 };
 
 const meta: Meta<MonthsTrackArgs> = {
   title: "Modules/MonthsTrack",
   argTypes: {
     short: { control: "boolean" },
+    showYearLabel: { control: "boolean" },
   },
-  args: { short: true },
+  args: { short: true, showYearLabel: false },
   render: (args, ctx) => {
     const [date, setDate] = useState<Date | null>(FIXED_DATE);
     return (
@@ -28,7 +30,10 @@ const meta: Meta<MonthsTrackArgs> = {
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
       >
-        <CalendarMonthsTrack short={args.short} />
+        <CalendarMonthsTrack
+          short={args.short}
+          showYearLabel={args.showYearLabel}
+        />
       </Calendar>
     );
   },
@@ -44,6 +49,11 @@ export const FullNames: Story = {
   args: { short: false },
 };
 FullNames.storyName = "Full month names";
+
+export const WithYearLabel: Story = {
+  args: { showYearLabel: true },
+};
+WithYearLabel.storyName = "Year label under active month";
 
 export const RangeBounds: Story = {
   parameters: {

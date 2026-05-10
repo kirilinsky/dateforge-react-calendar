@@ -4,7 +4,7 @@ import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import { useSelectionActions } from "@/context/selection-context";
 import shared from "@/global/global.module.css";
-import { useGridSlot } from "@/hooks/use-grid-slot";
+import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import styles from "./time.module.css";
 
 export interface CalendarTimeGridProps {
@@ -24,7 +24,7 @@ export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
     <div
       data-area="time"
       className={`${styles.timeContainer} ${shared.flexCenter}`}
-      style={useGridSlot(col)}
+      style={getGridSlotStyle(col)}
     >
       <TimeTrack
         date={date}

@@ -1,8 +1,8 @@
 import type React from "react";
 import { useRef } from "react";
-import { useGridSlot } from "@/hooks/use-grid-slot";
 import { useItemWidth } from "@/hooks/use-item-width";
 import { useTrack } from "@/hooks/use-track";
+import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import styles from "./virtual-track.module.css";
 
 interface VirtualTrackRenderArgs {
@@ -143,7 +143,7 @@ export const VirtualTrack: React.FC<VirtualTrackProps> = ({
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerCancel}
-      style={useGridSlot(col)}
+      style={getGridSlotStyle(col)}
     >
       <div className={cx(styles.highlight, highlightClassName)} aria-hidden />
       {renderOverlay?.({ activeIndex })}
