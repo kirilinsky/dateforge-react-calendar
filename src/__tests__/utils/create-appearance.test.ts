@@ -9,9 +9,16 @@ describe("createAppearance", () => {
   });
 
   it("maps known tokens to css var keys", () => {
-    const a = createAppearance({ radius: "0.25em", border: "3px" });
+    const a = createAppearance({
+      radius: "0.25em",
+      border: "3px",
+      dayFontSize: "1.1em",
+      controlFontSize: "0.95em",
+    });
     expect(a.vars["--cal-radius"]).toBe("0.25em");
     expect(a.vars["--cal-border"]).toBe("3px");
+    expect(a.vars["--cal-text-day"]).toBe("1.1em");
+    expect(a.vars["--cal-text-lg"]).toBe("0.95em");
   });
 
   it("ignores undefined token values", () => {

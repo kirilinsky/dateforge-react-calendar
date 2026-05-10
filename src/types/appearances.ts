@@ -9,6 +9,8 @@ export type AppearanceTokens = {
   transition: string;
   font: string;
   fontSize: string;
+  dayFontSize: string;
+  controlFontSize: string;
   daysSpacing: string;
   trackHeight: string;
   dayRatio: string;
@@ -25,6 +27,8 @@ export const APPEARANCE_TOKEN_TO_VAR: Record<keyof AppearanceTokens, string> = {
   transition: "--cal-transition",
   font: "--cal-font",
   fontSize: "--cal-font-size",
+  dayFontSize: "--cal-text-day",
+  controlFontSize: "--cal-text-lg",
   daysSpacing: "--cal-days-padding",
   trackHeight: "--cal-track-height",
   dayRatio: "--cal-day-ratio",
