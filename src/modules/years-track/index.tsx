@@ -20,11 +20,18 @@ const YEARS = Array.from(
 export interface CalendarYearsTrackProps {
   bound?: "from" | "to";
   col?: number | string;
+  /**
+   * Fires after the user lands on a year via the track. Receives the
+   * navigated date (or clamped bound date in range mode). Use for standalone
+   * year-picker UX without `CalendarDays`.
+   */
+  onYearSelect?: (date: Date) => void;
 }
 
 export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({
   bound,
   col,
+  onYearSelect,
 }) => {
   const { viewDate, navigateTo } = useNavigation();
   const { minDate, maxDate, range, readOnly } = useConfig();
@@ -91,8 +98,10 @@ export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({
       const clamped = clampBoundDate(next, bound!, rangeStart, rangeEnd);
       setLocalView(clamped);
       if (!readOnly) onRangeBoundSet(bound!, clamped);
+      onYearSelect?.(clamped);
     } else {
       navigateTo(next);
+      onYearSelect?.(next);
     }
   };
 

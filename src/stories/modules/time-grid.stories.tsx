@@ -89,3 +89,48 @@ export const Step2Hour: Story = {
   args: { hourStep: 2 },
 };
 Step2Hour.storyName = "Hour step = 2";
+
+export const StandaloneTimePicker: Story = {
+  render: (args, ctx) => {
+    const [picked, setPicked] = useState<{
+      h: number;
+      m: number;
+      s: number;
+    } | null>(null);
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const label = picked
+      ? args.seconds
+        ? `${pad(picked.h)}:${pad(picked.m)}:${pad(picked.s)}`
+        : `${pad(picked.h)}:${pad(picked.m)}`
+      : "—";
+    return (
+      <div style={{ display: "grid", gap: 12 }}>
+        <div data-testid="picked-time" style={{ fontSize: 14 }}>
+          Picked: <strong>{label}</strong>
+        </div>
+        <Calendar
+          hour12={args.hour12}
+          timeStep={{
+            hour: args.hourStep,
+            minute: args.minuteStep,
+            second: args.secondStep,
+          }}
+          theme={resolveStoryTheme(ctx.globals.theme)}
+          appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        >
+          <CalendarTimeGrid
+            seconds={args.seconds}
+            onTimeSelect={(d) =>
+              setPicked({
+                h: d.getHours(),
+                m: d.getMinutes(),
+                s: d.getSeconds(),
+              })
+            }
+          />
+        </Calendar>
+      </div>
+    );
+  },
+};
+StandaloneTimePicker.storyName = "Standalone time picker (onTimeSelect)";

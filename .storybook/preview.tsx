@@ -45,7 +45,19 @@ const preview: Preview = {
       },
     },
     a11y: {
-      test: "todo",
+      test: "error",
+      // `aria-hidden` elements are excluded from the accessibility tree, so
+      // their visual contrast is not consumed by assistive tech. Axe still
+      // flags `color-contrast` on them by default (e.g. opacity-faded
+      // decorations in TimeTrack drum picker). Skip the rule for them.
+      config: {
+        rules: [
+          {
+            id: "color-contrast",
+            selector: '*:not([aria-hidden="true"], [aria-hidden="true"] *)',
+          },
+        ],
+      },
     },
     layout: "centered",
   },
