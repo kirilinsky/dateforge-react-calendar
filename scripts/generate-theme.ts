@@ -8,7 +8,7 @@ const TOKEN_KEYS = Object.keys(TOKEN_TO_VAR) as (keyof ThemeTokens)[];
 const BRAND_EXPR = `Symbol.for("rcd.theme.custom")`;
 
 // light: graphite amethyst mint comfy neon rosa snow solar latte slate scarlet prism meadow monsoon pearl chalk split riso
-// dark:  industrial midnight sandstone phosphor dracula cyber temporal crimson forest nebula aurora espresso ember flare abyss
+// dark:  industrial midnight sandstone phosphor dracula cyber temporal crimson forest nebula aurora espresso ember flare abyss cobalt velvet eclipse
 
 function toJsVarsObj(tokens: ThemeTokens): string {
   return TOKEN_KEYS.map((k) => `"${TOKEN_TO_VAR[k]}":"${tokens[k]}"`).join(",");

@@ -67,4 +67,7 @@ export const THEMES_DATA: Record<string, ThemeTokens> = {
   riso:       { accent: "#fef7e8", backdrop: "#fef7e8", highlight: "#2b3fe0", tone: "#fdebf3",  text: "#1a1205", stroke: "#e5dcc8", shadow: "#2b3fe028", disabled: "#b8ab8c", weekend: "#ff3e8e", range: "#2bce8b", error: "#dc2626" },
   flare:      { accent: "#0e0e10", backdrop: "#141417", highlight: "#8a8a92", tone: "#1e1e22",  text: "#e8e8ec", stroke: "#2a2a30", shadow: "#8a8a9220", disabled: "#4a4a52", weekend: "#ff6028", range: "#3a3a40", error: "#ff5252" },
   abyss:      { accent: "#09010e", backdrop: "#060009", highlight: "#d400f0", tone: "#1c0030",  text: "#f0d0ff", stroke: "#2e0050", shadow: "#d400f028", disabled: "#2a0040", weekend: "#00ffee", range: "#ff6b35", error: "#ff1744" },
+  cobalt:     { accent: "#e6f0ff", backdrop: "#061323", highlight: "#2563eb", tone: "#0d1f3a",  text: "#d8e8ff", stroke: "#173b72", shadow: "#2563eb2a", disabled: "#274260", weekend: "#ffb703", range: "#00c2a8", error: "#ff4d6d" },
+  velvet:     { accent: "#fff0f8", backdrop: "#120711", highlight: "#ff4da6", tone: "#261127",  text: "#f9d8ea", stroke: "#4a2246", shadow: "#ff4da628", disabled: "#3b2339", weekend: "#ffc857", range: "#6ee7f9", error: "#ff6b6b" },
+  eclipse:    { accent: "#f4ffd8", backdrop: "#080d09", highlight: "#b7e000", tone: "#141a12",  text: "#e9f2c7", stroke: "#304024", shadow: "#b7e00024", disabled: "#3b442e", weekend: "#ff5d8f", range: "#a78bfa", error: "#ff3d68" },
 };
