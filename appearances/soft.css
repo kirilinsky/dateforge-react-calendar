@@ -6,6 +6,10 @@
     --cal-shadow-sm: 0 0.15em 0.5em var(--c-x);
     --cal-shadow-md: 0 0.25em 0.8em var(--c-x);
     --cal-shadow-lg: 0 0.3em 1.2em var(--c-x);
+    --cal-text-lg: 0.96em;
+    --cal-text-xl: 1.06em;
+    --cal-text-day: clamp(0.74em, 4.4cqi, 1.16em);
+    --cal-leading-normal: 1.35;
     --cal-transition: 0.25s;
     --cal-days-padding: 0.95em;
   }

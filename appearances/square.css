@@ -3,6 +3,12 @@
     --cal-radius: 0;
     --cal-border: 1px;
     --cal-spacing: 0.5em;
+    --cal-text-sm: 0.78em;
+    --cal-text-md: 0.84em;
+    --cal-text-lg: 0.94em;
+    --cal-text-day: clamp(0.72em, 4.4cqi, 1.12em);
+    --cal-leading-tight: 1;
+    --cal-leading-normal: 1.2;
     --cal-transition: 0.12s;
     --cal-day-ratio: 1 / 1;
   }

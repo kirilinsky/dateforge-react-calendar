@@ -7,6 +7,16 @@
     --cal-shadow-md: 0 0.1em 0.3em var(--c-x);
     --cal-shadow-lg: 0 0.1em 0.4em var(--c-x);
     --cal-font-size: clamp(11px, 2.3cqw, 15px);
+    --cal-text-2xs: 0.58em;
+    --cal-text-xs: 0.68em;
+    --cal-text-sm: 0.76em;
+    --cal-text-md: 0.82em;
+    --cal-text-lg: 0.9em;
+    --cal-text-xl: 1em;
+    --cal-text-2xl: 1.04em;
+    --cal-text-day: clamp(0.68em, 4.2cqi, 1em);
+    --cal-leading-tight: 1.05;
+    --cal-leading-normal: 1.2;
     --cal-transition: 0.15s;
     --cal-days-padding: 0.45em;
     --cal-track-height: 3.2em;

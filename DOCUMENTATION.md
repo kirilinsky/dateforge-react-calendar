@@ -943,7 +943,11 @@ Creates a custom appearance object to pass to the `appearance` prop.
 ```ts
 import { createAppearance } from "@dateforge/react-calendar";
 
-const myAppearance = createAppearance({ radius: "2px", fontSize: "13px" });
+const myAppearance = createAppearance({
+  radius: "2px",
+  fontSize: "13px",
+  dayFontSize: "1.05em",
+});
 ```
 
 | Token             | Description                                              |
@@ -954,6 +958,8 @@ const myAppearance = createAppearance({ radius: "2px", fontSize: "13px" });
 | `spacing`         | Internal padding / gap between elements                  |
 | `font`            | Font family                                              |
 | `fontSize`        | Base font size                                           |
+| `dayFontSize`     | Font size for day numbers. Accepts fixed or responsive CSS values like `clamp(...)` |
+| `controlFontSize` | Font size for primary controls such as nav/time buttons  |
 | `daysSpacing`     | Gap between individual day cells                         |
 | `dayRatio`        | Aspect ratio of each day cell (e.g. `"1 / 1"`)           |
 | `trackHeight`     | Height of Track module items                             |

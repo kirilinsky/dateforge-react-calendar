@@ -9,6 +9,17 @@
     --cal-shadow-md: 0 0.8em 2em var(--c-x);
     --cal-shadow-lg: 0 1.5em 3.5em var(--c-x);
     --cal-font-size: clamp(14px, 3.5cqw, 22px);
+    --cal-text-xs: 0.75em;
+    --cal-text-sm: 0.84em;
+    --cal-text-md: 0.9em;
+    --cal-text-lg: 1em;
+    --cal-text-xl: 1.12em;
+    --cal-text-2xl: 1.2em;
+    --cal-text-day: clamp(0.82em, 4.8cqi, 1.28em);
+    --cal-weight-semibold: 500;
+    --cal-weight-bold: 600;
+    --cal-leading-normal: 1.4;
+    --cal-leading-relaxed: 1.7;
     --cal-transition: 0.35s;
     --cal-days-padding: 1.8em;
     --cal-track-height: 5em;
