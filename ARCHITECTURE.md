@@ -136,6 +136,26 @@ This is a **third category** that the user's two-bucket model didn't initially c
 - UI-only side effects (e.g. `<CalendarNav themeToggle>`, popup open/close) are independent of selection — they touch `UIContext` only and never fire `onChange`.
 - Tests must cover each enabled prop explicitly per module: a Nav with `clear` is contractually different from a Nav without.
 
+**Track scroll axis (current limitation):**
+
+Each Track owns exactly one temporal axis and loops circularly within it. They do not roll over into the adjacent axis at the strip ends.
+
+| Module                  | Scroll axis     | Loops within                | Mutates              |
+| ----------------------- | --------------- | --------------------------- | -------------------- |
+| `<CalendarDaysTrack>`   | day-of-month    | `viewDate.getMonth()`       | day only             |
+| `<CalendarMonthsTrack>` | month-of-year   | `viewDate.getFullYear()`    | month only           |
+| `<CalendarYearsTrack>`  | year            | bounded by `minDate`/`maxDate` (or unbounded virtual range) | year only |
+
+Implementation detail: `handleChange` in DaysTrack/MonthsTrack calls `setDate(idx + 1)` / `setMonth(idx)` on a clone of `refDate` — neither touches the higher-order field. `VirtualTrack` is `circular` with fixed `count` (days-in-month / 12), so scrolling past the boundary wraps to index 0 of the same axis rather than advancing the next.
+
+Why intentional:
+
+- `VirtualTrack` `onChange(index)` exposes only target index — not direction or wrap-count — so reliable rollover detection on inertial scroll is not free.
+- `minDate`/`maxDate` clamp logic (`computeBoundLimits`, `minFromAbs`/`maxFromAbs`) assumes refYear / refMonth match — cross-axis scroll would require per-step recompute.
+- Range-bound mode (`bound="from"|"to"`) uses `clampBoundDate` against the current ref — also single-axis.
+
+Compose Tracks for multi-axis navigation: pair `MonthsTrack` with `YearsTrack`, or use `CalendarNav` for orthogonal moves.
+
 ### Special case — `<CalendarPresets>`
 
 Presets are interactive but operate at a different level than `<CalendarDays>`:

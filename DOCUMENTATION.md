@@ -754,6 +754,8 @@ A horizontal scrollable strip of day numbers for the current month.
 | `bound`          | `"from" \| "to"`   | —       | In range mode binds the track to a range boundary. Without it tracks single-mode behavior |
 | `col`            | `number \| string` | —       | CSS grid `grid-column` value                                                              |
 
+> **Scroll axis limitation.** The track loops day 1..N within `viewDate.getMonth()`. Scrolling past the last day wraps back to day 1 of the same month — it does not advance the month. Compose with `<CalendarMonthsTrack>` / `<CalendarYearsTrack>` / `<CalendarNav>` to change month or year. See `ARCHITECTURE.md → D. Hybrid modules → Track scroll axis (current limitation)`.
+
 In `mode="multiple"` the track automatically renders a save / remove button. Item click only previews; the button commits the date (toggles in/out of `selectedDates`). The button shows `Check` when the previewed date is not selected, `Clear` (×) when it is.
 
 ```tsx
@@ -789,6 +791,8 @@ A horizontal scrollable strip of month names for the current year.
 | `showYearLabel` | `boolean`          | `false` | Show the year under the active month item         |
 | `bound`         | `"from" \| "to"`   | —       | In range mode binds the track to a range boundary |
 | `col`           | `number \| string` | —       | CSS grid `grid-column` value                      |
+
+> **Scroll axis limitation.** The track loops month 0–11 within `viewDate.getFullYear()`. Scrolling past December does not advance the year — it wraps back to January of the same year. Compose with `<CalendarYearsTrack>` or `<CalendarNav>` to change year. See `ARCHITECTURE.md → D. Hybrid modules → Track scroll axis (current limitation)`.
 
 ---
 
@@ -1175,11 +1179,11 @@ type StartOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 ### Built-in themes
 
-33 named palettes, each exported as a tree-shakeable `CustomTheme` object.
+36 named palettes, each exported as a tree-shakeable `CustomTheme` object.
 
-**Light:** `mint` `comfy` `neon` `rosa` `snow` `solar` `graphite` `amethyst` `latte` `slate` `scarlet` `prism` `meadow` `monsoon` `pearl` `chalk` `split` `riso`
+**Light:** `graphite` `amethyst` `mint` `comfy` `neon` `rosa` `snow` `solar` `latte` `slate` `scarlet` `prism` `meadow` `monsoon` `pearl` `chalk` `split` `riso`
 
-**Dark:** `industrial` `midnight` `sandstone` `phosphor` `dracula` `cyber` `abyss` `temporal` `crimson` `forest` `nebula` `aurora` `espresso` `ember` `flare`
+**Dark:** `industrial` `midnight` `sandstone` `phosphor` `dracula` `cyber` `temporal` `crimson` `forest` `nebula` `aurora` `espresso` `ember` `flare` `abyss` `cobalt` `velvet` `eclipse`
 
 **Base (no palette):** `"light"` `"dark"` `"auto"` — passed as strings, no import needed.
 
