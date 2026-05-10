@@ -6,6 +6,7 @@ import { FIXED_DATE } from "../_constants";
 import { debugStyle, fmtDate, fmtRange } from "../_helpers/debug";
 import {
   resolveStoryAppearance,
+  resolveStoryLocale,
   resolveStoryTheme,
 } from "../_helpers/resolve-globals";
 
@@ -27,6 +28,7 @@ const meta: Meta<DaysTrackArgs> = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarDaysTrack showMonthLabel={args.showMonthLabel} />
       </Calendar>
@@ -65,6 +67,7 @@ export const RangeBounds: Story = {
           onChange={setRange}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarDaysTrack bound="from" />
           <CalendarDaysTrack bound="to" />
@@ -87,6 +90,7 @@ export const MultipleMode: Story = {
           onChange={setDates}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarDaysTrack />
         </Calendar>

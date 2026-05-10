@@ -5,6 +5,7 @@ import { CalendarTimeGrid } from "@/modules/time";
 import { FIXED_DATE } from "../_constants";
 import {
   resolveStoryAppearance,
+  resolveStoryLocale,
   resolveStoryTheme,
 } from "../_helpers/resolve-globals";
 
@@ -46,6 +47,7 @@ const meta: Meta<TimeGridArgs> = {
         }}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarTimeGrid seconds={args.seconds} />
       </Calendar>
@@ -117,6 +119,7 @@ export const StandaloneTimePicker: Story = {
           }}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarTimeGrid
             seconds={args.seconds}

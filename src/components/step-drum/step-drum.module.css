@@ -27,12 +27,13 @@
   right: 3px;
   height: calc(100% / 7);
   transform: translateY(-50%);
-  background: var(--c-h);
+  background: var(--active-cell-bg, var(--c-h));
   border-radius: var(--cal-radius, 0.5em);
-  box-shadow: var(--cal-shadow-md, 0 0.2em 0.6em var(--c-x));
+  box-shadow: var(--active-cell-stroke, var(--cal-shadow-md, 0 0.2em 0.6em var(--c-x)));
   pointer-events: none;
   z-index: 0;
 }
+
 
 .item {
   flex: 1;
@@ -51,7 +52,7 @@
 
 .active {
   font-weight: var(--cal-weight-semibold);
-  color: var(--c-at, var(--c-a));
+  color: var(--active-cell-color, var(--c-at, var(--c-a)));
   cursor: default;
 }
 

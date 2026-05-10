@@ -5,6 +5,7 @@ import { CalendarDays } from "@/modules/days";
 import { FIXED_DATE } from "../_constants";
 import {
   resolveStoryAppearance,
+  resolveStoryLocale,
   resolveStoryTheme,
 } from "../_helpers/resolve-globals";
 
@@ -17,6 +18,7 @@ type DaysArgs = {
   fixedRows?: boolean;
   weekNumbers?: boolean;
   hideWeekdays?: boolean;
+  weekdayFormat?: "narrow" | "short" | "long";
   hideOutOfRange?: boolean;
   lockDeselection?: boolean;
   blockNavigation?: boolean;
@@ -37,6 +39,10 @@ const meta: Meta<DaysArgs> = {
     fixedRows: { control: "boolean" },
     weekNumbers: { control: "boolean" },
     hideWeekdays: { control: "boolean" },
+    weekdayFormat: {
+      control: { type: "select" },
+      options: ["narrow", "short", "long"],
+    },
     hideOutOfRange: { control: "boolean" },
     lockDeselection: { control: "boolean" },
     blockNavigation: { control: "boolean" },
@@ -51,6 +57,7 @@ const meta: Meta<DaysArgs> = {
     fixedRows: true,
     weekNumbers: false,
     hideWeekdays: false,
+    weekdayFormat: "short",
     hideOutOfRange: false,
     lockDeselection: false,
     blockNavigation: false,
@@ -64,6 +71,7 @@ const meta: Meta<DaysArgs> = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarDays
           startOfWeek={args.startOfWeek}
@@ -74,6 +82,7 @@ const meta: Meta<DaysArgs> = {
           fixedRows={args.fixedRows}
           weekNumbers={args.weekNumbers}
           hideWeekdays={args.hideWeekdays}
+          weekdayFormat={args.weekdayFormat}
           hideOutOfRange={args.hideOutOfRange}
           lockDeselection={args.lockDeselection}
           blockNavigation={args.blockNavigation}
@@ -105,6 +114,46 @@ export const HiddenWeekdayHeader: Story = {
 };
 HiddenWeekdayHeader.storyName = "Hidden weekday header";
 
+export const NarrowWeekdays: Story = {
+  args: { weekdayFormat: "narrow" },
+};
+NarrowWeekdays.storyName = "Narrow weekdays (single letter)";
+
+export const LongWeekdays: Story = {
+  args: { weekdayFormat: "long" },
+  render: (args, ctx) => {
+    const [date, setDate] = useState<Date | null>(FIXED_DATE);
+    return (
+      <div style={{ width: 470 }}>
+        <Calendar
+          value={date}
+          onChange={setDate}
+          theme={resolveStoryTheme(ctx.globals.theme)}
+          appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
+        >
+          <CalendarDays
+            startOfWeek={args.startOfWeek}
+            currentMonthOnly={args.currentMonthOnly}
+            highlightWeekends={args.highlightWeekends}
+            boldWeekends={args.boldWeekends}
+            highlightToday={args.highlightToday}
+            fixedRows={args.fixedRows}
+            weekNumbers={args.weekNumbers}
+            hideWeekdays={args.hideWeekdays}
+            weekdayFormat={args.weekdayFormat}
+            hideOutOfRange={args.hideOutOfRange}
+            lockDeselection={args.lockDeselection}
+            blockNavigation={args.blockNavigation}
+            swipe={args.swipe}
+          />
+        </Calendar>
+      </div>
+    );
+  },
+};
+LongWeekdays.storyName = "Long weekdays";
+
 export const StartOfWeekSunday: Story = {
   args: { startOfWeek: 0 },
 };
@@ -122,6 +171,7 @@ export const HideOutOfRange: Story = {
         maxDate={new Date(2016, 1, 20)}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarDays
           startOfWeek={args.startOfWeek}
@@ -132,6 +182,7 @@ export const HideOutOfRange: Story = {
           fixedRows={args.fixedRows}
           weekNumbers={args.weekNumbers}
           hideWeekdays={args.hideWeekdays}
+          weekdayFormat={args.weekdayFormat}
           hideOutOfRange={args.hideOutOfRange}
           lockDeselection={args.lockDeselection}
           blockNavigation={args.blockNavigation}
@@ -173,6 +224,7 @@ export const MultiMonthOffset: Story = {
         cols={4}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarDays
           offset={0}
@@ -185,6 +237,7 @@ export const MultiMonthOffset: Story = {
           fixedRows={args.fixedRows}
           weekNumbers={args.weekNumbers}
           hideWeekdays={args.hideWeekdays}
+          weekdayFormat={args.weekdayFormat}
           hideOutOfRange={args.hideOutOfRange}
           lockDeselection={args.lockDeselection}
           blockNavigation={args.blockNavigation}
@@ -201,6 +254,7 @@ export const MultiMonthOffset: Story = {
           fixedRows={args.fixedRows}
           weekNumbers={args.weekNumbers}
           hideWeekdays={args.hideWeekdays}
+          weekdayFormat={args.weekdayFormat}
           hideOutOfRange={args.hideOutOfRange}
           lockDeselection={args.lockDeselection}
           blockNavigation={args.blockNavigation}

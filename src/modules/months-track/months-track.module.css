@@ -15,7 +15,8 @@
 .yearLabel {
   font-size: var(--cal-text-xs);
   font-weight: var(--cal-weight-regular);
-  color: var(--c-m, var(--c-c));
+  color: inherit;
+  opacity: 0.75;
 }
 
 }

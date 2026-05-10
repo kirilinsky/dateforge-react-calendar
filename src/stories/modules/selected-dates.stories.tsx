@@ -5,6 +5,7 @@ import { CalendarSelectedDates } from "@/modules/selected-dates";
 import { FIXED_DATE } from "../_constants";
 import {
   resolveStoryAppearance,
+  resolveStoryLocale,
   resolveStoryTheme,
 } from "../_helpers/resolve-globals";
 
@@ -40,6 +41,7 @@ const meta: Meta<SelectedDatesArgs> = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarSelectedDates
           allowClear={args.allowClear}

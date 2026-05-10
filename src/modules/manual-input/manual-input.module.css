@@ -128,16 +128,17 @@
     display: inline-flex;
     align-items: stretch;
     height: 2.1em;
-    background: var(--c-t);
+    background: var(--active-cell-bg, var(--c-t));
     border: var(--cal-border) solid transparent;
     border-radius: var(--cal-radius, 0.5em);
     overflow: hidden;
     transition: all var(--cal-transition, 0.2s) ease;
     animation: msSlotIn var(--cal-transition, 0.2s) ease;
+    box-shadow: var(--active-cell-stroke, none);
 
     &:hover {
       border-color: var(--c-s);
-      box-shadow: var(--cal-shadow-sm, 0 0.1em 0.3em var(--c-x));
+      box-shadow: var(--active-cell-stroke, var(--cal-shadow-sm, 0 0.1em 0.3em var(--c-x)));
     }
   }
 

@@ -15,3 +15,22 @@ export const resolveStoryAppearance = (
   if (key === "default" || typeof key !== "string") return undefined;
   return (appearances as Record<string, CalendarAppearance>)[key];
 };
+
+export const STORY_LOCALES = [
+  "default",
+  "en-US",
+  "en-GB",
+  "ru-RU",
+  "de-DE",
+  "fr-FR",
+  "es-ES",
+  "it-IT",
+  "ja-JP",
+  "zh-CN",
+  "ar-EG",
+] as const;
+
+export const resolveStoryLocale = (key: unknown): string | undefined => {
+  if (key === "default" || typeof key !== "string") return undefined;
+  return key;
+};

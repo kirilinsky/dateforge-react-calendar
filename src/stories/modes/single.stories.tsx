@@ -9,6 +9,7 @@ import { FIXED_DATE } from "../_constants";
 import { debugStyle, fmtDate } from "../_helpers/debug";
 import {
   resolveStoryAppearance,
+  resolveStoryLocale,
   resolveStoryTheme,
 } from "../_helpers/resolve-globals";
 
@@ -29,6 +30,7 @@ export const Default: Story = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav showMonthPicker compactYears />
         <CalendarDays />
@@ -48,6 +50,7 @@ export const DisabledDays: Story = {
         disabled={disabled}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav showMonthPicker compactYears />
         <CalendarDays />
@@ -68,6 +71,7 @@ export const MinMaxDate: Story = {
         maxDate={new Date(2016, 1, 20)}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav showMonthPicker compactYears />
         <CalendarDays />
@@ -88,6 +92,7 @@ export const WithTime: Story = {
           onChange={setDate}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarNav showMonthPicker compactYears />
           <CalendarDays />
@@ -108,6 +113,7 @@ export const ReadOnly: Story = {
         readOnly
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav showMonthPicker compactYears />
         <CalendarDays />
