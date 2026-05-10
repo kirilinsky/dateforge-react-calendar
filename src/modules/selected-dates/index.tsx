@@ -60,13 +60,24 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
   const { selectedDates, rangeStart, rangeEnd } = useSelectionValue();
   const { onChangeDate } = useSelectionActions();
 
-  const fmt = new Intl.DateTimeFormat(locale, {
+  const dateFmt = new Intl.DateTimeFormat(locale, {
     day: "numeric",
     month: "short",
     year: "numeric",
-    ...(showTime && { hour: "numeric", minute: "2-digit", hour12 }),
     ...(timeZone && { timeZone }),
   });
+
+  const timeFmt = showTime
+    ? new Intl.DateTimeFormat(locale, {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12,
+        ...(timeZone && { timeZone }),
+      })
+    : null;
+
+  const fmtChip = (d: Date) =>
+    timeFmt ? `${dateFmt.format(d)} | ${timeFmt.format(d)}` : dateFmt.format(d);
 
   const hasContent = range ? !!rangeStart : selectedDates.length > 0;
   const gridSlot = getGridSlotStyle(col);
@@ -108,10 +119,10 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
           onClick={() => allowNavigate && navigateTo(rangeStart)}
           className={chipClass(rangeStart)}
         >
-          {fmt.format(rangeStart)}
+          {fmtChip(rangeStart)}
         </button>
         <span className={styles.rangeSep}>
-          {rangeEnd ? getRangeSep(fmt, rangeStart, rangeEnd) : "…"}
+          {rangeEnd ? getRangeSep(dateFmt, rangeStart, rangeEnd) : "…"}
         </span>
         {rangeEnd && (
           <button
@@ -119,7 +130,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
             onClick={() => allowNavigate && navigateTo(rangeEnd)}
             className={chipClass(rangeEnd)}
           >
-            {fmt.format(rangeEnd)}
+            {fmtChip(rangeEnd)}
           </button>
         )}
       </>
@@ -143,7 +154,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
             .filter(Boolean)
             .join(" ")}
         >
-          {fmt.format(d)}
+          {fmtChip(d)}
         </button>
       );
     })

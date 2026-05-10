@@ -102,3 +102,28 @@ export const HideOutOfRange: Story = {
   },
 };
 HideOutOfRange.storyName = "Hide out-of-range years";
+
+export const StandaloneYearPicker: Story = {
+  render: (args, ctx) => {
+    const [picked, setPicked] = useState<Date | null>(null);
+    return (
+      <div style={{ display: "grid", gap: 12 }}>
+        <div data-testid="picked-year" style={{ fontSize: 14 }}>
+          Picked: <strong>{picked ? picked.getFullYear() : "—"}</strong>
+        </div>
+        <Calendar
+          theme={resolveStoryTheme(ctx.globals.theme)}
+          appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        >
+          <CalendarYearsGrid
+            yearsPerPage={args.yearsPerPage}
+            disableOutOfRange={args.disableOutOfRange}
+            hideOutOfRange={args.hideOutOfRange}
+            onYearSelect={setPicked}
+          />
+        </Calendar>
+      </div>
+    );
+  },
+};
+StandaloneYearPicker.storyName = "Standalone year picker (onYearSelect)";

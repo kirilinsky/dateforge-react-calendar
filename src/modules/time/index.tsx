@@ -10,15 +10,28 @@ import styles from "./time.module.css";
 export interface CalendarTimeGridProps {
   col?: number | string;
   seconds?: boolean;
+  /**
+   * Fires whenever the user changes any drum (hours / minutes / seconds /
+   * AM-PM). Receives a Date built from `viewDate` with the new time set —
+   * read `getHours()` / `getMinutes()` / `getSeconds()` for the time-only
+   * value. Use for standalone time-picker UX without a selected date.
+   */
+  onTimeSelect?: (date: Date) => void;
 }
 
 export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
   col,
   seconds = false,
+  onTimeSelect,
 }) => {
   const { hour12, locale, readOnly, timeStep } = useConfig();
   const { viewDate: date } = useNavigation();
   const { onChangeTime } = useSelectionActions();
+
+  const handleChange = (next: Date) => {
+    onChangeTime(next);
+    onTimeSelect?.(next);
+  };
 
   return (
     <div
@@ -33,7 +46,7 @@ export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
         showSeconds={seconds}
         readOnly={readOnly}
         step={timeStep}
-        onChange={onChangeTime}
+        onChange={handleChange}
       />
     </div>
   );

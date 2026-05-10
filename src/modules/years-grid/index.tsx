@@ -16,6 +16,12 @@ export interface CalendarYearsGridProps {
   disableOutOfRange?: boolean;
   hideOutOfRange?: boolean;
   col?: number | string;
+  /**
+   * Fires after the user clicks a year cell. Receives the navigated viewDate
+   * (same month/day, picked year). Use this for a standalone year-picker UX
+   * without mounting `CalendarDays`.
+   */
+  onYearSelect?: (date: Date) => void;
 }
 
 const ChevronLeft = () => (
@@ -85,6 +91,7 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
   disableOutOfRange = true,
   hideOutOfRange = false,
   col,
+  onYearSelect,
 }) => {
   const pageSize = Math.min(40, Math.max(1, yearsPerPage));
   if (
@@ -149,6 +156,7 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
     const next = new Date(viewDate);
     next.setFullYear(year);
     navigateTo(next);
+    onYearSelect?.(next);
   };
 
   const startYear = loYear + page * pageSize;

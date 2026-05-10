@@ -12,6 +12,12 @@ export interface CalendarMonthsGridProps {
   disableOutOfRange?: boolean;
   hideOutOfRange?: boolean;
   col?: number | string;
+  /**
+   * Fires after the user clicks a month cell. Receives the navigated viewDate
+   * (first day of the picked month, same year). Use this to drive a standalone
+   * month-picker UX without mounting `CalendarDays`.
+   */
+  onMonthSelect?: (date: Date) => void;
 }
 
 export const CalendarMonthsGrid: React.FC<CalendarMonthsGridProps> = ({
@@ -19,6 +25,7 @@ export const CalendarMonthsGrid: React.FC<CalendarMonthsGridProps> = ({
   disableOutOfRange = true,
   hideOutOfRange = false,
   col,
+  onMonthSelect,
 }) => {
   const { locale, minDate, maxDate, disabled } = useConfig();
   const { viewDate, navigateTo } = useNavigation();
@@ -49,7 +56,11 @@ export const CalendarMonthsGrid: React.FC<CalendarMonthsGridProps> = ({
     [locale, viewDate],
   );
 
-  const handleClick = (i: number) => navigateTo(setMonth(viewDate, i));
+  const handleClick = (i: number) => {
+    const next = setMonth(viewDate, i);
+    navigateTo(next);
+    onMonthSelect?.(next);
+  };
 
   return (
     <div

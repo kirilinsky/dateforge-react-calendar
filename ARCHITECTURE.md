@@ -90,6 +90,18 @@ Their job is to let the user _navigate_ through the calendar — to find the dat
 - Never fires the consumer's `onChange` callback.
 - May open/close popups via the UI context.
 
+**Standalone callbacks.** Even though navigational modules never fire the calendar-level `onChange`, each one exposes a per-module callback so it can be used **standalone** without `CalendarDays`:
+
+| Module                  | Prop            | Payload                                                  |
+| ----------------------- | --------------- | -------------------------------------------------------- |
+| `<CalendarMonthsGrid>`  | `onMonthSelect` | navigated `viewDate` (first day of picked month)         |
+| `<CalendarYearsGrid>`   | `onYearSelect`  | navigated `viewDate` (same month/day, picked year)       |
+| `<CalendarMonthsTrack>` | `onMonthSelect` | navigated date (clamped to bound in range mode)          |
+| `<CalendarYearsTrack>`  | `onYearSelect`  | navigated date (clamped to bound in range mode)          |
+| `<CalendarTimeGrid>`    | `onTimeSelect`  | Date built from `viewDate` with new time set             |
+
+Use them when you want a month-only / year-only / time-only picker UX without committing to the full date-selection pipeline. The contract is unchanged — these callbacks fire alongside `navigateTo` (or alongside `onChangeTime` for `TimeGrid`); they do **not** trigger calendar-level `onChange`.
+
 ### B. Interactive modules
 
 > **Definition:** Commit a final selection. Call selection actions (`onChangeDate`, `onRangeSet`, `onDatesSet`, `onChangeTime`) which lead to a consumer-visible `onChange` event.

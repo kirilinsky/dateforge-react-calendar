@@ -57,3 +57,23 @@ export const RangeBounds: Story = {
   },
 };
 RangeBounds.storyName = "Range — from + to tracks";
+
+export const StandaloneYearPicker: Story = {
+  render: (_args, ctx) => {
+    const [picked, setPicked] = useState<Date | null>(null);
+    return (
+      <div style={{ display: "grid", gap: 12 }}>
+        <div data-testid="picked-year" style={{ fontSize: 14 }}>
+          Picked: <strong>{picked ? picked.getFullYear() : "—"}</strong>
+        </div>
+        <Calendar
+          theme={resolveStoryTheme(ctx.globals.theme)}
+          appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        >
+          <CalendarYearsTrack onYearSelect={setPicked} />
+        </Calendar>
+      </div>
+    );
+  },
+};
+StandaloneYearPicker.storyName = "Standalone year picker (onYearSelect)";

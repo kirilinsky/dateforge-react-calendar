@@ -82,3 +82,33 @@ export const RangeBounds: Story = {
   },
 };
 RangeBounds.storyName = "Range — from + to tracks";
+
+export const StandaloneMonthPicker: Story = {
+  render: (args, ctx) => {
+    const [picked, setPicked] = useState<Date | null>(null);
+    const label = picked
+      ? new Intl.DateTimeFormat(undefined, {
+          month: "long",
+          year: "numeric",
+        }).format(picked)
+      : "—";
+    return (
+      <div style={{ display: "grid", gap: 12 }}>
+        <div data-testid="picked-month" style={{ fontSize: 14 }}>
+          Picked: <strong>{label}</strong>
+        </div>
+        <Calendar
+          theme={resolveStoryTheme(ctx.globals.theme)}
+          appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        >
+          <CalendarMonthsTrack
+            short={args.short}
+            showYearLabel={args.showYearLabel}
+            onMonthSelect={setPicked}
+          />
+        </Calendar>
+      </div>
+    );
+  },
+};
+StandaloneMonthPicker.storyName = "Standalone month picker (onMonthSelect)";

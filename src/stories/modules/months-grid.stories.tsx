@@ -113,3 +113,35 @@ export const LocaleRU: Story = {
   args: { locale: "ru" },
 };
 LocaleRU.storyName = "Locale RU";
+
+export const StandaloneMonthPicker: Story = {
+  render: (args, ctx) => {
+    const [picked, setPicked] = useState<Date | null>(null);
+    const label = picked
+      ? new Intl.DateTimeFormat(args.locale, {
+          month: "long",
+          year: "numeric",
+        }).format(picked)
+      : "—";
+    return (
+      <div style={{ display: "grid", gap: 12 }}>
+        <div data-testid="picked-month" style={{ fontSize: 14 }}>
+          Picked: <strong>{label}</strong>
+        </div>
+        <Calendar
+          locale={args.locale}
+          theme={resolveStoryTheme(ctx.globals.theme)}
+          appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        >
+          <CalendarMonthsGrid
+            short={args.short}
+            disableOutOfRange={args.disableOutOfRange}
+            hideOutOfRange={args.hideOutOfRange}
+            onMonthSelect={setPicked}
+          />
+        </Calendar>
+      </div>
+    );
+  },
+};
+StandaloneMonthPicker.storyName = "Standalone month picker (onMonthSelect)";

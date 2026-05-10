@@ -47,7 +47,7 @@ import { CalendarNav, CalendarDays } from "@dateforge/react-calendar/modules";
 | `onChange`        | `(value: CalendarValue<M>) => void` | —          | Fires when the selection changes (in both controlled and uncontrolled modes)                                                                                                                                                                                                                                                                                                                  |
 | `cols`            | `number`                            | —          | Number of columns in the internal CSS grid                                                                                                                                                                                                                                                                                                                                                    |
 | `locale`          | `string`                            | `"en"`     | BCP 47 language tag used for all labels and formatting                                                                                                                                                                                                                                                                                                                                        |
-| `timeZone`        | `string \| "auto"`                  | `"auto"`   | IANA timezone (`"Europe/Paris"`, `"UTC"`), fixed offset (`"UTC+2"`, `"UTC-5"`), or `"auto"`. When `"auto"` (or omitted) the library detects the user's timezone via `Intl.DateTimeFormat().resolvedOptions().timeZone` after mount. Invalid values fall back to auto-detect with a dev warning. Affects today detection, emitted date midnight, and formatting                                |
+| `timeZone`        | `string \| "auto"`                  | `"auto"`   | IANA timezone (`"Europe/Paris"`, `"UTC"`), fixed offset (`"UTC+2"`, `"UTC-5"`), or `"auto"`. When `"auto"` (or omitted) the library detects the user's timezone via `Intl.DateTimeFormat().resolvedOptions().timeZone` after mount. Invalid values fall back to auto-detect with a dev warning. Affects today detection, emitted date midnight, and formatting. **Important:** with an explicit `timeZone`, the `Date` passed to `onChange` is the absolute instant of midnight **in that zone** — see [Timezone](#timezone) for examples and storage guidance |
 | `readOnly`        | `boolean`                           | `false`    | Disables all state-changing interactions (date/time selection). Navigation still works. Adds `data-readonly` on the root and `aria-disabled` on each interactive cell — the wrapper itself carries no ARIA state because plain `<div>` does not support `aria-readonly` per ARIA spec                                                                                                         |
 | `hour12`          | `boolean`                           | `false`    | Use 12-hour time format instead of 24-hour                                                                                                                                                                                                                                                                                                                                                    |
 | `timeStep`        | `{ hour?: number; minute?: number; second?: number }` | `{1,1,1}` | Granularity (step) for time drums. Affects both inline `CalendarTimeGrid` and `CalendarNav` time popup. Example: `timeStep={{ minute: 5 }}` snaps minutes to 0/5/10/.../55. Step values divide the unit range; `aria-valuemax`, keyboard `±step`, and scroll snap follow the step. Default `1` (no snapping)                                                                                  |
@@ -165,6 +165,14 @@ When you need an explicit timezone — typically because your data is stored in 
 ```
 
 Fixed offsets `"UTC+N"` / `"UTC-N"` are normalized internally to the corresponding `Etc/GMT∓N` IANA name.
+
+**What `onChange` actually emits when `timeZone` is set.** The library always returns a native JS `Date` (an absolute UTC instant). What changes is which moment that instant points to:
+
+- **`timeZone` set** (e.g. `"Europe/Paris"`): the emitted `Date` represents **midnight in that zone**. For `"Europe/Paris"` (UTC+2 in summer) picking June 15 yields `2024-06-15T00:00:00+02:00` — i.e. UTC instant `2024-06-14T22:00:00Z`. A viewer in `America/New_York` (UTC-4) who calls `.toString()` on that same Date will see `Fri Jun 14 2024 18:00:00 GMT-0400` — that is correct: it is the same instant. The wall-clock day in Paris is June 15. Use `Intl.DateTimeFormat(..., { timeZone: 'Europe/Paris' })` (or any tz-aware formatter) when displaying.
+- **`timeZone` unset / `"auto"`**: midnight is set in **system local time** (`new Date(y, m, d)` semantics). Same calendar day across system zones, but the absolute instant differs per viewer.
+- **With `showTime`**: the time portion is added on top of the chosen midnight. With `timeZone`, that means hours/minutes are local to the configured zone.
+
+If you persist these dates server-side, prefer `.toISOString()` and store as UTC. Reconstruct in the configured zone via `Intl.DateTimeFormat`. Do **not** rely on `getDate()` / `getMonth()` for storage — those read the host machine's local zone and silently drift across servers.
 
 When does timezone matter?
 
@@ -550,39 +558,59 @@ Use this table to decide which guarantees apply to your composition. A `<Calenda
 
 ### CalendarMonthsGrid
 
-Full-page **month navigation grid** (12 cells). Clicking a month sets `viewDate` to that month — it does **not** select a date and does **not** call `onChange`. Pair with `<CalendarDays>` (or another interactive module) for date selection.
+Full-page **month navigation grid** (12 cells). Clicking a month sets `viewDate` to that month — it does **not** select a date and does **not** call `onChange`. Pair with `<CalendarDays>` (or another interactive module) for date selection, or use `onMonthSelect` for a standalone month-picker UX.
 
 ```tsx
 <CalendarMonthsGrid />
 ```
 
+Standalone month picker (no `CalendarDays` needed):
+
+```tsx
+<Calendar>
+  <CalendarMonthsGrid onMonthSelect={(date) => setMonth(date)} />
+</Calendar>
+```
+
+`date` is the navigated `viewDate` — first day of the picked month, same year.
+
 ### Props
 
-| Prop                | Type               | Default | Description                                                   |
-| ------------------- | ------------------ | ------- | ------------------------------------------------------------- |
-| `short`             | `boolean`          | `true`  | Use abbreviated month names (e.g. "Jan" instead of "January") |
-| `disableOutOfRange` | `boolean`          | `true`  | Disable months outside `minDate`/`maxDate` range              |
-| `hideOutOfRange`    | `boolean`          | `false` | Completely hide months outside the allowed range              |
-| `col`               | `number \| string` | —       | CSS grid `grid-column` value                                  |
+| Prop                | Type                     | Default | Description                                                                       |
+| ------------------- | ------------------------ | ------- | --------------------------------------------------------------------------------- |
+| `short`             | `boolean`                | `true`  | Use abbreviated month names (e.g. "Jan" instead of "January")                     |
+| `disableOutOfRange` | `boolean`                | `true`  | Disable months outside `minDate`/`maxDate` range                                  |
+| `hideOutOfRange`    | `boolean`                | `false` | Completely hide months outside the allowed range                                  |
+| `col`               | `number \| string`       | —       | CSS grid `grid-column` value                                                      |
+| `onMonthSelect`     | `(date: Date) => void`   | —       | Fires after a month click. Receives navigated `viewDate` (first day of the month) |
 
 ---
 
 ### CalendarYearsGrid
 
-Full-page **year navigation grid** with pagination. Clicking a year sets `viewDate` to that year — it does **not** select a date and does **not** call `onChange`. Pair with `<CalendarDays>` (or another interactive module) for date selection.
+Full-page **year navigation grid** with pagination. Clicking a year sets `viewDate` to that year — it does **not** select a date and does **not** call `onChange`. Pair with `<CalendarDays>` (or another interactive module) for date selection, or use `onYearSelect` for a standalone year-picker UX.
 
 ```tsx
 <CalendarYearsGrid yearsPerPage={12} />
 ```
 
+Standalone year picker:
+
+```tsx
+<Calendar>
+  <CalendarYearsGrid onYearSelect={(date) => setYear(date.getFullYear())} />
+</Calendar>
+```
+
 ### Props
 
-| Prop                | Type               | Default | Description                                                                                       |
-| ------------------- | ------------------ | ------- | ------------------------------------------------------------------------------------------------- |
-| `yearsPerPage`      | `number`           | `10`    | Number of years shown per page. Integer in 1..40; out-of-range values are clamped and warn in dev |
-| `disableOutOfRange` | `boolean`          | `true`  | Disable years outside `minDate`/`maxDate` range                                                   |
-| `hideOutOfRange`    | `boolean`          | `false` | Completely hide years outside the allowed range                                                   |
-| `col`               | `number \| string` | —       | CSS grid `grid-column` value                                                                      |
+| Prop                | Type                     | Default | Description                                                                                       |
+| ------------------- | ------------------------ | ------- | ------------------------------------------------------------------------------------------------- |
+| `yearsPerPage`      | `number`                 | `10`    | Number of years shown per page. Integer in 1..40; out-of-range values are clamped and warn in dev |
+| `disableOutOfRange` | `boolean`                | `true`  | Disable years outside `minDate`/`maxDate` range                                                   |
+| `hideOutOfRange`    | `boolean`                | `false` | Completely hide years outside the allowed range                                                   |
+| `col`               | `number \| string`       | —       | CSS grid `grid-column` value                                                                      |
+| `onYearSelect`      | `(date: Date) => void`   | —       | Fires after a year click. Receives navigated `viewDate` (same month/day, picked year)             |
 
 ---
 
@@ -604,12 +632,26 @@ Step granularity is configured via the `timeStep` prop on `<Calendar>` and appli
 
 With `minute: 5` the minute drum cycles `0, 5, 10, …, 55`; `minute: 30` cycles `0, 30`; `hour: 2` halves the hour range. `aria-valuemax`, keyboard `Arrow`/`Home`/`End`, and wheel/touch snapping all follow the configured step.
 
+Standalone time picker (no selected date required):
+
+```tsx
+<Calendar>
+  <CalendarTimeGrid
+    seconds
+    onTimeSelect={(d) => setTime({ h: d.getHours(), m: d.getMinutes(), s: d.getSeconds() })}
+  />
+</Calendar>
+```
+
+`onTimeSelect` fires on every drum change. The Date is built from `viewDate` with the new time — read `getHours()` / `getMinutes()` / `getSeconds()` for the time-only value.
+
 ### Props
 
-| Prop      | Type               | Default | Description                          |
-| --------- | ------------------ | ------- | ------------------------------------ |
-| `seconds` | `boolean`          | `false` | Show a third drum for seconds (0–59) |
-| `col`     | `number \| string` | —       | CSS grid `grid-column` value         |
+| Prop           | Type                     | Default | Description                                                                                |
+| -------------- | ------------------------ | ------- | ------------------------------------------------------------------------------------------ |
+| `seconds`      | `boolean`                | `false` | Show a third drum for seconds (0–59)                                                       |
+| `col`          | `number \| string`       | —       | CSS grid `grid-column` value                                                               |
+| `onTimeSelect` | `(date: Date) => void`   | —       | Fires on any drum change. Receives Date with new time — use `getHours()` / `getMinutes()` |
 
 ---
 
@@ -621,6 +663,53 @@ Two entry forms are supported:
 
 - **Simple** — `{ label, value, range? }` (declarative: day offsets, fixed dates, fixed-length ranges)
 - **Advanced** — `{ id, label, getValue }` (function form with `PresetContext`)
+
+#### Types
+
+All preset types are re-exported from the root barrel — no deep imports needed.
+
+```ts
+import type {
+  PresetEntry,
+  SimplePresetDef,
+  AdvancedPresetDef,
+  PresetContext,
+  PresetRangeValue,
+} from "@dateforge/react-calendar";
+
+// Simple — declarative
+interface SimplePresetDef {
+  id?: string;
+  label: string | ((locale: string) => string);
+  value: number | Date;   // number = day offset from today; Date = fixed
+  range?: number;         // length in days after `value`; absent = single
+}
+
+// Advanced — function form
+interface AdvancedPresetDef {
+  id: string;
+  label: string | ((locale: string) => string);
+  getValue: (ctx: PresetContext) => Date | PresetRangeValue | null;
+  //   Date         → single-date preset
+  //   {from, to}   → range preset (shown only in range mode)
+  //   null         → preset unavailable this render; button hidden
+}
+
+interface PresetContext {
+  now: Date;                              // real `new Date()` with time taken from viewDate
+  isValid: (date: Date) => boolean;       // checks against minDate / maxDate / disabled
+  locale: string;                         // BCP-47 locale from calendar config
+}
+
+interface PresetRangeValue {
+  from: Date;                             // always non-null
+  to: Date;
+}
+
+type PresetEntry = SimplePresetDef | AdvancedPresetDef;
+```
+
+`label` accepts a function `(locale) => string` for locale-aware labels. `id` is optional on `SimplePresetDef` (auto-derived from label) and required on `AdvancedPresetDef` for stable React keys.
 
 Import `basicPresets` for the classic pack.
 
@@ -785,12 +874,13 @@ A horizontal scrollable strip of month names for the current year.
 
 ### Props
 
-| Prop            | Type               | Default | Description                                       |
-| --------------- | ------------------ | ------- | ------------------------------------------------- |
-| `short`         | `boolean`          | `true`  | Use abbreviated month names                       |
-| `showYearLabel` | `boolean`          | `false` | Show the year under the active month item         |
-| `bound`         | `"from" \| "to"`   | —       | In range mode binds the track to a range boundary |
-| `col`           | `number \| string` | —       | CSS grid `grid-column` value                      |
+| Prop            | Type                     | Default | Description                                                                              |
+| --------------- | ------------------------ | ------- | ---------------------------------------------------------------------------------------- |
+| `short`         | `boolean`                | `true`  | Use abbreviated month names                                                              |
+| `showYearLabel` | `boolean`                | `false` | Show the year under the active month item                                                |
+| `bound`         | `"from" \| "to"`         | —       | In range mode binds the track to a range boundary                                        |
+| `col`           | `number \| string`       | —       | CSS grid `grid-column` value                                                             |
+| `onMonthSelect` | `(date: Date) => void`   | —       | Fires after the user lands on a month. Receives navigated date (or clamped bound date)   |
 
 > **Scroll axis limitation.** The track loops month 0–11 within `viewDate.getFullYear()`. Scrolling past December does not advance the year — it wraps back to January of the same year. Compose with `<CalendarYearsTrack>` or `<CalendarNav>` to change year. See `ARCHITECTURE.md → D. Hybrid modules → Track scroll axis (current limitation)`.
 
@@ -806,10 +896,11 @@ A horizontal scrollable strip of years.
 
 ### Props
 
-| Prop    | Type               | Default | Description                                       |
-| ------- | ------------------ | ------- | ------------------------------------------------- |
-| `bound` | `"from" \| "to"`   | —       | In range mode binds the track to a range boundary |
-| `col`   | `number \| string` | —       | CSS grid `grid-column` value                      |
+| Prop           | Type                     | Default | Description                                                                            |
+| -------------- | ------------------------ | ------- | -------------------------------------------------------------------------------------- |
+| `bound`        | `"from" \| "to"`         | —       | In range mode binds the track to a range boundary                                      |
+| `col`          | `number \| string`       | —       | CSS grid `grid-column` value                                                           |
+| `onYearSelect` | `(date: Date) => void`   | —       | Fires after the user lands on a year. Receives navigated date (or clamped bound date)  |
 
 ### Track behavior matrix
 
@@ -854,6 +945,8 @@ import { midnight } from "@dateforge/react-calendar/themes/midnight";
 ```
 
 Each theme is a self-contained `CustomTheme` object. The consuming bundler includes only the file you import. Theme vars are applied as inline CSS custom properties on the calendar container — no extra CSS file needed.
+
+**What ships in the core bundle.** The two base themes (`"light"` and `"dark"`) and the `"auto"` resolver are built into `<Calendar>` itself — no import, no extra bytes per theme, just pass the string. Default value is `"auto"`: server-render-safe, then resolves on mount via `prefers-color-scheme` and reacts in real time when the system toggle changes. Pick `"light"` or `"dark"` when you want to lock the color scheme and ignore the OS preference. For any **named palette** (`midnight`, `crimson`, `cobalt`, …) you must `import` the theme object — that is the line in cost vs. ergonomics: zero-cost defaults, opt-in palettes.
 
 **Option 2 — base theme** (`"auto"` / `"light"` / `"dark"`):
 

@@ -17,6 +17,12 @@ export interface CalendarMonthsTrackProps {
   showYearLabel?: boolean;
   bound?: "from" | "to";
   col?: number | string;
+  /**
+   * Fires after the user lands on a month via the track. Receives the
+   * navigated date (or clamped bound date in range mode). Use for standalone
+   * month-picker UX without `CalendarDays`.
+   */
+  onMonthSelect?: (date: Date) => void;
 }
 
 export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({
@@ -24,6 +30,7 @@ export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({
   showYearLabel = false,
   bound,
   col,
+  onMonthSelect,
 }) => {
   const { viewDate, navigateTo } = useNavigation();
   const { minDate, maxDate, locale, range, readOnly } = useConfig();
@@ -75,8 +82,10 @@ export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({
       const clamped = clampBoundDate(next, bound!, rangeStart, rangeEnd);
       setLocalView(clamped);
       if (!readOnly) onRangeBoundSet(bound!, clamped);
+      onMonthSelect?.(clamped);
     } else {
       navigateTo(next);
+      onMonthSelect?.(next);
     }
   };
 
