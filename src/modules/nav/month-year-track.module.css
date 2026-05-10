@@ -64,7 +64,7 @@
 
 .active {
   font-weight: 600;
-  color: var(--c-a);
+  color: var(--c-at, var(--c-a));
   cursor: default;
 }
 

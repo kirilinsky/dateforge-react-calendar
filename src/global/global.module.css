@@ -29,6 +29,7 @@
   .interactive[disabled],
   .interactive[aria-disabled="true"] {
     cursor: not-allowed;
+    background: color-mix(in srgb, var(--c-d) 10%, transparent);
     color: var(--c-dt, var(--c-c));
   }
 
@@ -41,7 +42,7 @@
 
   .activeItem {
     background: var(--c-h) !important;
-    color: var(--c-a) !important;
+    color: var(--c-at, var(--c-a)) !important;
     box-shadow: var(--active-shadow, 0 0.2em 0.6em var(--c-x));
   }
 

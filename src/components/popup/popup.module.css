@@ -47,7 +47,7 @@
 
   .confirm {
     background: var(--c-h);
-    color: var(--c-a);
+    color: var(--c-at, var(--c-a));
     border: none;
     display: flex;
     justify-content: center;
