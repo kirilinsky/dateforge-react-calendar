@@ -6,10 +6,9 @@
   justify-content: center;
   min-width: 0;
   overflow: hidden;
-  opacity: 0.5;
   text-transform: uppercase;
   user-select: none;
-  color: var(--c-c);
+  color: var(--c-m, var(--c-c));
   font-size: 0.6em;
   font-weight: 600;
 }
@@ -17,7 +16,7 @@
 .weekendDark,
 .weekendLight {
   color: var(--c-we);
-  opacity: .7;
+  font-weight: 700;
 }
 
 }

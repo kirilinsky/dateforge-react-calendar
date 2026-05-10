@@ -64,17 +64,17 @@
     height: 2.1em;
     padding: 0 0.6em !important;
     font-size: 0.9em !important;
-    opacity: 0.5;
+    color: var(--c-m, var(--c-c));
     flex-shrink: 0;
   }
 
   .clearBtn:hover {
-    opacity: 1;
+    color: var(--c-c);
   }
 
   .rangeSep {
     font-size: 0.8em;
-    color: var(--c-s);
+    color: var(--c-m, var(--c-c));
     align-self: center;
     user-select: none;
     white-space: pre;

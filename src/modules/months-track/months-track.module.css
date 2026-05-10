@@ -15,7 +15,7 @@
 .yearLabel {
   font-size: 0.72em;
   font-weight: 400;
-  opacity: 0.75;
+  color: var(--c-m, var(--c-c));
 }
 
 }

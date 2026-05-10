@@ -9,9 +9,16 @@ describe("createTheme", () => {
   });
 
   it("maps known tokens to css var keys", () => {
-    const theme = createTheme({ accent: "#ff6600", backdrop: "#000" });
+    const theme = createTheme({
+      accent: "#ff6600",
+      backdrop: "#000",
+      mutedText: "#667085",
+      disabledText: "#7a8190",
+    });
     expect(theme.vars["--c-a"]).toBe("#ff6600");
     expect(theme.vars["--c-b"]).toBe("#000");
+    expect(theme.vars["--c-m"]).toBe("#667085");
+    expect(theme.vars["--c-dt"]).toBe("#7a8190");
   });
 
   it("ignores undefined token values", () => {

@@ -29,8 +29,7 @@
   .interactive[disabled],
   .interactive[aria-disabled="true"] {
     cursor: not-allowed;
-    opacity: 0.9;
-    color: var(--c-d);
+    color: var(--c-dt, var(--c-c));
   }
 
   .interactive svg {
@@ -47,13 +46,13 @@
   }
 
   .otherItem {
-    opacity: 0.3;
+    color: var(--c-m, var(--c-c));
     &:hover {
-      opacity: 0.8;
+      color: var(--c-c);
     }
   }
 
   .selectedOtherItem {
-    opacity: 0.9;
+    color: inherit;
   }
 }

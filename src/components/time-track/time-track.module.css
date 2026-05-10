@@ -27,8 +27,7 @@
   border-radius: calc(var(--cal-radius, 0.5em) * 99);
   border: none;
   background: transparent;
-  color: var(--c-c);
-  opacity: 0.5;
+  color: var(--c-m, var(--c-c));
   font-size: 0.65em;
   font-weight: 600;
   cursor: pointer;
@@ -38,7 +37,6 @@
 .periodActive {
   background: var(--c-h);
   color: var(--c-a);
-  opacity: 1;
 }
 
 .drums {
@@ -54,8 +52,7 @@
 .colon {
   font-size: 1em;
   font-weight: 300;
-  color: var(--c-c);
-  opacity: 0.4;
+  color: var(--c-m, var(--c-c));
   flex-shrink: 0;
   align-self: center;
 }
