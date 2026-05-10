@@ -112,13 +112,22 @@ export function validateRange(
   return { from: start, to: end };
 }
 
-function selectSingle(state: CalendarState, date: Date | null): CalendarState {
+function selectSingle(
+  state: CalendarState,
+  date: Date | null,
+  config: SelectConfig,
+): CalendarState {
   if (!date) {
     return { ...state, selectedDates: [] };
   }
   const prev = state.selectedDates[0];
   if (prev && isSameDay(prev, date)) {
     return { ...state, selectedDates: [] };
+  }
+  if (
+    checkIsDateDisabled(date, config.minDate, config.maxDate, config.disabled)
+  ) {
+    return state;
   }
   return { ...state, viewDate: date, selectedDates: [date] };
 }
@@ -127,6 +136,7 @@ function selectMultiple(
   state: CalendarState,
   date: Date,
   maxCount: number,
+  config: SelectConfig,
 ): CalendarState {
   const alreadyIndex = state.selectedDates.findIndex((s) => isSameDay(s, date));
   let next: Date[];
@@ -135,6 +145,11 @@ function selectMultiple(
   } else if (state.selectedDates.length >= maxCount) {
     return state;
   } else {
+    if (
+      checkIsDateDisabled(date, config.minDate, config.maxDate, config.disabled)
+    ) {
+      return state;
+    }
     next = [...state.selectedDates, date];
   }
   return { ...state, viewDate: date, selectedDates: next };
@@ -193,9 +208,9 @@ export function calendarReducer(
       } else if (config.multiselect && date) {
         const maxCount =
           config.multiselect === true ? Infinity : Number(config.multiselect);
-        next = selectMultiple(state, date, maxCount);
+        next = selectMultiple(state, date, maxCount, config);
       } else {
-        next = selectSingle(state, date);
+        next = selectSingle(state, date, config);
       }
       if (next === state) return state;
       return { ...next, notifySeq: state.notifySeq + 1 };

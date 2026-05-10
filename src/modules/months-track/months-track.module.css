@@ -4,4 +4,18 @@
   --track-item-width: 6.5em;
 }
 
+.activeLabel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+  gap: 0.1em;
+}
+
+.yearLabel {
+  font-size: 0.72em;
+  font-weight: 400;
+  opacity: 0.75;
+}
+
 }

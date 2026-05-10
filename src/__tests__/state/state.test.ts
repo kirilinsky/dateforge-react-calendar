@@ -107,6 +107,36 @@ describe("SELECT single", () => {
     // selectedDates is already [] — notifySeq still increments (null clears)
     expect(next.selectedDates).toHaveLength(0);
   });
+
+  it("rejects disabled date", () => {
+    const date = d(2024, 6, 15);
+    const next = calendarReducer(baseState, {
+      type: "SELECT",
+      date,
+      config: singleCfg({ disabled: disabled(date) }),
+    });
+    expect(next).toBe(baseState);
+  });
+
+  it("rejects date below minDate", () => {
+    const date = d(2024, 6, 1);
+    const next = calendarReducer(baseState, {
+      type: "SELECT",
+      date,
+      config: singleCfg({ minDate: d(2024, 6, 10) }),
+    });
+    expect(next).toBe(baseState);
+  });
+
+  it("rejects date above maxDate", () => {
+    const date = d(2024, 6, 20);
+    const next = calendarReducer(baseState, {
+      type: "SELECT",
+      date,
+      config: singleCfg({ maxDate: d(2024, 6, 10) }),
+    });
+    expect(next).toBe(baseState);
+  });
 });
 
 // ─── SELECT — multiselect ────────────────────────────────────────────────────
@@ -186,6 +216,52 @@ describe("SELECT multiselect", () => {
       config: multiCfg(2),
     });
     expect(result).toBe(state);
+  });
+
+  it("rejects adding disabled date", () => {
+    const date = d(2024, 6, 15);
+    const cfg: SelectConfig = {
+      range: false,
+      multiselect: true,
+      disabled: disabled(date),
+    };
+    const next = calendarReducer(baseState, {
+      type: "SELECT",
+      date,
+      config: cfg,
+    });
+    expect(next).toBe(baseState);
+  });
+
+  it("allows removing already-selected date even if now disabled", () => {
+    const date = d(2024, 6, 15);
+    const state = { ...baseState, selectedDates: [date] };
+    const cfg: SelectConfig = {
+      range: false,
+      multiselect: true,
+      disabled: disabled(date),
+    };
+    const next = calendarReducer(state, {
+      type: "SELECT",
+      date,
+      config: cfg,
+    });
+    expect(next.selectedDates).toHaveLength(0);
+  });
+
+  it("rejects adding date outside min/max", () => {
+    const date = d(2024, 6, 1);
+    const cfg: SelectConfig = {
+      range: false,
+      multiselect: true,
+      minDate: d(2024, 6, 10),
+    };
+    const next = calendarReducer(baseState, {
+      type: "SELECT",
+      date,
+      config: cfg,
+    });
+    expect(next).toBe(baseState);
   });
 });
 

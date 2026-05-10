@@ -3,8 +3,8 @@ import { useMemo } from "react";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import shared from "@/global/global.module.css";
-import { useGridSlot } from "@/hooks/use-grid-slot";
 import { getMonthListData, setMonth } from "@/utils/date-utils";
+import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import styles from "./months-grid.module.css";
 
 export interface CalendarMonthsGridProps {
@@ -57,7 +57,7 @@ export const CalendarMonthsGrid: React.FC<CalendarMonthsGridProps> = ({
       data-area="months"
       role="group"
       aria-label={`Select month, ${gridLabel}`}
-      style={useGridSlot(col)}
+      style={getGridSlotStyle(col)}
     >
       {mNames.map((n, i) => {
         const isCurrent = i === currentMonth;

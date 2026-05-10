@@ -7,9 +7,9 @@ import {
   useSelectionValue,
 } from "@/context/selection-context";
 import shared from "@/global/global.module.css";
-import { useGridSlot } from "@/hooks/use-grid-slot";
 import type { PresetEntry } from "@/types/presets";
 import { isSameDay } from "@/utils/date-core";
+import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { getResolvedPresets } from "./preset-utils";
 import styles from "./presets.module.css";
 
@@ -71,7 +71,7 @@ export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
       maxRangeDays,
     ],
   );
-  const gridSlot = useGridSlot(col);
+  const gridSlot = getGridSlotStyle(col);
 
   if (!resolved.length) return null;
 

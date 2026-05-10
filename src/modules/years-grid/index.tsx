@@ -4,8 +4,8 @@ import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import { warnOnce } from "@/core/dev-warn";
 import shared from "@/global/global.module.css";
-import { useGridSlot } from "@/hooks/use-grid-slot";
 import type { DisabledConfig } from "@/types/calendar";
+import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import styles from "./years-grid.module.css";
 
 const MIN_YEAR = 1900;
@@ -159,7 +159,7 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
       data-area="years-grid"
       role="group"
       aria-label={`Select year, showing ${startYear} to ${endYear}`}
-      style={useGridSlot(col)}
+      style={getGridSlotStyle(col)}
     >
       <div
         className={styles.nav}

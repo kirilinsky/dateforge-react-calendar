@@ -14,12 +14,14 @@ import styles from "./months-track.module.css";
 
 export interface CalendarMonthsTrackProps {
   short?: boolean;
+  showYearLabel?: boolean;
   bound?: "from" | "to";
   col?: number | string;
 }
 
 export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({
   short = true,
+  showYearLabel = false,
   bound,
   col,
 }) => {
@@ -104,7 +106,16 @@ export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({
       getAriaValueText={(i) => fmt.format(new Date(year, i, 1))}
       col={col}
       onChange={handleChange}
-      renderItem={({ idx }) => MONTHS[idx]}
+      renderItem={({ idx, isActive }) =>
+        isActive && showYearLabel ? (
+          <span className={styles.activeLabel}>
+            <span>{MONTHS[idx]}</span>
+            <span className={styles.yearLabel}>{year}</span>
+          </span>
+        ) : (
+          MONTHS[idx]
+        )
+      }
     />
   );
 };

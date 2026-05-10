@@ -8,7 +8,6 @@ import {
   useSelectionValue,
 } from "@/context/selection-context";
 import shared from "@/global/global.module.css";
-import { useGridSlot } from "@/hooks/use-grid-slot";
 import { Check, Clear } from "@/Icons";
 import { checkIsDateDisabled, isSameDay } from "@/utils/date-core";
 import {
@@ -17,6 +16,7 @@ import {
   maskToDate,
   validatePartialMask,
 } from "@/utils/date-mask";
+import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { type AlignValue, alignToJustify } from "@/utils/layout-utils";
 import styles from "./manual-input.module.css";
 
@@ -339,7 +339,7 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
 
   const hasValue = range ? !!rangeStart : !!selectedDates.length;
 
-  const gridSlot = useGridSlot(col);
+  const gridSlot = getGridSlotStyle(col);
   const containerStyle: React.CSSProperties = { ...gridSlot };
   const contentStyle: React.CSSProperties = {
     justifyContent: alignToJustify[align],

@@ -6,8 +6,8 @@ import {
   useSelectionValue,
 } from "@/context/selection-context";
 import shared from "@/global/global.module.css";
-import { useGridSlot } from "@/hooks/use-grid-slot";
 import { isSameDay } from "@/utils/date-core";
+import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { type AlignValue, alignToJustify } from "@/utils/layout-utils";
 import styles from "./selected-dates.module.css";
 
@@ -69,7 +69,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
   });
 
   const hasContent = range ? !!rangeStart : selectedDates.length > 0;
-  const gridSlot = useGridSlot(col);
+  const gridSlot = getGridSlotStyle(col);
 
   if (!animated && !hasContent) return null;
 

@@ -146,21 +146,25 @@
   }
 
   .drumCurr {
-    animation: drumIn 0.18s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation: drumIn 0.22s cubic-bezier(0.2, 0.9, 0.2, 1.05) both;
   }
 
   .drumPrev {
-    animation: drumOut 0.18s cubic-bezier(0.55, 0, 0.78, 0) forwards;
+    animation: drumOut 0.22s cubic-bezier(0.4, 0, 0.6, 1) forwards;
   }
 
   @keyframes drumIn {
-    from { transform: translateY(100%); }
-    to   { transform: translateY(0); }
+    from { transform: translateY(60%); opacity: .2; }
+    to   { transform: translateY(0);   opacity: 1; }
   }
 
   @keyframes drumOut {
-    from { transform: translateY(0); }
-    to   { transform: translateY(-100%); }
+    from { transform: translateY(0);    opacity: 1; }
+    to   { transform: translateY(-60%); opacity: .1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .drumCurr, .drumPrev { animation: none; }
   }
 
   @keyframes nowPulse {
