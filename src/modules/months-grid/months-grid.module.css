@@ -34,7 +34,7 @@
     width: 100%;
     height: 2.4em;
     padding: 0 0.5em !important;
-    font-size: 0.8em !important;
+    font-size: var(--cal-text-sm) !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

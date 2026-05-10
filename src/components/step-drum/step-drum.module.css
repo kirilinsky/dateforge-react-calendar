@@ -40,8 +40,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--time-item-font);
-  font-weight: 300;
+  font-size: var(--time-item-font, var(--cal-text-lg));
+  font-weight: var(--cal-weight-regular);
   color: var(--c-c);
   padding: 0.25em 0;
   cursor: pointer;
@@ -50,7 +50,7 @@
 }
 
 .active {
-  font-weight: 600;
+  font-weight: var(--cal-weight-semibold);
   color: var(--c-at, var(--c-a));
   cursor: default;
 }

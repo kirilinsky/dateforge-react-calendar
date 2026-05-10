@@ -60,7 +60,24 @@
 @layer cal-base {
   .calendarContainer {
     --cal-radius: 0.5em;
-    --cal-font: system-ui, -apple-system, sans-serif;
+    --cal-font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --cal-text-2xs: 0.6em;
+    --cal-text-xs: 0.72em;
+    --cal-text-sm: 0.8em;
+    --cal-text-md: 0.85em;
+    --cal-text-base: 0.9em;
+    --cal-text-lg: 0.95em;
+    --cal-text-xl: 1.05em;
+    --cal-text-2xl: 1.1em;
+    --cal-text-day: clamp(0.72em, 4.4cqi, 1.15em);
+    --cal-weight-regular: 400;
+    --cal-weight-medium: 500;
+    --cal-weight-semibold: 600;
+    --cal-weight-bold: 700;
+    --cal-leading-none: 1;
+    --cal-leading-tight: 1.1;
+    --cal-leading-normal: 1.3;
+    --cal-leading-relaxed: 1.6;
     --cal-transition: 0.2s;
     --cal-border: 1px;
     --cal-spacing: 0.6em;
@@ -79,6 +96,10 @@
     background: var(--c-s);
     color: var(--c-c);
     font-family: var(--cal-font);
+    font-kerning: normal;
+    font-optical-sizing: auto;
+    line-height: var(--cal-leading-normal);
+    text-rendering: optimizeLegibility;
     user-select: none;
     border-radius: var(--cal-container-radius, calc(var(--cal-radius) * 1.6));
     border: var(--cal-border) solid var(--c-s);
@@ -88,6 +109,11 @@
 
   .calendarContainer * {
     box-sizing: border-box;
+  }
+
+  :where(.calendarContainer) :where(button, input) {
+    font: inherit;
+    letter-spacing: 0;
   }
 
   .calendarContainer > [data-area] {
@@ -132,16 +158,16 @@
 
   .emptyStateTitle {
     font-size: 1em;
-    font-weight: 700;
+    font-weight: var(--cal-weight-bold);
     color: var(--c-m, var(--c-c));
-    letter-spacing: 0.06em;
+    letter-spacing: 0;
     text-transform: uppercase;
   }
 
   .emptyStateHint {
-    font-size: 0.78em;
+    font-size: var(--cal-text-sm);
     color: var(--c-m, var(--c-c));
-    line-height: 1.6;
+    line-height: var(--cal-leading-relaxed);
     max-width: 22em;
 
     & code {
@@ -156,8 +182,8 @@
     justify-content: center;
     padding: 0.5em;
     min-height: 3em;
-    font-size: 0.9em;
-    font-weight: 800;
+    font-size: var(--cal-text-base);
+    font-weight: var(--cal-weight-bold);
     border-top: var(--cal-border) solid var(--c-s);
     border-bottom: var(--cal-border) solid var(--c-s);
     background: var(--c-a);

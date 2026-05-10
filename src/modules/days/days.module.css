@@ -35,9 +35,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.7em;
+  font-size: var(--cal-text-xs);
   color: var(--c-m, var(--c-c));
-  font-weight: 600;
+  font-weight: var(--cal-weight-semibold);
   padding: 0.5em 0.25em !important;
 }
 
@@ -48,7 +48,7 @@
 }
 
 .boldWeekend {
-  font-weight: 700;
+  font-weight: var(--cal-weight-bold);
 }
 
 .boldWeekend[data-weekend]:not([aria-selected="true"]) {
@@ -68,7 +68,7 @@
   padding: 0;
   position: relative;
   z-index: 1;
-  font-size: clamp(0.7em, 4.4cqi, 1.15em);
+  font-size: var(--cal-text-day);
   &:disabled,
   &[aria-disabled="true"] {
     text-decoration: line-through;

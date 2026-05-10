@@ -28,8 +28,8 @@
   border: none;
   background: transparent;
   color: var(--c-m, var(--c-c));
-  font-size: 0.65em;
-  font-weight: 600;
+  font-size: var(--cal-text-xs);
+  font-weight: var(--cal-weight-semibold);
   cursor: pointer;
   transition: all var(--cal-transition, 0.2s);
 }
@@ -51,7 +51,7 @@
 
 .colon {
   font-size: 1em;
-  font-weight: 300;
+  font-weight: var(--cal-weight-regular);
   color: var(--c-m, var(--c-c));
   flex-shrink: 0;
   align-self: center;

@@ -42,7 +42,7 @@
     min-width: 5em;
     max-width: 12em;
     height: 2.1em;
-    font-size: 0.85em;
+    font-size: var(--cal-text-md);
     background: var(--c-t);
     border: var(--cal-border) solid transparent;
     border-radius: var(--cal-radius, 0.5em);
@@ -147,10 +147,10 @@
     justify-content: center;
     height: 100%;
     padding: 0 0.8em;
-    font-size: 0.85em;
+    font-size: var(--cal-text-md);
     white-space: nowrap;
     background: transparent;
-    letter-spacing: 0.2px;
+    letter-spacing: 0;
     border: none;
     color: var(--c-c);
     cursor: pointer;
@@ -203,7 +203,7 @@
   .clearBtn {
     margin-left: auto;
     padding: 0.35em 0.6em;
-    font-size: 0.9em;
+    font-size: var(--cal-text-base);
     min-height: 2.1em;
     color: var(--c-m, var(--c-c));
     flex-shrink: 0;
@@ -219,7 +219,7 @@
   }
 
   .sep {
-    font-size: 0.8em;
+    font-size: var(--cal-text-sm);
     color: var(--c-m, var(--c-c));
     user-select: none;
     flex-shrink: 0;
