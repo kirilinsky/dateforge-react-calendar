@@ -41,9 +41,9 @@
   }
 
   .activeItem {
-    background: var(--c-h) !important;
-    color: var(--c-at, var(--c-a)) !important;
-    box-shadow: var(--active-shadow, 0 0.2em 0.6em var(--c-x));
+    background: var(--active-cell-bg, var(--c-h)) !important;
+    color: var(--active-cell-color, var(--c-at, var(--c-a))) !important;
+    box-shadow: var(--active-cell-stroke, var(--active-shadow, 0 0.2em 0.6em var(--c-x)));
   }
 
   .otherItem {

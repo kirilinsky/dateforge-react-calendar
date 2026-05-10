@@ -7,6 +7,7 @@ import type { PresetEntry } from "@/types/presets";
 import { FIXED_DATE } from "../_constants";
 import {
   resolveStoryAppearance,
+  resolveStoryLocale,
   resolveStoryTheme,
 } from "../_helpers/resolve-globals";
 
@@ -27,6 +28,7 @@ export const Default: Story = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarPresets presets={basicPresets} />
       </Calendar>
@@ -53,6 +55,7 @@ export const CustomResolvers: Story = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarPresets presets={customPresets} />
       </Calendar>
@@ -83,6 +86,7 @@ export const WithRangeMode: Story = {
         onChange={setRange}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarPresets presets={rangePresets} />
       </Calendar>
@@ -105,6 +109,7 @@ export const ComboBasicAndCustom: Story = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarPresets presets={combined} />
       </Calendar>
@@ -127,6 +132,7 @@ export const IdCollision: Story = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarPresets presets={presets} />
       </Calendar>
@@ -154,6 +160,7 @@ export const BadInputThrows: Story = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarPresets presets={presets} />
       </Calendar>
@@ -179,6 +186,7 @@ export const BadInputInvalidDate: Story = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarPresets presets={presets} />
       </Calendar>

@@ -23,11 +23,11 @@
   width: 2.2em;
   height: 2.2em;
   padding: 0;
-  background: var(--c-h);
-  color: var(--c-at, var(--c-a));
+  background: var(--active-cell-bg, var(--c-h));
+  color: var(--active-cell-color, var(--c-at, var(--c-a)));
   border-radius: calc(var(--cal-radius, 0.5em) * 99);
   z-index: 4;
-  box-shadow: var(--cal-shadow-md, 0 0.2em 0.6em var(--c-x));
+  box-shadow: var(--active-cell-stroke, var(--cal-shadow-md, 0 0.2em 0.6em var(--c-x)));
   & svg {
     width: 1.1em;
     height: 1.1em;

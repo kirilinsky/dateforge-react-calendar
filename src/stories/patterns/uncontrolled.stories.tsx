@@ -7,6 +7,7 @@ import { FIXED_DATE } from "../_constants";
 import { debugStyle, fmtDate } from "../_helpers/debug";
 import {
   resolveStoryAppearance,
+  resolveStoryLocale,
   resolveStoryTheme,
 } from "../_helpers/resolve-globals";
 
@@ -42,6 +43,7 @@ export const Uncontrolled: Story = {
           defaultViewDate={FIXED_DATE}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarNav showMonthPicker compactYears />
           <CalendarDays />

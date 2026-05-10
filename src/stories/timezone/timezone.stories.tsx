@@ -1,30 +1,46 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
-import { useConfig } from "@/context/config-context";
+import { validateTimeZone } from "@/core/dev-warn";
 import { CalendarDays } from "@/modules/days";
 import { CalendarNav } from "@/modules/nav";
 import { FIXED_DATE } from "../_constants";
 import { debugStyle } from "../_helpers/debug";
 import {
   resolveStoryAppearance,
+  resolveStoryLocale,
   resolveStoryTheme,
 } from "../_helpers/resolve-globals";
 
-// Probe component reads the resolved timeZone from ConfigContext so the user
-// can see what value reached the calendar internals.
-const TzProbe: React.FC<{ value: Date | null }> = ({ value }) => {
-  const { timeZone } = useConfig();
+// Probe shows the timeZone that Calendar resolves: explicit IANA (validated),
+// fixed offset, or auto-detect via Intl. Lives outside Calendar — replicates
+// the same resolution logic deterministically.
+const TzProbe: React.FC<{ value: Date | null; timeZone?: string }> = ({
+  value,
+  timeZone,
+}) => {
+  const [resolved, setResolved] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    if (timeZone === undefined) {
+      setResolved(Intl.DateTimeFormat().resolvedOptions().timeZone);
+      return;
+    }
+    if (validateTimeZone(timeZone)) {
+      setResolved(timeZone);
+      return;
+    }
+    setResolved(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  }, [timeZone]);
   return (
     <>
-      <p style={debugStyle}>resolved timeZone: {timeZone ?? "(unresolved)"}</p>
+      <p style={debugStyle}>resolved timeZone: {resolved ?? "(unresolved)"}</p>
       <p style={debugStyle}>value: {value ? value.toISOString() : "null"}</p>
     </>
   );
 };
 
 const meta: Meta = {
-  title: "Timezone",
+  title: "Timezone/Examples",
 };
 
 export default meta;
@@ -35,16 +51,19 @@ export const AutoDetect: Story = {
   render: (_args, ctx) => {
     const [date, setDate] = useState<Date | null>(FIXED_DATE);
     return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
+      <>
         <TzProbe value={date} />
-        <CalendarNav showMonthPicker compactYears />
-        <CalendarDays />
-      </Calendar>
+        <Calendar
+          value={date}
+          onChange={setDate}
+          theme={resolveStoryTheme(ctx.globals.theme)}
+          appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
+        >
+          <CalendarNav showMonthPicker compactYears />
+          <CalendarDays />
+        </Calendar>
+      </>
     );
   },
 };
@@ -54,17 +73,20 @@ export const ExplicitParis: Story = {
   render: (_args, ctx) => {
     const [date, setDate] = useState<Date | null>(FIXED_DATE);
     return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        timeZone="Europe/Paris"
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <TzProbe value={date} />
-        <CalendarNav showMonthPicker compactYears />
-        <CalendarDays />
-      </Calendar>
+      <>
+        <TzProbe value={date} timeZone="Europe/Paris" />
+        <Calendar
+          value={date}
+          onChange={setDate}
+          timeZone="Europe/Paris"
+          theme={resolveStoryTheme(ctx.globals.theme)}
+          appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
+        >
+          <CalendarNav showMonthPicker compactYears />
+          <CalendarDays />
+        </Calendar>
+      </>
     );
   },
 };
@@ -74,17 +96,20 @@ export const ExplicitNewYork: Story = {
   render: (_args, ctx) => {
     const [date, setDate] = useState<Date | null>(FIXED_DATE);
     return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        timeZone="America/New_York"
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <TzProbe value={date} />
-        <CalendarNav showMonthPicker compactYears />
-        <CalendarDays />
-      </Calendar>
+      <>
+        <TzProbe value={date} timeZone="America/New_York" />
+        <Calendar
+          value={date}
+          onChange={setDate}
+          timeZone="America/New_York"
+          theme={resolveStoryTheme(ctx.globals.theme)}
+          appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
+        >
+          <CalendarNav showMonthPicker compactYears />
+          <CalendarDays />
+        </Calendar>
+      </>
     );
   },
 };
@@ -94,17 +119,20 @@ export const FixedOffset: Story = {
   render: (_args, ctx) => {
     const [date, setDate] = useState<Date | null>(FIXED_DATE);
     return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        timeZone="UTC+2"
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-      >
-        <TzProbe value={date} />
-        <CalendarNav showMonthPicker compactYears />
-        <CalendarDays />
-      </Calendar>
+      <>
+        <TzProbe value={date} timeZone="UTC+2" />
+        <Calendar
+          value={date}
+          onChange={setDate}
+          timeZone="UTC+2"
+          theme={resolveStoryTheme(ctx.globals.theme)}
+          appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
+        >
+          <CalendarNav showMonthPicker compactYears />
+          <CalendarDays />
+        </Calendar>
+      </>
     );
   },
 };
@@ -123,14 +151,15 @@ export const OffByOneFix: Story = {
           America/Los_Angeles would render this as Feb 4 — setting
           timeZone="UTC" pins it to Feb 5.
         </p>
+        <TzProbe value={date} timeZone="UTC" />
         <Calendar
           value={date}
           onChange={setDate}
           timeZone="UTC"
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
         >
-          <TzProbe value={date} />
           <CalendarNav showMonthPicker compactYears />
           <CalendarDays />
         </Calendar>
@@ -149,14 +178,15 @@ export const InvalidTimezone: Story = {
           timeZone="Europe/Wrongville" → falls back to auto-detect (dev warn
           fires)
         </p>
+        <TzProbe value={date} timeZone="Europe/Wrongville" />
         <Calendar
           value={date}
           onChange={setDate}
           timeZone="Europe/Wrongville"
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
         >
-          <TzProbe value={date} />
           <CalendarNav showMonthPicker compactYears />
           <CalendarDays />
         </Calendar>

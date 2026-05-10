@@ -5,6 +5,7 @@ import { CalendarYearsGrid } from "@/modules/years-grid";
 import { FIXED_DATE } from "../_constants";
 import {
   resolveStoryAppearance,
+  resolveStoryLocale,
   resolveStoryTheme,
 } from "../_helpers/resolve-globals";
 
@@ -34,6 +35,7 @@ const meta: Meta<YearsGridArgs> = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarYearsGrid
           yearsPerPage={args.yearsPerPage}
@@ -67,6 +69,7 @@ export const WithDisabledRange: Story = {
         maxDate={new Date(2020, 11, 31)}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarYearsGrid
           yearsPerPage={args.yearsPerPage}
@@ -91,6 +94,7 @@ export const HideOutOfRange: Story = {
         maxDate={new Date(2020, 11, 31)}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarYearsGrid
           yearsPerPage={args.yearsPerPage}
@@ -114,6 +118,7 @@ export const StandaloneYearPicker: Story = {
         <Calendar
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarYearsGrid
             yearsPerPage={args.yearsPerPage}

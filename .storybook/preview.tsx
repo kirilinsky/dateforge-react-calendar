@@ -1,10 +1,12 @@
 import type { Preview } from "@storybook/react-vite";
 import * as appearances from "../appearances/index";
+import { STORY_LOCALES } from "../src/stories/_helpers/resolve-globals";
 import * as themes from "../themes/index";
 import "../dist/style.css";
 
 const themeNames = ["auto", "light", "dark", ...Object.keys(themes)];
 const appearanceNames = ["default", ...Object.keys(appearances)];
+const localeNames = [...STORY_LOCALES];
 
 const preview: Preview = {
   globalTypes: {
@@ -28,11 +30,23 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    locale: {
+      description: "Calendar locale",
+      defaultValue: "default",
+      toolbar: {
+        title: "Locale",
+        icon: "globe",
+        items: localeNames,
+        dynamicTitle: true,
+      },
+    },
   },
   decorators: [
     (Story, ctx) => (
       <div style={{ padding: 20, width: ctx.parameters.storyWidth ?? 305 }}>
-        <Story key={`${ctx.globals.theme}-${ctx.globals.appearance}`} />
+        <Story
+          key={`${ctx.globals.theme}-${ctx.globals.appearance}-${ctx.globals.locale}`}
+        />
       </div>
     ),
   ],
@@ -60,6 +74,20 @@ const preview: Preview = {
       },
     },
     layout: "centered",
+    options: {
+      storySort: {
+        method: "alphabetical",
+        order: [
+          "Compositions",
+          "Modes",
+          "Modules",
+          "Patterns",
+          "Timezone",
+          "Theming",
+        ],
+        locales: "en-US",
+      },
+    },
   },
 };
 

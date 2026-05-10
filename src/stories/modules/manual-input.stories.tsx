@@ -6,6 +6,7 @@ import { FIXED_DATE } from "../_constants";
 import { debugStyle, fmtDate, fmtRange } from "../_helpers/debug";
 import {
   resolveStoryAppearance,
+  resolveStoryLocale,
   resolveStoryTheme,
 } from "../_helpers/resolve-globals";
 
@@ -37,6 +38,7 @@ export const SingleEmpty: Story = {
           onChange={setDate}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarManualInput />
         </Calendar>
@@ -57,6 +59,7 @@ export const SinglePrefilled: Story = {
           onChange={setDate}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarManualInput />
         </Calendar>
@@ -84,6 +87,7 @@ export const SingleEnterEscape: Story = {
           }}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarManualInput />
         </Calendar>
@@ -116,6 +120,7 @@ export const SingleInvalidDate: Story = {
           }}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarManualInput />
         </Calendar>
@@ -150,6 +155,7 @@ export const SingleOutsideMinMax: Story = {
           maxDate={new Date(2016, 1, 20)}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarManualInput />
         </Calendar>
@@ -175,6 +181,7 @@ export const RangeBothEmpty: Story = {
           onChange={setRange}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarManualInput />
         </Calendar>
@@ -199,6 +206,7 @@ export const RangeOnlyFromFilled: Story = {
           onChange={setRange}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarManualInput />
         </Calendar>
@@ -223,6 +231,7 @@ export const RangeBothFilled: Story = {
           onChange={setRange}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarManualInput />
         </Calendar>
@@ -244,6 +253,7 @@ export const MultipleEmpty: Story = {
           onChange={setDates}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarManualInput />
         </Calendar>
@@ -268,6 +278,7 @@ export const MultipleCapped: Story = {
           maxDates={3}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarManualInput />
         </Calendar>
@@ -287,6 +298,7 @@ export const NoTopLevelClear: Story = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarManualInput allowClear={false} />
       </Calendar>
@@ -304,6 +316,7 @@ export const AlignCenter: Story = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarManualInput align="center" />
       </Calendar>
@@ -327,6 +340,7 @@ export const ReadOnly: Story = {
           readOnly
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarManualInput />
         </Calendar>
@@ -346,6 +360,7 @@ export const Playground: Story = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarManualInput allowClear={args.allowClear} align={args.align} />
       </Calendar>

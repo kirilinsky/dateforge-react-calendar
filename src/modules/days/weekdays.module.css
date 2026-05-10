@@ -14,6 +14,14 @@
   margin-bottom: 0.3em;
 }
 
+.header[data-weekday-format="narrow"] {
+  font-size: var(--cal-text-sm);
+}
+
+.header[data-weekday-format="long"] {
+  font-size: calc(var(--cal-text-2xs) * 0.85);
+}
+
 .weekendDark,
 .weekendLight {
   color: var(--c-we);

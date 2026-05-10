@@ -5,6 +5,7 @@ import { CalendarMonthsGrid } from "@/modules/months-grid";
 import { FIXED_DATE } from "../_constants";
 import {
   resolveStoryAppearance,
+  resolveStoryLocale,
   resolveStoryTheme,
 } from "../_helpers/resolve-globals";
 
@@ -35,7 +36,7 @@ const meta: Meta<MonthsGridArgs> = {
       <Calendar
         value={date}
         onChange={setDate}
-        locale={args.locale}
+        locale={args.locale ?? resolveStoryLocale(ctx.globals.locale)}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
       >
@@ -69,7 +70,7 @@ export const WithDisabledRange: Story = {
         onChange={setDate}
         minDate={new Date(2016, 1, 1)}
         maxDate={new Date(2016, 8, 30)}
-        locale={args.locale}
+        locale={args.locale ?? resolveStoryLocale(ctx.globals.locale)}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
       >
@@ -94,7 +95,7 @@ export const HideOutOfRange: Story = {
         onChange={setDate}
         minDate={new Date(2016, 1, 1)}
         maxDate={new Date(2016, 8, 30)}
-        locale={args.locale}
+        locale={args.locale ?? resolveStoryLocale(ctx.globals.locale)}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
       >
@@ -129,7 +130,7 @@ export const StandaloneMonthPicker: Story = {
           Picked: <strong>{label}</strong>
         </div>
         <Calendar
-          locale={args.locale}
+          locale={args.locale ?? resolveStoryLocale(ctx.globals.locale)}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
         >

@@ -46,8 +46,8 @@
   }
 
   .confirm {
-    background: var(--c-h);
-    color: var(--c-at, var(--c-a));
+    background: var(--active-cell-bg, var(--c-h));
+    color: var(--active-cell-color, var(--c-at, var(--c-a)));
     border: none;
     display: flex;
     justify-content: center;
@@ -58,7 +58,7 @@
     font-weight: var(--cal-weight-bold);
     cursor: pointer;
     transition: opacity var(--cal-transition, 0.2s);
-    box-shadow: var(--cal-shadow-md, 0 0.22em 0.6em var(--c-x));
+    box-shadow: var(--active-cell-stroke, var(--cal-shadow-md, 0 0.22em 0.6em var(--c-x)));
     flex-shrink: 0;
   }
 

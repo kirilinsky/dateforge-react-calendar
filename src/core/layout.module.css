@@ -137,6 +137,14 @@
         transparent 100%
       ),
       var(--c-b);
+    --active-cell-bg: linear-gradient(
+      155deg,
+      color-mix(in srgb, var(--c-h) 38%, var(--c-b)) 0%,
+      color-mix(in srgb, var(--c-h) 14%, var(--c-b)) 100%
+    );
+    --active-cell-stroke: inset 0 0 0 1px
+      color-mix(in srgb, var(--c-h) 22%, transparent);
+    --active-cell-color: var(--c-c);
   }
 
   .calendarContainer.gradient > [data-area] {

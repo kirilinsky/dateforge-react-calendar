@@ -81,6 +81,10 @@
   }
 }
 
+.dayItem[data-selected]:not([data-range-start]):not([data-range-end]):not([data-in-range]) {
+  box-shadow: var(--active-cell-stroke, var(--active-shadow, 0 0.2em 0.6em var(--c-x))) !important;
+}
+
 .rangeStart {
   border-radius: var(--cal-radius, 0.5em) 0 0 var(--cal-radius, 0.5em) !important;
   box-shadow: calc(var(--day-gap) / 2) 0 0 0 var(--c-h) !important;

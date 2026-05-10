@@ -6,6 +6,7 @@ import { FIXED_DATE } from "../_constants";
 import { debugStyle, fmtRange } from "../_helpers/debug";
 import {
   resolveStoryAppearance,
+  resolveStoryLocale,
   resolveStoryTheme,
 } from "../_helpers/resolve-globals";
 
@@ -26,6 +27,7 @@ export const Default: Story = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarYearsTrack />
       </Calendar>
@@ -48,6 +50,7 @@ export const RangeBounds: Story = {
           onChange={setRange}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarYearsTrack bound="from" />
           <CalendarYearsTrack bound="to" />
@@ -69,6 +72,7 @@ export const StandaloneYearPicker: Story = {
         <Calendar
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarYearsTrack onYearSelect={setPicked} />
         </Calendar>

@@ -16,6 +16,7 @@ import {
   getFirstDayOffset,
   getNextMonthFromSwipe,
   isSameDay,
+  type WeekdayFormat,
 } from "@/utils/date-utils";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { getTodayInTimezone, toTZMidnight } from "@/utils/tz-utils";
@@ -244,6 +245,7 @@ export interface CalendarDaysProps {
   boldWeekends?: boolean;
   weekNumbers?: boolean;
   hideWeekdays?: boolean;
+  weekdayFormat?: WeekdayFormat;
   highlightToday?: boolean;
   swipe?: boolean;
   hideOutOfRange?: boolean;
@@ -261,6 +263,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   boldWeekends = false,
   weekNumbers = false,
   hideWeekdays = false,
+  weekdayFormat = "short",
   highlightToday = true,
   swipe = true,
   hideOutOfRange = false,
@@ -565,6 +568,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
           highlightWeekends={highlightWeekends}
           weekNumbers={weekNumbers}
           hideWeekdays={hideWeekdays}
+          weekdayFormat={weekdayFormat}
         />
         {weeksData.map((week, wIndex) => {
           const isLastRow = wIndex === weeksData.length - 1;

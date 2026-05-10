@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import type { StartOfWeek } from "@/types/calendar";
+import type { WeekdayFormat } from "@/utils/calendar-data";
 import { getWeekdaysNames } from "@/utils/date-utils";
 import daysStyles from "./days.module.css";
 import styles from "./weekdays.module.css";
@@ -10,6 +11,7 @@ interface WeekDaysProps {
   highlightWeekends: boolean;
   weekNumbers: boolean;
   hideWeekdays: boolean;
+  weekdayFormat: WeekdayFormat;
 }
 
 const WeekDays = ({
@@ -18,10 +20,11 @@ const WeekDays = ({
   highlightWeekends,
   weekNumbers,
   hideWeekdays,
+  weekdayFormat,
 }: WeekDaysProps) => {
   const wDays = useMemo(
-    () => getWeekdaysNames(locale, startOfWeek),
-    [locale, startOfWeek],
+    () => getWeekdaysNames(locale, startOfWeek, weekdayFormat),
+    [locale, startOfWeek, weekdayFormat],
   );
 
   if (hideWeekdays) return null;
@@ -36,10 +39,11 @@ const WeekDays = ({
 
         return (
           <div
-            key={day}
+            key={actualDay}
             className={`${styles.header}${isWeekend ? ` ${styles.weekendLight}` : ""}`.trim()}
             role="columnheader"
             aria-label={day}
+            data-weekday-format={weekdayFormat}
           >
             {day}
           </div>

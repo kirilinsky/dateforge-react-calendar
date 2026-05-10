@@ -20,18 +20,21 @@ const cacheSet = (key: string, value: string[]): string[] => {
   return value;
 };
 
+export type WeekdayFormat = "narrow" | "short" | "long";
+
 export const getWeekdaysNames = (
   locale: string,
   startOfWeek: StartOfWeek,
+  format: WeekdayFormat = "short",
 ): string[] => {
-  const key = `${locale}W${startOfWeek}`;
+  const key = `${locale}W${startOfWeek}-${format}`;
   const cached = i18nCache.get(key);
   if (cached) return cached;
 
-  const baseKey = `${locale}W`;
+  const baseKey = `${locale}W-${format}`;
   let days = i18nCache.get(baseKey);
   if (!days) {
-    const fmt = new Intl.DateTimeFormat(locale, { weekday: "short" }).format;
+    const fmt = new Intl.DateTimeFormat(locale, { weekday: format }).format;
     const base = new Date(2024, 0, 1);
     days = cacheSet(
       baseKey,

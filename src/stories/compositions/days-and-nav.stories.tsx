@@ -7,6 +7,7 @@ import { CalendarNav } from "@/modules/nav";
 import { FIXED_DATE } from "../_constants";
 import {
   resolveStoryAppearance,
+  resolveStoryLocale,
   resolveStoryTheme,
 } from "../_helpers/resolve-globals";
 
@@ -25,6 +26,7 @@ export const Default: StoryObj = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav showTime showMonthPicker yearLabel />
         <CalendarDays />
