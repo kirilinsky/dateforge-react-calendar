@@ -22,3 +22,7 @@ export const ThemeToggle = () =>
   );
 export const Check = () =>
   I("M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z");
+export const ChevronLeft = () =>
+  I("M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z");
+export const ChevronRight = () =>
+  I("M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z");

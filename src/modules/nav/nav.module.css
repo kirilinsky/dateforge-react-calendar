@@ -8,7 +8,7 @@
     grid-column: 1 / -1;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: space-between;
     flex-wrap: wrap;
     gap: 0.4em;
     font-size: var(--cal-text-2xl);
@@ -26,20 +26,20 @@
   }
 
   .yearsSelector {
-    flex: 1 0 auto;
-    min-width: max-content;
+    flex: 0 1 auto;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     padding: 0 0.2em;
     gap: 0.2em;
+    min-width: 0;
   }
 
   .currentYear {
     font-size: var(--cal-text-xl);
     font-weight: var(--cal-weight-bold);
     line-height: var(--cal-leading-none);
-    flex: 1 0 auto;
+    flex: 0 0 auto;
     margin: 0 0.3em;
     height: 2.3em;
     white-space: nowrap;
@@ -56,18 +56,18 @@
   }
 
   .monthButton {
-    flex: 0 0 auto;
+    flex: 0 1 auto;
     min-width: 0;
-    padding: 0 1em;
+    padding: 0 0.7em;
     height: 2.3em;
-    font-size: var(--cal-text-lg);
+    font-size: var(--cal-text-base);
     background-color: var(--c-t) !important;
     color: var(--c-c);
     font-weight: var(--cal-weight-bold);
-    gap: 0.4em;
+    gap: 0.3em;
     & svg {
-      width: 1.3em;
-      height: 1.3em;
+      width: 1.1em;
+      height: 1.1em;
       stroke-width: 3;
     }
   }
@@ -96,7 +96,7 @@
   .flexWrapper {
     display: flex;
     align-items: center;
-    margin-left: auto;
+    gap: 0.2em;
   }
 
   .homeButtonDisabled {
@@ -198,9 +198,10 @@
     background: var(--active-cell-bg, var(--c-h)) !important;
     color: var(--active-cell-color, var(--c-at, var(--c-a))) !important;
     box-shadow: var(--active-cell-stroke, none);
-    padding: 0 1em;
+    padding: 0 0.7em;
     height: 2.3em;
-    font-size: var(--cal-text-lg);
+    font-size: var(--cal-text-base);
+    font-weight: var(--cal-weight-bold);
     flex: 0 0 auto;
     min-width: 0;
   }

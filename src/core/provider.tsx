@@ -59,6 +59,7 @@ function serializeValue(
 export function CalendarProvider<M extends CalendarMode = "single">({
   children,
   toggleTheme,
+  activeTheme = "auto",
   value: externalValue,
   defaultValue,
   defaultViewDate,
@@ -81,6 +82,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   children: ReactNode;
   containerWidth?: number;
   toggleTheme?: () => void;
+  activeTheme?: "light" | "dark" | "auto";
 }) {
   const range = mode === "range";
   const multiselect: number | boolean | undefined =
@@ -436,6 +438,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   const ui = useMemo(
     () => ({
       toggleTheme: toggleTheme ?? (() => {}),
+      activeTheme,
       containerWidth,
       containerRef,
       showTimePopup: openPopup === "time",
@@ -454,6 +457,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       toggleTheme,
+      activeTheme,
       containerWidth,
       openPopup,
       daysTrackActive,
