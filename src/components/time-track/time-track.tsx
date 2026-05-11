@@ -67,20 +67,26 @@ export const TimeTrack = ({
   return (
     <div className={styles.root} role="group" aria-label="Time picker">
       {hour12 && (
-        <div className={styles.period}>
-          {(["AM", "PM"] as const).map((p) => (
-            <button
-              key={p}
-              type="button"
-              className={`${styles.periodBtn} ${period === p ? styles.periodActive : ""}`}
-              aria-pressed={period === p}
-              onClick={() => emit(hours, minutes, seconds, p)}
-              disabled={readOnly}
-            >
-              {p}
-            </button>
-          ))}
-        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={period === "PM"}
+          aria-label={`Time period, currently ${period === "AM" ? "before noon" : "after noon"}`}
+          className={styles.period}
+          data-period={period}
+          onClick={() =>
+            emit(hours, minutes, seconds, period === "AM" ? "PM" : "AM")
+          }
+          disabled={readOnly}
+        >
+          <span className={styles.periodThumb} aria-hidden />
+          <span className={styles.periodLabel} aria-hidden>
+            AM
+          </span>
+          <span className={styles.periodLabel} aria-hidden>
+            PM
+          </span>
+        </button>
       )}
       <div className={styles.drums}>
         <StepDrum

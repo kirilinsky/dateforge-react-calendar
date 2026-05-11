@@ -14,29 +14,67 @@
 }
 
 .period {
-  display: flex;
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
   background: var(--c-t);
   border-radius: calc(var(--cal-radius, 0.5em) * 99);
-  padding: 2px;
-  gap: 2px;
-  flex-shrink: 0;
-}
-
-.periodBtn {
-  padding: 5px 9px;
-  border-radius: calc(var(--cal-radius, 0.5em) * 99);
   border: none;
-  background: transparent;
-  color: var(--c-m, var(--c-c));
-  font-size: var(--cal-text-xs);
-  font-weight: var(--cal-weight-semibold);
+  padding: 4px;
+  min-height: 2.4em;
+  min-width: 5.5em;
+  flex-shrink: 0;
   cursor: pointer;
-  transition: all var(--cal-transition, 0.2s);
+  font: inherit;
+  color: var(--c-m, var(--c-c));
+  transition: background var(--cal-transition, 0.2s);
 }
 
-.periodActive {
-  background: var(--c-h);
-  color: var(--c-at, var(--c-a));
+.period:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--c-b),
+    0 0 0 4px color-mix(in srgb, var(--c-a) 60%, transparent);
+}
+
+.period:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.periodThumb {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  border-radius: calc(var(--cal-radius, 0.5em) * 99);
+  background: var(--active-cell-bg, var(--c-h));
+  box-shadow: var(--active-cell-stroke, var(--cal-shadow-sm, 0 0.1em 0.3em var(--c-x)));
+  transition: transform var(--cal-transition, 0.2s);
+  pointer-events: none;
+}
+
+.period[data-period="PM"] .periodThumb {
+  transform: translateX(100%);
+}
+
+.periodLabel {
+  position: relative;
+  z-index: 1;
+  padding: 0 0.6em;
+  text-align: center;
+  font-size: var(--cal-text-sm, var(--cal-text-xs));
+  font-weight: var(--cal-weight-semibold);
+  line-height: 1;
+  transition: color var(--cal-transition, 0.2s);
+  user-select: none;
+}
+
+.period[data-period="AM"] .periodLabel:first-of-type,
+.period[data-period="PM"] .periodLabel:last-of-type {
+  color: var(--active-cell-color, var(--c-at, var(--c-a)));
 }
 
 .drums {
