@@ -144,7 +144,7 @@ export const MultiMonthRange: Story = {
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav showMonthPicker yearLabel col={2} home />
-        <CalendarNav monthLabel  yearLabel offset={1} col={2} />
+        <CalendarNav monthLabel yearLabel offset={1} col={2} />
         <CalendarDays offset={0} col={2} />
         <CalendarDays offset={1} col={2} />
         <CalendarSelectedDates col="1 / span 4" />
