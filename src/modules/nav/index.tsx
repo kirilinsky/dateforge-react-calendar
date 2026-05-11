@@ -40,6 +40,7 @@ import { getDateTimeFormat } from "@/utils/intl-cache";
 import { MonthPopup, YearPopup } from "./month-year-track";
 import styles from "./nav.module.css";
 import { TimePopup } from "./time-popup";
+import { useNavPopupState } from "./use-nav-popup-state";
 
 const DRUM_MS = 240;
 
@@ -233,18 +234,22 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
     }
   };
   const {
-    setShowTimePopup,
-    setShowMonthPopup,
-    setShowYearPopup,
-    showTimePopup,
-    showMonthPopup,
-    showYearPopup,
     toggleTheme,
     activeTheme,
     setPopupAnchorEl,
     setNavShowSeconds,
     navShowSeconds,
   } = useUI();
+  const usesLocalPopupState = offset !== 0;
+  const {
+    timePopupOpen,
+    monthPopupOpen,
+    yearPopupOpen,
+    setTimePopupOpen,
+    setMonthPopupOpen,
+    setYearPopupOpen,
+    closeSharedPopups,
+  } = useNavPopupState(usesLocalPopupState);
 
   useEffect(() => {
     setNavShowSeconds(seconds);
@@ -254,6 +259,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
     (setter: (v: boolean) => void) =>
     (e: React.MouseEvent<HTMLButtonElement>) => {
       setPopupAnchorEl(e.currentTarget);
+      if (usesLocalPopupState) closeSharedPopups();
       setter(true);
     };
 
@@ -353,8 +359,8 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
             className={`${styles.timeButton} ${shared.interactive}`}
             aria-label={`Change time, currently ${curTime}`}
             aria-haspopup="dialog"
-            aria-expanded={showTimePopup}
-            onClick={openPopup(setShowTimePopup)}
+            aria-expanded={timePopupOpen}
+            onClick={openPopup(setTimePopupOpen)}
           >
             <AnimatedTime time={curTime} flip={animateTime} />
           </button>
@@ -367,8 +373,8 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
             className={`${styles.monthButton} ${shared.interactive} ${shared.hovered}`}
             aria-label={`Change month, currently ${monthNameLong}`}
             aria-haspopup="dialog"
-            aria-expanded={showMonthPopup}
-            onClick={monthFixed ? undefined : openPopup(setShowMonthPopup)}
+            aria-expanded={monthPopupOpen}
+            onClick={monthFixed ? undefined : openPopup(setMonthPopupOpen)}
           >
             <Down />{" "}
             <MonthLabel
@@ -409,11 +415,11 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
             <button
               type="button"
               disabled={monthFixed}
-              onClick={monthFixed ? undefined : openPopup(setShowMonthPopup)}
+              onClick={monthFixed ? undefined : openPopup(setMonthPopupOpen)}
               className={`${styles.currentYear} ${shared.interactive} ${shared.hovered} ${monthFixed ? styles.staticButton : ""}`}
               aria-label={`Change month, currently ${monthNameLong}`}
               aria-haspopup={monthFixed ? undefined : "dialog"}
-              aria-expanded={monthFixed ? undefined : showMonthPopup}
+              aria-expanded={monthFixed ? undefined : monthPopupOpen}
             >
               <MonthLabel
                 locale={locale}
@@ -453,11 +459,11 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
             <button
               type="button"
               disabled={yearFixed}
-              onClick={yearFixed ? undefined : openPopup(setShowYearPopup)}
+              onClick={yearFixed ? undefined : openPopup(setYearPopupOpen)}
               className={`${styles.currentYear} ${shared.interactive} ${shared.hovered} ${yearFixed ? styles.staticButton : ""}`}
               aria-label={`Change year, currently ${cur}`}
               aria-haspopup={yearFixed ? undefined : "dialog"}
-              aria-expanded={yearFixed ? undefined : showYearPopup}
+              aria-expanded={yearFixed ? undefined : yearPopupOpen}
             >
               {cur}
             </button>
@@ -481,8 +487,8 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
             className={`${styles.monthButton} ${shared.interactive} ${shared.hovered}`}
             aria-label={`Change year, currently ${cur}`}
             aria-haspopup="dialog"
-            aria-expanded={showYearPopup}
-            onClick={yearFixed ? undefined : openPopup(setShowYearPopup)}
+            aria-expanded={yearPopupOpen}
+            onClick={yearFixed ? undefined : openPopup(setYearPopupOpen)}
           >
             {cur} <Down />
           </button>
@@ -562,7 +568,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           </div>
         )}
       </div>
-      {showTimePopup && (
+      {timePopupOpen && (
         <TimePopup
           date={date}
           hour12={hour12}
@@ -570,12 +576,12 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           readOnly={readOnly}
           onConfirm={(newDate) => {
             onChangeTime(newDate);
-            setShowTimePopup(false);
+            setTimePopupOpen(false);
           }}
-          onClose={() => setShowTimePopup(false)}
+          onClose={() => setTimePopupOpen(false)}
         />
       )}
-      {showMonthPopup && (
+      {monthPopupOpen && (
         <MonthPopup
           date={date}
           locale={locale}
@@ -583,21 +589,21 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           maxDate={maxDate}
           onConfirm={(newDate) => {
             navigateBoundOrView(newDate);
-            setShowMonthPopup(false);
+            setMonthPopupOpen(false);
           }}
-          onClose={() => setShowMonthPopup(false)}
+          onClose={() => setMonthPopupOpen(false)}
         />
       )}
-      {showYearPopup && (
+      {yearPopupOpen && (
         <YearPopup
           date={date}
           minDate={minDate}
           maxDate={maxDate}
           onConfirm={(newDate) => {
             navigateBoundOrView(newDate);
-            setShowYearPopup(false);
+            setYearPopupOpen(false);
           }}
-          onClose={() => setShowYearPopup(false)}
+          onClose={() => setYearPopupOpen(false)}
         />
       )}
     </>

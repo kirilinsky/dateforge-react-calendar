@@ -13,6 +13,7 @@ const lightThemeEntries = [
   ["graphite", themes.graphite],
   ["amethyst", themes.amethyst],
   ["mint", themes.mint],
+  ["tide", themes.tide],
   ["comfy", themes.comfy],
   ["neon", themes.neon],
   ["rosa", themes.rosa],
@@ -47,6 +48,7 @@ const darkThemeEntries = [
   ["flare", themes.flare],
   ["abyss", themes.abyss],
   ["cobalt", themes.cobalt],
+  ["fjord", themes.fjord],
   ["velvet", themes.velvet],
   ["eclipse", themes.eclipse],
 ] satisfies readonly (readonly [string, CalendarTheme])[];

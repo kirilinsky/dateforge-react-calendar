@@ -63,10 +63,10 @@ App Router note: `<Calendar>` is interactive, so it must live behind a `"use cli
 
 `onChange` and `value` / `defaultValue` are typed per `mode`. The same callback fires in both controlled and uncontrolled trees.
 
-| `mode`       | `value` / `defaultValue` type   | `onChange` argument                            | Cleared (clear button, deselect) |
-| ------------ | ------------------------------- | ---------------------------------------------- | -------------------------------- |
-| `"single"`   | `Date \| null`                  | `Date \| null`                                 | `null`                           |
-| `"multiple"` | `Date[]`                        | `Date[]` (new array each call)                 | `[]`                             |
+| `mode`       | `value` / `defaultValue` type              | `onChange` argument                        | Cleared (clear button, deselect) |
+| ------------ | ------------------------------------------ | ------------------------------------------ | -------------------------------- |
+| `"single"`   | `Date \| null`                             | `Date \| null`                             | `null`                           |
+| `"multiple"` | `Date[]`                                   | `Date[]` (new array each call)             | `[]`                             |
 | `"range"`    | `{ from: Date \| null; to: Date \| null }` | same shape; partial range allowed mid-flow | `{ from: null, to: null }`       |
 
 Notes:
@@ -79,17 +79,17 @@ Notes:
 
 Pick the modules per the UX you want. All compose under one `<Calendar>` provider and share state automatically.
 
-| You want…                          | Modules                                                                                                |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Basic date picker                  | `CalendarNav`, `CalendarDays`                                                                          |
-| Date range picker                  | `CalendarNav`, `CalendarDays` (set `mode="range"` on `<Calendar>`)                                     |
-| Date + time picker                 | `CalendarNav` (with `showTime`) + `CalendarDays`, or inline `CalendarTimeGrid`                         |
-| Time-only picker                   | `CalendarTimeGrid` (no `CalendarDays`)                                                                 |
-| Manual typing / keyboard-first     | `CalendarManualInput` (alone or with `CalendarDays`)                                                   |
-| Presets (Today, Last 7 days, …)    | `CalendarPresets` (+ any picker modules)                                                               |
-| Month / year-only picker           | `CalendarMonthsGrid` or `CalendarYearsGrid` (no `CalendarDays`)                                        |
-| Mobile / drum-style picker         | `CalendarDaysTrack`, `CalendarMonthsTrack`, `CalendarYearsTrack` (alone or alongside the grid)         |
-| Selected-dates chips / summary     | `CalendarSelectedDates` (best with `mode="multiple"` or `range`)                                       |
+| You want…                       | Modules                                                                                        |
+| ------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Basic date picker               | `CalendarNav`, `CalendarDays`                                                                  |
+| Date range picker               | `CalendarNav`, `CalendarDays` (set `mode="range"` on `<Calendar>`)                             |
+| Date + time picker              | `CalendarNav` (with `showTime`) + `CalendarDays`, or inline `CalendarTimeGrid`                 |
+| Time-only picker                | `CalendarTimeGrid` (no `CalendarDays`)                                                         |
+| Manual typing / keyboard-first  | `CalendarManualInput` (alone or with `CalendarDays`)                                           |
+| Presets (Today, Last 7 days, …) | `CalendarPresets` (+ any picker modules)                                                       |
+| Month / year-only picker        | `CalendarMonthsGrid` or `CalendarYearsGrid` (no `CalendarDays`)                                |
+| Mobile / drum-style picker      | `CalendarDaysTrack`, `CalendarMonthsTrack`, `CalendarYearsTrack` (alone or alongside the grid) |
+| Selected-dates chips / summary  | `CalendarSelectedDates` (best with `mode="multiple"` or `range`)                               |
 
 See [Recommended compositions](#recommended-compositions) for ready-made JSX snippets.
 
@@ -97,15 +97,15 @@ See [Recommended compositions](#recommended-compositions) for ready-made JSX sni
 
 Three subpaths, each tree-shakeable:
 
-| Import from                                  | What's there                                                                                          | When to use                                                                          |
-| -------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `@dateforge/react-calendar`                  | `Calendar`, `createTheme`, `createDisabled`, `createAppearance`, all public types                     | Always — the root provider lives here.                                               |
-| `@dateforge/react-calendar/modules`          | All `Calendar*` module components (Days, Nav, Presets, TimeGrid, …)                                   | When pulling in the visible UI pieces.                                               |
-| `@dateforge/react-calendar/context`          | Context hooks: `useConfig`, `useNavigation`, `useSelection`, `useSelectionActions`, `useUI`, …        | When building custom modules that need to read or dispatch calendar state.           |
-| `@dateforge/react-calendar/themes`           | All theme objects re-exported together                                                                | Quick prototyping; pulls every theme into the bundle.                                |
-| `@dateforge/react-calendar/themes/<name>`    | A single theme (e.g. `…/themes/midnight`)                                                             | Production — only the themes you actually use end up in the bundle.                  |
-| `@dateforge/react-calendar/appearances`      | All appearance objects together                                                                       | Same trade-off as themes — prefer the per-name subpath for production builds.        |
-| `@dateforge/react-calendar/appearances/<n>`  | A single appearance (`loft`, `compact`, `square`, `soft`, `bubble`)                                   | Production.                                                                          |
+| Import from                                 | What's there                                                                                   | When to use                                                                   |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `@dateforge/react-calendar`                 | `Calendar`, `createTheme`, `createDisabled`, `createAppearance`, all public types              | Always — the root provider lives here.                                        |
+| `@dateforge/react-calendar/modules`         | All `Calendar*` module components (Days, Nav, Presets, TimeGrid, …)                            | When pulling in the visible UI pieces.                                        |
+| `@dateforge/react-calendar/context`         | Context hooks: `useConfig`, `useNavigation`, `useSelection`, `useSelectionActions`, `useUI`, … | When building custom modules that need to read or dispatch calendar state.    |
+| `@dateforge/react-calendar/themes`          | All theme objects re-exported together                                                         | Quick prototyping; pulls every theme into the bundle.                         |
+| `@dateforge/react-calendar/themes/<name>`   | A single theme (e.g. `…/themes/midnight`)                                                      | Production — only the themes you actually use end up in the bundle.           |
+| `@dateforge/react-calendar/appearances`     | All appearance objects together                                                                | Same trade-off as themes — prefer the per-name subpath for production builds. |
+| `@dateforge/react-calendar/appearances/<n>` | A single appearance (`loft`, `compact`, `square`, `soft`, `bubble`)                            | Production.                                                                   |
 
 Each module is its own bundle, so importing `CalendarPresets` does not pull `CalendarTimeGrid` or any other unused module. The `modules` aggregate subpath is still tree-shakeable under ESM — bundlers drop unused named exports.
 
@@ -127,30 +127,30 @@ import { CalendarNav, CalendarDays } from "@dateforge/react-calendar/modules";
 
 ### Props
 
-| Prop              | Type                                | Default    | Description                                                                                                                                                                                                                                                                                                                                                                                   |
-| ----------------- | ----------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `mode`            | `"single" \| "multiple" \| "range"` | `"single"` | Selection mode                                                                                                                                                                                                                                                                                                                                                                                |
-| `value`           | `CalendarValue<M>`                  | —          | Controlled value. `Date \| null` for single, `Date[]` for multiple, `DateRange` for range. Pass `undefined` to opt out of controlled mode.                                                                                                                                                                                                                                                    |
-| `defaultValue`    | `CalendarValue<M>`                  | —          | Initial value for uncontrolled mode. Used only when `value` is `undefined`. Subsequent changes to `defaultValue` are ignored.                                                                                                                                                                                                                                                                 |
-| `defaultViewDate` | `Date`                              | —          | Initial month/year displayed on mount when no selection seeds the view. Read once; subsequent changes are ignored. Use this instead of repeating the prop on every `CalendarDays`. Non-`Date` values and `Invalid Date` are rejected (dev warn) and treated as omitted.                                                                                                                       |
-| `onChange`        | `(value: CalendarValue<M>) => void` | —          | Fires when the selection changes (in both controlled and uncontrolled modes)                                                                                                                                                                                                                                                                                                                  |
-| `cols`            | `number`                            | —          | Number of columns in the internal CSS grid                                                                                                                                                                                                                                                                                                                                                    |
-| `locale`          | `string`                            | `"en"`     | BCP 47 language tag used for all labels and formatting                                                                                                                                                                                                                                                                                                                                        |
-| `timeZone`        | `string \| "auto"`                  | `"auto"`   | IANA timezone (`"Europe/Paris"`, `"UTC"`), fixed offset (`"UTC+2"`, `"UTC-5"`), or `"auto"`. When `"auto"` (or omitted) the library detects the user's timezone via `Intl.DateTimeFormat().resolvedOptions().timeZone` after mount. Invalid values fall back to auto-detect with a dev warning. Affects today detection, emitted date midnight, and formatting. **Important:** with an explicit `timeZone`, the `Date` passed to `onChange` is the absolute instant of midnight **in that zone** — see [Timezone](#timezone) for examples and storage guidance |
-| `readOnly`        | `boolean`                           | `false`    | Disables all state-changing interactions (date/time selection). Navigation still works. Adds `data-readonly` on the root and `aria-disabled` on each interactive cell — the wrapper itself carries no ARIA state because plain `<div>` does not support `aria-readonly` per ARIA spec                                                                                                         |
-| `hour12`          | `boolean`                           | `false`    | Use 12-hour time format instead of 24-hour                                                                                                                                                                                                                                                                                                                                                    |
-| `timeStep`        | `{ hour?: number; minute?: number; second?: number }` | `{1,1,1}` | Granularity (step) for time drums. Affects both inline `CalendarTimeGrid` and `CalendarNav` time popup. Example: `timeStep={{ minute: 5 }}` snaps minutes to 0/5/10/.../55. Step values divide the unit range; `aria-valuemax`, keyboard `±step`, and scroll snap follow the step. Default `1` (no snapping)                                                                                  |
-| `theme`           | `CalendarTheme`                     | `"auto"`   | Base value (`"auto"` / `"light"` / `"dark"`), a pre-built theme object from `@dateforge/react-calendar/themes[/name]`, or a `CustomTheme` from `createTheme()`. Named string themes (e.g. `"midnight"`) are not supported — import the object instead.                                                                                                                                        |
-| `appearance`      | `CalendarAppearance`                | —          | Pre-built appearance object from `@dateforge/react-calendar/appearances[/name]`, or a `CustomAppearance` from `createAppearance()`. Omit the prop entirely for the default appearance.                                                                                                                                                                                                        |
-| `gradient`        | `boolean`                           | `false`    | Enable gradient backgrounds on selected cells                                                                                                                                                                                                                                                                                                                                                 |
-| `width`           | `string \| number`                  | `"100%"`   | Container width                                                                                                                                                                                                                                                                                                                                                                               |
-| `minDate`         | `Date`                              | —          | Earliest selectable date                                                                                                                                                                                                                                                                                                                                                                      |
-| `maxDate`         | `Date`                              | —          | Latest selectable date                                                                                                                                                                                                                                                                                                                                                                        |
-| `maxDates`        | `number`                            | —          | Maximum number of selectable dates (`mode="multiple"` only). When the cap is reached: clicking a not-yet-selected date (in `<CalendarDays>`, via a preset, or any other interactive module) is silently ignored — no `onChange`, no view change. Clicking an already-selected date still toggles it off, freeing a slot. `<CalendarManualInput>` hides its add-input when the cap is reached. |
-| `minRangeDays`    | `number`                            | —          | Minimum number of days in a range selection                                                                                                                                                                                                                                                                                                                                                   |
-| `maxRangeDays`    | `number`                            | —          | Maximum number of days in a range selection                                                                                                                                                                                                                                                                                                                                                   |
-| `disabled`        | `DisabledConfig`                    | —          | Rules for disabling specific dates. Build with `createDisabled()`                                                                                                                                                                                                                                                                                                                             |
-| `children`        | `React.ReactNode`                   | —          | Module components that compose the calendar UI                                                                                                                                                                                                                                                                                                                                                |
+| Prop              | Type                                                  | Default    | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ----------------- | ----------------------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mode`            | `"single" \| "multiple" \| "range"`                   | `"single"` | Selection mode                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `value`           | `CalendarValue<M>`                                    | —          | Controlled value. `Date \| null` for single, `Date[]` for multiple, `DateRange` for range. Pass `undefined` to opt out of controlled mode.                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `defaultValue`    | `CalendarValue<M>`                                    | —          | Initial value for uncontrolled mode. Used only when `value` is `undefined`. Subsequent changes to `defaultValue` are ignored.                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `defaultViewDate` | `Date`                                                | —          | Initial month/year displayed on mount when no selection seeds the view. Read once; subsequent changes are ignored. Use this instead of repeating the prop on every `CalendarDays`. Non-`Date` values and `Invalid Date` are rejected (dev warn) and treated as omitted.                                                                                                                                                                                                                                                                                        |
+| `onChange`        | `(value: CalendarValue<M>) => void`                   | —          | Fires when the selection changes (in both controlled and uncontrolled modes)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `cols`            | `number`                                              | —          | Number of columns in the internal CSS grid                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `locale`          | `string`                                              | `"en"`     | BCP 47 language tag used for all labels and formatting                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `timeZone`        | `string \| "auto"`                                    | `"auto"`   | IANA timezone (`"Europe/Paris"`, `"UTC"`), fixed offset (`"UTC+2"`, `"UTC-5"`), or `"auto"`. When `"auto"` (or omitted) the library detects the user's timezone via `Intl.DateTimeFormat().resolvedOptions().timeZone` after mount. Invalid values fall back to auto-detect with a dev warning. Affects today detection, emitted date midnight, and formatting. **Important:** with an explicit `timeZone`, the `Date` passed to `onChange` is the absolute instant of midnight **in that zone** — see [Timezone](#timezone) for examples and storage guidance |
+| `readOnly`        | `boolean`                                             | `false`    | Disables all state-changing interactions (date/time selection). Navigation still works. Adds `data-readonly` on the root and `aria-disabled` on each interactive cell — the wrapper itself carries no ARIA state because plain `<div>` does not support `aria-readonly` per ARIA spec                                                                                                                                                                                                                                                                          |
+| `hour12`          | `boolean`                                             | `false`    | Use 12-hour time format instead of 24-hour                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `timeStep`        | `{ hour?: number; minute?: number; second?: number }` | `{1,1,1}`  | Granularity (step) for time drums. Affects both inline `CalendarTimeGrid` and `CalendarNav` time popup. Example: `timeStep={{ minute: 5 }}` snaps minutes to 0/5/10/.../55. Step values divide the unit range; `aria-valuemax`, keyboard `±step`, and scroll snap follow the step. Default `1` (no snapping)                                                                                                                                                                                                                                                   |
+| `theme`           | `CalendarTheme`                                       | `"auto"`   | Base value (`"auto"` / `"light"` / `"dark"`), a pre-built theme object from `@dateforge/react-calendar/themes[/name]`, or a `CustomTheme` from `createTheme()`. Named string themes (e.g. `"midnight"`) are not supported — import the object instead.                                                                                                                                                                                                                                                                                                         |
+| `appearance`      | `CalendarAppearance`                                  | —          | Pre-built appearance object from `@dateforge/react-calendar/appearances[/name]`, or a `CustomAppearance` from `createAppearance()`. Omit the prop entirely for the default appearance.                                                                                                                                                                                                                                                                                                                                                                         |
+| `gradient`        | `boolean`                                             | `false`    | Enable gradient backgrounds on selected cells                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `width`           | `string \| number`                                    | `"100%"`   | Container width                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `minDate`         | `Date`                                                | —          | Earliest selectable date                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `maxDate`         | `Date`                                                | —          | Latest selectable date                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `maxDates`        | `number`                                              | —          | Maximum number of selectable dates (`mode="multiple"` only). When the cap is reached: clicking a not-yet-selected date (in `<CalendarDays>`, via a preset, or any other interactive module) is silently ignored — no `onChange`, no view change. Clicking an already-selected date still toggles it off, freeing a slot. `<CalendarManualInput>` hides its add-input when the cap is reached.                                                                                                                                                                  |
+| `minRangeDays`    | `number`                                              | —          | Minimum number of days in a range selection                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `maxRangeDays`    | `number`                                              | —          | Maximum number of days in a range selection                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `disabled`        | `DisabledConfig`                                      | —          | Rules for disabling specific dates. Build with `createDisabled()`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `children`        | `React.ReactNode`                                     | —          | Module components that compose the calendar UI                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
 ### When does each action fire `onChange`?
 
@@ -200,7 +200,11 @@ In Next.js / Remix / any SSR setup, evaluating `new Date()` returns a different 
 
 ```tsx
 const [date, setDate] = useState<Date | null>(new Date()); // ❌ hydration mismatch
-return <Calendar value={date} onChange={setDate}><CalendarDays /></Calendar>;
+return (
+  <Calendar value={date} onChange={setDate}>
+    <CalendarDays />
+  </Calendar>
+);
 ```
 
 **Do — use the SSR-safe `useToday` hook exported by the package:**
@@ -208,9 +212,13 @@ return <Calendar value={date} onChange={setDate}><CalendarDays /></Calendar>;
 ```tsx
 import { Calendar, useToday } from "@dateforge/react-calendar";
 
-const today = useToday();                                  // null on server, Date after mount
+const today = useToday(); // null on server, Date after mount
 const [date, setDate] = useState<Date | null>(null);
-return <Calendar value={date ?? today} onChange={setDate}><CalendarDays /></Calendar>;
+return (
+  <Calendar value={date ?? today} onChange={setDate}>
+    <CalendarDays />
+  </Calendar>
+);
 ```
 
 That's it — `value` is `null` on the server (no day selected in SSR HTML), `today` after hydration. No mismatch, no ghost selection.
@@ -590,23 +598,23 @@ Renders the month grid — weekday headers, week numbers (optional), and the day
 
 ### Props
 
-| Prop                | Type               | Default | Description                                                                                                                                                                                                                                                                         |
-| ------------------- | ------------------ | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `offset`            | `number`           | `0`     | Month offset relative to the current view. Use `1` or `-1` to render adjacent months                                                                                                                                                                                                |
-| `startOfWeek`       | `0–6`              | `1`     | First day of the week. `0` = Sunday, `1` = Monday, … `6` = Saturday                                                                                                                                                                                                                 |
-| `currentMonthOnly`  | `boolean`          | `false` | Hide day cells that belong to the previous or next month                                                                                                                                                                                                                            |
-| `highlightWeekends` | `boolean`          | `true`  | Apply a distinct style to Saturday and Sunday                                                                                                                                                                                                                                       |
-| `boldWeekends`      | `boolean`          | `false` | Render Saturday and Sunday in bold with the weekend accent color (`--c-we`)                                                                                                                                                                                                         |
-| `highlightToday`    | `boolean`          | `true`  | Highlight today's date                                                                                                                                                                                                                                                              |
-| `fixedRows`         | `boolean`          | `true`  | Always render 6 rows of day cells                                                                                                                                                                                                                                                   |
-| `weekNumbers`       | `boolean`          | `false` | Show ISO week numbers in the leftmost column                                                                                                                                                                                                                                        |
-| `hideWeekdays`      | `boolean`          | `false` | Hide the row of weekday name headers                                                                                                                                                                                                                                                |
+| Prop                | Type                            | Default   | Description                                                                                                                                                                                                                                                                                                                      |
+| ------------------- | ------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `offset`            | `number`                        | `0`       | Month offset relative to the current view. Use `1` or `-1` to render adjacent months                                                                                                                                                                                                                                             |
+| `startOfWeek`       | `0–6`                           | `1`       | First day of the week. `0` = Sunday, `1` = Monday, … `6` = Saturday                                                                                                                                                                                                                                                              |
+| `currentMonthOnly`  | `boolean`                       | `false`   | Hide day cells that belong to the previous or next month                                                                                                                                                                                                                                                                         |
+| `highlightWeekends` | `boolean`                       | `true`    | Apply a distinct style to Saturday and Sunday                                                                                                                                                                                                                                                                                    |
+| `boldWeekends`      | `boolean`                       | `false`   | Render Saturday and Sunday in bold with the weekend accent color (`--c-we`)                                                                                                                                                                                                                                                      |
+| `highlightToday`    | `boolean`                       | `true`    | Highlight today's date                                                                                                                                                                                                                                                                                                           |
+| `fixedRows`         | `boolean`                       | `true`    | Always render 6 rows of day cells                                                                                                                                                                                                                                                                                                |
+| `weekNumbers`       | `boolean`                       | `false`   | Show ISO week numbers in the leftmost column                                                                                                                                                                                                                                                                                     |
+| `hideWeekdays`      | `boolean`                       | `false`   | Hide the row of weekday name headers                                                                                                                                                                                                                                                                                             |
 | `weekdayFormat`     | `"narrow" \| "short" \| "long"` | `"short"` | Weekday header label format. Resolved per-locale via `Intl.DateTimeFormat`. `"narrow"` = single letter (e.g. `M T W T F S S`), `"short"` = abbreviated (e.g. `Mon Tue …`), `"long"` = full name. Note: `"narrow"` may produce duplicates in some locales (e.g. `T` for Tue/Thu in English) — that is expected locale convention. |
-| `hideOutOfRange`    | `boolean`          | `false` | Do not render visible day buttons for dates outside `minDate`/`maxDate` or disabled rules. Layout placeholders are still rendered with `role="presentation"` so the grid stays aligned and accessibility tree contains only real cells. See "`hideOutOfRange` accessibility" below. |
-| `lockDeselection`   | `boolean`          | `false` | Prevent the user from deselecting the currently selected date                                                                                                                                                                                                                       |
-| `blockNavigation`   | `boolean`          | `false` | Block keyboard navigation (arrow keys, `PageUp`/`PageDown`) from crossing month boundaries                                                                                                                                                                                          |
-| `swipe`             | `boolean`          | `true`  | Enable swipe gestures to navigate between months                                                                                                                                                                                                                                    |
-| `col`               | `number \| string` | —       | CSS grid `grid-column` value for layout positioning                                                                                                                                                                                                                                 |
+| `hideOutOfRange`    | `boolean`                       | `false`   | Do not render visible day buttons for dates outside `minDate`/`maxDate` or disabled rules. Layout placeholders are still rendered with `role="presentation"` so the grid stays aligned and accessibility tree contains only real cells. See "`hideOutOfRange` accessibility" below.                                              |
+| `lockDeselection`   | `boolean`                       | `false`   | Prevent the user from deselecting the currently selected date                                                                                                                                                                                                                                                                    |
+| `blockNavigation`   | `boolean`                       | `false`   | Block keyboard navigation (arrow keys, `PageUp`/`PageDown`) from crossing month boundaries                                                                                                                                                                                                                                       |
+| `swipe`             | `boolean`                       | `true`    | Enable swipe gestures to navigate between months                                                                                                                                                                                                                                                                                 |
+| `col`               | `number \| string`              | —         | CSS grid `grid-column` value for layout positioning                                                                                                                                                                                                                                                                              |
 
 ### `hideOutOfRange` accessibility
 
@@ -658,20 +666,20 @@ Navigation header with configurable controls.
 | `themeToggle`     | `boolean`          | `false` | Show a light/dark theme toggle button. Has no effect when a custom theme (`createTheme()` or pre-built palette) is passed to `<Calendar theme={...} />`                                                        |
 | `offset`          | `number`           | `0`     | Month offset relative to `viewDate`. Use to render two synced nav headers in `cols={2}` layouts (`<CalendarNav offset={1} />`)                                                                                 |
 | `col`             | `number \| string` | —       | CSS grid `grid-column` value                                                                                                                                                                                   |
-| `bound`           | `"from" \| "to"`   | —       | In range mode binds the nav to a range boundary. Header reflects that bound's date; arrows / popups / `home` / `clear` write to that bound only. Falls back to opposite bound when own bound is null            |
+| `bound`           | `"from" \| "to"`   | —       | In range mode binds the nav to a range boundary. Header reflects that bound's date; arrows / popups / `home` / `clear` write to that bound only. Falls back to opposite bound when own bound is null           |
 
 ### Behavior matrix
 
 `<CalendarNav>` is a hybrid module — its category depends on which props are enabled.
 
-| Prop                                                             | Effect                                          | Fires `onChange`? | Respects `readOnly`?                              |
-| ---------------------------------------------------------------- | ----------------------------------------------- | ----------------- | ------------------------------------------------- |
-| `showMonthPicker` / `compactMonths` / month/year arrows / popups | `navigateTo` (changes `viewDate`)               | no                | n/a — navigation                                  |
-| `home`                                                           | `navigateTo(today)`                             | no                | n/a — navigation                                  |
-| `monthLabel` / `yearLabel` / `showNowTime`                       | display only                                    | no                | n/a                                               |
-| `themeToggle`                                                    | toggles UI theme via `UIContext.toggleTheme`    | no                | yes — UI not blocked                              |
+| Prop                                                             | Effect                                                                                                                     | Fires `onChange`? | Respects `readOnly`?                              |
+| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------------------------------------------------- |
+| `showMonthPicker` / `compactMonths` / month/year arrows / popups | `navigateTo` (changes `viewDate`)                                                                                          | no                | n/a — navigation                                  |
+| `home`                                                           | `navigateTo(today)`                                                                                                        | no                | n/a — navigation                                  |
+| `monthLabel` / `yearLabel` / `showNowTime`                       | display only                                                                                                               | no                | n/a                                               |
+| `themeToggle`                                                    | toggles UI theme via `UIContext.toggleTheme`                                                                               | no                | yes — UI not blocked                              |
 | `clear`                                                          | `onChangeDate(null)` — clears current selection. With `bound` clears that boundary only via `onRangeBoundSet(bound, null)` | yes               | yes — button disabled when `readOnly`             |
-| `showTime`                                                       | opens time popup; confirm calls `onChangeTime`  | yes (on confirm)  | yes — drums and confirm read-only when `readOnly` |
+| `showTime`                                                       | opens time popup; confirm calls `onChangeTime`                                                                             | yes (on confirm)  | yes — drums and confirm read-only when `readOnly` |
 
 Use this table to decide which guarantees apply to your composition. A `<CalendarNav>` without `clear` and without `showTime` is purely navigational and never fires `onChange`.
 
@@ -697,13 +705,13 @@ Standalone month picker (no `CalendarDays` needed):
 
 ### Props
 
-| Prop                | Type                     | Default | Description                                                                       |
-| ------------------- | ------------------------ | ------- | --------------------------------------------------------------------------------- |
-| `short`             | `boolean`                | `true`  | Use abbreviated month names (e.g. "Jan" instead of "January")                     |
-| `disableOutOfRange` | `boolean`                | `true`  | Disable months outside `minDate`/`maxDate` range                                  |
-| `hideOutOfRange`    | `boolean`                | `false` | Completely hide months outside the allowed range                                  |
-| `col`               | `number \| string`       | —       | CSS grid `grid-column` value                                                      |
-| `onMonthSelect`     | `(date: Date) => void`   | —       | Fires after a month click. Receives navigated `viewDate` (first day of the month) |
+| Prop                | Type                   | Default | Description                                                                       |
+| ------------------- | ---------------------- | ------- | --------------------------------------------------------------------------------- |
+| `short`             | `boolean`              | `true`  | Use abbreviated month names (e.g. "Jan" instead of "January")                     |
+| `disableOutOfRange` | `boolean`              | `true`  | Disable months outside `minDate`/`maxDate` range                                  |
+| `hideOutOfRange`    | `boolean`              | `false` | Completely hide months outside the allowed range                                  |
+| `col`               | `number \| string`     | —       | CSS grid `grid-column` value                                                      |
+| `onMonthSelect`     | `(date: Date) => void` | —       | Fires after a month click. Receives navigated `viewDate` (first day of the month) |
 
 ---
 
@@ -725,13 +733,13 @@ Standalone year picker:
 
 ### Props
 
-| Prop                | Type                     | Default | Description                                                                                       |
-| ------------------- | ------------------------ | ------- | ------------------------------------------------------------------------------------------------- |
-| `yearsPerPage`      | `number`                 | `10`    | Number of years shown per page. Integer in 1..40; out-of-range values are clamped and warn in dev |
-| `disableOutOfRange` | `boolean`                | `true`  | Disable years outside `minDate`/`maxDate` range                                                   |
-| `hideOutOfRange`    | `boolean`                | `false` | Completely hide years outside the allowed range                                                   |
-| `col`               | `number \| string`       | —       | CSS grid `grid-column` value                                                                      |
-| `onYearSelect`      | `(date: Date) => void`   | —       | Fires after a year click. Receives navigated `viewDate` (same month/day, picked year)             |
+| Prop                | Type                   | Default | Description                                                                                       |
+| ------------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------------- |
+| `yearsPerPage`      | `number`               | `10`    | Number of years shown per page. Integer in 1..40; out-of-range values are clamped and warn in dev |
+| `disableOutOfRange` | `boolean`              | `true`  | Disable years outside `minDate`/`maxDate` range                                                   |
+| `hideOutOfRange`    | `boolean`              | `false` | Completely hide years outside the allowed range                                                   |
+| `col`               | `number \| string`     | —       | CSS grid `grid-column` value                                                                      |
+| `onYearSelect`      | `(date: Date) => void` | —       | Fires after a year click. Receives navigated `viewDate` (same month/day, picked year)             |
 
 ---
 
@@ -759,7 +767,9 @@ Standalone time picker (no selected date required):
 <Calendar>
   <CalendarTimeGrid
     seconds
-    onTimeSelect={(d) => setTime({ h: d.getHours(), m: d.getMinutes(), s: d.getSeconds() })}
+    onTimeSelect={(d) =>
+      setTime({ h: d.getHours(), m: d.getMinutes(), s: d.getSeconds() })
+    }
   />
 </Calendar>
 ```
@@ -768,12 +778,12 @@ Standalone time picker (no selected date required):
 
 ### Props
 
-| Prop           | Type                     | Default | Description                                                                                |
-| -------------- | ------------------------ | ------- | ------------------------------------------------------------------------------------------ |
-| `seconds`      | `boolean`                | `false` | Show a third drum for seconds (0–59)                                                       |
-| `col`          | `number \| string`       | —       | CSS grid `grid-column` value                                                               |
-| `labels`       | `"short" \| "long"`      | —       | Show a small label above each drum. `"short"` → `HH` / `MM` / `SS` (clock convention, not localized). `"long"` → localized field name via `Intl.DisplayNames(locale, { type: "dateTimeField" })` — e.g. `hour` / `minute` / `second` in EN, `час` / `минута` / `секунда` in RU. Omit to hide labels |
-| `onTimeSelect` | `(date: Date) => void`   | —       | Fires on any drum change. Receives Date with new time — use `getHours()` / `getMinutes()` |
+| Prop           | Type                   | Default | Description                                                                                                                                                                                                                                                                                         |
+| -------------- | ---------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `seconds`      | `boolean`              | `false` | Show a third drum for seconds (0–59)                                                                                                                                                                                                                                                                |
+| `col`          | `number \| string`     | —       | CSS grid `grid-column` value                                                                                                                                                                                                                                                                        |
+| `labels`       | `"short" \| "long"`    | —       | Show a small label above each drum. `"short"` → `HH` / `MM` / `SS` (clock convention, not localized). `"long"` → localized field name via `Intl.DisplayNames(locale, { type: "dateTimeField" })` — e.g. `hour` / `minute` / `second` in EN, `час` / `минута` / `секунда` in RU. Omit to hide labels |
+| `onTimeSelect` | `(date: Date) => void` | —       | Fires on any drum change. Receives Date with new time — use `getHours()` / `getMinutes()`                                                                                                                                                                                                           |
 
 ---
 
@@ -803,8 +813,8 @@ import type {
 interface SimplePresetDef {
   id?: string;
   label: string | ((locale: string) => string);
-  value: number | Date;   // number = day offset from today; Date = fixed
-  range?: number;         // length in days after `value`; absent = single
+  value: number | Date; // number = day offset from today; Date = fixed
+  range?: number; // length in days after `value`; absent = single
 }
 
 // Advanced — function form
@@ -818,13 +828,13 @@ interface AdvancedPresetDef {
 }
 
 interface PresetContext {
-  now: Date;                              // real `new Date()` with time taken from viewDate
-  isValid: (date: Date) => boolean;       // checks against minDate / maxDate / disabled
-  locale: string;                         // BCP-47 locale from calendar config
+  now: Date; // real `new Date()` with time taken from viewDate
+  isValid: (date: Date) => boolean; // checks against minDate / maxDate / disabled
+  locale: string; // BCP-47 locale from calendar config
 }
 
 interface PresetRangeValue {
-  from: Date;                             // always non-null
+  from: Date; // always non-null
   to: Date;
 }
 
@@ -996,13 +1006,13 @@ A horizontal scrollable strip of month names for the current year.
 
 ### Props
 
-| Prop            | Type                     | Default | Description                                                                              |
-| --------------- | ------------------------ | ------- | ---------------------------------------------------------------------------------------- |
-| `short`         | `boolean`                | `true`  | Use abbreviated month names                                                              |
-| `showYearLabel` | `boolean`                | `false` | Show the year under the active month item                                                |
-| `bound`         | `"from" \| "to"`         | —       | In range mode binds the track to a range boundary                                        |
-| `col`           | `number \| string`       | —       | CSS grid `grid-column` value                                                             |
-| `onMonthSelect` | `(date: Date) => void`   | —       | Fires after the user lands on a month. Receives navigated date (or clamped bound date)   |
+| Prop            | Type                   | Default | Description                                                                            |
+| --------------- | ---------------------- | ------- | -------------------------------------------------------------------------------------- |
+| `short`         | `boolean`              | `true`  | Use abbreviated month names                                                            |
+| `showYearLabel` | `boolean`              | `false` | Show the year under the active month item                                              |
+| `bound`         | `"from" \| "to"`       | —       | In range mode binds the track to a range boundary                                      |
+| `col`           | `number \| string`     | —       | CSS grid `grid-column` value                                                           |
+| `onMonthSelect` | `(date: Date) => void` | —       | Fires after the user lands on a month. Receives navigated date (or clamped bound date) |
 
 > **Scroll axis limitation.** The track loops month 0–11 within `viewDate.getFullYear()`. Scrolling past December does not advance the year — it wraps back to January of the same year. Compose with `<CalendarYearsTrack>` or `<CalendarNav>` to change year. See `ARCHITECTURE.md → D. Hybrid modules → Track scroll axis (current limitation)`.
 
@@ -1018,11 +1028,11 @@ A horizontal scrollable strip of years.
 
 ### Props
 
-| Prop           | Type                     | Default | Description                                                                            |
-| -------------- | ------------------------ | ------- | -------------------------------------------------------------------------------------- |
-| `bound`        | `"from" \| "to"`         | —       | In range mode binds the track to a range boundary                                      |
-| `col`          | `number \| string`       | —       | CSS grid `grid-column` value                                                           |
-| `onYearSelect` | `(date: Date) => void`   | —       | Fires after the user lands on a year. Receives navigated date (or clamped bound date)  |
+| Prop           | Type                   | Default | Description                                                                           |
+| -------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------- |
+| `bound`        | `"from" \| "to"`       | —       | In range mode binds the track to a range boundary                                     |
+| `col`          | `number \| string`     | —       | CSS grid `grid-column` value                                                          |
+| `onYearSelect` | `(date: Date) => void` | —       | Fires after the user lands on a year. Receives navigated date (or clamped bound date) |
 
 ### Track behavior matrix
 
@@ -1063,7 +1073,7 @@ import { midnight } from "@dateforge/react-calendar/themes";
 // per-theme — single file, zero overhead from other themes
 import { midnight } from "@dateforge/react-calendar/themes/midnight";
 
-<Calendar theme={midnight} />
+<Calendar theme={midnight} />;
 ```
 
 Each theme is a self-contained `CustomTheme` object. The consuming bundler includes only the file you import. Theme vars are applied as inline CSS custom properties on the calendar container — no extra CSS file needed.
@@ -1085,9 +1095,13 @@ Each theme is a self-contained `CustomTheme` object. The consuming bundler inclu
 ```ts
 import { createTheme } from "@dateforge/react-calendar";
 
-const myTheme = createTheme({ highlight: "#6366f1", backdrop: "#0f172a", text: "#f1f5f9" });
+const myTheme = createTheme({
+  highlight: "#6366f1",
+  backdrop: "#0f172a",
+  text: "#f1f5f9",
+});
 
-<Calendar theme={myTheme} />
+<Calendar theme={myTheme} />;
 ```
 
 `createTheme` accepts a partial token map — only the tokens you provide are applied; the rest fall back to the base palette CSS variables.
@@ -1111,7 +1125,7 @@ import { loft } from "@dateforge/react-calendar/appearances";
 // per-appearance — single file
 import { compact } from "@dateforge/react-calendar/appearances/compact";
 
-<Calendar appearance={compact} />
+<Calendar appearance={compact} />;
 ```
 
 Available presets: `soft` `compact` `square` `bubble` `loft`
@@ -1125,27 +1139,27 @@ import { createAppearance } from "@dateforge/react-calendar";
 
 const myAppearance = createAppearance({ radius: "0", spacing: "0.4em" });
 
-<Calendar appearance={myAppearance} />
+<Calendar appearance={myAppearance} />;
 ```
 
 ### `createTheme(tokens)`
 
-| Token          | CSS variable | Role                                                                                                            |
-| -------------- | ------------ | --------------------------------------------------------------------------------------------------------------- |
-| `highlight`    | `--c-h`      | **Primary accent.** Background of the selected day cell, active buttons, nav accents. The most impactful token. |
-| `activeText`   | `--c-at`     | Readable text/icon color on top of `highlight`. Built-in themes keep it at 4.5:1+ against `highlight`.         |
-| `accent`       | `--c-a`      | Inverted/accent surface color for secondary month labels and decorative active outlines.                        |
-| `backdrop`     | `--c-b`      | Main calendar background.                                                                                       |
-| `tone`         | `--c-t`      | Secondary / muted background for rows, tracks, and hover states.                                                |
-| `text`         | `--c-c`      | Default text color for all labels and numbers.                                                                  |
-| `stroke`       | `--c-s`      | Border and separator color between cells and sections.                                                          |
-| `shadow`       | `--c-x`      | Drop-shadow color. Should include alpha (e.g. `"#6366f130"`).                                                   |
-| `disabled`     | `--c-d`      | Decorative disabled surface color. Kept for non-text affordances; do not rely on it for readable disabled text. |
-| `mutedText`    | `--c-m`      | Secondary readable foreground: outside-month dates, week numbers, placeholders, separators.                     |
-| `disabledText` | `--c-dt`     | Readable disabled / unavailable foreground. Built-in themes keep it at 4.5:1+ against `backdrop` and `tone`.    |
+| Token          | CSS variable | Role                                                                                                                                      |
+| -------------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `highlight`    | `--c-h`      | **Primary accent.** Background of the selected day cell, active buttons, nav accents. The most impactful token.                           |
+| `activeText`   | `--c-at`     | Readable text/icon color on top of `highlight`. Built-in themes keep it at 4.5:1+ against `highlight`.                                    |
+| `accent`       | `--c-a`      | Inverted/accent surface color for secondary month labels and decorative active outlines.                                                  |
+| `backdrop`     | `--c-b`      | Main calendar background.                                                                                                                 |
+| `tone`         | `--c-t`      | Secondary / muted background for rows, tracks, and hover states.                                                                          |
+| `text`         | `--c-c`      | Default text color for all labels and numbers.                                                                                            |
+| `stroke`       | `--c-s`      | Border and separator color between cells and sections.                                                                                    |
+| `shadow`       | `--c-x`      | Drop-shadow color. Should include alpha (e.g. `"#6366f130"`).                                                                             |
+| `disabled`     | `--c-d`      | Decorative disabled surface color. Kept for non-text affordances; do not rely on it for readable disabled text.                           |
+| `mutedText`    | `--c-m`      | Secondary readable foreground: outside-month dates, week numbers, placeholders, separators.                                               |
+| `disabledText` | `--c-dt`     | Readable disabled / unavailable foreground. Built-in themes keep it at 4.5:1+ against `backdrop` and `tone`.                              |
 | `weekend`      | `--c-we`     | Weekend text accent for weekend day labels and bold weekend day numbers. Built-in themes keep it at 4.5:1+ against `backdrop` and `tone`. |
-| `range`        | `--c-r`      | Background tint for days that fall inside a selected date range.                                                |
-| `error`        | `--c-e`      | Error / destructive signal.                                                                                     |
+| `range`        | `--c-r`      | Background tint for days that fall inside a selected date range.                                                                          |
+| `error`        | `--c-e`      | Error / destructive signal.                                                                                                               |
 
 `activeText`, `mutedText`, `disabledText`, and `weekend` are intentionally contrast-aware text tokens, while `accent` and `disabled` can stay more expressive as surface/decorative colors.
 
@@ -1165,23 +1179,23 @@ const myAppearance = createAppearance({
 });
 ```
 
-| Token             | Description                                              |
-| ----------------- | -------------------------------------------------------- |
-| `radius`          | Border radius for day cells and buttons                  |
-| `containerRadius` | Border radius for the calendar container                 |
-| `border`          | Border width/style for the container                     |
-| `spacing`         | Internal padding / gap between elements                  |
-| `font`            | Font family                                              |
-| `fontSize`        | Base font size                                           |
+| Token             | Description                                                                         |
+| ----------------- | ----------------------------------------------------------------------------------- |
+| `radius`          | Border radius for day cells and buttons                                             |
+| `containerRadius` | Border radius for the calendar container                                            |
+| `border`          | Border width/style for the container                                                |
+| `spacing`         | Internal padding / gap between elements                                             |
+| `font`            | Font family                                                                         |
+| `fontSize`        | Base font size                                                                      |
 | `dayFontSize`     | Font size for day numbers. Accepts fixed or responsive CSS values like `clamp(...)` |
-| `controlFontSize` | Font size for primary controls such as nav/time buttons  |
-| `daysSpacing`     | Gap between individual day cells                         |
-| `dayRatio`        | Aspect ratio of each day cell (e.g. `"1 / 1"`)           |
-| `trackHeight`     | Height of Track module items                             |
-| `shadowSm`        | Small shadow value                                       |
-| `shadowMd`        | Medium shadow value                                      |
-| `shadowLg`        | Large shadow value                                       |
-| `transition`      | CSS transition shorthand applied to interactive elements |
+| `controlFontSize` | Font size for primary controls such as nav/time buttons                             |
+| `daysSpacing`     | Gap between individual day cells                                                    |
+| `dayRatio`        | Aspect ratio of each day cell (e.g. `"1 / 1"`)                                      |
+| `trackHeight`     | Height of Track module items                                                        |
+| `shadowSm`        | Small shadow value                                                                  |
+| `shadowMd`        | Medium shadow value                                                                 |
+| `shadowLg`        | Large shadow value                                                                  |
+| `transition`      | CSS transition shorthand applied to interactive elements                            |
 
 ---
 
@@ -1360,7 +1374,9 @@ import { basicPresets } from "@dateforge/react-calendar";
 <CalendarPresets presets={basicPresets} />;
 
 // Or mix
-<CalendarPresets presets={[...basicPresets, { label: "In 3 days", value: 3 }]} />;
+<CalendarPresets
+  presets={[...basicPresets, { label: "In 3 days", value: 3 }]}
+/>;
 ```
 
 Toggle behavior: clicking an active preset deselects (fires `onChangeDate(null)` / `onRangeSet(null, null)`).
@@ -1383,8 +1399,8 @@ type CalendarMode = "single" | "multiple" | "range";
 type CalendarValue<M extends CalendarMode> = M extends "range"
   ? DateRange
   : M extends "multiple"
-    ? Date[]
-    : Date | null;
+  ? Date[]
+  : Date | null;
 ```
 
 ### `DateRange`
@@ -1405,11 +1421,11 @@ type StartOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 ### Built-in themes
 
-36 named palettes, each exported as a tree-shakeable `CustomTheme` object.
+38 named palettes, each exported as a tree-shakeable `CustomTheme` object.
 
-**Light:** `graphite` `amethyst` `mint` `comfy` `neon` `rosa` `snow` `solar` `latte` `slate` `scarlet` `prism` `meadow` `monsoon` `pearl` `chalk` `split` `riso`
+**Light:** `tide`, `graphite` `amethyst` `mint` `comfy` `neon` `rosa` `snow` `solar` `latte` `slate` `scarlet` `prism` `meadow` `monsoon` `pearl` `chalk` `split` `riso`
 
-**Dark:** `industrial` `midnight` `sandstone` `phosphor` `dracula` `cyber` `temporal` `crimson` `forest` `nebula` `aurora` `espresso` `ember` `flare` `abyss` `cobalt` `velvet` `eclipse`
+**Dark:** `fjord`, `industrial` `midnight` `sandstone` `phosphor` `dracula` `cyber` `temporal` `crimson` `forest` `nebula` `aurora` `espresso` `ember` `flare` `abyss` `cobalt` `velvet` `eclipse`
 
 **Base (no palette):** `"light"` `"dark"` `"auto"` — passed as strings, no import needed.
 

@@ -91,6 +91,21 @@ describe("Nav popups — open/close via UI state", () => {
     await userEvent.click(btn);
     expect(lastValue).toBe("untouched");
   });
+
+  it("does not render a duplicate popup from an offset nav", async () => {
+    const { container, getByLabelText } = render(
+      <Calendar value={new Date(2024, 5, 15)} cols={4}>
+        <CalendarNav showMonthPicker yearLabel col={2} />
+        <CalendarNav monthLabel yearLabel offset={1} col={2} />
+      </Calendar>,
+    );
+
+    await userEvent.click(getByLabelText(/Change month/));
+
+    expect(
+      container.querySelectorAll('[role="dialog"][aria-label="Select month"]'),
+    ).toHaveLength(1);
+  });
 });
 
 describe("Nav — ambiguous picker combinations", () => {
