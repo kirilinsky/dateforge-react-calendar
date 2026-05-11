@@ -28,6 +28,7 @@ import {
   isYearFixed,
 } from "@/utils/date-utils";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
+import { getDateTimeFormat } from "@/utils/intl-cache";
 import { MonthPopup, YearPopup } from "./month-year-track";
 import styles from "./nav.module.css";
 import { TimePopup } from "./time-popup";
@@ -253,7 +254,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
     if (!showNowTime) return;
     const tick = () => setNowTime(getTimeString(new Date(), hour12, seconds));
     tick();
-    const id = setInterval(tick, 1000);
+    const id = setInterval(tick, seconds ? 1000 : 60_000);
     return () => clearInterval(id);
   }, [showNowTime, hour12, seconds]);
 
@@ -282,12 +283,12 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
     [cur, date, minDate, maxDate, disabled],
   );
 
-  const monthNameLong = new Intl.DateTimeFormat(locale, {
-    month: "long",
-  }).format(date);
-  const monthNameShort = new Intl.DateTimeFormat(locale, {
-    month: "short",
-  }).format(date);
+  const monthNameLong = getDateTimeFormat(locale, { month: "long" }).format(
+    date,
+  );
+  const monthNameShort = getDateTimeFormat(locale, { month: "short" }).format(
+    date,
+  );
 
   const ch = (v: number) =>
     navigateBoundOrView(addDate(rawDate, v, "year", minDate, maxDate));

@@ -29,9 +29,9 @@ Modular React calendar and date/time picker. Single, range, and multi-select wit
 </div>
 
 <div align="center">
-  <img src="https://i.ibb.co/xSDRNqJC/image.png" alt="Calendar dark" width="390" />
+  <img src="https://i.ibb.co/xSDRNqJC/image.png" alt="Calendar dark" width="350" />
   &nbsp;
-  <img src="https://i.ibb.co/TDY5zb94/image.png" alt="Calendar light" width="390" />
+  <img src="https://i.ibb.co/TDY5zb94/image.png" alt="Calendar light" width="350" />
 </div>
 
 ---

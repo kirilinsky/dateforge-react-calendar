@@ -9,12 +9,14 @@ export const getDrumValue = (
   return val < 0 ? val + max : val;
 };
 
+import { getDateTimeFormat } from "./intl-cache";
+
 export const getTimeString = (
   date: Date,
   hour12 = false,
   showSeconds = false,
 ): string =>
-  new Intl.DateTimeFormat("en", {
+  getDateTimeFormat("en", {
     hour: "numeric",
     minute: "2-digit",
     ...(showSeconds ? { second: "2-digit" } : {}),

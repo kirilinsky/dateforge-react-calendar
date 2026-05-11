@@ -2,6 +2,10 @@
 
 ## Table of Contents
 
+- [Quick start](#quick-start)
+- [`onChange` value shapes](#onchange-value-shapes)
+- [Which modules do I need?](#which-modules-do-i-need)
+- [Import strategy](#import-strategy)
 - [Calendar (Main Component)](#calendar)
 - [Edge cases](#edge-cases)
 - [Recommended compositions](#recommended-compositions)
@@ -19,6 +23,91 @@
   - [CalendarYearsTrack](#calendaryearstrack)
 - [Utility Functions](#utility-functions)
 - [Types](#types)
+
+---
+
+## Quick start
+
+Install:
+
+```bash
+npm i @dateforge/react-calendar
+```
+
+No global CSS import is required — every module bundles its own styles and applies them automatically on first render. Zero runtime dependencies; React 18 or 19 is the only peer.
+
+Minimal single-date picker:
+
+```tsx
+import { useState } from "react";
+import { Calendar } from "@dateforge/react-calendar";
+import { CalendarNav, CalendarDays } from "@dateforge/react-calendar/modules";
+
+export function DatePicker() {
+  const [date, setDate] = useState<Date | null>(null);
+
+  return (
+    <Calendar mode="single" value={date} onChange={setDate}>
+      <CalendarNav showMonthPicker compactYears />
+      <CalendarDays />
+    </Calendar>
+  );
+}
+```
+
+The `<Calendar>` wrapper is a headless state provider — children compose the visible UI. Swap or reorder modules to change the layout; omit `<CalendarDays>` to build a non-grid picker (drum, manual input, presets only).
+
+App Router note: `<Calendar>` is interactive, so it must live behind a `"use client"` boundary in RSC frameworks — see [Server-side rendering](#server-side-rendering).
+
+## `onChange` value shapes
+
+`onChange` and `value` / `defaultValue` are typed per `mode`. The same callback fires in both controlled and uncontrolled trees.
+
+| `mode`       | `value` / `defaultValue` type   | `onChange` argument                            | Cleared (clear button, deselect) |
+| ------------ | ------------------------------- | ---------------------------------------------- | -------------------------------- |
+| `"single"`   | `Date \| null`                  | `Date \| null`                                 | `null`                           |
+| `"multiple"` | `Date[]`                        | `Date[]` (new array each call)                 | `[]`                             |
+| `"range"`    | `{ from: Date \| null; to: Date \| null }` | same shape; partial range allowed mid-flow | `{ from: null, to: null }`       |
+
+Notes:
+
+- `Date` instances passed to `onChange` are midnight in the resolved timezone (see [Timezone](#timezone)).
+- For `mode="range"`, `onChange` fires on each bound update — guard with `if (range.from && range.to)` if you only care about complete ranges.
+- For `mode="multiple"`, the array is sorted ascending and bounded by `maxDates`.
+
+## Which modules do I need?
+
+Pick the modules per the UX you want. All compose under one `<Calendar>` provider and share state automatically.
+
+| You want…                          | Modules                                                                                                |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Basic date picker                  | `CalendarNav`, `CalendarDays`                                                                          |
+| Date range picker                  | `CalendarNav`, `CalendarDays` (set `mode="range"` on `<Calendar>`)                                     |
+| Date + time picker                 | `CalendarNav` (with `showTime`) + `CalendarDays`, or inline `CalendarTimeGrid`                         |
+| Time-only picker                   | `CalendarTimeGrid` (no `CalendarDays`)                                                                 |
+| Manual typing / keyboard-first     | `CalendarManualInput` (alone or with `CalendarDays`)                                                   |
+| Presets (Today, Last 7 days, …)    | `CalendarPresets` (+ any picker modules)                                                               |
+| Month / year-only picker           | `CalendarMonthsGrid` or `CalendarYearsGrid` (no `CalendarDays`)                                        |
+| Mobile / drum-style picker         | `CalendarDaysTrack`, `CalendarMonthsTrack`, `CalendarYearsTrack` (alone or alongside the grid)         |
+| Selected-dates chips / summary     | `CalendarSelectedDates` (best with `mode="multiple"` or `range`)                                       |
+
+See [Recommended compositions](#recommended-compositions) for ready-made JSX snippets.
+
+## Import strategy
+
+Three subpaths, each tree-shakeable:
+
+| Import from                                  | What's there                                                                                          | When to use                                                                          |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `@dateforge/react-calendar`                  | `Calendar`, `createTheme`, `createDisabled`, `createAppearance`, all public types                     | Always — the root provider lives here.                                               |
+| `@dateforge/react-calendar/modules`          | All `Calendar*` module components (Days, Nav, Presets, TimeGrid, …)                                   | When pulling in the visible UI pieces.                                               |
+| `@dateforge/react-calendar/context`          | Context hooks: `useConfig`, `useNavigation`, `useSelection`, `useSelectionActions`, `useUI`, …        | When building custom modules that need to read or dispatch calendar state.           |
+| `@dateforge/react-calendar/themes`           | All theme objects re-exported together                                                                | Quick prototyping; pulls every theme into the bundle.                                |
+| `@dateforge/react-calendar/themes/<name>`    | A single theme (e.g. `…/themes/midnight`)                                                             | Production — only the themes you actually use end up in the bundle.                  |
+| `@dateforge/react-calendar/appearances`      | All appearance objects together                                                                       | Same trade-off as themes — prefer the per-name subpath for production builds.        |
+| `@dateforge/react-calendar/appearances/<n>`  | A single appearance (`loft`, `compact`, `square`, `soft`, `bubble`)                                   | Production.                                                                          |
+
+Each module is its own bundle, so importing `CalendarPresets` does not pull `CalendarTimeGrid` or any other unused module. The `modules` aggregate subpath is still tree-shakeable under ESM — bundlers drop unused named exports.
 
 ---
 
@@ -225,11 +314,42 @@ What you can do to keep things fast:
 
 ### Server-side rendering
 
-`<Calendar>` is **SSR-safe** and works out of the box with Next.js (App Router and Pages), Remix, TanStack Start, and other React server-rendering setups. Server-rendered HTML matches the first client render, so React does not emit a hydration warning.
+`<Calendar>` is **SSR / hydration-safe**: the server-rendered HTML matches the first client render, so React does not emit a hydration warning. It works with Next.js (App Router and Pages), Remix, TanStack Start, Astro server islands, and any other React SSR setup.
 
-What you can rely on:
+**SSR-safe is not the same as React Server Component-compatible.** `<Calendar>` is an interactive widget — it uses hooks, state, and effects — so under the Next.js App Router (or any RSC-based framework) it must be rendered from a Client Component boundary. It cannot be returned directly from a Server Component.
 
-- Drop `<Calendar>` into a server component / `getServerSideProps` page / Remix loader-driven route — no `"use client"` plumbing required at the server boundary.
+**Next.js App Router:**
+
+```tsx
+// app/picker.tsx
+"use client";
+
+import { Calendar } from "@dateforge/react-calendar";
+import { CalendarDays, CalendarNav } from "@dateforge/react-calendar/modules";
+
+export function Picker() {
+  return (
+    <Calendar mode="single" defaultValue={null}>
+      <CalendarNav />
+      <CalendarDays />
+    </Calendar>
+  );
+}
+```
+
+```tsx
+// app/page.tsx — Server Component, no "use client" needed
+import { Picker } from "./picker";
+
+export default function Page() {
+  return <Picker />;
+}
+```
+
+**Pages Router / Remix / Vite SSR:** no boundary directive needed — render `<Calendar>` anywhere in the tree, the SSR HTML stays deterministic.
+
+What you can rely on regardless of framework:
+
 - `theme="auto"` and `timeZone="auto"` (the defaults) detect the user's preferences after hydration. The first server render uses neutral defaults (`light` theme, no timezone) so the markup is deterministic.
 - The live clock (`<CalendarNav showNowTime />`) renders an empty time slot on the server and starts ticking after hydration.
 - `highlightToday` is intentionally inactive on the server render — the highlight appears on the client once `today` is resolved in the user's timezone. This avoids the classic "server highlights yesterday because it's UTC, client expected today" bug.
@@ -652,6 +772,7 @@ Standalone time picker (no selected date required):
 | -------------- | ------------------------ | ------- | ------------------------------------------------------------------------------------------ |
 | `seconds`      | `boolean`                | `false` | Show a third drum for seconds (0–59)                                                       |
 | `col`          | `number \| string`       | —       | CSS grid `grid-column` value                                                               |
+| `labels`       | `"short" \| "long"`      | —       | Show a small label above each drum. `"short"` → `HH` / `MM` / `SS` (clock convention, not localized). `"long"` → localized field name via `Intl.DisplayNames(locale, { type: "dateTimeField" })` — e.g. `hour` / `minute` / `second` in EN, `час` / `минута` / `секунда` in RU. Omit to hide labels |
 | `onTimeSelect` | `(date: Date) => void`   | —       | Fires on any drum change. Receives Date with new time — use `getHours()` / `getMinutes()` |
 
 ---

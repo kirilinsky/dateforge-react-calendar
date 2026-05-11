@@ -1,5 +1,4 @@
 import type React from "react";
-import { useMemo } from "react";
 import { VirtualTrack } from "@/components/virtual-track/virtual-track";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
@@ -9,6 +8,7 @@ import {
 } from "@/context/selection-context";
 import { useBoundDateView } from "@/hooks/use-bound-date-view";
 import { clampBoundDate, computeBoundLimits } from "@/utils/clamp-bound-date";
+import { getDateTimeFormat } from "@/utils/intl-cache";
 import { getMonthNames } from "@/utils/month-utils";
 import styles from "./months-track.module.css";
 
@@ -92,10 +92,7 @@ export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({
   const minIdx = minIndex ?? 0;
   const maxIdx = maxIndex ?? MONTHS.length - 1;
 
-  const fmt = useMemo(
-    () => new Intl.DateTimeFormat(locale, { month: "long" }),
-    [locale],
-  );
+  const fmt = getDateTimeFormat(locale, { month: "long" });
 
   return (
     <VirtualTrack

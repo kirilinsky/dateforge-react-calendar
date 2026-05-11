@@ -422,6 +422,8 @@ Tests reset the dedupe cache via `__resetWarnOnce()` between cases.
 
 `@dateforge/react-calendar` is **SSR-safe**. Server-rendered HTML matches the first client render, no hydration warnings, works in Next.js (App Router and Pages), Remix, TanStack Start, and Astro server islands. The pattern below is enforced everywhere a value depends on the browser environment.
 
+**SSR-safe ≠ Server Component-compatible.** `<Calendar>` is interactive (hooks, state, effects), so under any RSC-based framework (Next.js App Router, etc.) it must be rendered from a Client Component boundary — wrap it in a `"use client"` file. The SSR-safety guarantee here is about deterministic first-render output and hydration matching, not about removing the client boundary. See `DOCUMENTATION.md → Server-side rendering` for the App Router example.
+
 ### The rule
 
 Any value that comes from a browser-only API — `new Date()`, `Intl.DateTimeFormat().resolvedOptions()`, `window.matchMedia(...)`, `navigator.*` — is not consumed during the initial render. It is filled in after mount via `useEffect`.

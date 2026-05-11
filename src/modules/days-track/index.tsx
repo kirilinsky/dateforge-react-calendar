@@ -13,6 +13,7 @@ import { useBoundDateView } from "@/hooks/use-bound-date-view";
 import { Check, Clear } from "@/Icons";
 import { clampBoundDate, computeBoundLimits } from "@/utils/clamp-bound-date";
 import { isSameDay } from "@/utils/date-core";
+import { getDateTimeFormat } from "@/utils/intl-cache";
 import styles from "./days-track.module.css";
 
 function daysInMonth(year: number, month: number): number {
@@ -124,22 +125,18 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
   const shortMonth = useMemo(
     () =>
       showMonthLabel
-        ? new Intl.DateTimeFormat(locale, { month: "short" }).format(
+        ? getDateTimeFormat(locale, { month: "short" }).format(
             new Date(year, month, 1),
           )
         : null,
     [showMonthLabel, locale, year, month],
   );
 
-  const fullDateFmt = useMemo(
-    () =>
-      new Intl.DateTimeFormat(locale, {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      }),
-    [locale],
-  );
+  const fullDateFmt = getDateTimeFormat(locale, {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 
   return (
     <VirtualTrack

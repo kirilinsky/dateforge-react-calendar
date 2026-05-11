@@ -72,8 +72,8 @@
   user-select: none;
 }
 
-.period[data-period="AM"] .periodLabel:first-of-type,
-.period[data-period="PM"] .periodLabel:last-of-type {
+.period[data-period="AM"] .periodLabel[data-value="AM"],
+.period[data-period="PM"] .periodLabel[data-value="PM"] {
   color: var(--active-cell-color, var(--c-at, var(--c-a)));
 }
 
@@ -87,12 +87,42 @@
   flex: 1;
 }
 
+.drumCol {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex: 1;
+  min-width: 0;
+}
+
+.colonCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.drumLabel {
+  text-align: center;
+  font-size: var(--cal-text-xs);
+  font-weight: var(--cal-weight-semibold);
+  color: var(--c-m, var(--c-c));
+  line-height: 1.2;
+  padding-bottom: 0.25em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  user-select: none;
+}
+
 .colon {
   font-size: 1em;
   font-weight: var(--cal-weight-regular);
   color: var(--c-m, var(--c-c));
   flex-shrink: 0;
   align-self: center;
+  flex: 1;
+  display: flex;
+  align-items: center;
 }
 
 }

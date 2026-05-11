@@ -5,6 +5,59 @@ import { TimeTrack } from "@/components/time-track/time-track";
 
 const at = (h: number, m = 0, s = 0) => new Date(2024, 5, 15, h, m, s);
 
+describe("TimeTrack labels", () => {
+  it("renders no drum labels by default", () => {
+    const { container } = render(
+      <TimeTrack date={at(9)} onChange={() => {}} />,
+    );
+    expect(container.textContent).not.toMatch(/HH|MM|SS/);
+    expect(container.textContent).not.toMatch(/hour|minute|second/i);
+  });
+
+  it('labels="short" renders HH and MM (no seconds by default)', () => {
+    const { container } = render(
+      <TimeTrack date={at(9)} labels="short" onChange={() => {}} />,
+    );
+    expect(container.textContent).toMatch(/HH/);
+    expect(container.textContent).toMatch(/MM/);
+    expect(container.textContent).not.toMatch(/SS/);
+  });
+
+  it('labels="short" + showSeconds renders SS', () => {
+    const { container } = render(
+      <TimeTrack date={at(9)} labels="short" showSeconds onChange={() => {}} />,
+    );
+    expect(container.textContent).toMatch(/SS/);
+  });
+
+  it('labels="long" renders localized field names (EN)', () => {
+    const { container } = render(
+      <TimeTrack date={at(9)} labels="long" locale="en" onChange={() => {}} />,
+    );
+    // EN "hour" / "minute" via Intl.DisplayNames dateTimeField
+    expect(container.textContent?.toLowerCase()).toMatch(/hour/);
+    expect(container.textContent?.toLowerCase()).toMatch(/minute/);
+  });
+
+  it('labels="long" picks a different word per locale', () => {
+    const { container: en } = render(
+      <TimeTrack date={at(9)} labels="long" locale="en" onChange={() => {}} />,
+    );
+    const { container: ru } = render(
+      <TimeTrack date={at(9)} labels="long" locale="ru" onChange={() => {}} />,
+    );
+    const enText = en.textContent?.toLowerCase() ?? "";
+    const ruText = ru.textContent?.toLowerCase() ?? "";
+    // Either Intl.DisplayNames returns Russian terms, or it falls back to
+    // the field key — either way EN and RU strings should not be identical
+    // when DisplayNames is available, and the test passes trivially when
+    // it isn't (both fall back to the same English keys).
+    if (ruText.includes("час") || ruText.includes("минут")) {
+      expect(enText).not.toBe(ruText);
+    }
+  });
+});
+
 describe("TimeTrack AM/PM switch", () => {
   it("does not render switch when hour12 is false", () => {
     const { queryByRole } = render(

@@ -8,6 +8,7 @@ import {
 import shared from "@/global/global.module.css";
 import { isSameDay } from "@/utils/date-core";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
+import { getDateTimeFormat } from "@/utils/intl-cache";
 import { type AlignValue, alignToJustify } from "@/utils/layout-utils";
 import styles from "./selected-dates.module.css";
 
@@ -60,7 +61,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
   const { selectedDates, rangeStart, rangeEnd } = useSelectionValue();
   const { onChangeDate } = useSelectionActions();
 
-  const dateFmt = new Intl.DateTimeFormat(locale, {
+  const dateFmt = getDateTimeFormat(locale, {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -68,7 +69,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
   });
 
   const timeFmt = showTime
-    ? new Intl.DateTimeFormat(locale, {
+    ? getDateTimeFormat(locale, {
         hour: "numeric",
         minute: "2-digit",
         hour12,
