@@ -3,7 +3,7 @@ import { useUI } from "@/context/ui-context";
 
 type SetBool = (v: boolean) => void;
 
-export interface NavPopupState {
+interface NavPopupState {
   timePopupOpen: boolean;
   monthPopupOpen: boolean;
   yearPopupOpen: boolean;

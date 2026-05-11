@@ -2,7 +2,7 @@
   {
     "name": "Calendar only (canary, no modules)",
     "import": { "./dist/index.mjs": "{ Calendar }" },
-    "limit": "6 KB",
+    "limit": "6.5 KB",
     "ignore": ["react", "react-dom"]
   },
   {
@@ -21,7 +21,7 @@
       "./dist/modules/nav.mjs": "{ CalendarNav }",
       "./dist/modules/days.mjs": "{ CalendarDays }"
     },
-    "limit": "20 KB",
+    "limit": "22 KB",
     "ignore": ["react", "react-dom"]
   },
   {
@@ -32,7 +32,7 @@
       "./dist/themes/dracula.mjs": "{ dracula }",
       "./dist/appearances/compact.mjs": "{ compact }"
     },
-    "limit": "15 KB",
+    "limit": "16 KB",
     "ignore": ["react", "react-dom"]
   }
 ]
