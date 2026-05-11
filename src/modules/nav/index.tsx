@@ -2,6 +2,7 @@ import type React from "react";
 import {
   memo,
   useEffect,
+  useId,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -18,7 +19,14 @@ import { warnOnce } from "@/core/dev-warn";
 import shared from "@/global/global.module.css";
 import { useBoundDateView } from "@/hooks/use-bound-date-view";
 import { useClientValue } from "@/hooks/use-client-value";
-import { Clear, Down, Home, ThemeToggle } from "@/Icons";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Clear,
+  Down,
+  Home,
+  ThemeToggle,
+} from "@/Icons";
 import { clampBoundDate } from "@/utils/clamp-bound-date";
 import {
   addDate,
@@ -189,6 +197,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
   }
 
   const safeLabel = useMemo(() => (label ? sanitizeLabel(label) : ""), [label]);
+  const labelId = useId();
   const { minDate, maxDate, locale, hour12, disabled, readOnly, range } =
     useConfig();
   const { viewDate, navigateTo } = useNavigation();
@@ -231,6 +240,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
     showMonthPopup,
     showYearPopup,
     toggleTheme,
+    activeTheme,
     setPopupAnchorEl,
     setNavShowSeconds,
     navShowSeconds,
@@ -294,6 +304,13 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
     navigateBoundOrView(addDate(rawDate, v, "year", minDate, maxDate));
   const cm = (v: number) =>
     navigateBoundOrView(addDate(rawDate, v, "month", minDate, maxDate));
+  const goHome = () => {
+    if (!today) return;
+    const next = new Date(date);
+    next.setFullYear(today.getFullYear());
+    next.setMonth(today.getMonth(), 1);
+    navigateBoundOrView(next);
+  };
 
   const visible =
     !!safeLabel ||
@@ -318,7 +335,9 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
         className={styles.headerContainer}
         data-area="header"
         role="toolbar"
-        aria-label="Calendar navigation"
+        {...(safeLabel
+          ? { "aria-labelledby": labelId }
+          : { "aria-label": "Calendar navigation" })}
         style={gridSlot}
       >
         {showNowTime && (
@@ -345,7 +364,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           <button
             type="button"
             disabled={monthFixed}
-            className={`${styles.monthButton} ${shared.interactive}`}
+            className={`${styles.monthButton} ${shared.interactive} ${shared.hovered}`}
             aria-label={`Change month, currently ${monthNameLong}`}
             aria-haspopup="dialog"
             aria-expanded={showMonthPopup}
@@ -360,7 +379,16 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           </button>
         )}
 
-        {safeLabel && <span className={styles.label}>{safeLabel}</span>}
+        {safeLabel && (
+          <span
+            id={labelId}
+            className={styles.label}
+            role="heading"
+            aria-level={2}
+          >
+            {safeLabel}
+          </span>
+        )}
 
         {showMonthPicker && (
           <div
@@ -375,17 +403,17 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
                 aria-label="Previous month"
                 onClick={() => cm(-1)}
               >
-                ‹
+                <ChevronLeft />
               </button>
             )}
             <button
               type="button"
+              disabled={monthFixed}
               onClick={monthFixed ? undefined : openPopup(setShowMonthPopup)}
               className={`${styles.currentYear} ${shared.interactive} ${shared.hovered} ${monthFixed ? styles.staticButton : ""}`}
               aria-label={`Change month, currently ${monthNameLong}`}
               aria-haspopup={monthFixed ? undefined : "dialog"}
               aria-expanded={monthFixed ? undefined : showMonthPopup}
-              aria-disabled={monthFixed || undefined}
             >
               <MonthLabel
                 locale={locale}
@@ -400,7 +428,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
                 aria-label="Next month"
                 onClick={() => cm(1)}
               >
-                ›
+                <ChevronRight />
               </button>
             )}
           </div>
@@ -419,17 +447,17 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
                 aria-label="Previous year"
                 onClick={() => ch(-1)}
               >
-                ‹
+                <ChevronLeft />
               </button>
             )}
             <button
               type="button"
+              disabled={yearFixed}
               onClick={yearFixed ? undefined : openPopup(setShowYearPopup)}
               className={`${styles.currentYear} ${shared.interactive} ${shared.hovered} ${yearFixed ? styles.staticButton : ""}`}
               aria-label={`Change year, currently ${cur}`}
               aria-haspopup={yearFixed ? undefined : "dialog"}
               aria-expanded={yearFixed ? undefined : showYearPopup}
-              aria-disabled={yearFixed || undefined}
             >
               {cur}
             </button>
@@ -440,7 +468,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
                 aria-label="Next year"
                 onClick={() => ch(1)}
               >
-                ›
+                <ChevronRight />
               </button>
             )}
           </div>
@@ -449,11 +477,12 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
         {compactYears && (
           <button
             type="button"
-            className={`${styles.monthButton} ${shared.interactive}`}
+            disabled={yearFixed}
+            className={`${styles.monthButton} ${shared.interactive} ${shared.hovered}`}
             aria-label={`Change year, currently ${cur}`}
             aria-haspopup="dialog"
             aria-expanded={showYearPopup}
-            onClick={openPopup(setShowYearPopup)}
+            onClick={yearFixed ? undefined : openPopup(setShowYearPopup)}
           >
             {cur} <Down />
           </button>
@@ -479,61 +508,59 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           </span>
         )}
 
-        <div className={styles.flexWrapper}>
-          {themeToggle && (
-            <button
-              type="button"
-              className={`${styles.homeButton} ${shared.interactive} ${shared.hovered}`}
-              aria-label="Toggle theme"
-              onClick={toggleTheme}
-            >
-              <ThemeToggle />
-            </button>
-          )}
-          {home && (
-            <button
-              type="button"
-              className={`${styles.homeButton} ${shared.interactive} ${shared.hovered} ${isCurrentMonth ? styles.homeButtonDisabled : ""}`}
-              disabled={isCurrentMonth}
-              aria-label="Go to current month"
-              onClick={() =>
-                today &&
-                navigateBoundOrView(
-                  new Date(
-                    today.getFullYear(),
-                    today.getMonth(),
-                    1,
-                    date.getHours(),
-                    date.getMinutes(),
-                    date.getSeconds(),
-                    date.getMilliseconds(),
-                  ),
-                )
-              }
-            >
-              <Home />
-            </button>
-          )}
-          {clear && (
-            <button
-              type="button"
-              className={`${styles.homeButton} ${shared.interactive} ${shared.hovered} ${
-                (isBound ? !boundDate : selectedDates.length === 0) || readOnly
-                  ? styles.homeButtonDisabled
-                  : ""
-              }`}
-              disabled={
-                (isBound ? !boundDate : selectedDates.length === 0) || readOnly
-              }
-              aria-label="Clear selection"
-              onClick={() =>
-                isBound ? onRangeBoundSet(bound!, null) : onChangeDate(null)
-              }
-            >
-              <Clear />
-            </button>
-          )}
-        </div>
+        {(themeToggle || home || clear) && (
+          <div className={styles.flexWrapper}>
+            {themeToggle && (
+              <button
+                type="button"
+                className={`${styles.homeButton} ${shared.interactive} ${shared.hovered}`}
+                aria-label={
+                  activeTheme === "dark"
+                    ? "Switch to light mode"
+                    : activeTheme === "light"
+                      ? "Switch to dark mode"
+                      : "Toggle theme"
+                }
+                aria-pressed={activeTheme === "dark"}
+                onClick={toggleTheme}
+              >
+                <ThemeToggle />
+              </button>
+            )}
+            {home && (
+              <button
+                type="button"
+                className={`${styles.homeButton} ${shared.interactive} ${shared.hovered} ${isCurrentMonth ? styles.homeButtonDisabled : ""}`}
+                disabled={isCurrentMonth}
+                aria-label="Go to current month"
+                onClick={goHome}
+              >
+                <Home />
+              </button>
+            )}
+            {clear && (
+              <button
+                type="button"
+                className={`${styles.homeButton} ${shared.interactive} ${shared.hovered} ${
+                  (isBound ? !boundDate : selectedDates.length === 0) ||
+                  readOnly
+                    ? styles.homeButtonDisabled
+                    : ""
+                }`}
+                disabled={
+                  (isBound ? !boundDate : selectedDates.length === 0) ||
+                  readOnly
+                }
+                aria-label="Clear selection"
+                onClick={() =>
+                  isBound ? onRangeBoundSet(bound!, null) : onChangeDate(null)
+                }
+              >
+                <Clear />
+              </button>
+            )}
+          </div>
+        )}
       </div>
       {showTimePopup && (
         <TimePopup

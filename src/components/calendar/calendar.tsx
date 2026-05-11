@@ -123,6 +123,7 @@ export function Calendar<M extends CalendarMode = "single">({
       readOnly={readOnly}
       containerWidth={containerWidth}
       toggleTheme={toggleTheme}
+      activeTheme={activeTheme}
       {...(restProps as import("@/types/calendar").CalendarProps<CalendarMode>)}
     >
       <div

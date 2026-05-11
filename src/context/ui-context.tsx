@@ -3,6 +3,7 @@ import { createContext, type RefObject, useContext } from "react";
 export interface CalendarUI {
   containerRef: RefObject<HTMLDivElement | null>;
   toggleTheme: () => void;
+  activeTheme: "light" | "dark" | "auto";
   containerWidth: number;
   showTimePopup: boolean;
   setShowTimePopup: (v: boolean) => void;
