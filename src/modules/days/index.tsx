@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import {
@@ -7,7 +13,6 @@ import {
   useSelectionValue,
 } from "@/context/selection-context";
 import { useUI } from "@/context/ui-context";
-import shared from "@/global/global.module.css";
 import { useCalendarKeyboard } from "@/hooks/use-calendar-keyboard";
 import { useClientValue } from "@/hooks/use-client-value";
 import type { StartOfWeek } from "@/types/calendar";
@@ -19,7 +24,9 @@ import {
   type WeekdayFormat,
 } from "@/utils/date-utils";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
+import { getDateTimeFormat } from "@/utils/intl-cache";
 import { getTodayInTimezone, toTZMidnight } from "@/utils/tz-utils";
+import { getDayCellClassName } from "./day-cell-class-name";
 import styles from "./days.module.css";
 import WeekDays from "./week-days";
 
@@ -113,48 +120,6 @@ const DayCell = React.memo(function DayCell({
 }: DayCellProps) {
   const fullDate = useMemo(() => new Date(dateTime), [dateTime]);
 
-  const rangeEndpointClass =
-    isRangeStart && rangeBridgeRight
-      ? styles.rStart
-      : isRangeEnd && rangeBridgeLeft
-        ? styles.rEnd
-        : null;
-
-  const rangeBridgeClass =
-    isRangeStart && rangeBridgeRight
-      ? styles.rBridgeRight
-      : isRangeEnd && rangeBridgeLeft
-        ? styles.rBridgeLeft
-        : isInRange && rangeBridgeLeft && rangeBridgeRight
-          ? styles.rBridgeBoth
-          : isInRange && rangeBridgeLeft
-            ? styles.rBridgeLeft
-            : isInRange && rangeBridgeRight
-              ? styles.rBridgeRight
-              : null;
-
-  const previewClass =
-    isPreviewStart && isSelected
-      ? styles.rStart
-      : isPreviewEnd && isSelected
-        ? styles.rEnd
-        : isPreviewStart
-          ? styles.rPreviewStart
-          : isPreviewEnd
-            ? styles.rPreviewEnd
-            : isPreviewMid && !isDisabled
-              ? styles.rPreview
-              : null;
-
-  const previewBridgeClass =
-    !isDisabled && previewBridgeLeft && previewBridgeRight
-      ? styles.rPreviewBridgeBoth
-      : !isDisabled && previewBridgeRight
-        ? styles.rPreviewBridgeRight
-        : !isDisabled && previewBridgeLeft
-          ? styles.rPreviewBridgeLeft
-          : null;
-
   const isToday =
     !!highlightToday &&
     isTodayDate &&
@@ -174,6 +139,29 @@ const DayCell = React.memo(function DayCell({
     isPreviewStart ||
     isPreviewEnd ||
     isPreviewMid;
+
+  const className = getDayCellClassName({
+    range,
+    isSelected,
+    isDisabled,
+    connectLeft,
+    connectRight,
+    isRangeStart,
+    isRangeEnd,
+    isInRange,
+    rangeBridgeLeft,
+    rangeBridgeRight,
+    isPreviewStart,
+    isPreviewEnd,
+    isPreviewMid,
+    previewBridgeLeft,
+    previewBridgeRight,
+    isToday,
+    boldWeekends,
+    isOtherMonth,
+    isHighlighted,
+    isMaxReachedTarget,
+  });
 
   return (
     <div
@@ -203,32 +191,7 @@ const DayCell = React.memo(function DayCell({
         data-weekend={isWeekend || undefined}
         data-other-month={isOtherMonth || undefined}
         data-max-reached={isMaxReachedTarget || undefined}
-        className={[
-          styles.dayItem,
-          shared.interactive,
-          shared.hovered,
-          isMaxReachedTarget && styles.maxReachedTarget,
-          !range && isSelected && shared.activeItem,
-          !range && connectLeft && connectRight && styles.rangeMid,
-          !range && connectLeft && !connectRight && styles.rangeEnd,
-          !range && !connectLeft && connectRight && styles.rangeStart,
-          range && isSelected && shared.activeItem,
-          range && rangeEndpointClass,
-          range && rangeBridgeClass,
-          range && isInRange && !isDisabled && styles.rIn,
-          range &&
-            (isInRange || isPreviewMid) &&
-            isDisabled &&
-            styles.rInDisabled,
-          previewClass,
-          previewBridgeClass,
-          isToday && styles.todayItem,
-          boldWeekends && styles.boldWeekend,
-          isOtherMonth &&
-            (isHighlighted ? shared.selectedOtherItem : shared.otherItem),
-        ]
-          .filter(Boolean)
-          .join(" ")}
+        className={className}
       >
         {day}
       </button>
@@ -412,68 +375,91 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
     maxRangeDays,
   ]);
 
-  const handleSetDay = useCallback(
-    (targetDate: Date, isDisabled: boolean) => {
-      if (readOnly) return;
-      const alreadySelected = selectedDates.some((d) =>
-        isSameDay(d, targetDate),
-      );
-      if (isDisabled) return;
-      if (isMultipleMaxReached && !alreadySelected) return;
-      if ((lockDeselection || daysTrackActive) && alreadySelected) return;
-      const next = timeZone
-        ? new Date(
-            toTZMidnight(targetDate, timeZone).getTime() +
-              date.getHours() * 3600000 +
-              date.getMinutes() * 60000 +
-              date.getSeconds() * 1000 +
-              date.getMilliseconds(),
-          )
-        : new Date(targetDate);
-      if (!timeZone)
-        next.setHours(
-          date.getHours(),
-          date.getMinutes(),
-          date.getSeconds(),
-          date.getMilliseconds(),
-        );
-      if (minDate && next.getTime() < minDate.getTime()) {
-        next.setHours(minDate.getHours(), minDate.getMinutes(), 0, 0);
-      }
-      if (maxDate && next.getTime() > maxDate.getTime()) {
-        next.setHours(maxDate.getHours(), maxDate.getMinutes(), 0, 0);
-      }
-      onChangeDate(next);
-    },
-    [
-      onChangeDate,
-      date,
-      minDate,
-      maxDate,
-      lockDeselection,
-      daysTrackActive,
-      selectedDates,
-      readOnly,
-      timeZone,
-      isMultipleMaxReached,
-    ],
-  );
-
   const isPickingRange = range && rangeStart && !rangeEnd;
 
-  const handleMouseEnter = useCallback(
-    (fullDate: Date) => {
-      if (!isPickingRange || !rangeStart) return;
-      const diffDays =
-        Math.round(
-          Math.abs(fullDate.getTime() - rangeStart.getTime()) / 86400000,
-        ) + 1;
-      if (minRangeDays !== undefined && diffDays < minRangeDays) return;
-      if (maxRangeDays !== undefined && diffDays > maxRangeDays) return;
-      setHoverDate(fullDate);
-    },
-    [isPickingRange, setHoverDate, rangeStart, minRangeDays, maxRangeDays],
-  );
+  // Ref-pattern: keep handlers stable so React.memo on DayCell isn't bypassed
+  // every time selectedDates / rangeStart change. We read latest values from
+  // the ref at call time instead of declaring them as useCallback deps.
+  const latestRef = useRef({
+    readOnly,
+    selectedDates,
+    isMultipleMaxReached,
+    lockDeselection,
+    daysTrackActive,
+    timeZone,
+    date,
+    minDate,
+    maxDate,
+    onChangeDate,
+    isPickingRange,
+    rangeStart,
+    minRangeDays,
+    maxRangeDays,
+    setHoverDate,
+  });
+  latestRef.current = {
+    readOnly,
+    selectedDates,
+    isMultipleMaxReached,
+    lockDeselection,
+    daysTrackActive,
+    timeZone,
+    date,
+    minDate,
+    maxDate,
+    onChangeDate,
+    isPickingRange,
+    rangeStart,
+    minRangeDays,
+    maxRangeDays,
+    setHoverDate,
+  };
+
+  const handleSetDay = useCallback((targetDate: Date, isDisabled: boolean) => {
+    const r = latestRef.current;
+    if (r.readOnly) return;
+    const alreadySelected = r.selectedDates.some((d) =>
+      isSameDay(d, targetDate),
+    );
+    if (isDisabled) return;
+    if (r.isMultipleMaxReached && !alreadySelected) return;
+    if ((r.lockDeselection || r.daysTrackActive) && alreadySelected) return;
+    const next = r.timeZone
+      ? new Date(
+          toTZMidnight(targetDate, r.timeZone).getTime() +
+            r.date.getHours() * 3600000 +
+            r.date.getMinutes() * 60000 +
+            r.date.getSeconds() * 1000 +
+            r.date.getMilliseconds(),
+        )
+      : new Date(targetDate);
+    if (!r.timeZone)
+      next.setHours(
+        r.date.getHours(),
+        r.date.getMinutes(),
+        r.date.getSeconds(),
+        r.date.getMilliseconds(),
+      );
+    if (r.minDate && next.getTime() < r.minDate.getTime()) {
+      next.setHours(r.minDate.getHours(), r.minDate.getMinutes(), 0, 0);
+    }
+    if (r.maxDate && next.getTime() > r.maxDate.getTime()) {
+      next.setHours(r.maxDate.getHours(), r.maxDate.getMinutes(), 0, 0);
+    }
+    r.onChangeDate(next);
+  }, []);
+
+  const handleMouseEnter = useCallback((fullDate: Date) => {
+    const r = latestRef.current;
+    if (!r.isPickingRange || !r.rangeStart) return;
+    const diffDays =
+      Math.round(
+        Math.abs(fullDate.getTime() - r.rangeStart.getTime()) / 86400000,
+      ) + 1;
+    if (r.minRangeDays !== undefined && diffDays < r.minRangeDays) return;
+    if (r.maxRangeDays !== undefined && diffDays > r.maxRangeDays) return;
+    r.setHoverDate(fullDate);
+  }, []);
 
   const handleMouseLeave = useCallback(() => {
     if (range) setHoverDate(null);
@@ -483,23 +469,19 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
 
   const gridLabel = useMemo(
     () =>
-      new Intl.DateTimeFormat(locale, {
+      getDateTimeFormat(locale, {
         month: "long",
         year: "numeric",
       }).format(date),
     [locale, date],
   );
 
-  const cellFmt = useMemo(
-    () =>
-      new Intl.DateTimeFormat(locale, {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      }),
-    [locale],
-  );
+  const cellFmt = getDateTimeFormat(locale, {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 
   const isDayHidden = useCallback(
     (d: { fullDate: Date; isDisabled: boolean; isCurrentMonth: boolean }) => {
@@ -531,6 +513,11 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const onKeyboardSelect = useCallback(
+    (d: Date) => handleSetDay(d, false),
+    [handleSetDay],
+  );
+
   const { gridRef, focusedDate, handleKeyDown } = useCalendarKeyboard({
     viewDate: date,
     initialFocusDate,
@@ -538,7 +525,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
     startOfWeek,
     blockNavigation,
     navigateTo,
-    onSelect: (d) => handleSetDay(d, false),
+    onSelect: onKeyboardSelect,
   });
 
   return (
@@ -603,43 +590,42 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
                 </div>
               )}
               {week.days.map(
-                (
-                  {
-                    day,
-                    fullDate,
-                    isCurrentMonth,
-                    isDisabled,
-                    isSelected,
-                    connectLeft,
-                    connectRight,
-                    isRangeStart,
-                    isRangeEnd,
-                    isInRange,
-                    rangeBridgeLeft,
-                    rangeBridgeRight,
-                    isPreviewStart,
-                    isPreviewEnd,
-                    isPreviewMid,
-                    previewBridgeLeft,
-                    previewBridgeRight,
-                  },
-                  i,
-                ) => {
+                ({
+                  day,
+                  fullDate,
+                  isCurrentMonth,
+                  isDisabled,
+                  isSelected,
+                  connectLeft,
+                  connectRight,
+                  isRangeStart,
+                  isRangeEnd,
+                  isInRange,
+                  rangeBridgeLeft,
+                  rangeBridgeRight,
+                  isPreviewStart,
+                  isPreviewEnd,
+                  isPreviewMid,
+                  previewBridgeLeft,
+                  previewBridgeRight,
+                }) => {
+                  const dateTime = fullDate.getTime();
                   if (isDayHidden({ fullDate, isDisabled, isCurrentMonth }))
                     return (
                       <div
-                        key={i}
+                        key={dateTime}
                         role="presentation"
                         className={styles.dayItemEmpty}
                       />
                     );
 
                   const dayOfWeek = fullDate.getDay();
+                  const isTodayDate = isSameDay(fullDate, today);
                   return (
                     <DayCell
-                      key={i}
+                      key={dateTime}
                       day={day}
-                      dateTime={fullDate.getTime()}
+                      dateTime={dateTime}
                       isDisabled={isDisabled}
                       isSelected={isSelected}
                       isCurrentMonth={isCurrentMonth}
@@ -655,7 +641,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
                       isPreviewMid={isPreviewMid}
                       previewBridgeLeft={previewBridgeLeft}
                       previewBridgeRight={previewBridgeRight}
-                      isTodayDate={isSameDay(fullDate, today)}
+                      isTodayDate={isTodayDate}
                       highlightToday={highlightToday}
                       isWeekend={
                         highlightWeekends &&
@@ -670,7 +656,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
                         cellFmt,
                         isDisabled,
                         isSelected,
-                        isTodayDate: isSameDay(fullDate, today),
+                        isTodayDate,
                         highlightToday,
                         isRangeStart,
                         isRangeEnd,

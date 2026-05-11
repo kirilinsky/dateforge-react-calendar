@@ -5,6 +5,7 @@ import { useNavigation } from "@/context/navigation-context";
 import shared from "@/global/global.module.css";
 import { getMonthListData, setMonth } from "@/utils/date-utils";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
+import { getDateTimeFormat } from "@/utils/intl-cache";
 import styles from "./months-grid.module.css";
 
 export interface CalendarMonthsGridProps {
@@ -47,12 +48,12 @@ export const CalendarMonthsGrid: React.FC<CalendarMonthsGridProps> = ({
     [locale, currentYear, minDate, maxDate, short, disabled, disableOutOfRange],
   );
 
-  const longFmt = useMemo(
-    () => new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }),
-    [locale],
-  );
+  const longFmt = getDateTimeFormat(locale, {
+    month: "long",
+    year: "numeric",
+  });
   const gridLabel = useMemo(
-    () => new Intl.DateTimeFormat(locale, { year: "numeric" }).format(viewDate),
+    () => getDateTimeFormat(locale, { year: "numeric" }).format(viewDate),
     [locale, viewDate],
   );
 

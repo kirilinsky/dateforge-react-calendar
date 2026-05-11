@@ -1,9 +1,10 @@
 import type React from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import { useSelectionValue } from "@/context/selection-context";
 import { useUI } from "@/context/ui-context";
+import { getDateTimeFormat } from "@/utils/intl-cache";
 import styles from "./layout.module.css";
 
 const SR_ONLY: React.CSSProperties = {
@@ -25,20 +26,16 @@ const CalendarAnnouncer: React.FC = () => {
   const [announcement, setAnnouncement] = useState("");
   const mountedRef = useRef(false);
 
-  const monthFmt = useMemo(
-    () => new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }),
-    [locale],
-  );
-  const dateFmt = useMemo(
-    () =>
-      new Intl.DateTimeFormat(locale, {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      }),
-    [locale],
-  );
+  const monthFmt = getDateTimeFormat(locale, {
+    month: "long",
+    year: "numeric",
+  });
+  const dateFmt = getDateTimeFormat(locale, {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 
   useEffect(() => {
     if (!mountedRef.current) return;

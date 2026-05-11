@@ -1,3 +1,5 @@
+import { getDateTimeFormat } from "./intl-cache";
+
 function normalizeTZ(tz: string): string {
   const m = tz.match(/^UTC([+-])(\d{1,2})$/i);
   if (m) {
@@ -9,7 +11,7 @@ function normalizeTZ(tz: string): string {
 
 export function getTodayInTimezone(timeZone: string): Date {
   const tz = normalizeTZ(timeZone);
-  const parts = new Intl.DateTimeFormat("en-US", {
+  const parts = getDateTimeFormat("en-US", {
     timeZone: tz,
     year: "numeric",
     month: "numeric",

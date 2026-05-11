@@ -7,6 +7,8 @@ interface TimeStep {
   second?: number;
 }
 
+export type TimeLabelStyle = "short" | "long";
+
 interface TimeTrackProps {
   date: Date;
   hour12?: boolean;
@@ -14,8 +16,25 @@ interface TimeTrackProps {
   showSeconds?: boolean;
   readOnly?: boolean;
   step?: TimeStep;
+  labels?: TimeLabelStyle;
   onChange: (date: Date) => void;
 }
+
+const SHORT_LABELS = { hour: "HH", minute: "MM", second: "SS" } as const;
+
+const getLongLabel = (
+  locale: string,
+  field: "hour" | "minute" | "second",
+): string => {
+  try {
+    const dn = new Intl.DisplayNames(locale, { type: "dateTimeField" });
+    const name = dn.of(field);
+    if (name) return name;
+  } catch {
+    // fall through
+  }
+  return field;
+};
 
 const makeUnitFormatter = (
   locale: string,
@@ -40,8 +59,17 @@ export const TimeTrack = ({
   showSeconds = false,
   readOnly = false,
   step,
+  labels,
   onChange,
 }: TimeTrackProps) => {
+  const resolveLabel = (field: "hour" | "minute" | "second") => {
+    if (!labels) return null;
+    if (labels === "short") return SHORT_LABELS[field];
+    return getLongLabel(locale, field);
+  };
+  const hourLabel = resolveLabel("hour");
+  const minuteLabel = resolveLabel("minute");
+  const secondLabel = resolveLabel("second");
   const raw = date.getHours();
   const hours = hour12 ? raw % 12 || 12 : raw;
   const minutes = date.getMinutes();
@@ -80,50 +108,73 @@ export const TimeTrack = ({
           disabled={readOnly}
         >
           <span className={styles.periodThumb} aria-hidden />
-          <span className={styles.periodLabel} aria-hidden>
+          <span className={styles.periodLabel} data-value="AM" aria-hidden>
             AM
           </span>
-          <span className={styles.periodLabel} aria-hidden>
+          <span className={styles.periodLabel} data-value="PM" aria-hidden>
             PM
           </span>
         </button>
       )}
-      <div className={styles.drums}>
-        <StepDrum
-          value={hours}
-          max={hourMax}
-          step={hourStep}
-          label="Hours"
-          getValueText={hourText}
-          readOnly={readOnly}
-          onChange={(h) => emit(h, minutes, seconds, period)}
-        />
-        <span className={styles.colon} aria-hidden>
-          :
-        </span>
-        <StepDrum
-          value={minutes}
-          max={60}
-          step={minuteStep}
-          label="Minutes"
-          getValueText={minuteText}
-          readOnly={readOnly}
-          onChange={(m) => emit(hours, m, seconds, period)}
-        />
+      <div className={styles.drums} data-labels={labels || undefined}>
+        <div className={styles.drumCol}>
+          {hourLabel && (
+            <span className={styles.drumLabel} aria-hidden>
+              {hourLabel}
+            </span>
+          )}
+          <StepDrum
+            value={hours}
+            max={hourMax}
+            step={hourStep}
+            label="Hours"
+            getValueText={hourText}
+            readOnly={readOnly}
+            onChange={(h) => emit(h, minutes, seconds, period)}
+          />
+        </div>
+        <div className={styles.colonCol} aria-hidden>
+          {labels && <span className={styles.drumLabel}>&nbsp;</span>}
+          <span className={styles.colon}>:</span>
+        </div>
+        <div className={styles.drumCol}>
+          {minuteLabel && (
+            <span className={styles.drumLabel} aria-hidden>
+              {minuteLabel}
+            </span>
+          )}
+          <StepDrum
+            value={minutes}
+            max={60}
+            step={minuteStep}
+            label="Minutes"
+            getValueText={minuteText}
+            readOnly={readOnly}
+            onChange={(m) => emit(hours, m, seconds, period)}
+          />
+        </div>
         {showSeconds && (
           <>
-            <span className={styles.colon} aria-hidden>
-              :
-            </span>
-            <StepDrum
-              value={seconds}
-              max={60}
-              step={secondStep}
-              label="Seconds"
-              getValueText={secondText}
-              readOnly={readOnly}
-              onChange={(s) => emit(hours, minutes, s, period)}
-            />
+            <div className={styles.colonCol} aria-hidden>
+              {labels && <span className={styles.drumLabel}>&nbsp;</span>}
+              <span className={styles.colon}>:</span>
+            </div>
+            <div className={styles.drumCol}>
+              {secondLabel && (
+                <span className={styles.drumLabel} aria-hidden>
+                  {secondLabel}
+                </span>
+              )}
+              <StepDrum
+                value={seconds}
+                max={60}
+                step={secondStep}
+                label="Seconds"
+                getValueText={secondText}
+                readOnly={readOnly}
+                onChange={(s) => emit(hours, minutes, s, period)}
+              />
+            </div>
           </>
         )}
       </div>

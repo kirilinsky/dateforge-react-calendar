@@ -15,6 +15,7 @@ type TimeGridArgs = {
   hourStep?: number;
   minuteStep?: number;
   secondStep?: number;
+  labels?: "short" | "long" | "none";
 };
 
 const meta: Meta<TimeGridArgs> = {
@@ -25,6 +26,10 @@ const meta: Meta<TimeGridArgs> = {
     hourStep: { control: { type: "number", min: 1, max: 12 } },
     minuteStep: { control: { type: "number", min: 1, max: 30 } },
     secondStep: { control: { type: "number", min: 1, max: 30 } },
+    labels: {
+      control: "inline-radio",
+      options: ["none", "short", "long"],
+    },
   },
   args: {
     seconds: false,
@@ -32,6 +37,7 @@ const meta: Meta<TimeGridArgs> = {
     hourStep: 1,
     minuteStep: 1,
     secondStep: 1,
+    labels: "none",
   },
   render: (args, ctx) => {
     const [date, setDate] = useState<Date | null>(FIXED_DATE);
@@ -39,7 +45,7 @@ const meta: Meta<TimeGridArgs> = {
       <Calendar
         value={date}
         onChange={setDate}
-        hour12={args.hour12} gradient
+        hour12={args.hour12}
         timeStep={{
           hour: args.hourStep,
           minute: args.minuteStep,
@@ -49,7 +55,10 @@ const meta: Meta<TimeGridArgs> = {
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
-        <CalendarTimeGrid seconds={args.seconds} />
+        <CalendarTimeGrid
+          seconds={args.seconds}
+          labels={args.labels === "none" ? undefined : args.labels}
+        />
       </Calendar>
     );
   },
@@ -91,6 +100,16 @@ export const Step2Hour: Story = {
   args: { hourStep: 2 },
 };
 Step2Hour.storyName = "Hour step = 2";
+
+export const ShortLabels: Story = {
+  args: { labels: "short", seconds: true },
+};
+ShortLabels.storyName = "Drum labels: HH / MM / SS";
+
+export const LongLabelsLocalized: Story = {
+  args: { labels: "long", seconds: true },
+};
+LongLabelsLocalized.storyName = "Drum labels: localized (Intl.DisplayNames)";
 
 export const StandaloneTimePicker: Story = {
   render: (args, ctx) => {

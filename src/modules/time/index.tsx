@@ -1,5 +1,8 @@
 import type React from "react";
-import { TimeTrack } from "@/components/time-track/time-track";
+import {
+  type TimeLabelStyle,
+  TimeTrack,
+} from "@/components/time-track/time-track";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import { useSelectionActions } from "@/context/selection-context";
@@ -10,6 +13,15 @@ import styles from "./time.module.css";
 export interface CalendarTimeGridProps {
   col?: number | string;
   seconds?: boolean;
+  /**
+   * Show a small label above each drum.
+   * - `"short"` renders `HH` / `MM` / `SS` (clock convention, not localized).
+   * - `"long"` renders the localized field name via
+   *   `Intl.DisplayNames(locale, { type: "dateTimeField" })` —
+   *   e.g. `hour` / `minute` / `second` in EN, `час` / `минута` / `секунда` in RU.
+   * Omit the prop to hide labels.
+   */
+  labels?: TimeLabelStyle;
   /**
    * Fires whenever the user changes any drum (hours / minutes / seconds /
    * AM-PM). Receives a Date built from `viewDate` with the new time set —
@@ -22,6 +34,7 @@ export interface CalendarTimeGridProps {
 export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
   col,
   seconds = false,
+  labels,
   onTimeSelect,
 }) => {
   const { hour12, locale, readOnly, timeStep } = useConfig();
@@ -46,6 +59,7 @@ export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
         showSeconds={seconds}
         readOnly={readOnly}
         step={timeStep}
+        labels={labels}
         onChange={handleChange}
       />
     </div>
