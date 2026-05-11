@@ -39,7 +39,7 @@ const meta: Meta<TimeGridArgs> = {
       <Calendar
         value={date}
         onChange={setDate}
-        hour12={args.hour12}
+        hour12={args.hour12} gradient
         timeStep={{
           hour: args.hourStep,
           minute: args.minuteStep,
