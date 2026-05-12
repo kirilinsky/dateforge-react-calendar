@@ -12,12 +12,7 @@
     border: none;
     background: transparent;
     color: var(--c-c);
-    transition:
-      background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
-      box-shadow var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
-      color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
-      outline-color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
-      transform var(--cal-transition, 0.2s) ease;
+    transition: all var(--cal-transition, 0.2s) ease;
     cursor: pointer;
     user-select: none;
     height: 2.1em;
@@ -92,8 +87,7 @@
       inset 0 -1px 0 color-mix(in srgb, var(--c-x) 9%, transparent),
       inset 0 0 0 1px color-mix(in srgb, var(--c-x) 5%, transparent);
     transition:
-      background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
-      box-shadow var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
-      color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
+      background var(--cal-transition, 0.2s) ease,
+      color var(--cal-transition, 0.2s) ease;
   }
 }

@@ -112,21 +112,6 @@
     font-size: var(--cal-font-size, clamp(11px, 2.7cqw, 18px));
     background: var(--c-s);
     color: var(--c-c);
-    transition:
-      --c-a var(--cal-transition) linear,
-      --c-at var(--cal-transition) linear,
-      --c-b var(--cal-transition) linear,
-      --c-h var(--cal-transition) linear,
-      --c-t var(--cal-transition) linear,
-      --c-c var(--cal-transition) linear,
-      --c-s var(--cal-transition) linear,
-      --c-x var(--cal-transition) linear,
-      --c-d var(--cal-transition) linear,
-      --c-m var(--cal-transition) linear,
-      --c-dt var(--cal-transition) linear,
-      --c-we var(--cal-transition) linear,
-      --c-r var(--cal-transition) linear,
-      --c-e var(--cal-transition) linear;
     font-family: var(--cal-font);
     font-kerning: normal;
     font-optical-sizing: auto;
@@ -137,21 +122,11 @@
     border: var(--cal-border) solid var(--c-s);
     box-shadow: var(--cal-shadow-lg);
     overflow: hidden;
-    transition:
-      background var(--cal-paint-transition) var(--cal-paint-easing),
-      border-color var(--cal-paint-transition) var(--cal-paint-easing),
-      box-shadow var(--cal-paint-transition) var(--cal-paint-easing),
-      color var(--cal-paint-transition) var(--cal-paint-easing);
+    transition: background var(--cal-paint-transition) var(--cal-paint-easing);
   }
 
   .calendarContainer * {
     box-sizing: border-box;
-  }
-
-  :where(.calendarContainer, .calendarContainer *, .calendarContainer *::before, .calendarContainer *::after) {
-    transition-property: background, border-color, box-shadow, color, fill, outline-color, stroke, text-shadow;
-    transition-duration: var(--cal-paint-transition);
-    transition-timing-function: var(--cal-paint-easing);
   }
 
   :where(.calendarContainer) :where(button, input) {
@@ -165,9 +140,7 @@
     overflow: hidden;
     background: var(--c-b);
     grid-column: 1 / -1;
-    transition:
-      background var(--cal-paint-transition) var(--cal-paint-easing),
-      outline-color var(--cal-paint-transition) var(--cal-paint-easing);
+    transition: background var(--cal-paint-transition) var(--cal-paint-easing);
   }
 
   .calendarContainer.gradient {
@@ -208,9 +181,7 @@
     padding: 2.5em 2em;
     text-align: center;
     background: var(--c-b);
-    transition:
-      background var(--cal-paint-transition) var(--cal-paint-easing),
-      color var(--cal-paint-transition) var(--cal-paint-easing);
+    transition: background var(--cal-paint-transition) var(--cal-paint-easing);
   }
 
   .emptyStateTitle {
