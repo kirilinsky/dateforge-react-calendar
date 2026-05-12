@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { fireEvent, render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
@@ -39,6 +39,26 @@ describe("Presets — combinations with basicPresets", () => {
     const buttons = Array.from(container.querySelectorAll("button"));
     expect(buttons.length).toBeGreaterThan(basicPresets.length - 2);
     expect(buttons.some((b) => b.textContent?.trim() === "My X")).toBe(true);
+  });
+
+  it("arrow keys move focus between preset tiles", () => {
+    const { getByText } = render(
+      <Calendar mode="single" defaultViewDate={new Date(2024, 5, 15)}>
+        <CalendarPresets
+          presets={[
+            { id: "today", label: "Today", value: 0 },
+            { id: "three", label: "In 3 days", value: 3 },
+            { id: "week", label: "In a week", value: 7 },
+          ]}
+        />
+      </Calendar>,
+    );
+    const first = getByText("Today");
+    const second = getByText("In 3 days");
+    expect(first.tabIndex).toBe(0);
+    first.focus();
+    fireEvent.keyDown(first, { key: "ArrowRight" });
+    expect(document.activeElement).toBe(second);
   });
 });
 

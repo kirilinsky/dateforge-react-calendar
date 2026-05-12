@@ -1366,7 +1366,17 @@ Filtered presets are silently dropped — no warning, no placeholder. Click hand
 
 #### `basicPresets`
 
-A ready-made pack (classic "yesterday / today / tomorrow / last week / next month / …" set) with localized labels.
+A ready-made compact pack with localized labels:
+
+- last year
+- last month
+- last week
+- yesterday
+- today
+- tomorrow
+- next week
+- next month
+- next year
 
 ```ts
 import { basicPresets } from "@dateforge/react-calendar";

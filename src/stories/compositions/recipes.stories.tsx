@@ -4,12 +4,14 @@ import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
 import { CalendarDaysTrack } from "@/modules/days-track";
 import { CalendarManualInput } from "@/modules/manual-input";
+import { CalendarMonthsGrid } from "@/modules/months-grid";
 import { CalendarMonthsTrack } from "@/modules/months-track";
 import { CalendarNav } from "@/modules/nav";
 import { CalendarPresets } from "@/modules/presets";
 import { basicPresets } from "@/modules/presets/presets-pack";
 import { CalendarSelectedDates } from "@/modules/selected-dates";
 import { CalendarTimeGrid } from "@/modules/time";
+import { CalendarYearsGrid } from "@/modules/years-grid";
 import { CalendarYearsTrack } from "@/modules/years-track";
 import { createDisabled } from "@/utils/create-disabled";
 import { FIXED_DATE } from "../_constants";
@@ -49,7 +51,37 @@ export const BasicDatePicker: Story = {
     );
   },
 };
-BasicDatePicker.storyName = "Basic date picker";
+BasicDatePicker.storyName = "Single / Basic";
+
+export const DaysPresetsAndTimeInLine: Story = {
+  parameters: { storyWidth: 500 },
+  render: (_args, ctx) => {
+    const [date, setDate] = useState<Date | null>(FIXED_DATE);
+    return (
+      <Calendar
+        mode="single"
+        value={date}
+        onChange={setDate}
+        theme={resolveStoryTheme(ctx.globals.theme)}
+        appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
+        cols={4}
+      >
+        <CalendarNav
+          label="Selection feedback"
+          showMonthPicker
+          compactYears
+          clear
+        />
+        <CalendarPresets presets={basicPresets} col={2} />
+        <CalendarDays col={2} />
+
+        <CalendarSelectedDates />
+      </Calendar>
+    );
+  },
+};
+DaysPresetsAndTimeInLine.storyName = "Single / Presets sidebar";
 
 export const FeedbackAndClear: Story = {
   render: (_args, ctx) => {
@@ -75,7 +107,7 @@ export const FeedbackAndClear: Story = {
     );
   },
 };
-FeedbackAndClear.storyName = "Date picker with feedback and clear";
+FeedbackAndClear.storyName = "Single / Feedback + clear";
 
 export const RangePicker: Story = {
   render: (_args, ctx) => {
@@ -97,7 +129,7 @@ export const RangePicker: Story = {
     );
   },
 };
-RangePicker.storyName = "Date range picker";
+RangePicker.storyName = "Range / Basic";
 
 export const RangeWithShortcuts: Story = {
   render: (_args, ctx) => {
@@ -125,11 +157,10 @@ export const RangeWithShortcuts: Story = {
     );
   },
 };
-RangeWithShortcuts.storyName =
-  "Date range picker with shortcuts (basicPresets)";
+RangeWithShortcuts.storyName = "Range / With presets";
 
 export const MultiMonthRange: Story = {
-  parameters: { storyWidth: 915 },
+  parameters: { storyWidth: 900 },
   render: (_args, ctx) => {
     const [range, setRange] = useState<RangeValue>({ from: null, to: null });
     return (
@@ -152,7 +183,7 @@ export const MultiMonthRange: Story = {
     );
   },
 };
-MultiMonthRange.storyName = "Multi-month range picker (cols=2)";
+MultiMonthRange.storyName = "Range / Two months";
 
 export const MultipleDatePicker: Story = {
   render: (_args, ctx) => {
@@ -175,7 +206,7 @@ export const MultipleDatePicker: Story = {
     );
   },
 };
-MultipleDatePicker.storyName = "Multiple-date picker (maxDates=3)";
+MultipleDatePicker.storyName = "Multiple / Max 3 dates";
 
 export const DateAndTimePicker: Story = {
   render: (_args, ctx) => {
@@ -196,7 +227,7 @@ export const DateAndTimePicker: Story = {
     );
   },
 };
-DateAndTimePicker.storyName = "Date + time picker (Days + TimeGrid)";
+DateAndTimePicker.storyName = "Single / Date + time";
 
 export const TimeOnlyPicker: Story = {
   parameters: { chromatic: { disable: true } },
@@ -218,7 +249,7 @@ export const TimeOnlyPicker: Story = {
     );
   },
 };
-TimeOnlyPicker.storyName = "Time-only picker (TimeGrid only, no Days)";
+TimeOnlyPicker.storyName = "Standalone / Time only";
 
 export const ManualInputAndGrid: Story = {
   render: (_args, ctx) => {
@@ -239,7 +270,7 @@ export const ManualInputAndGrid: Story = {
     );
   },
 };
-ManualInputAndGrid.storyName = "Manual input + grid";
+ManualInputAndGrid.storyName = "Single / Manual input";
 
 export const ReadOnlyDisplay: Story = {
   render: (_args, ctx) => {
@@ -257,7 +288,7 @@ export const ReadOnlyDisplay: Story = {
     );
   },
 };
-ReadOnlyDisplay.storyName = "Read-only display (specific month, no selection)";
+ReadOnlyDisplay.storyName = "Display / Read-only";
 
 export const TrackDrivenPicker: Story = {
   render: (_args, ctx) => {
@@ -278,8 +309,53 @@ export const TrackDrivenPicker: Story = {
     );
   },
 };
-TrackDrivenPicker.storyName =
-  "Track-driven picker (Years + Months + DaysTrack)";
+TrackDrivenPicker.storyName = "Navigation / Tracks only";
+
+export const DaysAndMonthsGrid: Story = {
+  parameters: { storyWidth: 760 },
+  render: (_args, ctx) => {
+    const [date, setDate] = useState<Date | null>(FIXED_DATE);
+    return (
+      <Calendar
+        mode="single"
+        value={date}
+        onChange={setDate}
+        cols={3}
+        theme={resolveStoryTheme(ctx.globals.theme)}
+        appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
+      >
+        <CalendarNav label="Month grid" showMonthPicker compactYears />
+        <CalendarMonthsGrid col={1} />
+        <CalendarDays col={2} />
+      </Calendar>
+    );
+  },
+};
+DaysAndMonthsGrid.storyName = "Navigation / Month grid + days";
+
+export const DaysAndYearsGrid: Story = {
+  parameters: { storyWidth: 760 },
+  render: (_args, ctx) => {
+    const [date, setDate] = useState<Date | null>(FIXED_DATE);
+    return (
+      <Calendar
+        mode="single"
+        value={date}
+        onChange={setDate}
+        cols={3}
+        theme={resolveStoryTheme(ctx.globals.theme)}
+        appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
+      >
+        <CalendarNav label="Year grid" showMonthPicker compactYears />
+        <CalendarYearsGrid col={1} yearsPerPage={16} />
+        <CalendarDays col={2} />
+      </Calendar>
+    );
+  },
+};
+DaysAndYearsGrid.storyName = "Navigation / Year grid + days";
 
 export const DaysAndMonthsTrack: Story = {
   render: (_args, ctx) => {
@@ -300,7 +376,7 @@ export const DaysAndMonthsTrack: Story = {
     );
   },
 };
-DaysAndMonthsTrack.storyName = "Days + MonthsTrack (compact month switcher)";
+DaysAndMonthsTrack.storyName = "Navigation / Months track + days";
 
 export const WithGradient: Story = {
   render: (_args, ctx) => {
@@ -322,7 +398,7 @@ export const WithGradient: Story = {
     );
   },
 };
-WithGradient.storyName = "With gradient (gradient prop on selected cells)";
+WithGradient.storyName = "Display / Gradient cells";
 
 export const FlightTracks: Story = {
   render: (_args, ctx) => {
@@ -363,7 +439,7 @@ export const FlightTracks: Story = {
     );
   },
 };
-FlightTracks.storyName = "Flight tracks (two-bound range, tracks only)";
+FlightTracks.storyName = "Range / Flight tracks";
 FlightTracks.parameters = {
   storyWidth: 720,
   chromatic: { delay: 1000, pauseAnimationAtEnd: true },

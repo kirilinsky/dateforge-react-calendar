@@ -9,3 +9,5 @@ Add `getNumberFormat` to `intl-cache` so `Intl.NumberFormat` instances (used for
 Deduplicate wrap arithmetic in `StepDrum` by using the existing `getDrumValue` utility.
 
 Only fire `onTimeSelect` for accepted time changes.
+
+Remove second-step future shortcuts from `basicPresets`.

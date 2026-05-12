@@ -56,4 +56,53 @@
   .selectedOtherItem {
     color: inherit;
   }
+
+  .adaptiveTiles {
+    container-type: inline-size;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
+    gap: var(--adaptive-tile-gap, 0.45em);
+    padding: var(--adaptive-tiles-padding, 0.65em 0.55em);
+    height: auto;
+    transition:
+      color var(--cal-transition) linear,
+      background var(--cal-transition) linear,
+      box-shadow var(--cal-transition) linear;
+  }
+
+  .adaptiveTile {
+    --hover-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--c-b) 54%, transparent),
+      inset 0 -1px 0 color-mix(in srgb, var(--c-x) 11%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--c-x) 7%, transparent);
+
+    justify-self: stretch;
+    align-self: stretch;
+    flex: 1 1 var(--adaptive-tile-min-width, 6.25em);
+    max-width: var(--adaptive-tile-max-width, 9.75em);
+    width: 100%;
+    height: auto !important;
+    min-height: var(--adaptive-tile-min-height, 4.1em);
+    padding: var(--adaptive-tile-padding, 0.55em 0.75em) !important;
+    border: none;
+    border-radius: calc(var(--cal-radius, 0.5em) * 0.85);
+    font-size: var(--cal-text-sm) !important;
+    line-height: var(--cal-leading-normal);
+    white-space: normal;
+    text-align: center;
+    text-wrap: balance;
+    word-break: normal;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    background: color-mix(in srgb, var(--c-b) 22%, transparent);
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, var(--c-b) 48%, transparent),
+      inset 0 -1px 0 color-mix(in srgb, var(--c-x) 9%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--c-x) 5%, transparent);
+    transition:
+      background var(--cal-transition, 0.2s) ease,
+      color var(--cal-transition, 0.2s) ease;
+  }
 }

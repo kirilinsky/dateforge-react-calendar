@@ -26,7 +26,7 @@
   }
 
   .yearsSelector {
-    flex: 0 1 auto;
+    flex: 1 1 12em;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -35,14 +35,19 @@
     min-width: 0;
   }
 
+  .headerContainer:has(> .yearsSelector:first-child + .yearsSelector:last-child) .yearsSelector {
+    flex-basis: calc(50% - 0.18em);
+  }
+
   .currentYear {
     font-size: var(--cal-text-xl);
     font-weight: var(--cal-weight-bold);
     line-height: var(--cal-leading-none);
-    flex: 0 0 auto;
+    flex: 1 1 auto;
     margin: 0 0.3em;
     height: 2.3em;
     white-space: nowrap;
+    min-width: 0;
     &:active {
       transform: scale(0.96);
     }

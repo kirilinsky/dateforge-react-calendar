@@ -66,6 +66,50 @@ Within the boundaries of physics, our modules will try to make any composition y
 
 ---
 
+## Layout grid contract
+
+`<Calendar>` lays its children out with a CSS grid. The grid API is intentionally small, but the terms are easy to misread:
+
+- `cols` on `<Calendar>` sets the number of equal parent tracks: `repeat(cols, 1fr)`.
+- A child module with no `col` spans the full row: `grid-column: 1 / -1`.
+- `col={number}` means **span this many tracks**, not "place in this column".
+- `col={string}` is passed through as an explicit `grid-column` value for advanced placement.
+- The wrapper uses dense auto-flow, so modules are packed into available row space when their spans allow it.
+
+Common layouts:
+
+```tsx
+// Header full width, then two equal modules.
+<Calendar cols={2}>
+  <CalendarNav />
+  <CalendarMonthsGrid col={1} />
+  <CalendarDays col={1} />
+</Calendar>
+```
+
+```tsx
+// Sidebar + main content.
+<Calendar cols={3}>
+  <CalendarNav />
+  <CalendarPresets col={1} />
+  <CalendarDays col={2} />
+</Calendar>
+```
+
+```tsx
+// Left / main / right proportions.
+<Calendar cols={4}>
+  <CalendarNav />
+  <CalendarPresets col={1} />
+  <CalendarDays col={2} />
+  <CalendarTimeGrid col={1} />
+</Calendar>
+```
+
+Use string placement only when a module must start or end at a specific grid line; otherwise prefer numeric spans because they keep recipes readable.
+
+---
+
 ## Module classification
 
 Modules fall into two functional categories. The split matters for both UX reasoning and test planning.
