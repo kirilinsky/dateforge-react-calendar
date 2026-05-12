@@ -187,6 +187,9 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       if (next.viewDate !== prev.viewDate) {
         dispatch({ type: "NAVIGATE", date: next.viewDate });
       }
+      if (next.hoverDate !== prev.hoverDate) {
+        dispatch({ type: "HOVER", date: next.hoverDate });
+      }
       return true;
     },
     [deriveValue],
