@@ -20,10 +20,12 @@
   &::before {
     left: 0;
     background: linear-gradient(to right, var(--c-b) 5%, transparent);
+    transition: background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
   }
   &::after {
     right: 0;
     background: linear-gradient(to left, var(--c-b) 5%, transparent);
+    transition: background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
   }
 }
 
@@ -48,6 +50,9 @@
   box-shadow: var(--active-cell-stroke, var(--cal-shadow-md, 0 0.2em 0.6em var(--c-x)));
   pointer-events: none;
   z-index: 0;
+  transition:
+    background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+    box-shadow var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
 }
 
 .strip {
@@ -73,7 +78,10 @@
   text-shadow: 0 0 0.4em var(--c-b), 0 0 0.8em var(--c-b);
   cursor: pointer;
   user-select: none;
-  transition: opacity 0.05s linear;
+  transition:
+    color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+    opacity 0.05s linear,
+    text-shadow var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
 }
 
 .active {

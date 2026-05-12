@@ -22,7 +22,9 @@
   cursor: pointer;
   outline: none;
   border-radius: calc(var(--cal-radius, 0.5em) * 2);
-  transition: box-shadow calc(var(--cal-transition, 0.2s) * 0.75);
+  transition:
+    box-shadow calc(var(--cal-transition, 0.2s) * 0.75),
+    outline-color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
 }
 
 .drum:focus-visible {
@@ -42,6 +44,9 @@
   box-shadow: var(--active-cell-stroke, var(--cal-shadow-md, 0 0.2em 0.6em var(--c-x)));
   pointer-events: none;
   z-index: 0;
+  transition:
+    background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+    box-shadow var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
 }
 
 .item {
@@ -60,6 +65,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
 }
 
 .active {

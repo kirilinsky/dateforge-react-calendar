@@ -245,6 +245,27 @@ describe("dev-warn — yearsPerPage", () => {
   });
 });
 
+describe("dev-warn — yearsGrid startYear", () => {
+  it("warns when startYear is outside the supported range", () => {
+    render(
+      <Calendar value={new Date(2024, 5, 15)}>
+        <CalendarYearsGrid startYear={9999} />
+      </Calendar>,
+    );
+    expect(warnSpy).toHaveBeenCalled();
+    expect(lastMsg()).toContain("startYear");
+  });
+
+  it("does not warn on a valid startYear", () => {
+    render(
+      <Calendar value={new Date(2024, 5, 15)}>
+        <CalendarYearsGrid startYear={2014} />
+      </Calendar>,
+    );
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+});
+
 describe("dev-warn — dedupe", () => {
   it("warns only once for the same condition across renders", () => {
     const { rerender } = render(

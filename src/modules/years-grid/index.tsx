@@ -5,15 +5,16 @@ import { useNavigation } from "@/context/navigation-context";
 import { warnOnce } from "@/core/dev-warn";
 import shared from "@/global/global.module.css";
 import { useRovingTileFocus } from "@/hooks/use-roving-tile-focus";
+import { ChevronLeft, ChevronRight } from "@/Icons";
 import type { DisabledConfig } from "@/types/calendar";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
+import { MAX_CALENDAR_YEAR, MIN_CALENDAR_YEAR } from "@/utils/year-range";
 import styles from "./years-grid.module.css";
-
-const MIN_YEAR = 1900;
-const MAX_YEAR = 2100;
 
 export interface CalendarYearsGridProps {
   yearsPerPage?: number;
+  startYear?: number;
+  showControls?: boolean;
   disableOutOfRange?: boolean;
   hideOutOfRange?: boolean;
   col?: number | string;
@@ -24,32 +25,6 @@ export interface CalendarYearsGridProps {
    */
   onYearSelect?: (date: Date) => void;
 }
-
-const ChevronLeft = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    aria-hidden="true"
-    focusable="false"
-  >
-    <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
-  </svg>
-);
-
-const ChevronRight = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    aria-hidden="true"
-    focusable="false"
-  >
-    <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
-  </svg>
-);
 
 const isYearFullyDisabled = (
   year: number,
@@ -89,6 +64,8 @@ const isYearFullyDisabled = (
 
 export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
   yearsPerPage = 10,
+  startYear,
+  showControls = true,
   disableOutOfRange = true,
   hideOutOfRange = false,
   col,
@@ -109,42 +86,79 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
   const { minDate, maxDate, disabled } = useConfig();
   const { viewDate, navigateTo } = useNavigation();
 
-  const loYear = minDate ? minDate.getFullYear() : MIN_YEAR;
-  const hiYear = maxDate ? maxDate.getFullYear() : MAX_YEAR;
+  const minAllowedYear = minDate ? minDate.getFullYear() : MIN_CALENDAR_YEAR;
+  const maxAllowedYear = maxDate ? maxDate.getFullYear() : MAX_CALENDAR_YEAR;
   const currentYear = viewDate.getFullYear();
+  const hasCustomStartYear = startYear !== undefined;
+  const startYearIsInteger =
+    startYear === undefined ||
+    (Number.isFinite(startYear) && startYear === Math.floor(startYear));
+  const fallbackStartYear = hasCustomStartYear
+    ? MIN_CALENDAR_YEAR
+    : minAllowedYear;
+  const firstListYear = hasCustomStartYear
+    ? startYearIsInteger
+      ? Math.min(MAX_CALENDAR_YEAR, Math.max(MIN_CALENDAR_YEAR, startYear))
+      : fallbackStartYear
+    : fallbackStartYear;
 
-  const initialPage = Math.floor((currentYear - loYear) / pageSize);
+  if (
+    hasCustomStartYear &&
+    (!startYearIsInteger ||
+      startYear < MIN_CALENDAR_YEAR ||
+      startYear > MAX_CALENDAR_YEAR)
+  ) {
+    warnOnce(
+      "years-grid:start-year-clamped",
+      `<CalendarYearsGrid startYear={${startYear}} /> is out of the supported ${MIN_CALENDAR_YEAR}..${MAX_CALENDAR_YEAR} integer range. Using ${firstListYear}.`,
+    );
+  }
+
+  const initialPage = hasCustomStartYear
+    ? 0
+    : Math.floor((currentYear - firstListYear) / pageSize);
   const [page, setPage] = useState(initialPage);
   const [direction, setDirection] = useState<"left" | "right" | "none">("none");
 
   useEffect(() => {
-    const targetPage = Math.floor((currentYear - loYear) / pageSize);
-    if (targetPage !== page) {
-      setDirection(targetPage > page ? "right" : "left");
-      setPage(targetPage);
-    }
-  }, [currentYear, loYear, pageSize]);
+    if (hasCustomStartYear) return;
+    const targetPage = Math.floor((currentYear - firstListYear) / pageSize);
+    setPage((prevPage) => {
+      if (targetPage === prevPage) return prevPage;
+      setDirection(targetPage > prevPage ? "right" : "left");
+      return targetPage;
+    });
+  }, [currentYear, firstListYear, hasCustomStartYear, pageSize]);
+
+  const listEndYear = Math.max(firstListYear, maxAllowedYear);
+  const totalPages = Math.max(
+    1,
+    Math.ceil((listEndYear - firstListYear + 1) / pageSize),
+  );
 
   const navigate = (delta: number) => {
+    const nextPage = Math.min(totalPages - 1, Math.max(0, page + delta));
+    if (nextPage === page) return;
     setDirection(delta > 0 ? "right" : "left");
-    setPage((p) => p + delta);
+    setPage(nextPage);
   };
 
-  const totalPages = Math.ceil((hiYear - loYear + 1) / pageSize);
-
   const years = useMemo(() => {
-    const start = loYear + page * pageSize;
+    const start = firstListYear + page * pageSize;
     return Array.from({ length: pageSize }, (_, i) => {
       const year = start + i;
-      const outOfRange = year < loYear || year > hiYear;
+      const outOfRange = year < minAllowedYear || year > maxAllowedYear;
       const fullyDisabled =
         !outOfRange && isYearFullyDisabled(year, disabled, minDate, maxDate);
       const limited = outOfRange || fullyDisabled;
       return { year, limited, disabled: disableOutOfRange && limited };
-    }).filter(({ year }) => year >= MIN_YEAR && year <= MAX_YEAR);
+    }).filter(
+      ({ year }) => year >= MIN_CALENDAR_YEAR && year <= MAX_CALENDAR_YEAR,
+    );
   }, [
-    loYear,
-    hiYear,
+    firstListYear,
+    minAllowedYear,
+    maxAllowedYear,
     page,
     pageSize,
     disabled,
@@ -160,8 +174,10 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
     onYearSelect?.(next);
   };
 
-  const startYear = loYear + page * pageSize;
-  const endYear = Math.min(hiYear, startYear + pageSize - 1);
+  const pageStartYear = years[0]?.year ?? firstListYear + page * pageSize;
+  const pageEndYear =
+    years.at(-1)?.year ??
+    Math.min(MAX_CALENDAR_YEAR, pageStartYear + pageSize - 1);
   const activeIndex = years.findIndex(({ year }) => year === currentYear);
   const { containerRef, handleKeyDown, getItemProps } = useRovingTileFocus({
     itemCount: years.length,
@@ -173,36 +189,38 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
       data-area="years-grid"
       className={styles.root}
       role="group"
-      aria-label={`Select year, showing ${startYear} to ${endYear}`}
+      aria-label={`Select year, showing ${pageStartYear} to ${pageEndYear}`}
       style={getGridSlotStyle(col)}
     >
-      <div
-        className={styles.nav}
-        role="group"
-        aria-label="Year page navigation"
-      >
-        <button
-          type="button"
-          className={[shared.interactive, shared.hovered].join(" ")}
-          disabled={page <= 0}
-          aria-label="Previous years"
-          onClick={() => navigate(-1)}
+      {showControls && (
+        <div
+          className={styles.nav}
+          role="group"
+          aria-label="Year page navigation"
         >
-          <ChevronLeft />
-        </button>
-        <span className={styles.range} aria-live="polite">
-          {startYear}–{endYear}
-        </span>
-        <button
-          type="button"
-          className={[shared.interactive, shared.hovered].join(" ")}
-          disabled={page >= totalPages - 1}
-          aria-label="Next years"
-          onClick={() => navigate(1)}
-        >
-          <ChevronRight />
-        </button>
-      </div>
+          <button
+            type="button"
+            className={[shared.interactive, shared.hovered].join(" ")}
+            disabled={page <= 0}
+            aria-label="Previous years"
+            onClick={() => navigate(-1)}
+          >
+            <ChevronLeft />
+          </button>
+          <span className={styles.range} aria-live="polite">
+            {pageStartYear}–{pageEndYear}
+          </span>
+          <button
+            type="button"
+            className={[shared.interactive, shared.hovered].join(" ")}
+            disabled={page >= totalPages - 1}
+            aria-label="Next years"
+            onClick={() => navigate(1)}
+          >
+            <ChevronRight />
+          </button>
+        </div>
+      )}
       <div
         ref={containerRef}
         key={page}
