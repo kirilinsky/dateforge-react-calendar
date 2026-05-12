@@ -11,7 +11,7 @@
 .monthLabel {
   font-size: var(--cal-text-xs);
   font-weight: var(--cal-weight-regular);
-  color: var(--active-cell-color, var(--c-at, var(--c-a)));
+  color: inherit;
   text-transform: lowercase;
 }
 

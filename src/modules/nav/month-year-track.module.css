@@ -22,6 +22,7 @@
   cursor: pointer;
   outline: none;
   border-radius: calc(var(--cal-radius, 0.5em) * 2);
+  isolation: isolate;
   transition:
     box-shadow calc(var(--cal-transition, 0.2s) * 0.75),
     outline-color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
@@ -57,7 +58,8 @@
   justify-content: center;
   font-size: var(--cal-text-sm);
   font-weight: var(--cal-weight-regular);
-  color: var(--c-c);
+  color: #fff;
+  mix-blend-mode: difference;
   padding: 0.25em 0.4em;
   cursor: pointer;
   position: relative;
@@ -65,18 +67,19 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
+  transition: color 0.14s ease 0.04s;
 }
 
 .active {
   font-weight: var(--cal-weight-semibold);
   color: var(--active-cell-color, var(--c-at, var(--c-a)));
+  mix-blend-mode: normal;
   cursor: default;
 }
 
 .disabled {
   cursor: default;
-  color: var(--c-dt, var(--c-c));
+  opacity: 0.45;
 }
 
 }

@@ -7,6 +7,7 @@
   cursor: grab;
   touch-action: pan-y;
   z-index: 3;
+  isolation: isolate;
   &::before,
   &::after {
     content: "";
@@ -62,10 +63,13 @@
   height: 100%;
   display: flex;
   align-items: center;
+  z-index: 1;
   will-change: transform;
 }
 
 .item {
+  position: relative;
+  z-index: 1;
   flex-shrink: 0;
   width: var(--track-item-width, 4em);
   height: 2.6em;
@@ -74,21 +78,28 @@
   justify-content: center;
   font-size: var(--cal-text-md);
   font-weight: var(--cal-weight-regular);
-  color: var(--c-c);
-  text-shadow: 0 0 0.4em var(--c-b), 0 0 0.8em var(--c-b);
   cursor: pointer;
   user-select: none;
-  transition:
-    color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
-    opacity 0.05s linear,
-    text-shadow var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
+  transition: opacity 0.05s linear;
+}
+
+.itemText {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+  mix-blend-mode: difference;
+  pointer-events: none;
+  transition: color 0.14s ease 0.04s;
 }
 
 .active {
   font-weight: var(--cal-weight-semibold);
-  color: var(--active-cell-color, var(--c-at, var(--c-a)));
-  text-shadow: none;
   cursor: default;
+}
+
+.active .itemText {
+  color: var(--active-cell-color, var(--c-at, var(--c-a)));
+  mix-blend-mode: normal;
 }
 
 }
