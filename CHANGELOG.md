@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.4
+
+### Patch Changes
+
+- [#62](https://github.com/kirilinsky/dateforge-react-calendar/pull/62) [`9cd903e`](https://github.com/kirilinsky/dateforge-react-calendar/commit/9cd903e83beb2bce4c8fb7e274e590765fd87746) Thanks [@kirilinsky](https://github.com/kirilinsky)! - Fix stale hover preview in range mode after clearing and re-selecting the start day. Clicking the start of a complete range now clears both bounds.
+
+  Add `todayDot` prop to `CalendarDays` (default `true`) — renders a small `--c-b` dot under the digit when the selected day is also today.
+
 ## 1.4.3
 
 ### Patch Changes
