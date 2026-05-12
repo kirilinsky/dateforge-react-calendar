@@ -175,6 +175,44 @@ describe("controlled vs uncontrolled — value precedence", () => {
   });
 });
 
+describe("controlled range — hover sync", () => {
+  it("clearing range via start-click also clears stale hoverDate (controlled)", async () => {
+    const user = userEvent.setup();
+    const Wrap = () => {
+      const [val, setVal] = (
+        require("react") as typeof import("react")
+      ).useState<{ from: Date | null; to: Date | null }>({
+        from: null,
+        to: null,
+      });
+      return (
+        <Calendar
+          mode="range"
+          value={val}
+          onChange={(v) => setVal(v as { from: Date | null; to: Date | null })}
+          defaultViewDate={D}
+        >
+          <CalendarDays />
+        </Calendar>
+      );
+    };
+    const { container } = render(<Wrap />);
+    const start = findDayButton(container, 10);
+    const mid = findDayButton(container, 15);
+    const end = findDayButton(container, 20);
+    await user.click(start);
+    await user.hover(mid);
+    await user.click(end);
+    await user.click(findDayButton(container, 10));
+    await user.click(findDayButton(container, 10));
+    const grid = within(container).getByRole("grid");
+    const inRange = within(grid)
+      .getAllByRole("gridcell")
+      .filter((c) => c.querySelector("[data-in-range]"));
+    expect(inRange.length).toBe(0);
+  });
+});
+
 describe("Invalid Date — drop policy", () => {
   it("single mode: invalid value yields no selection (no silent today fallback)", () => {
     const { container } = render(
