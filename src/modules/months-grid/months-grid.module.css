@@ -1,14 +1,20 @@
 @layer cal-base {
+  .monthsWrapper {
+    display: flex;
+    flex-direction: column;
+    z-index: 2;
+  }
+
   .monthsContainer {
     container-type: inline-size;
+    flex: 1;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    align-content: center;
+    align-content: space-evenly;
     gap: 0.45em;
     padding: 0.65em 0.55em;
     --adaptive-tile-min-height: 3.4em;
     --adaptive-tile-padding: 0.45em 0.65em;
-    z-index: 2;
   }
 
   /* 12 months: 4×3 on medium+ */

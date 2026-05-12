@@ -27,7 +27,7 @@
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-auto-rows: auto;
-    align-content: center;
+    align-content: space-evenly;
     flex: 1;
     gap: 0.32em;
     padding: 0.45em 0.65em 0.8em;
