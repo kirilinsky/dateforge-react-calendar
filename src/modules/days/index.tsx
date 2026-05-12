@@ -209,6 +209,7 @@ export interface CalendarDaysProps {
   lockDeselection?: boolean;
   fixedRows?: boolean;
   blockNavigation?: boolean;
+  todayDot?: boolean;
 }
 
 export const CalendarDays: React.FC<CalendarDaysProps> = ({
@@ -227,6 +228,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   lockDeselection = false,
   fixedRows = true,
   blockNavigation = false,
+  todayDot = true,
 }) => {
   const { daysTrackActive } = useUI();
   const {
@@ -536,6 +538,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
         role="grid"
         aria-label={gridLabel}
         key={animationKey}
+        data-today-dot={todayDot || undefined}
         className={[
           styles.dayGridContainer,
           direction !== "none" ? styles[direction] : "",

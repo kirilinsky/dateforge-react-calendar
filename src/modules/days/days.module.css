@@ -115,7 +115,7 @@
   box-shadow: var(--active-cell-stroke, var(--active-shadow, 0 0.2em 0.6em var(--c-x))) !important;
 }
 
-.dayItem[data-selected][aria-current="date"]::after {
+.dayGridContainer[data-today-dot] .dayItem[data-selected][aria-current="date"]::after {
   content: "";
   position: absolute;
   bottom: 0.35em;

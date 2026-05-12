@@ -99,6 +99,7 @@ export const FeedbackAndClear: Story = {
           label="Selection feedback"
           showMonthPicker
           compactYears
+          home
           clear
         />
         <CalendarDays />
@@ -107,7 +108,7 @@ export const FeedbackAndClear: Story = {
     );
   },
 };
-FeedbackAndClear.storyName = "Single / Feedback + clear";
+FeedbackAndClear.storyName = "Single / Feedback + home + clear";
 
 export const RangePicker: Story = {
   render: (_args, ctx) => {
@@ -122,8 +123,8 @@ export const RangePicker: Story = {
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
-        <CalendarNav label="Pick range" showMonthPicker compactYears clear />
-        <CalendarDays />
+        <CalendarNav label="Range" showMonthPicker yearLabel clear />
+        <CalendarDays boldWeekends />
         <CalendarSelectedDates />
       </Calendar>
     );
@@ -243,7 +244,7 @@ export const TimeOnlyPicker: Story = {
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
-        <CalendarNav label="Select time" />
+        <CalendarNav label="Select time" themeToggle />
         <CalendarTimeGrid seconds />
       </Calendar>
     );
