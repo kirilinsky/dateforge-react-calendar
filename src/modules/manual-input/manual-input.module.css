@@ -46,7 +46,10 @@
     background: var(--c-t);
     border: var(--cal-border) solid transparent;
     border-radius: var(--cal-radius, 0.5em);
-    transition: all var(--cal-transition, 0.2s) ease;
+    transition:
+      background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      border-color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      box-shadow var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
     overflow: hidden;
     animation: msSlotIn var(--cal-transition, 0.2s) ease;
   }
@@ -104,7 +107,10 @@
     background: transparent;
     color: var(--c-h);
     cursor: pointer;
-    transition: all var(--cal-transition, 0.2s) ease;
+    transition:
+      background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      border-color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
     flex-shrink: 0;
 
     & svg {
@@ -132,7 +138,10 @@
     border: var(--cal-border) solid transparent;
     border-radius: var(--cal-radius, 0.5em);
     overflow: hidden;
-    transition: all var(--cal-transition, 0.2s) ease;
+    transition:
+      background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      border-color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      box-shadow var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
     animation: msSlotIn var(--cal-transition, 0.2s) ease;
     box-shadow: var(--active-cell-stroke, none);
 
@@ -156,7 +165,7 @@
     color: var(--c-c);
     cursor: pointer;
     user-select: none;
-    transition: color var(--cal-transition, 0.2s) ease;
+    transition: color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
     overflow: hidden;
     text-overflow: ellipsis;
   }
@@ -172,7 +181,10 @@
     background: transparent;
     color: var(--c-m, var(--c-c));
     cursor: pointer;
-    transition: all var(--cal-transition, 0.2s) ease;
+    transition:
+      background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      border-color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
     flex-shrink: 0;
 
     & svg {

@@ -120,15 +120,7 @@ const DayCell = React.memo(function DayCell({
 }: DayCellProps) {
   const fullDate = useMemo(() => new Date(dateTime), [dateTime]);
 
-  const isToday =
-    !!highlightToday &&
-    isTodayDate &&
-    !isRangeStart &&
-    !isRangeEnd &&
-    !isInRange &&
-    !isPreviewStart &&
-    !isPreviewEnd &&
-    !isPreviewMid;
+  const isToday = !!highlightToday && isTodayDate;
 
   const isOtherMonth = !isCurrentMonth;
   const isHighlighted =

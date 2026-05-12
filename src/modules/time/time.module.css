@@ -5,7 +5,10 @@
   position: relative;
   padding: var(--cal-spacing);
   min-height: 10em;
-  transition: all var(--cal-transition) linear;
+  transition:
+    background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+    box-shadow var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+    color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
   display: flex;
   flex-direction: column;
   align-items: stretch;

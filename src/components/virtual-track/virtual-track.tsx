@@ -178,7 +178,9 @@ export const VirtualTrack: React.FC<VirtualTrackProps> = ({
               aria-hidden={!isActive}
               onClick={!isActive ? () => scrollTo(round + o) : undefined}
             >
-              {renderItem({ idx, raw, isActive })}
+              <span className={styles.itemText}>
+                {renderItem({ idx, raw, isActive })}
+              </span>
             </div>
           );
         })}
