@@ -1,4 +1,6 @@
 import { StepDrum } from "@/components/step-drum/step-drum";
+import { getNumberFormat } from "@/utils/intl-cache";
+import { padTime } from "@/utils/time-utils";
 import styles from "./time-track.module.css";
 
 interface TimeStep {
@@ -40,16 +42,12 @@ const makeUnitFormatter = (
   locale: string,
   unit: "hour" | "minute" | "second",
 ) => {
-  try {
-    const fmt = new Intl.NumberFormat(locale, {
-      style: "unit",
-      unit,
-      unitDisplay: "long",
-    });
-    return (v: number) => fmt.format(v);
-  } catch {
-    return (v: number) => String(v);
-  }
+  const fmt = getNumberFormat(locale, {
+    style: "unit",
+    unit,
+    unitDisplay: "long",
+  });
+  return fmt ? (v: number) => fmt.format(v) : (v: number) => String(v);
 };
 
 export const TimeTrack = ({
@@ -124,13 +122,14 @@ export const TimeTrack = ({
             </span>
           )}
           <StepDrum
-            value={hours}
+            value={hour12 ? hours - 1 : hours}
             max={hourMax}
             step={hourStep}
             label="Hours"
-            getValueText={hourText}
+            getValueText={hour12 ? (v) => hourText(v + 1) : hourText}
+            format={hour12 ? (v) => padTime(v + 1) : undefined}
             readOnly={readOnly}
-            onChange={(h) => emit(h, minutes, seconds, period)}
+            onChange={(h) => emit(hour12 ? h + 1 : h, minutes, seconds, period)}
           />
         </div>
         <div className={styles.colonCol} aria-hidden>

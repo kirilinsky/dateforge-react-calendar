@@ -6,7 +6,6 @@ import {
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import { useSelectionActions } from "@/context/selection-context";
-import shared from "@/global/global.module.css";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import styles from "./time.module.css";
 
@@ -42,14 +41,15 @@ export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
   const { onChangeTime } = useSelectionActions();
 
   const handleChange = (next: Date) => {
-    onChangeTime(next);
-    onTimeSelect?.(next);
+    if (onChangeTime(next)) {
+      onTimeSelect?.(next);
+    }
   };
 
   return (
     <div
       data-area="time"
-      className={`${styles.timeContainer} ${shared.flexCenter}`}
+      className={styles.timeContainer}
       style={getGridSlotStyle(col)}
     >
       <TimeTrack

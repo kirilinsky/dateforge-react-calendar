@@ -15,8 +15,9 @@ export const getTimeString = (
   date: Date,
   hour12 = false,
   showSeconds = false,
+  locale = "en",
 ): string =>
-  getDateTimeFormat("en", {
+  getDateTimeFormat(locale, {
     hour: "numeric",
     minute: "2-digit",
     ...(showSeconds ? { second: "2-digit" } : {}),
