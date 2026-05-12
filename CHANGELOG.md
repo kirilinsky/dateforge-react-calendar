@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.4.3
+
+### Patch Changes
+
+- [#60](https://github.com/kirilinsky/dateforge-react-calendar/pull/60) [`1cc5f5a`](https://github.com/kirilinsky/dateforge-react-calendar/commit/1cc5f5af2de974b9bb7195024bd00bc093da368f) Thanks [@kirilinsky](https://github.com/kirilinsky)! - Fix `getTimeString` ignoring locale (always formatted with `"en"`). Add `locale` parameter; update both call sites in `CalendarNav` to pass the configured locale.
+
+  Add `getNumberFormat` to `intl-cache` so `Intl.NumberFormat` instances (used for unit labels in the time track) are cached across renders instead of recreated each time.
+
+  Deduplicate wrap arithmetic in `StepDrum` by using the existing `getDrumValue` utility.
+
+  Only fire `onTimeSelect` for accepted time changes.
+
+  Remove second-step future shortcuts from `basicPresets`.
+
 ## 1.4.2
 
 ### Patch Changes
