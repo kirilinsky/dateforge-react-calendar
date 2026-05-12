@@ -339,6 +339,31 @@ describe("SELECT range", () => {
     expect(state.rangeEnd).toBeNull();
   });
 
+  it("click rangeStart when range is complete clears both bounds", () => {
+    const a = d(2024, 6, 1);
+    const b = d(2024, 6, 10);
+    let state = calendarReducer(baseState, {
+      type: "SELECT",
+      date: a,
+      config: rangeCfg(),
+    });
+    state = calendarReducer(state, {
+      type: "SELECT",
+      date: b,
+      config: rangeCfg(),
+    });
+    expect(state.rangeStart!.getTime()).toBe(a.getTime());
+    expect(state.rangeEnd!.getTime()).toBe(b.getTime());
+    state = calendarReducer(state, {
+      type: "SELECT",
+      date: a,
+      config: rangeCfg(),
+    });
+    expect(state.rangeStart).toBeNull();
+    expect(state.rangeEnd).toBeNull();
+    expect(state.hoverDate).toBeNull();
+  });
+
   it("when rangeEnd exists, next click restarts range", () => {
     const a = d(2024, 6, 1);
     const b = d(2024, 6, 10);
