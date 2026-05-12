@@ -77,46 +77,50 @@ export const CalendarMonthsGrid: React.FC<CalendarMonthsGridProps> = ({
 
   return (
     <div
-      ref={containerRef}
-      className={styles.monthsContainer}
+      className={styles.monthsWrapper}
       data-area="months"
-      role="group"
-      aria-label={`Select month, ${gridLabel}`}
-      onKeyDown={handleKeyDown}
       style={getGridSlotStyle(col)}
     >
-      {mNames.map((n, i) => {
-        const isCurrent = i === currentMonth;
-        const isHidden = hideOutOfRange && n.limited;
-        const isDisabled = n.disabled || isHidden;
-        const fullLabel =
-          longFmt.format(new Date(currentYear, i, 1)) +
-          (isDisabled && !isHidden ? ", limited" : "");
-        return (
-          <button
-            key={`${currentYear}-${n.label}`}
-            type="button"
-            {...getItemProps(i)}
-            className={[
-              styles.item,
-              shared.adaptiveTile,
-              shared.interactive,
-              shared.hovered,
-              isCurrent ? shared.activeItem : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-            aria-label={fullLabel}
-            aria-current={isCurrent ? "true" : undefined}
-            aria-disabled={isDisabled || undefined}
-            aria-hidden={isHidden || undefined}
-            style={isHidden ? { visibility: "hidden" } : undefined}
-            onClick={() => !isDisabled && handleClick(i)}
-          >
-            {n.label}
-          </button>
-        );
-      })}
+      <div
+        ref={containerRef}
+        className={styles.monthsContainer}
+        role="group"
+        aria-label={`Select month, ${gridLabel}`}
+        onKeyDown={handleKeyDown}
+      >
+        {mNames.map((n, i) => {
+          const isCurrent = i === currentMonth;
+          const isHidden = hideOutOfRange && n.limited;
+          const isDisabled = n.disabled || isHidden;
+          const fullLabel =
+            longFmt.format(new Date(currentYear, i, 1)) +
+            (isDisabled && !isHidden ? ", limited" : "");
+          return (
+            <button
+              key={`${currentYear}-${n.label}`}
+              type="button"
+              {...getItemProps(i)}
+              className={[
+                styles.item,
+                shared.adaptiveTile,
+                shared.interactive,
+                shared.hovered,
+                isCurrent ? shared.activeItem : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              aria-label={fullLabel}
+              aria-current={isCurrent ? "true" : undefined}
+              aria-disabled={isDisabled || undefined}
+              aria-hidden={isHidden || undefined}
+              style={isHidden ? { visibility: "hidden" } : undefined}
+              onClick={() => !isDisabled && handleClick(i)}
+            >
+              {n.label}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 };
