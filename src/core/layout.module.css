@@ -1,3 +1,18 @@
+@property --c-a { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
+@property --c-at { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
+@property --c-b { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
+@property --c-h { syntax: "<color>"; inherits: true; initial-value: #1a1a1c; }
+@property --c-t { syntax: "<color>"; inherits: true; initial-value: #f4f4f4; }
+@property --c-c { syntax: "<color>"; inherits: true; initial-value: #1a1a1c; }
+@property --c-s { syntax: "<color>"; inherits: true; initial-value: #e8e8e8; }
+@property --c-x { syntax: "<color>"; inherits: true; initial-value: rgba(26,26,28,0.078); }
+@property --c-d { syntax: "<color>"; inherits: true; initial-value: #a0a0a2; }
+@property --c-m { syntax: "<color>"; inherits: true; initial-value: #6e6e6f; }
+@property --c-dt { syntax: "<color>"; inherits: true; initial-value: #686869; }
+@property --c-we { syntax: "<color>"; inherits: true; initial-value: #c62828; }
+@property --c-r { syntax: "<color>"; inherits: true; initial-value: #4a90d9; }
+@property --c-e { syntax: "<color>"; inherits: true; initial-value: #dc2626; }
+
 @layer themes {
   :global([data-theme="light"]),
   :global([data-theme="auto"]) {
@@ -95,6 +110,21 @@
     font-size: var(--cal-font-size, clamp(11px, 2.7cqw, 18px));
     background: var(--c-s);
     color: var(--c-c);
+    transition:
+      --c-a var(--cal-transition) linear,
+      --c-at var(--cal-transition) linear,
+      --c-b var(--cal-transition) linear,
+      --c-h var(--cal-transition) linear,
+      --c-t var(--cal-transition) linear,
+      --c-c var(--cal-transition) linear,
+      --c-s var(--cal-transition) linear,
+      --c-x var(--cal-transition) linear,
+      --c-d var(--cal-transition) linear,
+      --c-m var(--cal-transition) linear,
+      --c-dt var(--cal-transition) linear,
+      --c-we var(--cal-transition) linear,
+      --c-r var(--cal-transition) linear,
+      --c-e var(--cal-transition) linear;
     font-family: var(--cal-font);
     font-kerning: normal;
     font-optical-sizing: auto;
