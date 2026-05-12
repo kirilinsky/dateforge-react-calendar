@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.5
+
+### Patch Changes
+
+- [#64](https://github.com/kirilinsky/dateforge-react-calendar/pull/64) [`09a4194`](https://github.com/kirilinsky/dateforge-react-calendar/commit/09a4194a26ddf4d379850ec808bbf9307a383d36) Thanks [@kirilinsky](https://github.com/kirilinsky)! - Add `startYear` and `showControls` to `CalendarYearsGrid`, refresh selected date chip styles, and improve track text contrast.
+
 ## 1.4.4
 
 ### Patch Changes
