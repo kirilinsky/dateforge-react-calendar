@@ -162,6 +162,10 @@ function selectRange(
 ): CalendarState {
   const { rangeStart, rangeEnd } = state;
 
+  if (rangeStart && rangeEnd && isSameDay(date, rangeStart)) {
+    return { ...state, rangeStart: null, rangeEnd: null, hoverDate: null };
+  }
+
   if (!rangeStart || (rangeStart && rangeEnd)) {
     const range = validateRange(date, null, config);
     if (!range) return state;

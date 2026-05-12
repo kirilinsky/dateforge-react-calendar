@@ -93,6 +93,19 @@
   box-shadow: var(--active-cell-stroke, var(--active-shadow, 0 0.2em 0.6em var(--c-x))) !important;
 }
 
+.dayItem[data-selected][aria-current="date"]::after {
+  content: "";
+  position: absolute;
+  bottom: 0.35em;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0.26em;
+  height: 0.26em;
+  border-radius: 50%;
+  background: var(--c-b);
+  pointer-events: none;
+}
+
 .rangeStart {
   border-radius: var(--cal-radius, 0.5em) 0 0 var(--cal-radius, 0.5em) !important;
   box-shadow: calc(var(--day-gap) / 2) 0 0 0 var(--c-h) !important;
