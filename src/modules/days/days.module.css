@@ -55,6 +55,28 @@
   --hover-outline: var(--cal-today-outline-width, 1px) solid color-mix(in srgb, var(--c-h) 50%, transparent);
 }
 
+.todayItem::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0.34em;
+  width: 0.22em;
+  height: 0.22em;
+  border-radius: 50%;
+  background: currentColor;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.todayItem[data-selected] {
+  padding-bottom: 0.22em;
+}
+
+.todayItem[data-selected]::after {
+  bottom: 0.46em;
+  background: var(--active-cell-color, var(--c-at, var(--c-a)));
+}
+
 .boldWeekend {
   font-weight: var(--cal-weight-bold);
 }

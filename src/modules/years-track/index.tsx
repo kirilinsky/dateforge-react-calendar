@@ -8,13 +8,12 @@ import {
 } from "@/context/selection-context";
 import { useBoundDateView } from "@/hooks/use-bound-date-view";
 import { clampBoundDate, computeBoundLimits } from "@/utils/clamp-bound-date";
+import { MAX_CALENDAR_YEAR, MIN_CALENDAR_YEAR } from "@/utils/year-range";
 import styles from "./years-track.module.css";
 
-const MIN_YEAR = 1900;
-const MAX_YEAR = 2100;
 const YEARS = Array.from(
-  { length: MAX_YEAR - MIN_YEAR + 1 },
-  (_, i) => MIN_YEAR + i,
+  { length: MAX_CALENDAR_YEAR - MIN_CALENDAR_YEAR + 1 },
+  (_, i) => MIN_CALENDAR_YEAR + i,
 );
 
 export interface CalendarYearsTrackProps {
@@ -46,7 +45,7 @@ export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({
   });
   const currentIndex = Math.max(
     0,
-    Math.min(YEARS.length - 1, refDate.getFullYear() - MIN_YEAR),
+    Math.min(YEARS.length - 1, refDate.getFullYear() - MIN_CALENDAR_YEAR),
   );
 
   const refYear = refDate.getFullYear();
@@ -63,16 +62,16 @@ export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({
   });
 
   const minFromAbs = minDate
-    ? Math.max(0, minDate.getFullYear() - MIN_YEAR)
+    ? Math.max(0, minDate.getFullYear() - MIN_CALENDAR_YEAR)
     : undefined;
   const maxFromAbs = maxDate
-    ? Math.min(YEARS.length - 1, maxDate.getFullYear() - MIN_YEAR)
+    ? Math.min(YEARS.length - 1, maxDate.getFullYear() - MIN_CALENDAR_YEAR)
     : undefined;
   const minFromBound = Number.isFinite(boundLimits.yearMin)
-    ? Math.max(0, boundLimits.yearMin - MIN_YEAR)
+    ? Math.max(0, boundLimits.yearMin - MIN_CALENDAR_YEAR)
     : undefined;
   const maxFromBound = Number.isFinite(boundLimits.yearMax)
-    ? Math.min(YEARS.length - 1, boundLimits.yearMax - MIN_YEAR)
+    ? Math.min(YEARS.length - 1, boundLimits.yearMax - MIN_CALENDAR_YEAR)
     : undefined;
 
   const minCandidates = [minFromAbs, minFromBound].filter(

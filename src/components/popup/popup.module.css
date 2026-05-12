@@ -35,6 +35,10 @@
     box-shadow: 0 0.4em 2em var(--c-x);
     user-select: none;
     box-sizing: border-box;
+    transition:
+      background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      border-color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      box-shadow var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
   }
 
   .popup[data-direction="down"] {
@@ -57,7 +61,11 @@
     font-size: 1em;
     font-weight: var(--cal-weight-bold);
     cursor: pointer;
-    transition: opacity var(--cal-transition, 0.2s);
+    transition:
+      background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      box-shadow var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      opacity var(--cal-transition, 0.2s) ease;
     box-shadow: var(--active-cell-stroke, var(--cal-shadow-md, 0 0.22em 0.6em var(--c-x)));
     flex-shrink: 0;
   }

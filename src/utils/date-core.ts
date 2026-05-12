@@ -1,4 +1,5 @@
 import type { DisabledConfig, DisabledRule } from "@/types/calendar";
+import { MAX_CALENDAR_YEAR, MIN_CALENDAR_YEAR } from "@/utils/year-range";
 
 const daysInMonth = (year: number, month: number) =>
   new Date(year, month + 1, 0).getDate();
@@ -154,10 +155,8 @@ export const checkYearNavigation = (
         : endDate
       : (dMax ?? endDate ?? null);
 
-  const MIN = 1900,
-    MAX = 2100;
-  const minYear = getYearSafe(effectiveStart) ?? MIN;
-  const maxYear = getYearSafe(effectiveEnd) ?? MAX;
+  const minYear = getYearSafe(effectiveStart) ?? MIN_CALENDAR_YEAR;
+  const maxYear = getYearSafe(effectiveEnd) ?? MAX_CALENDAR_YEAR;
   const startYear = Array.isArray(payload) ? payload[0].value : payload;
   const endYear = Array.isArray(payload)
     ? payload[payload.length - 1].value
@@ -178,8 +177,8 @@ export const checkYearNavigation = (
   }
 
   return {
-    canGoPrev: startYear > Math.max(minYear, MIN),
-    canGoNext: endYear < Math.min(maxYear, MAX),
+    canGoPrev: startYear > Math.max(minYear, MIN_CALENDAR_YEAR),
+    canGoNext: endYear < Math.min(maxYear, MAX_CALENDAR_YEAR),
     canGoPrevMonth,
     canGoNextMonth,
   };

@@ -79,6 +79,8 @@
     --cal-leading-normal: 1.3;
     --cal-leading-relaxed: 1.6;
     --cal-transition: 0.2s;
+    --cal-paint-transition: var(--cal-transition, 0.2s);
+    --cal-paint-easing: linear;
     --cal-border: 1px;
     --cal-spacing: 0.6em;
     --cal-shadow-sm: 0 0.1em 0.3em var(--c-x);
@@ -105,10 +107,21 @@
     border: var(--cal-border) solid var(--c-s);
     box-shadow: var(--cal-shadow-lg);
     overflow: hidden;
+    transition:
+      background var(--cal-paint-transition) var(--cal-paint-easing),
+      border-color var(--cal-paint-transition) var(--cal-paint-easing),
+      box-shadow var(--cal-paint-transition) var(--cal-paint-easing),
+      color var(--cal-paint-transition) var(--cal-paint-easing);
   }
 
   .calendarContainer * {
     box-sizing: border-box;
+  }
+
+  :where(.calendarContainer, .calendarContainer *, .calendarContainer *::before, .calendarContainer *::after) {
+    transition-property: background, border-color, box-shadow, color, fill, outline-color, stroke, text-shadow;
+    transition-duration: var(--cal-paint-transition);
+    transition-timing-function: var(--cal-paint-easing);
   }
 
   :where(.calendarContainer) :where(button, input) {
@@ -122,6 +135,9 @@
     overflow: hidden;
     background: var(--c-b);
     grid-column: 1 / -1;
+    transition:
+      background var(--cal-paint-transition) var(--cal-paint-easing),
+      outline-color var(--cal-paint-transition) var(--cal-paint-easing);
   }
 
   .calendarContainer.gradient {
@@ -162,6 +178,9 @@
     padding: 2.5em 2em;
     text-align: center;
     background: var(--c-b);
+    transition:
+      background var(--cal-paint-transition) var(--cal-paint-easing),
+      color var(--cal-paint-transition) var(--cal-paint-easing);
   }
 
   .emptyStateTitle {
@@ -184,18 +203,4 @@
     }
   }
 
-  .secondMonthLabel {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.5em;
-    min-height: 3em;
-    font-size: var(--cal-text-base);
-    font-weight: var(--cal-weight-bold);
-    border-top: var(--cal-border) solid var(--c-s);
-    border-bottom: var(--cal-border) solid var(--c-s);
-    background: var(--c-a);
-    color: var(--c-c);
-    grid-column: 1 / -1;
-  }
 }

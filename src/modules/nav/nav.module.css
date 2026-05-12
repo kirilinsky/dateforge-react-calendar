@@ -18,7 +18,10 @@
     z-index: 3;
     position: relative;
     box-sizing: border-box;
-    transition: all var(--cal-transition) linear;
+    transition:
+      background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      box-shadow var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
     overflow: hidden;
     &:hover {
       box-shadow: 0 0.1em 0.1em var(--c-x);

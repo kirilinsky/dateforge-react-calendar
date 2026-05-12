@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarYearsGrid } from "@/modules/years-grid";
+import { MAX_CALENDAR_YEAR, MIN_CALENDAR_YEAR } from "@/utils/year-range";
 import { FIXED_DATE } from "../_constants";
 import {
   resolveStoryAppearance,
@@ -11,6 +12,8 @@ import {
 
 type YearsGridArgs = {
   yearsPerPage?: number;
+  startYear?: number;
+  showControls?: boolean;
   disableOutOfRange?: boolean;
   hideOutOfRange?: boolean;
 };
@@ -19,11 +22,20 @@ const meta: Meta<YearsGridArgs> = {
   title: "Modules/YearsGrid",
   argTypes: {
     yearsPerPage: { control: { type: "number", min: 1, max: 40 } },
+    startYear: {
+      control: {
+        type: "number",
+        min: MIN_CALENDAR_YEAR,
+        max: MAX_CALENDAR_YEAR,
+      },
+    },
+    showControls: { control: "boolean" },
     disableOutOfRange: { control: "boolean" },
     hideOutOfRange: { control: "boolean" },
   },
   args: {
     yearsPerPage: 10,
+    showControls: true,
     disableOutOfRange: true,
     hideOutOfRange: false,
   },
@@ -39,6 +51,8 @@ const meta: Meta<YearsGridArgs> = {
       >
         <CalendarYearsGrid
           yearsPerPage={args.yearsPerPage}
+          startYear={args.startYear}
+          showControls={args.showControls}
           disableOutOfRange={args.disableOutOfRange}
           hideOutOfRange={args.hideOutOfRange}
         />
@@ -58,6 +72,16 @@ export const DecadePagination: Story = {
 };
 DecadePagination.storyName = "Decade pagination (yearsPerPage=10)";
 
+export const CustomStartYear: Story = {
+  args: { yearsPerPage: 12, startYear: 2014 },
+};
+CustomStartYear.storyName = "Custom start year";
+
+export const WithoutControls: Story = {
+  args: { showControls: false, yearsPerPage: 12, startYear: 2014 },
+};
+WithoutControls.storyName = "Without pagination controls";
+
 export const WithDisabledRange: Story = {
   render: (args, ctx) => {
     const [date, setDate] = useState<Date | null>(FIXED_DATE);
@@ -73,6 +97,8 @@ export const WithDisabledRange: Story = {
       >
         <CalendarYearsGrid
           yearsPerPage={args.yearsPerPage}
+          startYear={args.startYear}
+          showControls={args.showControls}
           disableOutOfRange={args.disableOutOfRange}
           hideOutOfRange={args.hideOutOfRange}
         />
@@ -98,6 +124,8 @@ export const HideOutOfRange: Story = {
       >
         <CalendarYearsGrid
           yearsPerPage={args.yearsPerPage}
+          startYear={args.startYear}
+          showControls={args.showControls}
           disableOutOfRange={args.disableOutOfRange}
           hideOutOfRange={args.hideOutOfRange}
         />
@@ -122,6 +150,8 @@ export const StandaloneYearPicker: Story = {
         >
           <CalendarYearsGrid
             yearsPerPage={args.yearsPerPage}
+            startYear={args.startYear}
+            showControls={args.showControls}
             disableOutOfRange={args.disableOutOfRange}
             hideOutOfRange={args.hideOutOfRange}
             onYearSelect={setPicked}

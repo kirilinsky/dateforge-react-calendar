@@ -22,7 +22,6 @@
   font-size: calc(var(--cal-text-2xs) * 0.85);
 }
 
-.weekendDark,
 .weekendLight {
   color: var(--c-we);
   font-weight: var(--cal-weight-bold);

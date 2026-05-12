@@ -15,6 +15,9 @@ const yearButton = (container: HTMLElement, label: number) =>
     b.getAttribute("aria-label")?.startsWith(`${label}`),
   );
 
+const yearTiles = (container: HTMLElement) =>
+  yearButtons(container).filter((b) => /^\d{4}/.test(b.textContent ?? ""));
+
 describe("CalendarYearsGrid", () => {
   it("clicking a year navigates viewDate to that year", async () => {
     const { container } = render(
@@ -74,6 +77,27 @@ describe("CalendarYearsGrid", () => {
       ) as HTMLElement
     ).textContent;
     expect(back).toBe(before);
+  });
+
+  it("startYear sets the first rendered year", () => {
+    const { container } = render(
+      <Calendar value={new Date(2024, 5, 15)}>
+        <CalendarYearsGrid yearsPerPage={6} startYear={2014} />
+      </Calendar>,
+    );
+    expect(yearTiles(container)[0]?.textContent).toBe("2014");
+    expect(yearTiles(container).at(-1)?.textContent).toBe("2019");
+  });
+
+  it("showControls=false hides the pagination controls", () => {
+    const { container, queryByLabelText } = render(
+      <Calendar value={new Date(2024, 5, 15)}>
+        <CalendarYearsGrid yearsPerPage={10} showControls={false} />
+      </Calendar>,
+    );
+    expect(queryByLabelText("Previous years")).toBeNull();
+    expect(queryByLabelText("Next years")).toBeNull();
+    expect(yearButton(container, 2024)).toBeTruthy();
   });
 
   it("Previous chevron is disabled at the first page (minDate-bounded)", () => {

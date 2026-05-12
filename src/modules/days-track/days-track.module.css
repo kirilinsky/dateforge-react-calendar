@@ -28,6 +28,11 @@
   border-radius: calc(var(--cal-radius, 0.5em) * 99);
   z-index: 4;
   box-shadow: var(--active-cell-stroke, var(--cal-shadow-md, 0 0.2em 0.6em var(--c-x)));
+  transition:
+    background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+    box-shadow var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+    color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+    transform var(--cal-transition, 0.2s) ease;
   & svg {
     width: 1.1em;
     height: 1.1em;

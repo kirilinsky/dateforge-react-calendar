@@ -723,6 +723,12 @@ Full-page **year navigation grid** with pagination. Clicking a year sets `viewDa
 <CalendarYearsGrid yearsPerPage={12} />
 ```
 
+Custom first year / no pagination controls:
+
+```tsx
+<CalendarYearsGrid startYear={2014} yearsPerPage={12} showControls={false} />
+```
+
 Standalone year picker:
 
 ```tsx
@@ -736,6 +742,8 @@ Standalone year picker:
 | Prop                | Type                   | Default | Description                                                                                       |
 | ------------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------------- |
 | `yearsPerPage`      | `number`               | `10`    | Number of years shown per page. Integer in 1..40; out-of-range values are clamped and warn in dev |
+| `startYear`         | `number`               | —       | First year rendered on the first page. Integer in 1900..2100; out-of-range values are clamped     |
+| `showControls`      | `boolean`              | `true`  | Render the previous/next pagination controls and visible year range label                         |
 | `disableOutOfRange` | `boolean`              | `true`  | Disable years outside `minDate`/`maxDate` range                                                   |
 | `hideOutOfRange`    | `boolean`              | `false` | Completely hide years outside the allowed range                                                   |
 | `col`               | `number \| string`     | —       | CSS grid `grid-column` value                                                                      |
