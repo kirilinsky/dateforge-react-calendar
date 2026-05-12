@@ -170,18 +170,24 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   );
 
   const commitSelection = useCallback(
-    (action: Parameters<typeof calendarReducer>[1]) => {
+    (action: Parameters<typeof calendarReducer>[1]): boolean => {
+      const prev = stateRef.current;
+      const next = calendarReducer(prev, action);
+      if (next === prev) return false;
+
       if (!isControlledRef.current) {
         dispatch(action);
-        return;
+        return true;
       }
-      const next = calendarReducer(stateRef.current, action);
-      if (next === stateRef.current) return;
-      const nextValue = deriveValue(next);
-      onChangeRef.current?.(nextValue as CalendarValue<M>);
-      if (next.viewDate !== stateRef.current.viewDate) {
+
+      if (next.notifySeq !== prev.notifySeq) {
+        const nextValue = deriveValue(next);
+        onChangeRef.current?.(nextValue as CalendarValue<M>);
+      }
+      if (next.viewDate !== prev.viewDate) {
         dispatch({ type: "NAVIGATE", date: next.viewDate });
       }
+      return true;
     },
     [deriveValue],
   );
@@ -275,8 +281,12 @@ export function CalendarProvider<M extends CalendarMode = "single">({
 
   const handleChangeTime = useCallback(
     (d: Date) => {
-      if (readOnly) return;
-      commitSelection({ type: "CHANGE_TIME", date: d, config: selectConfig });
+      if (readOnly) return false;
+      return commitSelection({
+        type: "CHANGE_TIME",
+        date: d,
+        config: selectConfig,
+      });
     },
     [readOnly, selectConfig, commitSelection],
   );

@@ -1,7 +1,7 @@
 import type React from "react";
 import { useRef } from "react";
 import { useScrollAccumulator } from "@/hooks/use-scroll-accumulator";
-import { padTime } from "@/utils/time-utils";
+import { getDrumValue, padTime } from "@/utils/time-utils";
 import styles from "./step-drum.module.css";
 
 const OFFSETS = Array.from({ length: 7 }, (_, i) => i - 3);
@@ -34,14 +34,13 @@ export const StepDrum: React.FC<StepDrumProps> = ({
   const safeStep = step > 0 ? step : 1;
   const count = Math.max(1, Math.floor(max / safeStep));
   const rawIndex = Math.floor(value / safeStep);
-  const index = ((rawIndex % count) + count) % count;
+  const index = getDrumValue(rawIndex, 0, count);
   const aligned = index * safeStep;
   const valueMax = (count - 1) * safeStep;
 
   const moveByIdx = (delta: number) => {
     if (readOnly) return;
-    const next = (((index + delta) % count) + count) % count;
-    onChange(next * safeStep);
+    onChange(getDrumValue(index, delta, count) * safeStep);
   };
 
   useScrollAccumulator(ref, moveByIdx, { requireHover: true });
@@ -80,7 +79,7 @@ export const StepDrum: React.FC<StepDrumProps> = ({
         const dist = Math.abs(o);
         const opacity =
           dist === 0 ? 1 : dist === 1 ? 0.6 : dist === 2 ? 0.35 : 0.15;
-        const idx = (((index + o) % count) + count) % count;
+        const idx = getDrumValue(index, o, count);
         const v = idx * safeStep;
         return (
           <div

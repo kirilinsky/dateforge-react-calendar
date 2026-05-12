@@ -13,7 +13,7 @@ export interface SelectionActions {
   onDatesSet: (dates: Date[]) => void;
   onRangeSet: (from: Date | null, to: Date | null) => void;
   onRangeBoundSet: (bound: "from" | "to", date: Date | null) => void;
-  onChangeTime: (date: Date) => void;
+  onChangeTime: (date: Date) => boolean;
 }
 
 export interface SelectionHover {

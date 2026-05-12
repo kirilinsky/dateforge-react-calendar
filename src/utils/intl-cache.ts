@@ -1,10 +1,12 @@
 const dateTimeCache = new Map<string, Intl.DateTimeFormat>();
+const numberFormatCache = new Map<string, Intl.NumberFormat>();
 const MAX_ENTRIES = 64;
 
-const stableOptionsKey = (options?: Intl.DateTimeFormatOptions): string => {
+const stableOptionsKey = (options?: object): string => {
   if (!options) return "";
-  const keys = Object.keys(options).sort();
-  const pairs = keys.map((k) => [k, (options as Record<string, unknown>)[k]]);
+  const rec = options as Record<string, unknown>;
+  const keys = Object.keys(rec).sort();
+  const pairs = keys.map((k) => [k, rec[k]]);
   return JSON.stringify(pairs);
 };
 
@@ -27,8 +29,26 @@ export const getDateTimeFormat = (
   return fmt;
 };
 
+export const getNumberFormat = (
+  locale: string | undefined,
+  options?: Intl.NumberFormatOptions,
+): Intl.NumberFormat | null => {
+  const key = `${locale ?? ""}|${stableOptionsKey(options)}`;
+  const cached = numberFormatCache.get(key);
+  if (cached) return cached;
+  evictOldestIfFull(numberFormatCache);
+  try {
+    const fmt = new Intl.NumberFormat(locale, options);
+    numberFormatCache.set(key, fmt);
+    return fmt;
+  } catch {
+    return null;
+  }
+};
+
 export const clearIntlCache = () => {
   dateTimeCache.clear();
+  numberFormatCache.clear();
 };
 
 export const __getIntlCacheSize = () => dateTimeCache.size;

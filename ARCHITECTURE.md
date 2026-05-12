@@ -100,7 +100,7 @@ Their job is to let the user _navigate_ through the calendar — to find the dat
 | `<CalendarYearsTrack>`  | `onYearSelect`  | navigated date (clamped to bound in range mode)          |
 | `<CalendarTimeGrid>`    | `onTimeSelect`  | Date built from `viewDate` with new time set             |
 
-Use them when you want a month-only / year-only / time-only picker UX without committing to the full date-selection pipeline. The contract is unchanged — these callbacks fire alongside `navigateTo` (or alongside `onChangeTime` for `TimeGrid`); they do **not** trigger calendar-level `onChange`.
+Use them when you want a month-only / year-only / time-only picker UX without committing to the full date-selection pipeline. The contract is unchanged — these callbacks fire alongside `navigateTo` (or alongside an accepted `onChangeTime` for `TimeGrid`); they do **not** trigger calendar-level `onChange`. Rejected no-op time changes (`disabled` / `minDate` / `maxDate` / invalid range constraints / `readOnly`) do not fire `onTimeSelect`.
 
 ### B. Interactive modules
 

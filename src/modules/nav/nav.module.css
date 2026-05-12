@@ -10,7 +10,7 @@
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 0.4em;
+    gap: 0.35em;
     font-size: var(--cal-text-2xl);
     padding: var(--header-padding, 0.45em 0.7em);
     min-height: var(--header-min-height, 3.2em);
@@ -201,7 +201,7 @@
     padding: 0 0.7em;
     height: 2.3em;
     font-size: var(--cal-text-base);
-    font-weight: var(--cal-weight-bold);
+    font-weight: var(--cal-weight-semibold);
     flex: 0 0 auto;
     min-width: 0;
   }

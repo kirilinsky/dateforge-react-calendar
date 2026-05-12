@@ -28,6 +28,28 @@ describe("CHANGE_TIME respects min/max/disabled", () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
+  it("does not fire onTimeSelect when a time change is rejected", () => {
+    const onChange = vi.fn();
+    const onTimeSelect = vi.fn();
+    const value = new Date(2024, 5, 15, 10, 0, 0);
+    const disabled = createDisabled({ before: new Date(2024, 5, 15, 10, 0) });
+    const { container } = render(
+      <Calendar
+        mode="single"
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+      >
+        <CalendarTimeGrid onTimeSelect={onTimeSelect} />
+      </Calendar>,
+    );
+    const hour = drumByLabel(container, "Hours");
+    hour.focus();
+    fireEvent.keyDown(hour, { key: "ArrowUp" });
+    expect(onChange).not.toHaveBeenCalled();
+    expect(onTimeSelect).not.toHaveBeenCalled();
+  });
+
   it("allows time change when result stays within `disabled.before`", () => {
     const onChange = vi.fn();
     const value = new Date(2024, 5, 15, 10, 0, 0);

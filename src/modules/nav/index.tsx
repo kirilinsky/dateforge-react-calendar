@@ -268,7 +268,8 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
   const [nowTime, setNowTime] = useState("");
   useEffect(() => {
     if (!showNowTime) return;
-    const tick = () => setNowTime(getTimeString(new Date(), hour12, seconds));
+    const tick = () =>
+      setNowTime(getTimeString(new Date(), hour12, seconds, locale));
     tick();
     const id = setInterval(tick, seconds ? 1000 : 60_000);
     return () => clearInterval(id);
@@ -283,7 +284,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
     date.getMonth() === today.getMonth();
 
   const cur = date.getFullYear();
-  const curTime = getTimeString(date, hour12, seconds);
+  const curTime = getTimeString(date, hour12, seconds, locale);
 
   const yearFixed = useMemo(
     () => isYearFixed(cur, minDate, maxDate),

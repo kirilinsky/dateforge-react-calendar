@@ -64,6 +64,23 @@ describe("Time semantics — multiple mode", () => {
     fireEvent.keyDown(drum, ARROW_DOWN);
     expect(onChange).not.toHaveBeenCalled();
   });
+
+  it("controlled empty selection keeps pending time out of onChange", () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <Calendar
+        mode="multiple"
+        value={[]}
+        defaultViewDate={new Date(2024, 5, 15, 10, 0, 0)}
+        onChange={onChange}
+      >
+        <CalendarTimeGrid />
+      </Calendar>,
+    );
+    const drum = focusFirstDrum(container);
+    fireEvent.keyDown(drum, ARROW_DOWN);
+    expect(onChange).not.toHaveBeenCalled();
+  });
 });
 
 describe("Time semantics — range mode", () => {

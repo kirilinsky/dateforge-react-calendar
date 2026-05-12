@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getDrumValue, padTime } from "@/utils/time-utils";
+import { getDrumValue, getTimeString, padTime } from "@/utils/time-utils";
 
 // ─── padTime ──────────────────────────────────────────────────────────────────
 
@@ -27,4 +27,40 @@ describe("getDrumValue", () => {
   it("zero offset → same value", () =>
     expect(getDrumValue(15, 0, 60)).toBe(15));
   it("exact max → wraps to 0", () => expect(getDrumValue(0, 24, 24)).toBe(0));
+});
+
+// ─── getTimeString ────────────────────────────────────────────────────────────
+
+describe("getTimeString", () => {
+  const d = new Date(2024, 0, 1, 14, 5, 30);
+
+  it("24h no seconds", () => {
+    const s = getTimeString(d, false, false, "en");
+    expect(s).toContain("14");
+    expect(s).toContain("05");
+    expect(s).not.toContain("30");
+  });
+
+  it("12h no seconds shows PM", () => {
+    const s = getTimeString(d, true, false, "en");
+    expect(s).toContain("PM");
+    expect(s).toContain("2");
+  });
+
+  it("24h with seconds", () => {
+    const s = getTimeString(d, false, true, "en");
+    expect(s).toContain("30");
+  });
+
+  it("accepts locale param without throwing", () => {
+    const result = getTimeString(d, false, false, "de");
+    expect(typeof result).toBe("string");
+    expect(result.length).toBeGreaterThan(0);
+  });
+
+  it("defaults locale to en when omitted", () => {
+    expect(getTimeString(d, false, false)).toBe(
+      getTimeString(d, false, false, "en"),
+    );
+  });
 });
