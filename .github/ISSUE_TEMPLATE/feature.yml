@@ -1,0 +1,54 @@
+name: Feature request
+description: Propose a new feature or enhancement
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the proposal. Keep it focused — one feature per issue.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What pain or gap does this solve? Concrete scenario beats abstract wish.
+      placeholder: "When using range mode with timezones, I cannot …"
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: API shape, prop names, default behavior. Mock TSX welcome.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other APIs, userland workarounds, why they fall short.
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope
+      options:
+        - Core / state
+        - Module (days, nav, time, presets, …)
+        - Theme / appearance
+        - SSR / hydration
+        - A11y
+        - Docs
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: breaking
+    attributes:
+      label: Breaking change
+      options:
+        - label: This proposal would be a breaking change
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
+      description: Prior art (other libs), references, mockups.
