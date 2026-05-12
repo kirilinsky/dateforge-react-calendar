@@ -1,5 +1,7 @@
 @layer cal-base {
   .selectedContainer {
+    --selected-dates-transition: 0.2s;
+
     display: flex;
     flex-wrap: wrap;
     gap: 0.35em;
@@ -7,14 +9,16 @@
     z-index: 3;
   }
 
-  .animated {
+  .selectedContainer.animated[data-area="selected-dates"] {
     display: grid;
     grid-template-rows: 0fr;
-    transition: grid-template-rows 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+      background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      grid-template-rows var(--selected-dates-transition) cubic-bezier(0.4, 0, 0.2, 1);
     padding: 0;
   }
 
-  .animated.visible {
+  .selectedContainer.animated.visible[data-area="selected-dates"] {
     grid-template-rows: 1fr;
   }
 
@@ -27,7 +31,7 @@
     padding: 0 var(--cal-spacing);
     padding-top: 0;
     padding-bottom: 0;
-    transition: padding 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: padding var(--selected-dates-transition) cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .chipsGroup {
@@ -44,23 +48,30 @@
   }
 
   .chip {
-    height: 2.1em;
+    height: 2.3em;
     flex-shrink: 0;
-    padding: 0 0.75em !important;
-    font-size: var(--cal-text-sm) !important;
+    min-width: 0;
+    max-width: 100%;
+    padding: 0 0.7em !important;
+    font-size: var(--cal-text-md) !important;
+    font-weight: var(--cal-weight-semibold);
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .inactiveChip {
     background: var(--c-t);
+    color: var(--c-c);
+    box-shadow: var(--active-cell-stroke, none);
   }
 
   .activeChip {
-    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-a) 28%, transparent);
+    box-shadow: var(--active-cell-stroke, none);
   }
 
   .clearBtn {
-    height: 2.1em;
+    height: 2.3em;
     padding: 0 0.6em !important;
     font-size: var(--cal-text-base) !important;
     color: var(--c-m, var(--c-c));

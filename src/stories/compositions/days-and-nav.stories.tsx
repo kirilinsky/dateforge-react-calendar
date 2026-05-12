@@ -28,7 +28,7 @@ export const Default: StoryObj = {
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
-        <CalendarNav showTime showMonthPicker yearLabel />
+        <CalendarNav themeToggle showTime showMonthPicker yearLabel />
         <CalendarDays />
         <CalendarSelectedDates showTime />
       </Calendar>
