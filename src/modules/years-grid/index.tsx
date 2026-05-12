@@ -4,6 +4,7 @@ import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import { warnOnce } from "@/core/dev-warn";
 import shared from "@/global/global.module.css";
+import { useRovingTileFocus } from "@/hooks/use-roving-tile-focus";
 import type { DisabledConfig } from "@/types/calendar";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import styles from "./years-grid.module.css";
@@ -161,10 +162,16 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
 
   const startYear = loYear + page * pageSize;
   const endYear = Math.min(hiYear, startYear + pageSize - 1);
+  const activeIndex = years.findIndex(({ year }) => year === currentYear);
+  const { containerRef, handleKeyDown, getItemProps } = useRovingTileFocus({
+    itemCount: years.length,
+    activeIndex: activeIndex >= 0 ? activeIndex : 0,
+  });
 
   return (
     <div
       data-area="years-grid"
+      className={styles.root}
       role="group"
       aria-label={`Select year, showing ${startYear} to ${endYear}`}
       style={getGridSlotStyle(col)}
@@ -197,13 +204,16 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
         </button>
       </div>
       <div
+        ref={containerRef}
         key={page}
         className={[styles.grid, direction !== "none" ? styles[direction] : ""]
           .filter(Boolean)
           .join(" ")}
+        data-count={years.length}
+        onKeyDown={handleKeyDown}
         onAnimationEnd={() => setDirection("none")}
       >
-        {years.map(({ year, disabled, limited }) => {
+        {years.map(({ year, disabled, limited }, index) => {
           const isHidden = hideOutOfRange && limited;
           const isDisabled = disabled || isHidden;
           const isCurrent = year === currentYear;
@@ -211,12 +221,14 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
             <button
               key={year}
               type="button"
+              {...getItemProps(index)}
               aria-label={`${year}${isDisabled && !isHidden ? ", limited" : ""}`}
               aria-current={isCurrent ? "true" : undefined}
               aria-disabled={isDisabled || undefined}
               aria-hidden={isHidden || undefined}
               className={[
                 styles.item,
+                shared.adaptiveTile,
                 shared.interactive,
                 shared.hovered,
                 isCurrent ? shared.activeItem : "",

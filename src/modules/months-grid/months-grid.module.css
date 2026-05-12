@@ -2,41 +2,23 @@
   .monthsContainer {
     container-type: inline-size;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-rows: auto;
-    padding: 0.75em 0.6em;
-    gap: 0.25em;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-content: center;
+    gap: 0.45em;
+    padding: 0.65em 0.55em;
+    --adaptive-tile-min-height: 3.4em;
+    --adaptive-tile-padding: 0.45em 0.65em;
     z-index: 2;
-    transition: all var(--cal-transition) linear;
   }
 
-  @container (min-width: 10em) {
-    .monthsContainer {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  @container (min-width: 16em) {
+  /* 12 months: 4×3 on medium+ */
+  @container (min-width: 18em) {
     .monthsContainer {
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
 
-  @container (min-width: 25em) {
-    .monthsContainer {
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-    }
-  }
-
   .item {
-    justify-self: stretch;
-    align-self: center;
-    width: 100%;
-    height: 2.4em;
-    padding: 0 0.5em !important;
-    font-size: var(--cal-text-sm) !important;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    min-height: var(--adaptive-tile-min-height, 3.4em);
   }
 }

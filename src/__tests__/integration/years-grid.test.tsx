@@ -32,6 +32,20 @@ describe("CalendarYearsGrid", () => {
     expect(current?.textContent).toBe("2026");
   });
 
+  it("arrow keys move focus between year tiles", () => {
+    const { container } = render(
+      <Calendar value={new Date(2024, 5, 15)}>
+        <CalendarYearsGrid yearsPerPage={10} />
+      </Calendar>,
+    );
+    const current = yearButton(container, 2024)!;
+    const next = yearButton(container, 2025)!;
+    expect(current.tabIndex).toBe(0);
+    current.focus();
+    fireEvent.keyDown(current, { key: "ArrowRight" });
+    expect(document.activeElement).toBe(next);
+  });
+
   it("Next/Previous chevrons paginate through years", async () => {
     const { container, getByLabelText } = render(
       <Calendar value={new Date(2024, 5, 15)}>

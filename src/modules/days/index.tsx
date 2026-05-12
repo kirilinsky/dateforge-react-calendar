@@ -531,6 +531,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   return (
     <div
       data-area={resolvedArea}
+      className={styles.daysArea}
       onTouchEnd={handleTouchEnd}
       onTouchStart={handleTouchStart}
       onMouseLeave={handleMouseLeave}

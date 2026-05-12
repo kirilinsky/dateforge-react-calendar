@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import shared from "@/global/global.module.css";
+import { useRovingTileFocus } from "@/hooks/use-roving-tile-focus";
 import { getMonthListData, setMonth } from "@/utils/date-utils";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { getDateTimeFormat } from "@/utils/intl-cache";
@@ -56,6 +57,17 @@ export const CalendarMonthsGrid: React.FC<CalendarMonthsGridProps> = ({
     () => getDateTimeFormat(locale, { year: "numeric" }).format(viewDate),
     [locale, viewDate],
   );
+  const activeIndex =
+    hideOutOfRange && mNames[currentMonth]?.limited
+      ? Math.max(
+          0,
+          mNames.findIndex((month) => !month.limited),
+        )
+      : currentMonth;
+  const { containerRef, handleKeyDown, getItemProps } = useRovingTileFocus({
+    itemCount: mNames.length,
+    activeIndex,
+  });
 
   const handleClick = (i: number) => {
     const next = setMonth(viewDate, i);
@@ -65,10 +77,12 @@ export const CalendarMonthsGrid: React.FC<CalendarMonthsGridProps> = ({
 
   return (
     <div
+      ref={containerRef}
       className={styles.monthsContainer}
       data-area="months"
       role="group"
       aria-label={`Select month, ${gridLabel}`}
+      onKeyDown={handleKeyDown}
       style={getGridSlotStyle(col)}
     >
       {mNames.map((n, i) => {
@@ -82,8 +96,10 @@ export const CalendarMonthsGrid: React.FC<CalendarMonthsGridProps> = ({
           <button
             key={`${currentYear}-${n.label}`}
             type="button"
+            {...getItemProps(i)}
             className={[
               styles.item,
+              shared.adaptiveTile,
               shared.interactive,
               shared.hovered,
               isCurrent ? shared.activeItem : "",

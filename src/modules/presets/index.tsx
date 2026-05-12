@@ -7,6 +7,7 @@ import {
   useSelectionValue,
 } from "@/context/selection-context";
 import shared from "@/global/global.module.css";
+import { useRovingTileFocus } from "@/hooks/use-roving-tile-focus";
 import type { PresetEntry } from "@/types/presets";
 import { isSameDay } from "@/utils/date-core";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
@@ -72,6 +73,18 @@ export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
     ],
   );
   const gridSlot = getGridSlotStyle(col);
+  const isPresetActive = (p: (typeof resolved)[number]) =>
+    p.isRange
+      ? !!rangeStart &&
+        !!rangeEnd &&
+        isSameDay((p.value as { from: Date; to: Date }).from, rangeStart) &&
+        isSameDay((p.value as { from: Date; to: Date }).to, rangeEnd)
+      : !!selectedDate && isSameDay(p.value as Date, selectedDate);
+  const activeIndex = resolved.findIndex(isPresetActive);
+  const { containerRef, handleKeyDown, getItemProps } = useRovingTileFocus({
+    itemCount: resolved.length,
+    activeIndex: activeIndex >= 0 ? activeIndex : 0,
+  });
 
   if (!resolved.length) return null;
 
@@ -79,48 +92,51 @@ export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
     <div
       className={styles.presetsContainer}
       data-area="presets"
-      data-count={resolved.length}
       style={gridSlot}
     >
-      {resolved.map((p) => {
-        const isActive = p.isRange
-          ? !!rangeStart &&
-            !!rangeEnd &&
-            isSameDay((p.value as { from: Date; to: Date }).from, rangeStart) &&
-            isSameDay((p.value as { from: Date; to: Date }).to, rangeEnd)
-          : !!selectedDate && isSameDay(p.value as Date, selectedDate);
+      <div
+        ref={containerRef}
+        className={styles.presetsGrid}
+        data-count={resolved.length}
+        onKeyDown={handleKeyDown}
+      >
+        {resolved.map((p, index) => {
+          const isActive = isPresetActive(p);
 
-        return (
-          <button
-            key={p.id}
-            type="button"
-            className={[
-              styles.presetItem,
-              shared.interactive,
-              shared.hovered,
-              isActive ? shared.activeItem : styles.inactiveItem,
-            ]
-              .filter(Boolean)
-              .join(" ")}
-            onClick={() => {
-              if (readOnly) return;
-              if (p.isRange) {
-                if (isActive) {
-                  onRangeSet(null, null);
+          return (
+            <button
+              key={p.id}
+              type="button"
+              {...getItemProps(index)}
+              className={[
+                styles.presetItem,
+                shared.adaptiveTile,
+                shared.interactive,
+                shared.hovered,
+                isActive ? shared.activeItem : styles.inactiveItem,
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              onClick={() => {
+                if (readOnly) return;
+                if (p.isRange) {
+                  if (isActive) {
+                    onRangeSet(null, null);
+                  } else {
+                    const r = p.value as { from: Date; to: Date };
+                    onRangeSet(r.from, r.to);
+                  }
                 } else {
-                  const r = p.value as { from: Date; to: Date };
-                  onRangeSet(r.from, r.to);
+                  onChangeDate(isActive ? null : (p.value as Date));
                 }
-              } else {
-                onChangeDate(isActive ? null : (p.value as Date));
-              }
-            }}
-            disabled={readOnly}
-          >
-            {p.label}
-          </button>
-        );
-      })}
+              }}
+              disabled={readOnly}
+            >
+              {p.label}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 };

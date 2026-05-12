@@ -1,15 +1,23 @@
 @layer cal-base {
 
+.daysArea {
+  display: flex;
+  align-items: stretch;
+  min-height: 0;
+}
+
 .dayGridContainer {
   container-type: inline-size;
   display: flex;
   flex-direction: column;
-  gap: 0.15em;
+  justify-content: space-between;
+  gap: var(--day-gap);
   --day-gap: 0.15em;
   --rng-bg: color-mix(in srgb, var(--c-r) 28%, var(--c-b));
   --rng-prev: color-mix(in srgb, var(--c-r) 16%, transparent);
   padding: var(--cal-days-padding, 0.85em);
-  height: auto;
+  width: 100%;
+  height: 100%;
   box-sizing: border-box;
   overflow: hidden;
   min-width: 0;
