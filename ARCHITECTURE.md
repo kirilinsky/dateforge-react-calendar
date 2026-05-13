@@ -170,9 +170,9 @@ Use them when you want a month-only / year-only / time-only picker UX without co
 
 | Module                    | Role                                                                                                                               |
 | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `<CalendarSelectedDates>` | Chips showing currently selected date(s). Click chip → `navigateTo`. May fire `onChange(null)` only via the explicit clear button. |
+| `<CalendarSelectedDates>` | Chips showing currently selected date(s). Click chip → `navigateTo`. Optional clear button is visible only when `allowClear`; it is disabled and no-ops in `readOnly`. |
 
-This is a **third category** that the user's two-bucket model didn't initially cover but exists in the codebase. Strictly speaking `<CalendarSelectedDates>` does nothing on its own — it's purely reactive UI plus an opt-in `Clear` action.
+`allowClear` is only a visibility affordance for the clear button. The `readOnly` contract still unconditionally blocks the clear action.
 
 ### D. Hybrid modules
 
@@ -256,7 +256,7 @@ The single source of truth for which user actions change view, mutate selection,
 | `<CalendarPresets>` click (single date)                           | yes                 | yes               | yes              | button disabled                  |
 | `<CalendarPresets>` click (range, in `mode="range"`)              | yes                 | yes               | yes              | button disabled                  |
 | `<CalendarSelectedDates>` chip click                              | yes                 | no                | no               | works (navigation)               |
-| `<CalendarSelectedDates>` clear                                   | no                  | yes               | yes              | button disabled                  |
+| `<CalendarSelectedDates>` clear                                   | no                  | yes               | yes              | button disabled, handler no-ops  |
 | `<CalendarManualInput>` typing                                    | no                  | no                | no               | input HTML `readOnly`            |
 | `<CalendarManualInput>` Enter / apply (✓)                         | maybe               | yes               | yes              | inputs / buttons disabled        |
 | `<CalendarManualInput>` per-chip remove (multi)                   | no                  | yes               | yes              | disabled                         |
@@ -319,7 +319,7 @@ The wrapper exposes four contexts to modules. Each has a clear responsibility:
 
 - Navigational modules touch only `NavigationContext` (writes) and `ConfigContext` (reads).
 - Interactive modules write to `SelectionContext`. They may also `navigateTo` if selection implies a view change.
-- Display modules read from `SelectionContext` and may `navigateTo`. They never write to `SelectionContext` except via explicit user action (Clear button).
+- Display modules read from `SelectionContext` and may `navigateTo`. They never write to `SelectionContext` except via explicit opt-in actions such as the `CalendarSelectedDates` clear button, which still obeys `readOnly`.
 - Hybrid modules follow navigational rules in their navigational state and interactive rules in their interactive state. Switching is determined by props/mode at render time.
 
 ---

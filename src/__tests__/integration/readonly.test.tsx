@@ -43,7 +43,7 @@ describe("readOnly — SelectedDates clear", () => {
     const onChange = vi.fn();
     const { container } = render(
       <Calendar value={D} onChange={onChange} readOnly>
-        <CalendarSelectedDates />
+        <CalendarSelectedDates allowClear />
       </Calendar>,
     );
     const btn = within(container).getByLabelText("Clear");

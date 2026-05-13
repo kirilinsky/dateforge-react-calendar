@@ -55,11 +55,20 @@ describe("CalendarSelectedDates — single mode", () => {
     expect(container.querySelector('[aria-label="Clear"]')).toBeNull();
   });
 
+  it("does not render Clear by default", () => {
+    const { container } = render(
+      <Calendar mode="single" value={D(2024, 5, 15)}>
+        <CalendarSelectedDates />
+      </Calendar>,
+    );
+    expect(container.querySelector('[aria-label="Clear"]')).toBeNull();
+  });
+
   it("Clear button calls onChange with null", async () => {
     const onChange = vi.fn();
     const { container } = render(
       <Calendar mode="single" value={D(2024, 5, 15)} onChange={onChange}>
-        <CalendarSelectedDates />
+        <CalendarSelectedDates allowClear />
       </Calendar>,
     );
     const clear = container.querySelector(
@@ -72,7 +81,7 @@ describe("CalendarSelectedDates — single mode", () => {
   it("Clear button is disabled in readOnly", () => {
     const { container } = render(
       <Calendar mode="single" value={D(2024, 5, 15)} readOnly>
-        <CalendarSelectedDates />
+        <CalendarSelectedDates allowClear />
       </Calendar>,
     );
     const clear = container.querySelector(
@@ -138,10 +147,59 @@ describe("CalendarSelectedDates — multiple mode", () => {
         <CalendarSelectedDates />
       </Calendar>,
     );
-    const chips = container.querySelectorAll(
-      'button[type="button"]:not([aria-label="Clear"])',
-    );
+    const chips = container.querySelectorAll("[data-selected-date-chip]");
     expect(chips.length).toBe(3);
+  });
+
+  it("limits visible chips and renders overflow count", () => {
+    const dates = [
+      D(2024, 5, 15),
+      D(2024, 5, 16),
+      D(2024, 5, 17),
+      D(2024, 5, 18),
+    ];
+    const { container, getByText } = render(
+      <Calendar mode="multiple" value={dates}>
+        <CalendarSelectedDates maxVisibleChips={2} />
+      </Calendar>,
+    );
+    const chips = container.querySelectorAll("[data-selected-date-chip]");
+    expect(chips.length).toBe(2);
+    expect(getByText("+2")).toBeTruthy();
+  });
+
+  it("expands overflow chips on click", async () => {
+    const dates = [
+      D(2024, 5, 15),
+      D(2024, 5, 16),
+      D(2024, 5, 17),
+      D(2024, 5, 18),
+    ];
+    const { container, getByText, queryByText } = render(
+      <Calendar mode="multiple" value={dates}>
+        <CalendarSelectedDates maxVisibleChips={2} />
+      </Calendar>,
+    );
+
+    await userEvent.click(getByText("+2"));
+
+    expect(container.querySelectorAll("[data-selected-date-chip]").length).toBe(
+      4,
+    );
+    expect(queryByText("+2")).toBeNull();
+  });
+
+  it("uses custom overflow label template", () => {
+    const dates = [D(2024, 5, 15), D(2024, 5, 16), D(2024, 5, 17)];
+    const { getByText } = render(
+      <Calendar mode="multiple" value={dates}>
+        <CalendarSelectedDates
+          maxVisibleChips={1}
+          overflowLabel="{count} hidden"
+        />
+      </Calendar>,
+    );
+    expect(getByText("2 hidden")).toBeTruthy();
   });
 
   it("empty array → no chips, but Clear hidden when no content", () => {

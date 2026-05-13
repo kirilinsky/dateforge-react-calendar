@@ -1,5 +1,6 @@
 @property --c-a { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
 @property --c-at { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
+@property --c-t-d { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
 @property --c-b { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
 @property --c-h { syntax: "<color>"; inherits: true; initial-value: #1a1a1c; }
 @property --c-t { syntax: "<color>"; inherits: true; initial-value: #f4f4f4; }
@@ -18,6 +19,7 @@
   :global([data-theme="auto"]) {
     --c-a: #ffffff;
     --c-at: #ffffff;
+    --c-t-d: #ffffff;
     --c-b: #ffffff;
     --c-h: #1a1a1c;
     --c-t: #f4f4f4;
@@ -35,6 +37,7 @@
   :global([data-theme="dark"]) {
     --c-a: #1a1a1c;
     --c-at: #1a1a1c;
+    --c-t-d: #1a1a1c;
     --c-b: #1a1a1c;
     --c-h: #ffffff;
     --c-t: #2d2d2d;
@@ -56,6 +59,7 @@
     :global([data-theme="auto"]) {
       --c-a: #1a1a1c;
       --c-at: #1a1a1c;
+      --c-t-d: #1a1a1c;
       --c-b: #1a1a1c;
       --c-h: #ffffff;
       --c-t: #2d2d2d;

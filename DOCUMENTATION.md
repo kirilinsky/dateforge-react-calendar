@@ -606,7 +606,7 @@ Renders the month grid — weekday headers, week numbers (optional), and the day
 | `highlightWeekends` | `boolean`                       | `true`    | Apply a distinct style to Saturday and Sunday                                                                                                                                                                                                                                                                                    |
 | `boldWeekends`      | `boolean`                       | `false`   | Render Saturday and Sunday in bold with the weekend accent color (`--c-we`)                                                                                                                                                                                                                                                      |
 | `highlightToday`    | `boolean`                       | `true`    | Highlight today's date                                                                                                                                                                                                                                                                                                           |
-| `todayDot`          | `boolean`                       | `true`    | Render a small dot (color `--c-b`) under the digit when today is also the selected day                                                                                                                                                                                                                                           |
+| `todayDot`          | `boolean`                       | `true`    | Render a small dot under the digit when today is also the selected day. Selected-today dot color uses `--c-t-d`                                                                                                                                                                                                                  |
 | `fixedRows`         | `boolean`                       | `true`    | Always render 6 rows of day cells                                                                                                                                                                                                                                                                                                |
 | `weekNumbers`       | `boolean`                       | `false`   | Show ISO week numbers in the leftmost column                                                                                                                                                                                                                                                                                     |
 | `hideWeekdays`      | `boolean`                       | `false`   | Hide the row of weekday name headers                                                                                                                                                                                                                                                                                             |
@@ -890,7 +890,7 @@ import { CalendarPresets } from "@dateforge/react-calendar/modules";
 
 ### CalendarSelectedDates
 
-Displays the currently selected dates as chips. Clicking a chip navigates the view to that date (when `allowNavigate`). An optional clear-all button next to the chips wipes the selection. Per-chip remove is **not** currently supported — use `<CalendarManualInput>` in multi/range mode if individual remove is required.
+Displays the currently selected dates as chips. Clicking a chip navigates the view to that date (when `allowNavigate`). An optional clear-all button next to the chips wipes the selection unless the calendar is `readOnly`. In multiple mode, `maxVisibleChips` can cap the visible chip count and collapse the rest into an overflow chip such as `+27`; clicking that overflow chip expands the hidden dates. Per-chip remove is **not** currently supported — use `<CalendarManualInput>` in multi/range mode if individual remove is required.
 
 ```tsx
 <CalendarSelectedDates allowClear animated align="center" />
@@ -898,14 +898,16 @@ Displays the currently selected dates as chips. Clicking a chip navigates the vi
 
 ### Props
 
-| Prop            | Type                            | Default  | Description                                                                                         |
-| --------------- | ------------------------------- | -------- | --------------------------------------------------------------------------------------------------- |
-| `allowClear`    | `boolean`                       | `true`   | Show a clear-all button next to the chips                                                           |
-| `allowNavigate` | `boolean`                       | `true`   | Clicking a chip navigates the calendar to that date                                                 |
-| `animated`      | `boolean`                       | `true`   | Animate chips appearing and disappearing                                                            |
-| `align`         | `"left" \| "center" \| "right"` | `"left"` | Horizontal alignment of the chip list                                                               |
-| `showTime`      | `boolean`                       | `false`  | Include time (hours and minutes) in the chip label. Respects the `hour12` setting from `<Calendar>` |
-| `col`           | `number \| string`              | —        | CSS grid `grid-column` value                                                                        |
+| Prop              | Type                            | Default      | Description                                                                                         |
+| ----------------- | ------------------------------- | ------------ | --------------------------------------------------------------------------------------------------- |
+| `allowClear`      | `boolean`                       | `false`      | Show a clear-all button next to the chips. In `readOnly`, the button remains disabled and cannot clear selection |
+| `allowNavigate`   | `boolean`                       | `true`       | Clicking a chip navigates the calendar to that date                                                 |
+| `animated`        | `boolean`                       | `true`       | Animate chips appearing and disappearing                                                            |
+| `align`           | `"left" \| "center" \| "right"` | `"left"`     | Horizontal alignment of the chip list                                                               |
+| `maxVisibleChips` | `number`                        | —            | Maximum number of selected-date chips to render before collapsing the remainder                      |
+| `overflowLabel`   | `string`                        | `"+{count}"` | Overflow chip label. `{count}` is replaced with the number of hidden selected dates                  |
+| `showTime`        | `boolean`                       | `false`      | Include time (hours and minutes) in the chip label. Respects the `hour12` setting from `<Calendar>` |
+| `col`             | `number \| string`              | —            | CSS grid `grid-column` value                                                                        |
 
 ---
 
@@ -1157,6 +1159,7 @@ const myAppearance = createAppearance({ radius: "0", spacing: "0.4em" });
 | -------------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | `highlight`    | `--c-h`      | **Primary accent.** Background of the selected day cell, active buttons, nav accents. The most impactful token.                           |
 | `activeText`   | `--c-at`     | Readable text/icon color on top of `highlight`. Built-in themes keep it at 4.5:1+ against `highlight`.                                    |
+| `todayDot`     | `--c-t-d`    | Dot color for selected today. Built-in themes choose a contrasting ink that matches the theme's active surface.                            |
 | `accent`       | `--c-a`      | Inverted/accent surface color for secondary month labels and decorative active outlines.                                                  |
 | `backdrop`     | `--c-b`      | Main calendar background.                                                                                                                 |
 | `tone`         | `--c-t`      | Secondary / muted background for rows, tracks, and hover states.                                                                          |

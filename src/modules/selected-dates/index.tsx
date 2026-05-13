@@ -1,4 +1,5 @@
 import type React from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import {
@@ -11,6 +12,9 @@ import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { getDateTimeFormat } from "@/utils/intl-cache";
 import { type AlignValue, alignToJustify } from "@/utils/layout-utils";
 import styles from "./selected-dates.module.css";
+
+const useIsoLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 const getRangeSep = (
   fmt: Intl.DateTimeFormat,
@@ -44,18 +48,30 @@ export interface CalendarSelectedDatesProps {
   allowNavigate?: boolean;
   animated?: boolean;
   align?: AlignValue;
+  maxVisibleChips?: number;
+  overflowLabel?: string;
   showTime?: boolean;
   col?: number | string;
 }
 
+const formatOverflowLabel = (label: string, count: number) =>
+  label.replaceAll("{count}", String(count));
+
 export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
-  allowClear = true,
+  allowClear = false,
   allowNavigate = true,
   animated = true,
   align = "left",
+  maxVisibleChips,
+  overflowLabel = "+{count}",
   showTime = false,
   col,
 }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [innerHeight, setInnerHeight] = useState<number | null>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const chipsGroupRef = useRef<HTMLDivElement>(null);
+  const clearBtnRef = useRef<HTMLButtonElement>(null);
   const { locale, range, hour12, timeZone, readOnly } = useConfig();
   const { viewDate: date, navigateTo } = useNavigation();
   const { selectedDates, rangeStart, rangeEnd } = useSelectionValue();
@@ -83,6 +99,71 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
   const hasContent = range ? !!rangeStart : selectedDates.length > 0;
   const gridSlot = getGridSlotStyle(col);
 
+  const visibleChipsCount =
+    maxVisibleChips === undefined || !Number.isFinite(maxVisibleChips)
+      ? selectedDates.length
+      : Math.max(0, Math.floor(maxVisibleChips));
+
+  const hasOverflow = selectedDates.length > visibleChipsCount;
+  const shouldCollapseChips = hasOverflow && !isExpanded;
+  const visibleSelectedDates = shouldCollapseChips
+    ? selectedDates.slice(0, visibleChipsCount)
+    : selectedDates;
+  const overflowCount = shouldCollapseChips
+    ? selectedDates.length - visibleSelectedDates.length
+    : 0;
+
+  useEffect(() => {
+    setIsExpanded(false);
+  }, [maxVisibleChips, selectedDates.length]);
+
+  useIsoLayoutEffect(() => {
+    if (!animated || !hasContent) {
+      setInnerHeight(null);
+      return;
+    }
+
+    const inner = innerRef.current;
+    const chipsGroup = chipsGroupRef.current;
+    if (!inner || !chipsGroup) return;
+
+    const measure = () => {
+      const computedStyle = window.getComputedStyle(inner);
+      const paddingY =
+        Number.parseFloat(computedStyle.paddingTop) +
+        Number.parseFloat(computedStyle.paddingBottom);
+      const contentHeight = Math.max(
+        chipsGroup.scrollHeight,
+        clearBtnRef.current?.offsetHeight ?? 0,
+      );
+
+      setInnerHeight(Math.ceil(contentHeight + paddingY));
+    };
+    measure();
+
+    if (typeof ResizeObserver === "undefined") return;
+
+    const resizeObserver = new ResizeObserver(measure);
+    resizeObserver.observe(chipsGroup);
+    if (clearBtnRef.current) {
+      resizeObserver.observe(clearBtnRef.current);
+    }
+
+    return () => resizeObserver.disconnect();
+  }, [
+    animated,
+    hasContent,
+    visibleSelectedDates.length,
+    overflowCount,
+    allowClear,
+    align,
+    showTime,
+    overflowLabel,
+    locale,
+    hour12,
+    timeZone,
+  ]);
+
   if (!animated && !hasContent) return null;
 
   const isCurrentMonth = (d: Date) =>
@@ -100,12 +181,18 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
       .filter(Boolean)
       .join(" ");
 
+  const handleClear = () => {
+    if (readOnly) return;
+    onChangeDate(null);
+  };
+
   const clearBtn = allowClear ? (
     <button
+      ref={clearBtnRef}
       type="button"
       aria-label="Clear"
       className={`${styles.clearBtn} ${shared.interactive} ${shared.hovered}`}
-      onClick={() => onChangeDate(null)}
+      onClick={handleClear}
       disabled={readOnly}
     >
       ×
@@ -137,29 +224,53 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
       </>
     ) : null
   ) : (
-    selectedDates.map((d) => {
-      const isActive = isSameDay(d, date);
-      return (
+    <>
+      {visibleSelectedDates.map((d, index) => {
+        const isActive = isSameDay(d, date);
+        const isRevealedChip =
+          isExpanded && hasOverflow && index >= visibleChipsCount;
+        return (
+          <button
+            key={d.getTime()}
+            type="button"
+            data-active={isActive || undefined}
+            data-selected-date-chip="true"
+            onClick={() => allowNavigate && navigateTo(d)}
+            className={[
+              styles.chip,
+              shared.interactive,
+              shared.hovered,
+              isActive ? shared.activeItem : styles.inactiveChip,
+              isActive ? styles.activeChip : "",
+              isRevealedChip ? styles.revealedChip : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          >
+            {fmtChip(d)}
+          </button>
+        );
+      })}
+      {overflowCount > 0 && (
         <button
-          key={d.getTime()}
           type="button"
-          data-active={isActive || undefined}
-          onClick={() => allowNavigate && navigateTo(d)}
-          className={[
-            styles.chip,
-            shared.interactive,
-            shared.hovered,
-            isActive ? shared.activeItem : styles.inactiveChip,
-            isActive ? styles.activeChip : "",
-          ]
-            .filter(Boolean)
-            .join(" ")}
+          className={`${styles.chip} ${styles.overflowChip} ${shared.interactive} ${shared.hovered}`}
+          aria-label={`Show ${overflowCount} more selected dates`}
+          onClick={() => setIsExpanded(true)}
+          title={`${overflowCount} more selected dates`}
         >
-          {fmtChip(d)}
+          {formatOverflowLabel(overflowLabel, overflowCount)}
         </button>
-      );
-    })
+      )}
+    </>
   );
+
+  const innerStyle =
+    animated && innerHeight !== null
+      ? ({
+          "--selected-dates-inner-height": `${innerHeight}px`,
+        } as React.CSSProperties)
+      : undefined;
 
   return (
     <div
@@ -173,8 +284,9 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
       data-area="selected-dates"
       style={gridSlot}
     >
-      <div className={styles.inner}>
+      <div ref={innerRef} className={styles.inner} style={innerStyle}>
         <div
+          ref={chipsGroupRef}
           className={styles.chipsGroup}
           style={{ justifyContent: alignToJustify[align] }}
         >

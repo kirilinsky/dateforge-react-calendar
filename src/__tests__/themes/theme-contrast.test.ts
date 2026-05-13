@@ -74,6 +74,15 @@ describe("built-in theme contrast tokens", () => {
 
   it.each(
     Object.entries(THEMES_DATA),
+  )("%s today dot passes normal text contrast", (_name, theme) => {
+    expect(
+      contrastRatio(theme.todayDot, theme.highlight),
+      "todayDot on highlight",
+    ).toBeGreaterThanOrEqual(MIN_NORMAL_TEXT_CONTRAST);
+  });
+
+  it.each(
+    Object.entries(THEMES_DATA),
   )("%s weekend text passes normal text contrast", (_name, theme) => {
     for (const background of WEEKEND_BACKGROUNDS) {
       expect(
@@ -97,6 +106,7 @@ describe("built-in theme contrast tokens", () => {
   it("covers every built-in theme with the new a11y tokens", () => {
     for (const theme of Object.values(THEMES_DATA) as ThemeTokens[]) {
       expect(theme.activeText).toMatch(/^#[0-9a-f]{6}$/i);
+      expect(theme.todayDot).toMatch(/^#[0-9a-f]{6}$/i);
       expect(theme.mutedText).toMatch(/^#[0-9a-f]{6}$/i);
       expect(theme.disabledText).toMatch(/^#[0-9a-f]{6}$/i);
       expect(theme.weekend).toMatch(/^#[0-9a-f]{6}$/i);

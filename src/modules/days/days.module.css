@@ -60,9 +60,9 @@
     content: "";
     position: absolute;
     left: 50%;
-    bottom: 0.2em;
-    width: 0.2em;
-    height: 0.2em;
+    bottom: 0.3em;
+    width: 0.26em;
+    height: 0.26em;
     border-radius: 50%;
     background: currentColor;
     transform: translateX(-50%);
@@ -70,7 +70,7 @@
   }
 
   .todayItem[data-selected]::after {
-    background: var(--active-cell-color, var(--c-at, var(--c-a)));
+    background: var(--c-t-d, var(--active-cell-color, var(--c-at, var(--c-a))));
   }
 
   .boldWeekend {
