@@ -63,6 +63,67 @@
     text-overflow: ellipsis;
   }
 
+  .chipWithRemove {
+    display: inline-flex;
+    align-items: stretch;
+    justify-content: flex-start;
+    border-radius: var(--cal-radius, 0.5em);
+    overflow: hidden;
+    padding: 0 !important;
+  }
+
+  .chipMain {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    height: 100%;
+    padding: 0 0.7em;
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+    font-weight: inherit;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .chipRemoveBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 0 0.45em;
+    border: none;
+    border-left: var(--cal-border) solid var(--c-s);
+    background: transparent;
+    color: var(--c-m, currentColor);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition:
+      background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      border-color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
+  }
+
+  .chipRemoveBtn svg {
+    width: 0.8em;
+    height: 0.8em;
+    fill: currentColor;
+  }
+
+  .chipRemoveBtn:hover:not([disabled]) {
+    background: color-mix(in srgb, var(--c-e) 12%, transparent);
+    color: var(--c-e);
+  }
+
+  .chipRemoveBtn[disabled] {
+    color: var(--c-dt, var(--c-c));
+    cursor: not-allowed;
+  }
+
   .inactiveChip {
     background: var(--c-t);
     color: var(--c-c);

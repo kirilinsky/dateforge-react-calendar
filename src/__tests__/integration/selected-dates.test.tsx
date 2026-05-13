@@ -27,6 +27,84 @@ describe("CalendarSelectedDates — single mode", () => {
     ).toBeTruthy();
   });
 
+  it("does not render Clear when animated=true and no value", () => {
+    const { container } = render(
+      <Calendar mode="single">
+        <CalendarSelectedDates animated allowClear />
+      </Calendar>,
+    );
+    expect(container.querySelector('[aria-label="Clear"]')).toBeNull();
+  });
+
+  it("keeps animated height numeric after select-clear-select", () => {
+    const renderSelectedDates = (value: Date | null) => (
+      <Calendar mode="single" value={value}>
+        <CalendarSelectedDates animated />
+      </Calendar>
+    );
+    const { container, rerender } = render(renderSelectedDates(D(2024, 5, 15)));
+    const getInner = () =>
+      container.querySelector(
+        '[data-area="selected-dates"] > div',
+      ) as HTMLElement;
+
+    expect(
+      getInner().style.getPropertyValue("--selected-dates-inner-height"),
+    ).toMatch(/px$/);
+
+    rerender(renderSelectedDates(null));
+    expect(
+      getInner().style.getPropertyValue("--selected-dates-inner-height"),
+    ).toBe("0px");
+
+    rerender(renderSelectedDates(D(2024, 5, 16)));
+    expect(
+      getInner().style.getPropertyValue("--selected-dates-inner-height"),
+    ).toMatch(/px$/);
+  });
+
+  it("measures animated height with target padding, not transitional padding", () => {
+    const originalGetComputedStyle = window.getComputedStyle.bind(window);
+    const getComputedStyleSpy = vi
+      .spyOn(window, "getComputedStyle")
+      .mockImplementation((element) => {
+        const style = originalGetComputedStyle(element);
+        const isPaddingProbe =
+          element instanceof HTMLElement &&
+          element.style.paddingTop === "var(--cal-spacing)";
+
+        return new Proxy(style, {
+          get(target, prop, receiver) {
+            if (prop === "paddingTop" || prop === "paddingBottom") {
+              return isPaddingProbe ? "12px" : "0px";
+            }
+            return Reflect.get(target, prop, receiver);
+          },
+        }) as CSSStyleDeclaration;
+      });
+    const scrollHeightSpy = vi
+      .spyOn(HTMLElement.prototype, "scrollHeight", "get")
+      .mockReturnValue(26);
+
+    try {
+      const { container } = render(
+        <Calendar mode="single" value={D(2024, 5, 15)}>
+          <CalendarSelectedDates animated />
+        </Calendar>,
+      );
+      const inner = container.querySelector(
+        '[data-area="selected-dates"] > div',
+      ) as HTMLElement;
+
+      expect(
+        inner.style.getPropertyValue("--selected-dates-inner-height"),
+      ).toBe("50px");
+    } finally {
+      getComputedStyleSpy.mockRestore();
+      scrollHeightSpy.mockRestore();
+    }
+  });
+
   it("renders single chip with formatted date", () => {
     const { container } = render(
       <Calendar mode="single" value={D(2024, 5, 15)}>
@@ -75,6 +153,19 @@ describe("CalendarSelectedDates — single mode", () => {
       '[aria-label="Clear"]',
     ) as HTMLButtonElement;
     await userEvent.click(clear);
+    expect(onChange).toHaveBeenCalledWith(null);
+  });
+
+  it("per-chip clear removes the selected date in single mode", async () => {
+    const onChange = vi.fn();
+    const { getByLabelText } = render(
+      <Calendar mode="single" value={D(2024, 5, 15)} onChange={onChange}>
+        <CalendarSelectedDates allowClearPerChip />
+      </Calendar>,
+    );
+
+    await userEvent.click(getByLabelText("Remove selected date"));
+
     expect(onChange).toHaveBeenCalledWith(null);
   });
 
@@ -149,6 +240,31 @@ describe("CalendarSelectedDates — multiple mode", () => {
     );
     const chips = container.querySelectorAll("[data-selected-date-chip]");
     expect(chips.length).toBe(3);
+  });
+
+  it("per-chip clear removes one date in multiple mode", async () => {
+    const onChange = vi.fn();
+    const dates = [D(2024, 5, 15), D(2024, 5, 16), D(2024, 5, 17)];
+    const { getAllByLabelText } = render(
+      <Calendar mode="multiple" value={dates} onChange={onChange}>
+        <CalendarSelectedDates allowClearPerChip />
+      </Calendar>,
+    );
+
+    await userEvent.click(getAllByLabelText("Remove selected date")[1]);
+
+    expect(onChange).toHaveBeenCalledWith([dates[0], dates[2]]);
+  });
+
+  it("per-chip clear does not nest buttons", () => {
+    const dates = [D(2024, 5, 15), D(2024, 5, 16)];
+    const { container } = render(
+      <Calendar mode="multiple" value={dates}>
+        <CalendarSelectedDates allowClearPerChip />
+      </Calendar>,
+    );
+
+    expect(container.querySelector("button button")).toBeNull();
   });
 
   it("limits visible chips and renders overflow count", () => {
@@ -250,6 +366,21 @@ describe("CalendarSelectedDates — range mode", () => {
       'button[type="button"]:not([aria-label="Clear"])',
     );
     expect(chips.length).toBe(2);
+  });
+
+  it("per-chip clear removes one range bound", async () => {
+    const onChange = vi.fn();
+    const from = D(2024, 5, 10);
+    const to = D(2024, 5, 20);
+    const { getByLabelText } = render(
+      <Calendar mode="range" value={{ from, to }} onChange={onChange}>
+        <CalendarSelectedDates allowClearPerChip />
+      </Calendar>,
+    );
+
+    await userEvent.click(getByLabelText("Remove range end"));
+
+    expect(onChange).toHaveBeenCalledWith({ from, to: null });
   });
 
   it("range chip click navigates when allowNavigate", async () => {

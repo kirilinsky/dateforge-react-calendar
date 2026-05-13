@@ -890,7 +890,7 @@ import { CalendarPresets } from "@dateforge/react-calendar/modules";
 
 ### CalendarSelectedDates
 
-Displays the currently selected dates as chips. Clicking a chip navigates the view to that date (when `allowNavigate`). An optional clear-all button next to the chips wipes the selection unless the calendar is `readOnly`. In multiple mode, `maxVisibleChips` can cap the visible chip count and collapse the rest into an overflow chip such as `+27`; clicking that overflow chip expands the hidden dates. Per-chip remove is **not** currently supported — use `<CalendarManualInput>` in multi/range mode if individual remove is required.
+Displays the currently selected dates as chips. Clicking a chip navigates the view to that date (when `allowNavigate`). An optional clear-all button next to the chips wipes the selection unless the calendar is `readOnly`. Set `allowClearPerChip` to add a remove button inside each chip; in range mode it clears the matching `from` / `to` bound. In multiple mode, `maxVisibleChips` can cap the visible chip count and collapse the rest into an overflow chip such as `+27`; clicking that overflow chip expands the hidden dates. In range mode, `maxVisibleChips` is ignored: the start chip and optional end chip render normally.
 
 ```tsx
 <CalendarSelectedDates allowClear animated align="center" />
@@ -901,10 +901,11 @@ Displays the currently selected dates as chips. Clicking a chip navigates the vi
 | Prop              | Type                            | Default      | Description                                                                                         |
 | ----------------- | ------------------------------- | ------------ | --------------------------------------------------------------------------------------------------- |
 | `allowClear`      | `boolean`                       | `false`      | Show a clear-all button next to the chips. In `readOnly`, the button remains disabled and cannot clear selection |
+| `allowClearPerChip` | `boolean`                     | `false`      | Show a remove button inside each chip. Removes that date; in range mode, clears the matching bound   |
 | `allowNavigate`   | `boolean`                       | `true`       | Clicking a chip navigates the calendar to that date                                                 |
 | `animated`        | `boolean`                       | `true`       | Animate chips appearing and disappearing                                                            |
 | `align`           | `"left" \| "center" \| "right"` | `"left"`     | Horizontal alignment of the chip list                                                               |
-| `maxVisibleChips` | `number`                        | —            | Maximum number of selected-date chips to render before collapsing the remainder                      |
+| `maxVisibleChips` | `number`                        | —            | Maximum number of selected-date chips before overflow. Applies to `mode="multiple"` only; range chips are not collapsed |
 | `overflowLabel`   | `string`                        | `"+{count}"` | Overflow chip label. `{count}` is replaced with the number of hidden selected dates                  |
 | `showTime`        | `boolean`                       | `false`      | Include time (hours and minutes) in the chip label. Respects the `hour12` setting from `<Calendar>` |
 | `col`             | `number \| string`              | —            | CSS grid `grid-column` value                                                                        |

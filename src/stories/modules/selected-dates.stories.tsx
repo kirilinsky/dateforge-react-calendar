@@ -11,6 +11,7 @@ import {
 
 type SelectedDatesArgs = {
   allowClear?: boolean;
+  allowClearPerChip?: boolean;
   allowNavigate?: boolean;
   animated?: boolean;
   align?: "left" | "center" | "right";
@@ -23,6 +24,7 @@ const meta: Meta<SelectedDatesArgs> = {
   title: "Modules/SelectedDates",
   argTypes: {
     allowClear: { control: "boolean" },
+    allowClearPerChip: { control: "boolean" },
     allowNavigate: { control: "boolean" },
     animated: { control: "boolean" },
     align: { control: "inline-radio", options: ["left", "center", "right"] },
@@ -32,6 +34,7 @@ const meta: Meta<SelectedDatesArgs> = {
   },
   args: {
     allowClear: false,
+    allowClearPerChip: false,
     allowNavigate: true,
     animated: true,
     align: "left",
@@ -50,6 +53,7 @@ const meta: Meta<SelectedDatesArgs> = {
       >
         <CalendarSelectedDates
           allowClear={args.allowClear}
+          allowClearPerChip={args.allowClearPerChip}
           allowNavigate={args.allowNavigate}
           animated={args.animated}
           align={args.align}
@@ -77,6 +81,39 @@ export const WithClear: Story = {
   args: { allowClear: true },
 };
 WithClear.storyName = "With clear";
+
+export const WithPerChipClear: Story = {
+  args: { allowClearPerChip: true },
+  render: (args, ctx) => {
+    const [dates, setDates] = useState([
+      FIXED_DATE,
+      new Date(2024, 5, 16),
+      new Date(2024, 5, 17),
+    ]);
+    return (
+      <Calendar
+        mode="multiple"
+        value={dates}
+        onChange={setDates}
+        theme={resolveStoryTheme(ctx.globals.theme)}
+        appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
+      >
+        <CalendarSelectedDates
+          allowClear={args.allowClear}
+          allowClearPerChip={args.allowClearPerChip}
+          allowNavigate={args.allowNavigate}
+          animated={args.animated}
+          align={args.align}
+          maxVisibleChips={args.maxVisibleChips}
+          overflowLabel={args.overflowLabel}
+          showTime={args.showTime}
+        />
+      </Calendar>
+    );
+  },
+};
+WithPerChipClear.storyName = "With per-chip clear";
 
 export const NoNavigate: Story = {
   args: { allowNavigate: false },
@@ -108,6 +145,7 @@ export const Overflow: Story = {
       >
         <CalendarSelectedDates
           allowClear={args.allowClear}
+          allowClearPerChip={args.allowClearPerChip}
           allowNavigate={args.allowNavigate}
           animated={args.animated}
           align={args.align}

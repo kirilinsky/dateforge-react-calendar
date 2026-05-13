@@ -7,6 +7,7 @@ import {
   useSelectionValue,
 } from "@/context/selection-context";
 import shared from "@/global/global.module.css";
+import { Clear } from "@/Icons";
 import { isSameDay } from "@/utils/date-core";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { getDateTimeFormat } from "@/utils/intl-cache";
@@ -40,11 +41,9 @@ const getRangeSep = (
   }
 };
 
-// TODO: per-chip remove (× icon on each chip). Useful in mode="multiple" to drop one
-// date without wiping the whole selection, and in mode="range" to clear from/to
-// individually via onRangeBoundSet(bound, null). Gate behind a new prop, e.g. `chipRemove`.
 export interface CalendarSelectedDatesProps {
   allowClear?: boolean;
+  allowClearPerChip?: boolean;
   allowNavigate?: boolean;
   animated?: boolean;
   align?: AlignValue;
@@ -57,8 +56,40 @@ export interface CalendarSelectedDatesProps {
 const formatOverflowLabel = (label: string, count: number) =>
   label.replaceAll("{count}", String(count));
 
+const getTargetPaddingY = (
+  inner: HTMLDivElement,
+  fallbackStyle: CSSStyleDeclaration,
+): number => {
+  const probe = document.createElement("div");
+  probe.style.position = "absolute";
+  probe.style.visibility = "hidden";
+  probe.style.pointerEvents = "none";
+  probe.style.paddingTop = "var(--cal-spacing)";
+  probe.style.paddingBottom = "var(--cal-spacing)";
+  inner.appendChild(probe);
+
+  const probeStyle = window.getComputedStyle(probe);
+  const targetPaddingTop = Number.parseFloat(probeStyle.paddingTop);
+  const targetPaddingBottom = Number.parseFloat(probeStyle.paddingBottom);
+  probe.remove();
+
+  const targetPaddingY =
+    (Number.isFinite(targetPaddingTop) ? targetPaddingTop : 0) +
+    (Number.isFinite(targetPaddingBottom) ? targetPaddingBottom : 0);
+
+  if (targetPaddingY > 0) return targetPaddingY;
+
+  const paddingTop = Number.parseFloat(fallbackStyle.paddingTop);
+  const paddingBottom = Number.parseFloat(fallbackStyle.paddingBottom);
+  return (
+    (Number.isFinite(paddingTop) ? paddingTop : 0) +
+    (Number.isFinite(paddingBottom) ? paddingBottom : 0)
+  );
+};
+
 export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
   allowClear = false,
+  allowClearPerChip = false,
   allowNavigate = true,
   animated = true,
   align = "left",
@@ -72,10 +103,11 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
   const innerRef = useRef<HTMLDivElement>(null);
   const chipsGroupRef = useRef<HTMLDivElement>(null);
   const clearBtnRef = useRef<HTMLButtonElement>(null);
-  const { locale, range, hour12, timeZone, readOnly } = useConfig();
+  const { locale, range, multiselect, hour12, timeZone, readOnly } =
+    useConfig();
   const { viewDate: date, navigateTo } = useNavigation();
   const { selectedDates, rangeStart, rangeEnd } = useSelectionValue();
-  const { onChangeDate } = useSelectionActions();
+  const { onChangeDate, onDatesSet, onRangeSet } = useSelectionActions();
 
   const dateFmt = getDateTimeFormat(locale, {
     day: "numeric",
@@ -118,8 +150,13 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
   }, [maxVisibleChips, selectedDates.length]);
 
   useIsoLayoutEffect(() => {
-    if (!animated || !hasContent) {
+    if (!animated) {
       setInnerHeight(null);
+      return;
+    }
+
+    if (!hasContent) {
+      setInnerHeight(0);
       return;
     }
 
@@ -129,9 +166,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
 
     const measure = () => {
       const computedStyle = window.getComputedStyle(inner);
-      const paddingY =
-        Number.parseFloat(computedStyle.paddingTop) +
-        Number.parseFloat(computedStyle.paddingBottom);
+      const paddingY = getTargetPaddingY(inner, computedStyle);
       const contentHeight = Math.max(
         chipsGroup.scrollHeight,
         clearBtnRef.current?.offsetHeight ?? 0,
@@ -156,6 +191,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
     visibleSelectedDates.length,
     overflowCount,
     allowClear,
+    allowClearPerChip,
     align,
     showTime,
     overflowLabel,
@@ -172,8 +208,8 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
   const chipClass = (d: Date) =>
     [
       styles.chip,
-      shared.interactive,
-      shared.hovered,
+      allowClearPerChip ? styles.chipWithRemove : shared.interactive,
+      !allowClearPerChip && shared.hovered,
       isCurrentMonth(d) && allowNavigate
         ? shared.activeItem
         : styles.inactiveChip,
@@ -186,41 +222,121 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
     onChangeDate(null);
   };
 
-  const clearBtn = allowClear ? (
-    <button
-      ref={clearBtnRef}
-      type="button"
-      aria-label="Clear"
-      className={`${styles.clearBtn} ${shared.interactive} ${shared.hovered}`}
-      onClick={handleClear}
-      disabled={readOnly}
-    >
-      ×
-    </button>
-  ) : null;
+  const removeDate = (d: Date, bound?: "from" | "to") => {
+    if (readOnly) return;
+
+    if (range) {
+      if (bound === "from") {
+        onRangeSet(null, rangeEnd);
+      } else {
+        onRangeSet(rangeStart, null);
+      }
+      return;
+    }
+
+    if (multiselect) {
+      onDatesSet(selectedDates.filter((selected) => !isSameDay(selected, d)));
+    } else {
+      onChangeDate(null);
+    }
+  };
+
+  const renderDateChip = ({
+    d,
+    key,
+    className,
+    label,
+    onNavigate,
+    removeLabel,
+    bound,
+    dataActive,
+    dataSelectedDateChip,
+  }: {
+    d: Date;
+    key?: React.Key;
+    className: string;
+    label: string;
+    onNavigate: () => void;
+    removeLabel: string;
+    bound?: "from" | "to";
+    dataActive?: boolean;
+    dataSelectedDateChip?: boolean;
+  }) =>
+    allowClearPerChip ? (
+      <span
+        key={key}
+        className={className}
+        data-active={dataActive || undefined}
+        data-selected-date-chip={dataSelectedDateChip ? "true" : undefined}
+      >
+        <button type="button" className={styles.chipMain} onClick={onNavigate}>
+          {label}
+        </button>
+        <button
+          type="button"
+          className={styles.chipRemoveBtn}
+          onClick={(event) => {
+            event.stopPropagation();
+            removeDate(d, bound);
+          }}
+          aria-label={removeLabel}
+          disabled={readOnly}
+        >
+          <Clear />
+        </button>
+      </span>
+    ) : (
+      <button
+        key={key}
+        type="button"
+        data-active={dataActive || undefined}
+        data-selected-date-chip={dataSelectedDateChip ? "true" : undefined}
+        onClick={onNavigate}
+        className={className}
+      >
+        {label}
+      </button>
+    );
+
+  const clearBtn =
+    allowClear && hasContent ? (
+      <button
+        ref={clearBtnRef}
+        type="button"
+        aria-label="Clear"
+        className={`${styles.clearBtn} ${shared.interactive} ${shared.hovered}`}
+        onClick={handleClear}
+        disabled={readOnly}
+      >
+        ×
+      </button>
+    ) : null;
 
   const chipsContent = range ? (
     rangeStart ? (
       <>
-        <button
-          type="button"
-          onClick={() => allowNavigate && navigateTo(rangeStart)}
-          className={chipClass(rangeStart)}
-        >
-          {fmtChip(rangeStart)}
-        </button>
+        {renderDateChip({
+          d: rangeStart,
+          key: "range-start",
+          className: chipClass(rangeStart),
+          label: fmtChip(rangeStart),
+          onNavigate: () => allowNavigate && navigateTo(rangeStart),
+          removeLabel: "Remove range start",
+          bound: "from",
+        })}
         <span className={styles.rangeSep}>
           {rangeEnd ? getRangeSep(dateFmt, rangeStart, rangeEnd) : "…"}
         </span>
-        {rangeEnd && (
-          <button
-            type="button"
-            onClick={() => allowNavigate && navigateTo(rangeEnd)}
-            className={chipClass(rangeEnd)}
-          >
-            {fmtChip(rangeEnd)}
-          </button>
-        )}
+        {rangeEnd &&
+          renderDateChip({
+            d: rangeEnd,
+            key: "range-end",
+            className: chipClass(rangeEnd),
+            label: fmtChip(rangeEnd),
+            onNavigate: () => allowNavigate && navigateTo(rangeEnd),
+            removeLabel: "Remove range end",
+            bound: "to",
+          })}
       </>
     ) : null
   ) : (
@@ -229,27 +345,25 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
         const isActive = isSameDay(d, date);
         const isRevealedChip =
           isExpanded && hasOverflow && index >= visibleChipsCount;
-        return (
-          <button
-            key={d.getTime()}
-            type="button"
-            data-active={isActive || undefined}
-            data-selected-date-chip="true"
-            onClick={() => allowNavigate && navigateTo(d)}
-            className={[
-              styles.chip,
-              shared.interactive,
-              shared.hovered,
-              isActive ? shared.activeItem : styles.inactiveChip,
-              isActive ? styles.activeChip : "",
-              isRevealedChip ? styles.revealedChip : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-          >
-            {fmtChip(d)}
-          </button>
-        );
+        return renderDateChip({
+          d,
+          key: d.getTime(),
+          dataActive: isActive,
+          dataSelectedDateChip: true,
+          label: fmtChip(d),
+          onNavigate: () => allowNavigate && navigateTo(d),
+          removeLabel: "Remove selected date",
+          className: [
+            styles.chip,
+            allowClearPerChip ? styles.chipWithRemove : shared.interactive,
+            !allowClearPerChip && shared.hovered,
+            isActive ? shared.activeItem : styles.inactiveChip,
+            isActive ? styles.activeChip : "",
+            isRevealedChip ? styles.revealedChip : "",
+          ]
+            .filter(Boolean)
+            .join(" "),
+        });
       })}
       {overflowCount > 0 && (
         <button
@@ -265,12 +379,11 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
     </>
   );
 
-  const innerStyle =
-    animated && innerHeight !== null
-      ? ({
-          "--selected-dates-inner-height": `${innerHeight}px`,
-        } as React.CSSProperties)
-      : undefined;
+  const innerStyle = animated
+    ? ({
+        "--selected-dates-inner-height": `${innerHeight ?? 0}px`,
+      } as React.CSSProperties)
+    : undefined;
 
   return (
     <div
