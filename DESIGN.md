@@ -31,12 +31,13 @@ User layer wins over `themes` and `appearances`; both win over base/component/mo
 
 ### Color tokens (`--c-*`)
 
-Source: `themes/themes.ts`. 14 tokens per theme.
+Source: `themes/themes.ts`. 15 tokens per theme.
 
 | Token   | Role                                          |
 | ------- | --------------------------------------------- |
 | `--c-a` | accent — primary action                       |
 | `--c-at`| activeText — text on active/pressed           |
+| `--c-t-d` | todayDot — dot under selected today         |
 | `--c-b` | backdrop — dialog/overlay background          |
 | `--c-h` | highlight — hover/focus indicator, selected   |
 | `--c-t` | tone — calendar grid background subtone       |
@@ -284,7 +285,7 @@ CSS wins the race vs JS. Client-side resolution via `useClientValue(matchMedia, 
 
 ## File references
 
-- `themes/themes.ts` — 34 themes, 14 tokens each
+- `themes/themes.ts` — 38 themes, 15 tokens each
 - `appearances/index.ts` — 5 appearances
 - `src/core/layout.module.css` — typography, container query, color defaults
 - `src/hooks/use-client-value.ts` — SSR-safe deferred values

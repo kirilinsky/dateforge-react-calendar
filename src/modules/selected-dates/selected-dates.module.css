@@ -2,20 +2,17 @@
   .selectedContainer {
     --selected-dates-transition: 0.2s;
 
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.35em;
-    padding: var(--cal-spacing);
+    display: grid;
+    grid-template-rows: 1fr;
+    padding: 0;
     z-index: 3;
   }
 
   .selectedContainer.animated[data-area="selected-dates"] {
-    display: grid;
     grid-template-rows: 0fr;
     transition:
       background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
       grid-template-rows var(--selected-dates-transition) cubic-bezier(0.4, 0, 0.2, 1);
-    padding: 0;
   }
 
   .selectedContainer.animated.visible[data-area="selected-dates"] {
@@ -28,10 +25,16 @@
     display: flex;
     align-items: center;
     gap: 0.35em;
+    padding: var(--cal-spacing);
+    transition:
+      padding var(--selected-dates-transition) cubic-bezier(0.4, 0, 0.2, 1),
+      height var(--selected-dates-transition) cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .animated .inner {
+    box-sizing: border-box;
+    height: var(--selected-dates-inner-height, auto);
     padding: 0 var(--cal-spacing);
-    padding-top: 0;
-    padding-bottom: 0;
-    transition: padding var(--selected-dates-transition) cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .chipsGroup {
@@ -68,6 +71,38 @@
 
   .activeChip {
     box-shadow: var(--active-cell-stroke, none);
+  }
+
+  .revealedChip {
+    animation: selected-dates-chip-reveal var(--selected-dates-transition) cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .overflowChip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--c-t);
+    color: var(--c-m, var(--c-c));
+    box-shadow: var(--active-cell-stroke, none);
+    user-select: none;
+  }
+
+  @keyframes selected-dates-chip-reveal {
+    from {
+      opacity: 0;
+      transform: translateY(-0.3em) scale(0.96);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .revealedChip {
+      animation: none;
+    }
   }
 
   .clearBtn {
