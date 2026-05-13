@@ -56,7 +56,7 @@
       color-mix(in srgb, var(--c-h) 50%, transparent);
   }
 
-  .todayItem::after {
+  .dayGridContainer[data-today-dot] .todayItem::after {
     content: "";
     position: absolute;
     left: 50%;
@@ -69,8 +69,16 @@
     pointer-events: none;
   }
 
-  .todayItem[data-selected]::after {
+  .dayGridContainer[data-today-dot] .todayItem[data-selected]::after {
     background: var(--c-t-d, var(--active-cell-color, var(--c-at, var(--c-a))));
+  }
+
+  .dayLabel {
+    display: inline-block;
+  }
+
+  .dayGridContainer[data-today-dot] .todayItem .dayLabel {
+    transform: translateY(-0.1em);
   }
 
   .boldWeekend {
@@ -193,10 +201,14 @@
       padding: min(var(--days-wn-padding, 0.5em), 0.3em);
     }
 
-    .todayItem::after {
+    .dayGridContainer[data-today-dot] .todayItem::after {
       bottom: 0.14em;
       width: 0.16em;
       height: 0.16em;
+    }
+
+    .dayGridContainer[data-today-dot] .todayItem .dayLabel {
+      transform: translateY(-0.08em);
     }
   }
 
