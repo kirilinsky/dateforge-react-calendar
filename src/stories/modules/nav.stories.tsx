@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
+import { userEvent, within } from "storybook/test";
 import { Calendar } from "@/components/calendar/calendar";
+import { CalendarDays } from "@/modules/days";
 import { CalendarNav } from "@/modules/nav";
 import { FIXED_DATE } from "../_constants";
 import {
@@ -85,6 +87,7 @@ const meta: Meta<NavArgs> = {
           clear={args.clear}
           themeToggle={args.themeToggle}
         />
+        <CalendarDays />
       </Calendar>
     );
   },
@@ -161,6 +164,7 @@ export const WithThemeToggle: Story = {
           clear={args.clear}
           themeToggle={args.themeToggle}
         />
+        <CalendarDays />
       </Calendar>
     );
   },
@@ -177,6 +181,15 @@ export const ShowTimePicker: Story = {
   args: { showMonthPicker: true, showTime: true },
 };
 ShowTimePicker.storyName = "Show time picker popup";
+
+export const MonthPopupOpen: Story = {
+  args: { showMonthPicker: true, showYearPicker: true },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByLabelText(/Change month/));
+  },
+};
+MonthPopupOpen.storyName = "Month popup open";
 
 export const WithLabel: Story = {
   args: { label: "This is label" },

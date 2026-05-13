@@ -2,6 +2,7 @@ import type React from "react";
 import { useMemo } from "react";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
+import { useSelectionValue } from "@/context/selection-context";
 import shared from "@/global/global.module.css";
 import { useRovingTileFocus } from "@/hooks/use-roving-tile-focus";
 import { getMonthListData, setMonth } from "@/utils/date-utils";
@@ -31,9 +32,19 @@ export const CalendarMonthsGrid: React.FC<CalendarMonthsGridProps> = ({
 }) => {
   const { locale, minDate, maxDate, disabled } = useConfig();
   const { viewDate, navigateTo } = useNavigation();
+  const { selectedDates, rangeStart, rangeEnd } = useSelectionValue();
 
   const currentMonth = viewDate.getMonth();
   const currentYear = viewDate.getFullYear();
+  const selectedMonths = useMemo(() => {
+    const months = new Set<number>();
+    for (const date of [...selectedDates, rangeStart, rangeEnd]) {
+      if (date && date.getFullYear() === currentYear) {
+        months.add(date.getMonth());
+      }
+    }
+    return months;
+  }, [selectedDates, rangeStart, rangeEnd, currentYear]);
 
   const mNames = useMemo(
     () =>
@@ -90,11 +101,16 @@ export const CalendarMonthsGrid: React.FC<CalendarMonthsGridProps> = ({
       >
         {mNames.map((n, i) => {
           const isCurrent = i === currentMonth;
+          const isSelected = selectedMonths.has(i);
           const isHidden = hideOutOfRange && n.limited;
           const isDisabled = n.disabled || isHidden;
-          const fullLabel =
-            longFmt.format(new Date(currentYear, i, 1)) +
-            (isDisabled && !isHidden ? ", limited" : "");
+          const fullLabel = [
+            longFmt.format(new Date(currentYear, i, 1)),
+            isSelected ? "selected" : "",
+            isDisabled && !isHidden ? "limited" : "",
+          ]
+            .filter(Boolean)
+            .join(", ");
           return (
             <button
               key={`${currentYear}-${n.label}`}
@@ -105,6 +121,7 @@ export const CalendarMonthsGrid: React.FC<CalendarMonthsGridProps> = ({
                 shared.adaptiveTile,
                 shared.interactive,
                 shared.hovered,
+                isSelected ? shared.selectedItem : "",
                 isCurrent ? shared.activeItem : "",
               ]
                 .filter(Boolean)
@@ -113,6 +130,7 @@ export const CalendarMonthsGrid: React.FC<CalendarMonthsGridProps> = ({
               aria-current={isCurrent ? "true" : undefined}
               aria-disabled={isDisabled || undefined}
               aria-hidden={isHidden || undefined}
+              data-selected={isSelected || undefined}
               style={isHidden ? { visibility: "hidden" } : undefined}
               onClick={() => !isDisabled && handleClick(i)}
             >

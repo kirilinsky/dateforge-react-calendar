@@ -35,6 +35,21 @@ describe("CalendarYearsGrid", () => {
     expect(current?.textContent).toBe("2026");
   });
 
+  it("marks selected years without changing the navigation-only click contract", async () => {
+    const { container } = render(
+      <Calendar value={new Date(2024, 5, 15)}>
+        <CalendarYearsGrid yearsPerPage={10} />
+      </Calendar>,
+    );
+    await userEvent.click(yearButton(container, 2026)!);
+    const selected = yearButton(container, 2024)!;
+    const current = yearButton(container, 2026)!;
+    expect(selected.getAttribute("data-selected")).toBe("true");
+    expect(selected.getAttribute("aria-current")).toBeNull();
+    expect(current.getAttribute("aria-current")).toBe("true");
+    expect(current.getAttribute("data-selected")).toBeNull();
+  });
+
   it("arrow keys move focus between year tiles", () => {
     const { container } = render(
       <Calendar value={new Date(2024, 5, 15)}>
@@ -47,6 +62,21 @@ describe("CalendarYearsGrid", () => {
     current.focus();
     fireEvent.keyDown(current, { key: "ArrowRight" });
     expect(document.activeElement).toBe(next);
+  });
+
+  it("arrow keys can focus disabled out-of-range year tiles for announcement", () => {
+    const { container } = render(
+      <Calendar value={new Date(2024, 5, 15)} maxDate={new Date(2024, 11, 31)}>
+        <CalendarYearsGrid yearsPerPage={10} />
+      </Calendar>,
+    );
+    const current = yearButton(container, 2024)!;
+    const disabledNext = yearButton(container, 2025)!;
+    expect(current.tabIndex).toBe(0);
+    expect(disabledNext.getAttribute("aria-disabled")).toBe("true");
+    current.focus();
+    fireEvent.keyDown(current, { key: "ArrowRight" });
+    expect(document.activeElement).toBe(disabledNext);
   });
 
   it("Next/Previous chevrons paginate through years", async () => {
@@ -151,6 +181,23 @@ describe("CalendarYearsGrid", () => {
     expect(limited.length).toBeGreaterThan(0);
   });
 
+  it("hideOutOfRange puts the initial tab stop on the first visible year", () => {
+    const { container } = render(
+      <Calendar
+        value={new Date(2024, 5, 15)}
+        minDate={new Date(2025, 0, 1)}
+        maxDate={new Date(2026, 11, 31)}
+      >
+        <CalendarYearsGrid yearsPerPage={10} startYear={2020} hideOutOfRange />
+      </Calendar>,
+    );
+    const hiddenCurrent = yearButton(container, 2024)!;
+    const firstVisible = yearButton(container, 2025)!;
+    expect(hiddenCurrent.getAttribute("aria-hidden")).toBe("true");
+    expect(hiddenCurrent.tabIndex).toBe(-1);
+    expect(firstVisible.tabIndex).toBe(0);
+  });
+
   it("invalid yearsPerPage clamps and emits dev warning", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     render(
@@ -180,5 +227,23 @@ describe("CalendarYearsGrid", () => {
     await userEvent.click(out!);
     const current = container.querySelector('[aria-current="true"]');
     expect(current?.textContent).toBe("2024");
+  });
+
+  it("clamps Feb 29 to Feb 28 when selecting a non-leap year", async () => {
+    const onYearSelect = vi.fn();
+    const { container } = render(
+      <Calendar
+        value={new Date(2024, 1, 29)}
+        defaultViewDate={new Date(2024, 1, 29)}
+      >
+        <CalendarYearsGrid yearsPerPage={10} onYearSelect={onYearSelect} />
+      </Calendar>,
+    );
+    await userEvent.click(yearButton(container, 2025)!);
+    expect(onYearSelect).toHaveBeenCalledTimes(1);
+    const next = onYearSelect.mock.calls[0][0] as Date;
+    expect(next.getFullYear()).toBe(2025);
+    expect(next.getMonth()).toBe(1);
+    expect(next.getDate()).toBe(28);
   });
 });

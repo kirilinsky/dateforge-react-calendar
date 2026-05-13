@@ -1,4 +1,4 @@
-# Design
+Reduced motion# Design
 
 Visual & UX design system for `@dateforge/react-calendar`. Covers tokens, themes, appearances, motion, interaction patterns, and accessibility.
 

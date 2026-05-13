@@ -58,8 +58,7 @@
   justify-content: center;
   font-size: var(--cal-text-sm);
   font-weight: var(--cal-weight-regular);
-  color: #fff;
-  mix-blend-mode: difference;
+  color: var(--c-c);
   padding: 0.25em 0.4em;
   cursor: pointer;
   position: relative;
@@ -73,12 +72,12 @@
 .active {
   font-weight: var(--cal-weight-semibold);
   color: var(--active-cell-color, var(--c-at, var(--c-a)));
-  mix-blend-mode: normal;
   cursor: default;
 }
 
 .disabled {
   cursor: default;
+  color: var(--c-dt, var(--c-c));
   opacity: 0.45;
 }
 
