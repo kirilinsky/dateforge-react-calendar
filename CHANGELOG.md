@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.7
+
+### Patch Changes
+
+- [#68](https://github.com/kirilinsky/dateforge-react-calendar/pull/68) [`a86063d`](https://github.com/kirilinsky/dateforge-react-calendar/commit/a86063d172e50e754cfc91687b6c5c165b738c13) Thanks [@kirilinsky](https://github.com/kirilinsky)! - Hotfix popup drum text colors.
+
+  Improve month/year grid accessibility states.
+
 ## 1.4.6
 
 ### Patch Changes

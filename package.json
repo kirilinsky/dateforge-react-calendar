@@ -1,6 +1,6 @@
 {
   "name": "@dateforge/react-calendar",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "description": "Modular React calendar and date/time picker. Single, range, and multi-select with time support and presets. Themeable, accessible, SSR-safe, zero dependencies.",
   "publishConfig": {
     "access": "public",
