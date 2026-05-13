@@ -185,7 +185,7 @@ const DayCell = React.memo(function DayCell({
         data-max-reached={isMaxReachedTarget || undefined}
         className={className}
       >
-        {day}
+        <span className={styles.dayLabel}>{day}</span>
       </button>
     </div>
   );
