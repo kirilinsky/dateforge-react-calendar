@@ -293,7 +293,6 @@
     "themeable",
     "css-grid",
     "zero-dependencies",
-    "react-19",
     "dateforge"
   ],
   "engines": {
