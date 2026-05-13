@@ -37,10 +37,7 @@ describe("CalendarMonthsGrid", () => {
 
   it("arrow keys can focus disabled out-of-range month tiles for announcement", () => {
     const { getByLabelText } = render(
-      <Calendar
-        value={new Date(2024, 4, 15)}
-        maxDate={new Date(2024, 4, 31)}
-      >
+      <Calendar value={new Date(2024, 4, 15)} maxDate={new Date(2024, 4, 31)}>
         <CalendarMonthsGrid />
       </Calendar>,
     );
@@ -55,10 +52,7 @@ describe("CalendarMonthsGrid", () => {
 
   it("clicking a disabled out-of-range month is a no-op", async () => {
     const { container, getByLabelText } = render(
-      <Calendar
-        value={new Date(2024, 4, 15)}
-        maxDate={new Date(2024, 4, 31)}
-      >
+      <Calendar value={new Date(2024, 4, 15)} maxDate={new Date(2024, 4, 31)}>
         <CalendarMonthsGrid />
       </Calendar>,
     );
