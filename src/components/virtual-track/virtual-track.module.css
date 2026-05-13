@@ -86,8 +86,7 @@
 .itemText {
   position: relative;
   z-index: 2;
-  color: #fff;
-  mix-blend-mode: difference;
+  color: var(--c-c);
   pointer-events: none;
   transition: color 0.14s ease 0.04s;
 }
@@ -99,7 +98,6 @@
 
 .active .itemText {
   color: var(--active-cell-color, var(--c-at, var(--c-a)));
-  mix-blend-mode: normal;
 }
 
 }
