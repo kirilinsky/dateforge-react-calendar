@@ -130,6 +130,8 @@ export const StandaloneMonthPicker: Story = {
           Picked: <strong>{label}</strong>
         </div>
         <Calendar
+          minDate={new Date(2016, 1, 1)}
+          maxDate={new Date(2016, 8, 30)}
           locale={args.locale ?? resolveStoryLocale(ctx.globals.locale)}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}

@@ -57,6 +57,13 @@
     color: inherit;
   }
 
+  .selectedItem {
+    background: color-mix(in srgb, var(--c-h) 12%, var(--c-b));
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--c-h) 48%, transparent),
+      inset 0 1px 0 color-mix(in srgb, var(--c-b) 54%, transparent);
+  }
+
   .adaptiveTile {
     --hover-shadow:
       inset 0 1px 0 color-mix(in srgb, var(--c-b) 54%, transparent),

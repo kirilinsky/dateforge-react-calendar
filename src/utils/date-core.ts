@@ -68,7 +68,11 @@ export const addDate = (
   });
 
 export const setYear = (date: Date, v: number) =>
-  mutate(date, (d) => d.setFullYear(v));
+  mutate(date, (d) => {
+    const max = daysInMonth(v, d.getMonth());
+    if (d.getDate() > max) d.setDate(max);
+    d.setFullYear(v);
+  });
 
 const checkDisabledRule = (d: Date, rule: DisabledRule): boolean => {
   if (typeof rule === "boolean") return rule;

@@ -2,11 +2,13 @@ import type React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
+import { useSelectionValue } from "@/context/selection-context";
 import { warnOnce } from "@/core/dev-warn";
 import shared from "@/global/global.module.css";
 import { useRovingTileFocus } from "@/hooks/use-roving-tile-focus";
 import { ChevronLeft, ChevronRight } from "@/Icons";
 import type { DisabledConfig } from "@/types/calendar";
+import { setYear } from "@/utils/date-utils";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { MAX_CALENDAR_YEAR, MIN_CALENDAR_YEAR } from "@/utils/year-range";
 import styles from "./years-grid.module.css";
@@ -85,10 +87,18 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
   }
   const { minDate, maxDate, disabled } = useConfig();
   const { viewDate, navigateTo } = useNavigation();
+  const { selectedDates, rangeStart, rangeEnd } = useSelectionValue();
 
   const minAllowedYear = minDate ? minDate.getFullYear() : MIN_CALENDAR_YEAR;
   const maxAllowedYear = maxDate ? maxDate.getFullYear() : MAX_CALENDAR_YEAR;
   const currentYear = viewDate.getFullYear();
+  const selectedYears = useMemo(() => {
+    const years = new Set<number>();
+    for (const date of [...selectedDates, rangeStart, rangeEnd]) {
+      if (date) years.add(date.getFullYear());
+    }
+    return years;
+  }, [selectedDates, rangeStart, rangeEnd]);
   const hasCustomStartYear = startYear !== undefined;
   const startYearIsInteger =
     startYear === undefined ||
@@ -168,8 +178,7 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
   ]);
 
   const handleClick = (year: number) => {
-    const next = new Date(viewDate);
-    next.setFullYear(year);
+    const next = setYear(viewDate, year);
     navigateTo(next);
     onYearSelect?.(next);
   };
@@ -178,10 +187,17 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
   const pageEndYear =
     years.at(-1)?.year ??
     Math.min(MAX_CALENDAR_YEAR, pageStartYear + pageSize - 1);
-  const activeIndex = years.findIndex(({ year }) => year === currentYear);
+  const currentIndex = years.findIndex(({ year }) => year === currentYear);
+  const activeIndex =
+    currentIndex >= 0 && !(hideOutOfRange && years[currentIndex]?.limited)
+      ? currentIndex
+      : Math.max(
+          0,
+          years.findIndex(({ limited }) => !limited),
+        );
   const { containerRef, handleKeyDown, getItemProps } = useRovingTileFocus({
     itemCount: years.length,
-    activeIndex: activeIndex >= 0 ? activeIndex : 0,
+    activeIndex,
   });
 
   return (
@@ -235,12 +251,19 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
           const isHidden = hideOutOfRange && limited;
           const isDisabled = disabled || isHidden;
           const isCurrent = year === currentYear;
+          const isSelected = selectedYears.has(year);
           return (
             <button
               key={year}
               type="button"
               {...getItemProps(index)}
-              aria-label={`${year}${isDisabled && !isHidden ? ", limited" : ""}`}
+              aria-label={[
+                year,
+                isSelected ? "selected" : "",
+                isDisabled && !isHidden ? "limited" : "",
+              ]
+                .filter(Boolean)
+                .join(", ")}
               aria-current={isCurrent ? "true" : undefined}
               aria-disabled={isDisabled || undefined}
               aria-hidden={isHidden || undefined}
@@ -249,10 +272,12 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
                 shared.adaptiveTile,
                 shared.interactive,
                 shared.hovered,
+                isSelected ? shared.selectedItem : "",
                 isCurrent ? shared.activeItem : "",
               ]
                 .filter(Boolean)
                 .join(" ")}
+              data-selected={isSelected || undefined}
               style={isHidden ? { visibility: "hidden" } : undefined}
               onClick={() => !isDisabled && handleClick(year)}
             >

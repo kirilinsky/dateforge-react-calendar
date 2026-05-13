@@ -120,6 +120,12 @@ describe("addDate", () => {
 describe("setYear", () => {
   it("sets year", () =>
     expect(setYear(d(2024, 6, 15), 2030).getFullYear()).toBe(2030));
+  it("clamps leap day when target year is not leap", () => {
+    const result = setYear(d(2024, 2, 29), 2025);
+    expect(result.getFullYear()).toBe(2025);
+    expect(result.getMonth()).toBe(1);
+    expect(result.getDate()).toBe(28);
+  });
   it("does not mutate input", () => {
     const orig = d(2024, 6, 15);
     const ts = orig.getTime();
