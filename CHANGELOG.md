@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.6
+
+### Patch Changes
+
+- [#66](https://github.com/kirilinsky/dateforge-react-calendar/pull/66) [`2bbc9c6`](https://github.com/kirilinsky/dateforge-react-calendar/commit/2bbc9c65f9b43409a22fb9bd0090a67422498cb0) Thanks [@kirilinsky](https://github.com/kirilinsky)! - Add controlled overflow chips for `CalendarSelectedDates`, make its clear action opt-in/read-only safe, and introduce the `todayDot` theme token for selected-today dots.
+
 ## 1.4.5
 
 ### Patch Changes
