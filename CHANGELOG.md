@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.8
+
+### Patch Changes
+
+- [#70](https://github.com/kirilinsky/dateforge-react-calendar/pull/70) [`3aca8c5`](https://github.com/kirilinsky/dateforge-react-calendar/commit/3aca8c56ed889f8cc35178222b0c1f91169a98d8) Thanks [@kirilinsky](https://github.com/kirilinsky)! - Add `allowClearPerChip` to `CalendarSelectedDates` and fix animated height after clearing and selecting again.
+
 ## 1.4.7
 
 ### Patch Changes
