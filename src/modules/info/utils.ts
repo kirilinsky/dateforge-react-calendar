@@ -1,0 +1,313 @@
+import { getDateTimeFormat, getNumberFormat } from "@/utils/intl-cache";
+
+export const DAY_MS = 86_400_000;
+export const HOUR_MS = 3_600_000;
+export const MINUTE_MS = 60_000;
+
+export type CalendarInfoUnit = "date" | "day" | "hour" | "minute" | "night";
+type CalendarInfoIntlUnit = Extract<
+  CalendarInfoUnit,
+  "day" | "hour" | "minute"
+>;
+
+export type CalendarInfoRangeStyle = "nights" | "duration";
+export type CalendarInfoRelativeTarget =
+  | "selected"
+  | "range-start"
+  | "range-end";
+
+export interface CalendarInfoFormatContext {
+  hour12: boolean;
+  locale: string;
+  timeZone?: string;
+}
+
+export interface CalendarInfoFormatHelpers {
+  formatRelative: (date: Date, baseDate?: Date) => string;
+  formatSelectionCount: (count: number) => string;
+  formatUnit: (value: number, unit: CalendarInfoUnit) => string;
+}
+
+export type CalendarInfoUnitFormatter = (
+  value: number,
+  unit: CalendarInfoUnit,
+  context: CalendarInfoFormatContext,
+) => string | undefined;
+
+export type CalendarInfoSelectionCountFormatter = (
+  count: number,
+  context: CalendarInfoFormatContext,
+) => string;
+
+export interface CalendarInfoTargetContext {
+  rangeEnd: Date | null;
+  rangeStart: Date | null;
+  selectedDate: Date | null;
+  selectedDates: Date[];
+}
+
+export interface CalendarInfoRangeSummaryContext {
+  durationDays: number;
+  durationMs: number;
+  from: Date;
+  nights: number;
+  to: Date;
+}
+
+const intlUnits = new Set<CalendarInfoUnit>(["day", "hour", "minute"]);
+
+const isIntlUnit = (unit: CalendarInfoUnit): unit is CalendarInfoIntlUnit =>
+  intlUnits.has(unit);
+
+export const isValidDate = (date: Date | null | undefined): date is Date =>
+  date instanceof Date && !Number.isNaN(date.getTime());
+
+const getDatePartValue = (
+  parts: Intl.DateTimeFormatPart[],
+  type: "day" | "month" | "year",
+) => Number(parts.find((part) => part.type === type)?.value);
+
+export const getCalendarDayIndex = (date: Date, timeZone?: string) => {
+  const formatter = new Intl.DateTimeFormat("en-US-u-ca-gregory", {
+    day: "numeric",
+    month: "numeric",
+    year: "numeric",
+    ...(timeZone && { timeZone }),
+  });
+  const parts = formatter.formatToParts(date);
+  return (
+    Date.UTC(
+      getDatePartValue(parts, "year"),
+      getDatePartValue(parts, "month") - 1,
+      getDatePartValue(parts, "day"),
+    ) / DAY_MS
+  );
+};
+
+export const getRelativeTargetDate = (
+  target: CalendarInfoRelativeTarget,
+  context: CalendarInfoTargetContext,
+) => {
+  if (target === "range-start") return context.rangeStart;
+  if (target === "range-end") return context.rangeEnd;
+  return (
+    context.selectedDate ??
+    context.selectedDates[0] ??
+    context.rangeStart ??
+    context.rangeEnd
+  );
+};
+
+const getRelativeUnitValue = (
+  targetDate: Date,
+  baseDate: Date,
+  timeZone?: string,
+): [Intl.RelativeTimeFormatUnit, number] => {
+  const dayDiff =
+    getCalendarDayIndex(targetDate, timeZone) -
+    getCalendarDayIndex(baseDate, timeZone);
+  if (dayDiff !== 0) return ["day", dayDiff];
+
+  const diffMs = targetDate.getTime() - baseDate.getTime();
+  const hourDiff = Math.round(diffMs / HOUR_MS);
+  if (hourDiff !== 0) return ["hour", hourDiff];
+
+  const minuteDiff = Math.round(diffMs / MINUTE_MS);
+  return ["minute", minuteDiff];
+};
+
+export const createCalendarInfoFormatters = ({
+  hour12,
+  locale,
+  relativeBaseDate,
+  selectionCountFormatter,
+  timeZone,
+  unitFormatter,
+}: {
+  hour12: boolean;
+  locale: string;
+  relativeBaseDate: Date | null;
+  selectionCountFormatter?: CalendarInfoSelectionCountFormatter;
+  timeZone?: string;
+  unitFormatter?: CalendarInfoUnitFormatter;
+}): CalendarInfoFormatHelpers => {
+  const numberFormat = getNumberFormat(locale, { maximumFractionDigits: 0 });
+  const formatContext = { hour12, locale, timeZone };
+
+  const formatNumber = (value: number) =>
+    numberFormat?.format(value) ?? String(value);
+
+  const formatUnit = (value: number, unit: CalendarInfoUnit) => {
+    const custom = unitFormatter?.(value, unit, formatContext);
+    if (custom !== undefined) return custom;
+
+    if (isIntlUnit(unit)) {
+      return (
+        getNumberFormat(locale, {
+          maximumFractionDigits: 0,
+          style: "unit",
+          unit,
+          unitDisplay: "long",
+        })?.format(value) ?? formatNumber(value)
+      );
+    }
+
+    return formatNumber(value);
+  };
+
+  const formatSelectionCount = (count: number) =>
+    selectionCountFormatter?.(count, formatContext) ?? formatNumber(count);
+
+  const formatRelative = (date: Date, baseDate = relativeBaseDate ?? null) => {
+    if (!baseDate) return "";
+    const [unit, value] = getRelativeUnitValue(date, baseDate, timeZone);
+    try {
+      return new Intl.RelativeTimeFormat(locale, { numeric: "auto" }).format(
+        value,
+        unit,
+      );
+    } catch {
+      return formatUnit(value, unit as CalendarInfoUnit);
+    }
+  };
+
+  return { formatRelative, formatSelectionCount, formatUnit };
+};
+
+const formatDuration = (
+  durationMs: number,
+  formatUnit: CalendarInfoFormatHelpers["formatUnit"],
+) => {
+  const ms = Math.abs(durationMs);
+  const days = Math.floor(ms / DAY_MS);
+  const hours = Math.floor((ms % DAY_MS) / HOUR_MS);
+  const minutes = Math.floor((ms % HOUR_MS) / MINUTE_MS);
+  const parts: string[] = [];
+
+  if (days > 0) parts.push(formatUnit(days, "day"));
+  if (hours > 0) parts.push(formatUnit(hours, "hour"));
+  if (parts.length === 0) parts.push(formatUnit(minutes, "minute"));
+
+  return parts.join(" ");
+};
+
+const formatRangeLabelPrefix = (label?: string) => {
+  const normalized = label?.trim();
+  if (!normalized) return "";
+  return normalized.endsWith(":") ? `${normalized} ` : `${normalized}: `;
+};
+
+const formatRangeDates = (
+  from: Date,
+  to: Date,
+  hour12: boolean,
+  locale: string,
+  timeZone: string | undefined,
+  rangeDateOptions?: Intl.DateTimeFormatOptions,
+) => {
+  const formatter = getDateTimeFormat(locale, {
+    day: "numeric",
+    hour12: rangeDateOptions?.hour12 ?? hour12,
+    month: "short",
+    ...rangeDateOptions,
+    ...(timeZone && { timeZone }),
+  });
+  return `${formatter.format(from)} – ${formatter.format(to)}`;
+};
+
+export const formatCalendarInfoRangeSummary = ({
+  context,
+  hour12,
+  helpers,
+  locale,
+  rangeDateOptions,
+  rangeLabel,
+  rangeStyle,
+  showDurationInDays,
+  showNights,
+  showRangeDates,
+  timeZone,
+}: {
+  context: CalendarInfoRangeSummaryContext;
+  hour12: boolean;
+  helpers: CalendarInfoFormatHelpers;
+  locale: string;
+  rangeDateOptions?: Intl.DateTimeFormatOptions;
+  rangeLabel?: string;
+  rangeStyle: CalendarInfoRangeStyle;
+  showDurationInDays?: boolean;
+  showNights?: boolean;
+  showRangeDates?: boolean;
+  timeZone?: string;
+}) => {
+  const hasExplicitMetric =
+    showDurationInDays !== undefined || showNights !== undefined;
+  const shouldShowDurationInDays = hasExplicitMetric
+    ? !!showDurationInDays
+    : false;
+  const shouldShowNights = hasExplicitMetric
+    ? !!showNights
+    : rangeStyle === "nights";
+
+  const metrics: string[] = [];
+  if (shouldShowDurationInDays) {
+    metrics.push(helpers.formatUnit(context.durationDays, "day"));
+  }
+  if (shouldShowNights) {
+    metrics.push(helpers.formatUnit(context.nights, "night"));
+  }
+
+  if (!hasExplicitMetric && rangeStyle === "duration") {
+    metrics.push(formatDuration(context.durationMs, helpers.formatUnit));
+  }
+
+  if (showRangeDates) {
+    const dates = formatRangeDates(
+      context.from,
+      context.to,
+      hour12,
+      locale,
+      timeZone,
+      rangeDateOptions,
+    );
+    const prefix = formatRangeLabelPrefix(rangeLabel);
+    return metrics.length > 0
+      ? `${prefix}${dates} (${metrics.join(", ")})`
+      : `${prefix}${dates}`;
+  }
+
+  if (metrics.length > 0) return metrics.join(", ");
+
+  return helpers.formatUnit(context.nights, "night");
+};
+
+export const getTargetPaddingY = (
+  inner: HTMLDivElement,
+  fallbackStyle: CSSStyleDeclaration,
+): number => {
+  const probe = document.createElement("div");
+  probe.style.position = "absolute";
+  probe.style.visibility = "hidden";
+  probe.style.pointerEvents = "none";
+  probe.style.paddingTop = "var(--cal-spacing)";
+  probe.style.paddingBottom = "var(--cal-spacing)";
+  inner.appendChild(probe);
+
+  const probeStyle = window.getComputedStyle(probe);
+  const targetPaddingTop = Number.parseFloat(probeStyle.paddingTop);
+  const targetPaddingBottom = Number.parseFloat(probeStyle.paddingBottom);
+  probe.remove();
+
+  const targetPaddingY =
+    (Number.isFinite(targetPaddingTop) ? targetPaddingTop : 0) +
+    (Number.isFinite(targetPaddingBottom) ? targetPaddingBottom : 0);
+
+  if (targetPaddingY > 0) return targetPaddingY;
+
+  const paddingTop = Number.parseFloat(fallbackStyle.paddingTop);
+  const paddingBottom = Number.parseFloat(fallbackStyle.paddingBottom);
+  return (
+    (Number.isFinite(paddingTop) ? paddingTop : 0) +
+    (Number.isFinite(paddingBottom) ? paddingBottom : 0)
+  );
+};

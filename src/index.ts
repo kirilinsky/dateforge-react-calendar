@@ -1,6 +1,7 @@
 export { Calendar } from "./components/calendar/calendar";
 export { useToday } from "./hooks/use-today";
 export type { CalendarDaysTrackProps } from "./modules/days-track/index";
+export type { CalendarInfoProps } from "./modules/info/index";
 export type { CalendarManualInputProps } from "./modules/manual-input/index";
 export type { CalendarMonthsGridProps } from "./modules/months-grid/index";
 export type { CalendarMonthsTrackProps } from "./modules/months-track/index";

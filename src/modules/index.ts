@@ -1,5 +1,6 @@
 export { CalendarDays } from "./days";
 export { CalendarDaysTrack } from "./days-track";
+export { CalendarInfo } from "./info";
 export { CalendarManualInput } from "./manual-input";
 export { CalendarMonthsGrid } from "./months-grid";
 export { CalendarMonthsTrack } from "./months-track";

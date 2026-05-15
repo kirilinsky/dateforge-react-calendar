@@ -52,6 +52,7 @@ export default defineConfig([
     ...sharedBase,
     entry: {
       index: "src/modules/index.ts",
+      info: "src/modules/info/index.tsx",
       days: "src/modules/days/index.tsx",
       nav: "src/modules/nav/index.tsx",
       "months-grid": "src/modules/months-grid/index.tsx",
@@ -83,6 +84,7 @@ export default defineConfig([
     ...sharedBase,
     entry: {
       index: "src/modules/index.ts",
+      info: "src/modules/info/index.tsx",
       days: "src/modules/days/index.tsx",
       nav: "src/modules/nav/index.tsx",
       "months-grid": "src/modules/months-grid/index.tsx",
