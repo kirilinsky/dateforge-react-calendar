@@ -108,7 +108,7 @@
 
     container-type: inline-size;
     display: grid;
-    gap: 1px;
+    gap: var(--cal-container-gap, 1px);
     position: relative;
     box-sizing: border-box;
     width: 100%;

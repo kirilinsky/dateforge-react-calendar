@@ -8,7 +8,9 @@ const TOKEN_KEYS = Object.keys(TOKEN_TO_VAR) as (keyof ThemeTokens)[];
 const BRAND_EXPR = `Symbol.for("rcd.theme.custom")`;
 
 function toJsVarsObj(tokens: ThemeTokens): string {
-  return TOKEN_KEYS.map((k) => `"${TOKEN_TO_VAR[k]}":"${tokens[k]}"`).join(",");
+  return TOKEN_KEYS.filter((k) => tokens[k] !== undefined)
+    .map((k) => `"${TOKEN_TO_VAR[k]}":"${tokens[k]}"`)
+    .join(",");
 }
 
 const names = Object.keys(THEMES_DATA);

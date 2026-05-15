@@ -47,7 +47,7 @@
   }
 
   .otherItem {
-    color: var(--c-m, var(--c-c));
+    color: var(--c-oom, var(--c-m, var(--c-c)));
     &:hover {
       color: var(--c-c);
     }

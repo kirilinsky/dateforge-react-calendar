@@ -20,5 +20,11 @@
     --cal-days-padding: 1em;
     --cal-track-height: 4.5em;
     --cal-day-ratio: 1 / 1;
+    --cal-popup-padding: 0.9em;
+    --cal-size-chip: 2.4em;
+    --cal-size-track-item: 4.5em;
+    --cal-opacity-disabled: 0.45;
+    --cal-opacity-muted: 0.65;
+    --cal-opacity-hover: 0.82;
   }
 }
