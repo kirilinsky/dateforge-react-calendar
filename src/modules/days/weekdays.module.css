@@ -11,6 +11,7 @@
   color: var(--c-m, var(--c-c));
   font-size: var(--cal-text-2xs);
   font-weight: var(--cal-weight-semibold);
+  letter-spacing: var(--cal-letter-spacing, 0);
   margin-bottom: 0.3em;
 }
 

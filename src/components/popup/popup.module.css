@@ -21,7 +21,7 @@
     position: absolute;
     background: var(--c-b);
     border-radius: calc(var(--cal-radius, 0.5em) * 1.5);
-    padding: 0.8em;
+    padding: var(--cal-popup-padding, 0.8em);
     width: 55%;
     max-width: 13.9em;
     min-width: 9.2em;
@@ -71,7 +71,7 @@
   }
 
   .confirm:hover {
-    opacity: 0.85;
+    opacity: var(--cal-opacity-hover, 0.85);
   }
 
 }

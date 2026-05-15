@@ -78,7 +78,7 @@
 .disabled {
   cursor: default;
   color: var(--c-dt, var(--c-c));
-  opacity: 0.45;
+  opacity: var(--cal-opacity-disabled, 0.45);
 }
 
 }

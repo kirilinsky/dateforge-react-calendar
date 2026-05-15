@@ -43,7 +43,7 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: var(--track-item-width, 4em);
+  width: var(--track-item-width, var(--cal-size-track-item, 4em));
   height: 2.6em;
   transform: translate(-50%, -50%);
   background: var(--active-cell-bg, var(--c-h));
@@ -71,7 +71,7 @@
   position: relative;
   z-index: 1;
   flex-shrink: 0;
-  width: var(--track-item-width, 4em);
+  width: var(--track-item-width, var(--cal-size-track-item, 4em));
   height: 2.6em;
   display: flex;
   align-items: center;

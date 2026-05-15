@@ -1,7 +1,7 @@
 /**
  * token keys map directly to CSS variable suffixes: --c-{key}
  * accent=a, activeText=at, todayDot=t-d, backdrop=b, highlight=h, tone=t, text=c, stroke=s, shadow=x, disabled=d,
- * mutedText=m, disabledText=dt, weekend=we, range=r, error=e
+ * mutedText=m, disabledText=dt, weekend=we, range=r, error=e, outOfMonth=oom
  */
 export type ThemeTokens = {
   accent: string;
@@ -19,24 +19,26 @@ export type ThemeTokens = {
   weekend: string;
   range: string;
   error: string;
+  outOfMonth?: string;
 };
 
 export const TOKEN_TO_VAR: Record<keyof ThemeTokens, string> = {
-  accent:   "--c-a",
-  activeText: "--c-at",
-  todayDot: "--c-t-d",
-  backdrop: "--c-b",
-  highlight:"--c-h",
-  tone:     "--c-t",
-  text:     "--c-c",
-  stroke:   "--c-s",
-  shadow:   "--c-x",
-  disabled: "--c-d",
-  mutedText: "--c-m",
-  disabledText: "--c-dt",
-  weekend:  "--c-we",
-  range:    "--c-r",
-  error:    "--c-e",
+  accent:      "--c-a",
+  activeText:  "--c-at",
+  todayDot:    "--c-t-d",
+  backdrop:    "--c-b",
+  highlight:   "--c-h",
+  tone:        "--c-t",
+  text:        "--c-c",
+  stroke:      "--c-s",
+  shadow:      "--c-x",
+  disabled:    "--c-d",
+  mutedText:   "--c-m",
+  disabledText:"--c-dt",
+  weekend:     "--c-we",
+  range:       "--c-r",
+  error:       "--c-e",
+  outOfMonth:  "--c-oom",
 };
 
 const W = "#ffffff";
@@ -81,4 +83,6 @@ export const THEMES_DATA: Record<string, ThemeTokens> = {
   fjord:      { accent: "#eaf3f2", activeText: "#091113", todayDot: "#091113", backdrop: "#0e1416", highlight: "#2fa39b", tone: "#131c1f",  text: "#eaf3f2", stroke: "#223136", shadow: "#2fa39b26", disabled: "#5f6e6c", mutedText: "#8ea3a0", disabledText: "#788b88", weekend: "#d56d64", range: "#38b8ae", error: "#ff6b6b" },
   velvet:     { accent: "#fff0f8", activeText: "#120711", todayDot: "#120711", backdrop: "#120711", highlight: "#ff4da6", tone: "#261127",  text: "#f9d8ea", stroke: "#4a2246", shadow: "#ff4da628", disabled: "#3b2339", mutedText: "#947d8b", disabledText: "#9b8391", weekend: "#ffc857", range: "#6ee7f9", error: "#ff6b6b" },
   eclipse:    { accent: "#f4ffd8", activeText: "#080d09", todayDot: "#080d09", backdrop: "#080d09", highlight: "#b7e000", tone: "#141a12",  text: "#e9f2c7", stroke: "#304024", shadow: "#b7e00024", disabled: "#3b442e", mutedText: "#7f866d", disabledText: "#858c72", weekend: "#ff5d8f", range: "#a78bfa", error: "#ff3d68" },
+  mono:       { accent: W,         activeText: W,         todayDot: "#111111", backdrop: W,         highlight: "#111111", tone: "#f5f5f5",  text: "#111111", stroke: "#e8e8e8", shadow: "#00000010", disabled: "#cccccc", mutedText: "#999999", disabledText: "#cccccc", weekend: "#111111", range: "#111111", error: "#cc0000", outOfMonth: "#d8d8d8" },
+  noir:       { accent: "#111111", activeText: "#111111", todayDot: W,         backdrop: "#111111", highlight: W,         tone: "#1c1c1c",  text: "#e8e8e8", stroke: "#2a2a2a", shadow: "#ffffff08", disabled: "#444444", mutedText: "#666666", disabledText: "#505050", weekend: "#e8e8e8", range: "#e8e8e8", error: "#ff4444", outOfMonth: "#3a3a3a" },
 };

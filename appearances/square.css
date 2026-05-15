@@ -11,5 +11,12 @@
     --cal-leading-normal: 1.2;
     --cal-transition: 0.12s;
     --cal-day-ratio: 1 / 1;
+    --cal-popup-padding: 0.7em;
+    --cal-size-chip: 2em;
+    --cal-size-track-item: 3.8em;
+    --cal-opacity-disabled: 0.3;
+    --cal-opacity-muted: 0.5;
+    --cal-opacity-hover: 0.72;
+    --cal-letter-spacing: 0.04em;
   }
 }

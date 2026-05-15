@@ -23,6 +23,7 @@
   - [CalendarYearsTrack](#calendaryearstrack)
 - [Utility Functions](#utility-functions)
 - [Types](#types)
+- [Design space](#design-space)
 
 ---
 
@@ -607,6 +608,7 @@ Renders the month grid — weekday headers, week numbers (optional), and the day
 | `boldWeekends`      | `boolean`                       | `false`   | Render Saturday and Sunday in bold with the weekend accent color (`--c-we`)                                                                                                                                                                                                                                                      |
 | `highlightToday`    | `boolean`                       | `true`    | Highlight today's date                                                                                                                                                                                                                                                                                                           |
 | `todayDot`          | `boolean`                       | `true`    | Render a small dot under the digit when today is also the selected day. Selected-today dot color uses `--c-t-d`                                                                                                                                                                                                                  |
+| `selectedStyle`     | `"fill" \| "text"`              | `"fill"`  | Render selected days as filled cells (`"fill"`) or as text with a small dot (`"text"`)                                                                                                                                                                                                                                          |
 | `fixedRows`         | `boolean`                       | `true`    | Always render 6 rows of day cells                                                                                                                                                                                                                                                                                                |
 | `weekNumbers`       | `boolean`                       | `false`   | Show ISO week numbers in the leftmost column                                                                                                                                                                                                                                                                                     |
 | `hideWeekdays`      | `boolean`                       | `false`   | Hide the row of weekday name headers                                                                                                                                                                                                                                                                                             |
@@ -1070,6 +1072,22 @@ In multiselect mode the active item follows the date in `selectedDates[]` whose 
 
 ---
 
+## Design space
+
+11 composable modules, ~80 public props (≈60 boolean), 38 built-in themes, 5 appearances, plus `createTheme`/`createAppearance` for custom tokens.
+
+| Layer | Count |
+|---|---|
+| Module prop combinations (full calendar) | ~10^10 |
+| × built-in themes | × 38 |
+| × appearances | × 5 |
+| **= built-in configurations** | **~1.9 trillion** |
+| + `createTheme` / `createAppearance` | ∞ |
+
+Every configuration is type-safe, tree-shakeable, and SSR-compatible.
+
+---
+
 ## Utility Functions
 
 ### Theming
@@ -1196,11 +1214,16 @@ const myAppearance = createAppearance({
 | ----------------- | ----------------------------------------------------------------------------------- |
 | `radius`          | Border radius for day cells and buttons                                             |
 | `containerRadius` | Border radius for the calendar container                                            |
-| `border`          | Border width/style for the container                                                |
+| `border`          | Border width for the container and internal dividers                                |
+| `containerGap`    | Gap between calendar module areas. Use `"0px"` for borderless layouts              |
 | `spacing`         | Internal padding / gap between elements                                             |
+| `headerPadding`   | Padding for `CalendarNav`                                                           |
+| `headerMinHeight` | Minimum height for `CalendarNav`                                                    |
+| `navButtonBg`     | Background for month/year picker buttons in `CalendarNav`                           |
 | `font`            | Font family                                                                         |
 | `fontSize`        | Base font size                                                                      |
 | `dayFontSize`     | Font size for day numbers. Accepts fixed or responsive CSS values like `clamp(...)` |
+| `dayWeight`       | Font weight for non-selected day numbers                                            |
 | `controlFontSize` | Font size for primary controls such as nav/time buttons                             |
 | `daysSpacing`     | Gap between individual day cells                                                    |
 | `dayRatio`        | Aspect ratio of each day cell (e.g. `"1 / 1"`)                                      |
@@ -1209,6 +1232,12 @@ const myAppearance = createAppearance({
 | `shadowMd`        | Medium shadow value                                                                 |
 | `shadowLg`        | Large shadow value                                                                  |
 | `transition`      | CSS transition shorthand applied to interactive elements                            |
+| `todayOutlineWidth` | Width of the today outline. Use `"0px"` to hide it                                |
+| `selectedDayWeight` | Font weight for selected day cells                                                |
+| `selectedTextColor` | Text color used by `<CalendarDays selectedStyle="text" />`                        |
+| `selectedTextDotColor` | Dot color used by `<CalendarDays selectedStyle="text" />`                    |
+| `selectedTextDotSize` | Dot size used by `<CalendarDays selectedStyle="text" />`                       |
+| `selectedTextDotOffset` | Dot offset from the bottom of the selected day cell                         |
 
 ---
 

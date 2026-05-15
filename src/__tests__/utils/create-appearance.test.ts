@@ -12,13 +12,25 @@ describe("createAppearance", () => {
     const a = createAppearance({
       radius: "0.25em",
       border: "3px",
+      containerGap: "0px",
+      navButtonBg: "transparent",
       dayFontSize: "1.1em",
+      dayWeight: "300",
       controlFontSize: "0.95em",
+      todayOutlineWidth: "0px",
+      selectedDayWeight: "500",
+      selectedTextDotSize: "0.2em",
     });
     expect(a.vars["--cal-radius"]).toBe("0.25em");
     expect(a.vars["--cal-border"]).toBe("3px");
+    expect(a.vars["--cal-container-gap"]).toBe("0px");
+    expect(a.vars["--cal-nav-button-bg"]).toBe("transparent");
     expect(a.vars["--cal-text-day"]).toBe("1.1em");
+    expect(a.vars["--cal-day-weight"]).toBe("300");
     expect(a.vars["--cal-text-lg"]).toBe("0.95em");
+    expect(a.vars["--cal-today-outline-width"]).toBe("0px");
+    expect(a.vars["--cal-selected-day-weight"]).toBe("500");
+    expect(a.vars["--cal-selected-text-dot-size"]).toBe("0.2em");
   });
 
   it("ignores undefined token values", () => {

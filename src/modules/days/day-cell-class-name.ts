@@ -22,6 +22,7 @@ export interface DayCellFlags {
   isOtherMonth: boolean;
   isHighlighted: boolean;
   isMaxReachedTarget: boolean;
+  selectedStyle?: "fill" | "text";
 }
 
 const rangeEndpointClass = (f: DayCellFlags) => {
@@ -64,11 +65,13 @@ export const getDayCellClassName = (f: DayCellFlags): string =>
     shared.interactive,
     shared.hovered,
     f.isMaxReachedTarget && styles.maxReachedTarget,
-    !f.range && f.isSelected && shared.activeItem,
+    !f.range && f.isSelected && f.selectedStyle !== "text" && shared.activeItem,
+    !f.range && f.isSelected && f.selectedStyle === "text" && styles.selectedTextItem,
     !f.range && f.connectLeft && f.connectRight && styles.rangeMid,
     !f.range && f.connectLeft && !f.connectRight && styles.rangeEnd,
     !f.range && !f.connectLeft && f.connectRight && styles.rangeStart,
-    f.range && f.isSelected && shared.activeItem,
+    f.range && f.isSelected && f.selectedStyle !== "text" && shared.activeItem,
+    f.range && f.isSelected && f.selectedStyle === "text" && styles.selectedTextItem,
     f.range && rangeEndpointClass(f),
     f.range && rangeBridgeClass(f),
     f.range && f.isInRange && !f.isDisabled && styles.rIn,

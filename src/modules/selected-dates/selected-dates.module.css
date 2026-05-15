@@ -51,7 +51,7 @@
   }
 
   .chip {
-    height: 2.3em;
+    height: var(--cal-size-chip, 2.3em);
     flex-shrink: 0;
     min-width: 0;
     max-width: 100%;
@@ -167,7 +167,7 @@
   }
 
   .clearBtn {
-    height: 2.3em;
+    height: var(--cal-size-chip, 2.3em);
     padding: 0 0.6em !important;
     font-size: var(--cal-text-base) !important;
     color: var(--c-m, var(--c-c));

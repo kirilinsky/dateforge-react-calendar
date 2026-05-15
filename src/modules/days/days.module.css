@@ -77,8 +77,41 @@
     display: inline-block;
   }
 
+  .selectedTextItem {
+    background: transparent !important;
+    box-shadow: none !important;
+    color: var(--cal-selected-text-color, var(--c-c)) !important;
+    font-weight: var(--cal-selected-day-weight, var(--cal-weight-bold));
+    --hover-bg: transparent;
+    --hover-shadow: none;
+  }
+
+  .selectedTextItem::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: var(--cal-selected-text-dot-offset, 0.2em);
+    width: var(--cal-selected-text-dot-size, 0.18em);
+    height: var(--cal-selected-text-dot-size, 0.18em);
+    border-radius: 50%;
+    background: var(--cal-selected-text-dot-color, currentColor);
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .selectedTextItem .dayLabel {
+    transform: translateY(-0.1em);
+  }
+
   .dayGridContainer[data-today-dot] .todayItem .dayLabel {
     transform: translateY(-0.1em);
+  }
+
+  .dayGridContainer[data-today-dot] .selectedTextItem::after {
+    bottom: var(--cal-selected-text-dot-offset, 0.2em);
+    width: var(--cal-selected-text-dot-size, 0.18em);
+    height: var(--cal-selected-text-dot-size, 0.18em);
+    background: var(--cal-selected-text-dot-color, currentColor);
   }
 
   .boldWeekend {
@@ -103,6 +136,12 @@
     position: relative;
     z-index: 1;
     font-size: var(--cal-text-day);
+    font-weight: var(--cal-day-weight, inherit);
+
+    &[data-selected] {
+      font-weight: var(--cal-selected-day-weight, inherit);
+    }
+
     &:disabled,
     &[aria-disabled="true"] {
       text-decoration: line-through;
@@ -205,6 +244,12 @@
       bottom: 0.14em;
       width: 0.16em;
       height: 0.16em;
+    }
+
+    .dayGridContainer[data-today-dot] .selectedTextItem::after {
+      bottom: var(--cal-selected-text-dot-offset, 0.14em);
+      width: var(--cal-selected-text-dot-size, 0.16em);
+      height: var(--cal-selected-text-dot-size, 0.16em);
     }
 
     .dayGridContainer[data-today-dot] .todayItem .dayLabel {
