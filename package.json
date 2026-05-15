@@ -102,6 +102,16 @@
         "default": "./dist/modules/selected-dates.cjs"
       }
     },
+    "./modules/info": {
+      "import": {
+        "types": "./dist/modules/info.d.ts",
+        "default": "./dist/modules/info.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/info.d.cts",
+        "default": "./dist/modules/info.cjs"
+      }
+    },
     "./modules/manual-input": {
       "import": {
         "types": "./dist/modules/manual-input.d.ts",

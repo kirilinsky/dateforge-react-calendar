@@ -1,0 +1,100 @@
+@layer cal-base {
+  .infoContainer {
+    --calendar-info-transition: 0.2s;
+
+    z-index: 3;
+    display: grid;
+    grid-template-rows: 1fr;
+    min-width: 0;
+    padding: 0;
+  }
+
+  .infoContainer.animated[data-area="calendar-info"] {
+    grid-template-rows: 0fr;
+    transition:
+      background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      grid-template-rows var(--calendar-info-transition) cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .infoContainer.animated.visible[data-area="calendar-info"] {
+    grid-template-rows: 1fr;
+  }
+
+  .inner {
+    overflow: hidden;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.35em;
+    padding: var(--cal-spacing);
+    transition:
+      padding var(--calendar-info-transition) cubic-bezier(0.4, 0, 0.2, 1),
+      height var(--calendar-info-transition) cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .animated .inner {
+    box-sizing: border-box;
+    height: var(--calendar-info-inner-height, auto);
+    padding: 0 var(--cal-spacing);
+  }
+
+  .visible .inner {
+    padding: var(--cal-spacing);
+  }
+
+  .contentGroup {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    align-items: center;
+  }
+
+  .infoText {
+    height: var(--cal-size-chip, 2.3em);
+    min-width: 0;
+    max-width: 100%;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 0.7em;
+    border-radius: var(--cal-radius, 0.5em);
+    background: var(--c-t);
+    color: var(--c-c);
+    box-shadow: var(--active-cell-stroke, none);
+    font-size: var(--cal-text-md) !important;
+    font-weight: var(--cal-weight-semibold);
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .actionBtn {
+    box-sizing: border-box;
+    width: 2.2em;
+    height: var(--cal-size-chip, 2.3em) !important;
+    padding: 0 !important;
+    font-size: var(--cal-text-base) !important;
+    line-height: 1;
+    color: var(--c-m, var(--c-c));
+    flex-shrink: 0;
+  }
+
+  .actionBtn svg {
+    width: 1.1em;
+    height: 1.1em;
+  }
+
+  .actionBtnDisabled {
+    color: var(--c-dt, var(--c-c));
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .clearBtn {
+    padding: 0 0.6em !important;
+  }
+
+  .clearBtn:hover {
+    color: var(--c-c);
+  }
+}
