@@ -48,8 +48,6 @@
     --cal-letter-spacing: 0;
     --cal-today-outline-width: 0px;
     --cal-selected-day-weight: 700;
-    --cal-selected-text-color: var(--c-c);
-    --cal-selected-text-dot-color: var(--c-c);
     --cal-selected-text-dot-size: 0.18em;
     --cal-selected-text-dot-offset: 0.16em;
   }

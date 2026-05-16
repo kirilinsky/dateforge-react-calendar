@@ -17,6 +17,30 @@ afterEach(() => {
 });
 
 describe("Nav popups — open/close via UI state", () => {
+  it("marks how many picker selector groups are rendered", () => {
+    const { container, rerender } = render(
+      <Calendar value={new Date(2024, 5, 15)}>
+        <CalendarNav showMonthPicker />
+      </Calendar>,
+    );
+    expect(
+      container
+        .querySelector('[data-area="header"]')
+        ?.getAttribute("data-selector-count"),
+    ).toBe("1");
+
+    rerender(
+      <Calendar value={new Date(2024, 5, 15)}>
+        <CalendarNav showMonthPicker showYearPicker />
+      </Calendar>,
+    );
+    expect(
+      container
+        .querySelector('[data-area="header"]')
+        ?.getAttribute("data-selector-count"),
+    ).toBe("2");
+  });
+
   it("clicking showTime button opens the time popup", async () => {
     const { container, queryByLabelText } = render(
       <Calendar value={new Date(2024, 5, 15)}>
@@ -58,6 +82,38 @@ describe("Nav popups — open/close via UI state", () => {
     expect(
       container.querySelector('[aria-label="Select year"]'),
     ).not.toBeNull();
+  });
+
+  it("compactTime icon button opens the time popup", async () => {
+    const { queryByLabelText, getByLabelText } = render(
+      <Calendar value={new Date(2024, 5, 15)}>
+        <CalendarNav compactTime />
+      </Calendar>,
+    );
+    expect(queryByLabelText("Select time")).toBeNull();
+    const btn = getByLabelText(/Change time/);
+    await userEvent.click(btn);
+    expect(queryByLabelText("Select time")).not.toBeNull();
+  });
+
+  it("compactTime does not render any nav UI other than the icon button", () => {
+    const { container, getByLabelText } = render(
+      <Calendar value={new Date(2024, 5, 15)}>
+        <CalendarNav compactTime />
+      </Calendar>,
+    );
+    expect(getByLabelText(/Change time/)).toBeTruthy();
+    expect(container.querySelectorAll("button")).toHaveLength(1);
+  });
+
+  it("compactTime button shows current time in its aria-label", () => {
+    const { getByLabelText } = render(
+      <Calendar value={new Date(2024, 5, 15, 14, 30)}>
+        <CalendarNav compactTime />
+      </Calendar>,
+    );
+    const btn = getByLabelText(/Change time, currently/);
+    expect(btn.getAttribute("aria-label")).toMatch(/\d/);
   });
 
   it("compactMonths button opens the same month popup", async () => {

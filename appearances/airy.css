@@ -32,5 +32,8 @@
     --cal-opacity-muted: 0.4;
     --cal-opacity-hover: 0.75;
     --cal-letter-spacing: 0.1em;
+    --cal-selected-text-dot-size: 0.18em;
+    --cal-selected-text-dot-offset: 0.12em;
+    --cal-selected-text-dot-label-shift: 0px;
   }
 }
