@@ -54,7 +54,7 @@ const meta: Meta<TimeGridArgs> = {
         }}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
-          gradient={resolveStoryGradient(ctx.globals.gradient)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarTimeGrid

@@ -50,7 +50,7 @@ const meta: Meta<SelectedDatesArgs> = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
-          gradient={resolveStoryGradient(ctx.globals.gradient)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarSelectedDates
@@ -99,7 +99,7 @@ export const WithPerChipClear: Story = {
         onChange={setDates}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
-          gradient={resolveStoryGradient(ctx.globals.gradient)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarSelectedDates
@@ -144,7 +144,7 @@ export const Overflow: Story = {
         onChange={setDates}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
-          gradient={resolveStoryGradient(ctx.globals.gradient)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarSelectedDates

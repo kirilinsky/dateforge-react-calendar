@@ -48,7 +48,7 @@ const meta: Meta<YearsGridArgs> = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
-          gradient={resolveStoryGradient(ctx.globals.gradient)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarYearsGrid
@@ -95,7 +95,7 @@ export const WithDisabledRange: Story = {
         maxDate={new Date(2020, 11, 31)}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
-          gradient={resolveStoryGradient(ctx.globals.gradient)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarYearsGrid
@@ -123,7 +123,7 @@ export const HideOutOfRange: Story = {
         maxDate={new Date(2020, 11, 31)}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
-          gradient={resolveStoryGradient(ctx.globals.gradient)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarYearsGrid
