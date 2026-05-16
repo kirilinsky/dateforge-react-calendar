@@ -99,7 +99,8 @@ Range covers muted pastels (`latte`, `comfy`), neon/cyber (`phosphor`, `neon`, `
 | `square`   | Sharp corners, tight, minimal shadows           | radius 0, spacing 0.5em, transition 0.12s                            |
 | `soft`     | Subtle rounding, balanced, gentle shadows       | radius 0.75em, spacing 0.7em, transition 0.25s                       |
 | `bubble`   | Rounded, spacious, prominent shadows            | radius 1.5em, spacing 0.7em, transition 0.28s, header 4em           |
-| `loft`     | Large, airy, relaxed                            | radius 1em, spacing 1em, transition 0.35s, day-padding 1.8em        |
+| `loft`     | Large, relaxed                                  | radius 1em, spacing 1em, transition 0.35s, day-padding 1.8em        |
+| `airy`     | Borderless, light weights, generous spacing     | radius 0.4em, border 1px, spacing 1em, weights 300, no shadows      |
 
 ---
 
@@ -133,7 +134,7 @@ Source: `src/core/layout.module.css`.
 
 ### Transition durations (per appearance)
 
-`compact 0.15s`, `square 0.12s`, `soft 0.25s`, `bubble 0.28s`, `loft 0.35s`. Used by CSS transitions on opacity / transform / colors via `var(--cal-transition)`.
+`compact 0.15s`, `square 0.12s`, `soft 0.25s`, `bubble 0.28s`, `loft 0.35s`, `airy 0.2s`. Used by CSS transitions on opacity / transform / colors via `var(--cal-transition)`.
 
 ### Track scroll physics
 
@@ -286,7 +287,7 @@ CSS wins the race vs JS. Client-side resolution via `useClientValue(matchMedia, 
 ## File references
 
 - `themes/themes.ts` — 40 themes, 15 tokens each
-- `appearances/index.ts` — 5 appearances
+- `appearances/index.ts` — 6 appearances
 - `src/core/layout.module.css` — typography, container query, color defaults
 - `src/hooks/use-client-value.ts` — SSR-safe deferred values
 - `src/hooks/use-calendar-keyboard.ts` — keyboard nav

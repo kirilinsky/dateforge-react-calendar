@@ -82,7 +82,6 @@ interface DayCellProps {
   tabIndex: number;
   readOnly: boolean;
   isMaxReachedTarget: boolean;
-  selectedStyle: "fill" | "text";
   onSelect: (date: Date, isDisabled: boolean) => void;
   onMouseEnter: (date: Date) => void;
   onKeyDown: (e: React.KeyboardEvent, date: Date) => void;
@@ -115,7 +114,6 @@ const DayCell = React.memo(function DayCell({
   tabIndex,
   readOnly,
   isMaxReachedTarget,
-  selectedStyle,
   onSelect,
   onMouseEnter,
   onKeyDown,
@@ -155,7 +153,6 @@ const DayCell = React.memo(function DayCell({
     isOtherMonth,
     isHighlighted,
     isMaxReachedTarget,
-    selectedStyle,
   });
 
   return (
@@ -211,7 +208,6 @@ export interface CalendarDaysProps {
   fixedRows?: boolean;
   blockNavigation?: boolean;
   todayDot?: boolean;
-  selectedStyle?: "fill" | "text";
 }
 
 export const CalendarDays: React.FC<CalendarDaysProps> = ({
@@ -231,7 +227,6 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   fixedRows = true,
   blockNavigation = false,
   todayDot = true,
-  selectedStyle = "fill",
 }) => {
   const { daysTrackActive } = useUI();
   const {
@@ -672,7 +667,6 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
                         !isDisabled &&
                         isCurrentMonth
                       }
-                      selectedStyle={selectedStyle}
                       onSelect={handleSetDay}
                       onMouseEnter={handleMouseEnter}
                       onKeyDown={handleKeyDown}

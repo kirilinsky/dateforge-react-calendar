@@ -108,7 +108,7 @@ Three subpaths, each tree-shakeable:
 | `@dateforge/react-calendar/themes`          | All theme objects re-exported together                                                         | Quick prototyping; pulls every theme into the bundle.                         |
 | `@dateforge/react-calendar/themes/<name>`   | A single theme (e.g. `…/themes/midnight`)                                                      | Production — only the themes you actually use end up in the bundle.           |
 | `@dateforge/react-calendar/appearances`     | All appearance objects together                                                                | Same trade-off as themes — prefer the per-name subpath for production builds. |
-| `@dateforge/react-calendar/appearances/<n>` | A single appearance (`loft`, `compact`, `square`, `soft`, `bubble`)                            | Production.                                                                   |
+| `@dateforge/react-calendar/appearances/<n>` | A single appearance (`loft`, `compact`, `square`, `soft`, `bubble`, `airy`)                    | Production.                                                                   |
 
 Each module is its own bundle, so importing `CalendarPresets` does not pull `CalendarTimeGrid` or any other unused module. The `modules` aggregate subpath is still tree-shakeable under ESM — bundlers drop unused named exports.
 
@@ -610,7 +610,6 @@ Renders the month grid — weekday headers, week numbers (optional), and the day
 | `boldWeekends`      | `boolean`                       | `false`   | Render Saturday and Sunday in bold with the weekend accent color (`--c-we`)                                                                                                                                                                                                                                                      |
 | `highlightToday`    | `boolean`                       | `true`    | Highlight today's date                                                                                                                                                                                                                                                                                                           |
 | `todayDot`          | `boolean`                       | `true`    | Render a small dot under the digit when today is also the selected day. Selected-today dot color uses `--c-t-d`                                                                                                                                                                                                                  |
-| `selectedStyle`     | `"fill" \| "text"`              | `"fill"`  | Render selected days as filled cells (`"fill"`) or as text with a small dot (`"text"`)                                                                                                                                                                                                                                          |
 | `fixedRows`         | `boolean`                       | `true`    | Always render 6 rows of day cells                                                                                                                                                                                                                                                                                                |
 | `weekNumbers`       | `boolean`                       | `false`   | Show ISO week numbers in the leftmost column                                                                                                                                                                                                                                                                                     |
 | `hideWeekdays`      | `boolean`                       | `false`   | Hide the row of weekday name headers                                                                                                                                                                                                                                                                                             |
@@ -1154,13 +1153,13 @@ In multiselect mode the active item follows the date in `selectedDates[]` whose 
 
 ## Design space
 
-12 composable modules, ~80 public props (≈60 boolean), 40 built-in themes, 5 appearances, plus `createTheme`/`createAppearance` for custom tokens.
+12 composable modules, ~80 public props (≈60 boolean), 40 built-in themes, 6 appearances, plus `createTheme`/`createAppearance` for custom tokens.
 
 | Layer | Count |
 |---|---|
 | Module prop combinations (full calendar) | ~10^10 |
 | × built-in themes | × 40 |
-| × appearances | × 5 |
+| × appearances | × 6 |
 | **= built-in configurations** | **~2.0 trillion** |
 | + `createTheme` / `createAppearance` | ∞ |
 
@@ -1314,10 +1313,6 @@ const myAppearance = createAppearance({
 | `transition`      | CSS transition shorthand applied to interactive elements                            |
 | `todayOutlineWidth` | Width of the today outline. Use `"0px"` to hide it                                |
 | `selectedDayWeight` | Font weight for selected day cells                                                |
-| `selectedTextColor` | Text color used by `<CalendarDays selectedStyle="text" />`                        |
-| `selectedTextDotColor` | Dot color used by `<CalendarDays selectedStyle="text" />`                    |
-| `selectedTextDotSize` | Dot size used by `<CalendarDays selectedStyle="text" />`                       |
-| `selectedTextDotOffset` | Dot offset from the bottom of the selected day cell                         |
 
 ---
 
