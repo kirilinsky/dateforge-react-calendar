@@ -95,4 +95,45 @@ describe("Time semantics — range mode", () => {
     fireEvent.keyDown(drum, ARROW_DOWN);
     expect(onChange).not.toHaveBeenCalled();
   });
+
+  it("bound=to updates rangeEnd even when viewDate is on rangeStart", () => {
+    const onChange = vi.fn();
+    const from = new Date(2024, 5, 10, 9, 0, 0);
+    const to = new Date(2024, 5, 13, 14, 0, 0);
+    const { container } = render(
+      <Calendar mode="range" value={{ from, to }} onChange={onChange}>
+        <CalendarTimeGrid bound="to" />
+      </Calendar>,
+    );
+    const minute = container.querySelector(
+      '[aria-label="Minutes"]',
+    ) as HTMLElement;
+    minute.focus();
+    fireEvent.keyDown(minute, ARROW_DOWN);
+
+    const next = onChange.mock.calls.at(-1)![0] as {
+      from: Date;
+      to: Date;
+    };
+    expect(next.from.getTime()).toBe(from.getTime());
+    expect(next.to.getDate()).toBe(13);
+    expect(next.to.getHours()).toBe(14);
+    expect(next.to.getMinutes()).toBe(1);
+  });
+
+  it("bound=to does not invent a missing rangeEnd", () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <Calendar
+        mode="range"
+        value={{ from: new Date(2024, 5, 10), to: null }}
+        onChange={onChange}
+      >
+        <CalendarTimeGrid bound="to" />
+      </Calendar>,
+    );
+    const drum = focusFirstDrum(container);
+    fireEvent.keyDown(drum, ARROW_DOWN);
+    expect(onChange).not.toHaveBeenCalled();
+  });
 });

@@ -39,23 +39,13 @@ export const getCalendarDayIndex = (date: Date, timeZone?: string) => {
   );
 };
 
-const getRelativeUnitValue = (
+const getRelativeDayDiff = (
   targetDate: Date,
   baseDate: Date,
   timeZone?: string,
-): [Intl.RelativeTimeFormatUnit, number] => {
-  const dayDiff =
-    getCalendarDayIndex(targetDate, timeZone) -
-    getCalendarDayIndex(baseDate, timeZone);
-  if (dayDiff !== 0) return ["day", dayDiff];
-
-  const diffMs = targetDate.getTime() - baseDate.getTime();
-  const hourDiff = Math.round(diffMs / HOUR_MS);
-  if (hourDiff !== 0) return ["hour", hourDiff];
-
-  const minuteDiff = Math.round(diffMs / MINUTE_MS);
-  return ["minute", minuteDiff];
-};
+): number =>
+  getCalendarDayIndex(targetDate, timeZone) -
+  getCalendarDayIndex(baseDate, timeZone);
 
 const formatNumber = (value: number, locale: string) =>
   getNumberFormat(locale, { maximumFractionDigits: 0 })?.format(value) ??
@@ -81,14 +71,14 @@ export const formatCalendarInfoRelative = ({
   timeZone?: string;
 }) => {
   if (!baseDate) return "";
-  const [unit, value] = getRelativeUnitValue(targetDate, baseDate, timeZone);
+  const dayDiff = getRelativeDayDiff(targetDate, baseDate, timeZone);
   try {
     return new Intl.RelativeTimeFormat(locale, { numeric: "auto" }).format(
-      value,
-      unit,
+      dayDiff,
+      "day",
     );
   } catch {
-    return formatUnit(value, unit as CalendarInfoUnit, locale);
+    return formatUnit(dayDiff, "day", locale);
   }
 };
 

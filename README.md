@@ -24,7 +24,7 @@
 
 Monolithic pickers ship everything. DateForge ships only what you use.
 
-Build exactly the calendar your product needs: start with a tiny date grid, then add navigation, ranges, multi-select, time, presets, manual input, track pickers, themes, appearances, and layout rules as separate modules. The module mix, selection modes, visual tokens, and focused props unlock **~1.9 trillion built-in calendar configurations** without forcing you into one prebuilt picker.
+Build exactly the calendar your product needs: start with a tiny date grid, then add navigation, ranges, multi-select, time, presets, manual input, track pickers, themes, appearances, and layout rules as separate modules. The module mix, selection modes, visual tokens, and focused props unlock **~2.0 trillion built-in calendar configurations** without forcing you into one prebuilt picker.
 
 <div align="center">
 

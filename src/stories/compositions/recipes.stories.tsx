@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
 import { CalendarDaysTrack } from "@/modules/days-track";
+import { CalendarInfo } from "@/modules/info";
 import { CalendarManualInput } from "@/modules/manual-input";
 import { CalendarMonthsGrid } from "@/modules/months-grid";
 import { CalendarMonthsTrack } from "@/modules/months-track";
@@ -445,3 +446,157 @@ FlightTracks.parameters = {
   storyWidth: 720,
   chromatic: { delay: 1000, pauseAnimationAtEnd: true },
 };
+
+export const HotelBooking: Story = {
+  render: (_args, ctx) => {
+    const [range, setRange] = useState<RangeValue>({
+      from: FIXED_DATE,
+      to: new Date(
+        FIXED_DATE.getFullYear(),
+        FIXED_DATE.getMonth(),
+        FIXED_DATE.getDate() + 5,
+      ),
+    });
+    return (
+      <Calendar
+        mode="range"
+        value={range}
+        onChange={setRange}
+        defaultViewDate={FIXED_DATE}
+        theme={resolveStoryTheme(ctx.globals.theme)}
+        appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
+      >
+        <CalendarNav showMonthPicker compactYears />
+        <CalendarInfo
+          prefix="Stay:"
+          rangeStyle="days"
+          allowClear
+          showHome
+          formatter={(value) => {
+            if (!value || value instanceof Date || Array.isArray(value)) {
+              return null;
+            }
+            if (!value.from || !value.to) return null;
+            const nights = Math.round(
+              Math.abs(value.to.getTime() - value.from.getTime()) / 86_400_000,
+            );
+            return `${nights} ${nights === 1 ? "night" : "nights"}`;
+          }}
+        />
+        <CalendarDays />
+        <CalendarSelectedDates />
+      </Calendar>
+    );
+  },
+};
+HotelBooking.storyName = "Range / Hotel booking (Info + SelectedDates)";
+
+export const TripDuration: Story = {
+  render: (_args, ctx) => {
+    const [range, setRange] = useState<RangeValue>({ from: null, to: null });
+    return (
+      <Calendar
+        mode="range"
+        value={range}
+        onChange={setRange}
+        defaultViewDate={FIXED_DATE}
+        theme={resolveStoryTheme(ctx.globals.theme)}
+        appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
+      >
+        <CalendarNav showMonthPicker compactYears clear />
+        <CalendarPresets presets={basicPresets} />
+        <CalendarInfo
+          prefix="Duration:"
+          rangeStyle="duration"
+          emptyLabel="Pick a range"
+          showHome
+        />
+        <CalendarDays />
+      </Calendar>
+    );
+  },
+};
+TripDuration.storyName = "Range / Trip duration (rangeStyle=duration)";
+
+export const RangeDurationWithTimeGrid: Story = {
+  parameters: { storyWidth: 900 },
+  render: (_args, ctx) => {
+    const [range, setRange] = useState<RangeValue>(() => {
+      const from = new Date(FIXED_DATE);
+      from.setHours(10, 0, 0, 0);
+
+      const to = new Date(FIXED_DATE);
+      to.setDate(to.getDate() + 3);
+      to.setHours(14, 30, 0, 0);
+
+      return { from, to };
+    });
+
+    return (
+      <Calendar
+        mode="range"
+        value={range}
+        onChange={setRange}
+        defaultViewDate={range.from ?? FIXED_DATE}
+        cols={4}
+        timeStep={{ minute: 5 }}
+        theme={resolveStoryTheme(ctx.globals.theme)}
+        appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
+      >
+        <CalendarNav
+          label="Range duration"
+          showMonthPicker
+          compactYears
+          clear
+        />
+        <CalendarInfo
+          prefix="Elapsed:"
+          rangeStyle="duration"
+          emptyLabel="Pick a range"
+          allowClear
+        />
+        <CalendarDays col={2} />
+        <CalendarTimeGrid bound="from" labels="short" col={1} />
+        <CalendarTimeGrid bound="to" labels="short" col={1} />
+        <CalendarSelectedDates showTime />
+      </Calendar>
+    );
+  },
+};
+RangeDurationWithTimeGrid.storyName = "Range / Duration + time grid";
+
+export const RelativeDeadline: Story = {
+  render: (_args, ctx) => {
+    const [date, setDate] = useState<Date | null>(() => {
+      const tomorrow = new Date();
+      tomorrow.setHours(0, 0, 0, 0);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      return tomorrow;
+    });
+    return (
+      <Calendar
+        mode="single"
+        value={date}
+        onChange={setDate}
+        defaultViewDate={date ?? undefined}
+        theme={resolveStoryTheme(ctx.globals.theme)}
+        appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
+      >
+        <CalendarNav showMonthPicker compactYears />
+        <CalendarInfo
+          showRelative
+          showSummary={false}
+          emptyLabel="Pick a deadline"
+          allowClear
+        />
+        <CalendarDays />
+      </Calendar>
+    );
+  },
+};
+RelativeDeadline.storyName =
+  "Single / Relative deadline (Intl.RelativeTimeFormat)";

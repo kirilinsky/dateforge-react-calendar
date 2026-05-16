@@ -19,12 +19,14 @@ export interface CalendarManualInputProps {
   allowClear?: boolean;
   align?: AlignValue;
   col?: number | string;
+  label?: React.ReactNode;
 }
 
 export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
   allowClear = true,
   align = "left",
   col,
+  label,
 }) => {
   const { range, multiselect, disabled, minDate, maxDate, readOnly } =
     useConfig();
@@ -60,6 +62,11 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
   const contentStyle: React.CSSProperties = {
     justifyContent: alignToJustify[align],
   };
+  const hasLabel =
+    label !== null && label !== undefined && label !== "" && label !== false;
+  const labelNode = hasLabel ? (
+    <span className={styles.label}>{label}</span>
+  ) : null;
 
   const clearBtn = (
     <button
@@ -110,6 +117,7 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
         style={containerStyle}
       >
         <div className={styles.datesArea} style={contentStyle}>
+          {labelNode}
           {canAddMore && (
             <div
               className={[
@@ -188,6 +196,7 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
         style={containerStyle}
       >
         <div className={styles.contentArea} style={contentStyle}>
+          {labelNode}
           <DateSlot
             date={rangeStart}
             isAllowed={isAllowed}
@@ -218,6 +227,7 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
       style={containerStyle}
     >
       <div className={styles.contentArea} style={contentStyle}>
+        {labelNode}
         <DateSlot
           date={selectedDates[0] ?? null}
           isAllowed={isAllowed}

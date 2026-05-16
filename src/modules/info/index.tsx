@@ -109,7 +109,8 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
     if (!showSummary || !hasSelection) return null;
     if (formatter) return formatter(selectedValue);
 
-    if (range && rangeStart && rangeEnd) {
+    if (range) {
+      if (!rangeStart || !rangeEnd) return null;
       const from = rangeStart <= rangeEnd ? rangeStart : rangeEnd;
       const to = rangeStart <= rangeEnd ? rangeEnd : rangeStart;
       const durationDays = Math.abs(

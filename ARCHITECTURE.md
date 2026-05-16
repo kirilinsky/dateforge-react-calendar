@@ -570,7 +570,9 @@ Timezone-dependent operations live in `src/utils/tz-utils.ts` (`getTodayInTimezo
 
 ## Time editing semantics
 
-Time interactions (`CalendarTimeGrid` drums, `CalendarNav.showTime` popup confirm) are unified through one reducer action: `CHANGE_TIME { date, config }`. The action is dispatched by `provider.handleChangeTime`, which always passes the current `selectConfig`.
+Time interactions (`CalendarTimeGrid` drums, `CalendarNav.showTime` popup confirm) usually flow through one reducer action: `CHANGE_TIME { date, config }`. The action is dispatched by `provider.handleChangeTime`, which always passes the current `selectConfig`.
+
+Range-bound time controls (`CalendarTimeGrid bound="from"|"to"` and `CalendarNav bound="from"|"to" showTime`) use `SET_RANGE_BOUND` instead. They intentionally bypass the `viewDate.day` matching heuristic and write to the explicit boundary. If that boundary does not exist yet, the time control is read-only / no-op; time alone must not invent a missing `from` or `to` date.
 
 The reducer's contract:
 

@@ -7,7 +7,7 @@
   flex: 1;
   min-height: 8em;
   overflow: hidden;
-  padding: 5px;
+  padding: 5px 0;
   box-sizing: border-box;
 }
 
@@ -21,7 +21,7 @@
   overflow: hidden;
   cursor: pointer;
   outline: none;
-  border-radius: calc(var(--cal-radius, 0.5em) * 2);
+  border-radius: var(--cal-radius, 0.5em);
   isolation: isolate;
   transition:
     box-shadow calc(var(--cal-transition, 0.2s) * 0.75),
@@ -36,8 +36,8 @@
 .highlight {
   position: absolute;
   top: 50%;
-  left: 2px;
-  right: 2px;
+  left: 0;
+  right: 0;
   height: calc(100% / 7);
   transform: translateY(-50%);
   background: var(--active-cell-bg, var(--c-h));

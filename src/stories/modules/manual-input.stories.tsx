@@ -13,6 +13,7 @@ import {
 type ManualInputArgs = {
   allowClear?: boolean;
   align?: "left" | "center" | "right";
+  label?: string;
 };
 
 const meta: Meta<ManualInputArgs> = {
@@ -20,6 +21,7 @@ const meta: Meta<ManualInputArgs> = {
   argTypes: {
     allowClear: { control: "boolean" },
     align: { control: "inline-radio", options: ["left", "center", "right"] },
+    label: { control: "text" },
   },
 };
 
@@ -325,6 +327,43 @@ export const AlignCenter: Story = {
 };
 AlignCenter.storyName = "Aligned center";
 
+export const WithLabel: Story = {
+  render: (_args, ctx) => {
+    const [date, setDate] = useState<Date | null>(FIXED_DATE);
+    return (
+      <Calendar
+        value={date}
+        onChange={setDate}
+        theme={resolveStoryTheme(ctx.globals.theme)}
+        appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
+      >
+        <CalendarManualInput label="Date" />
+      </Calendar>
+    );
+  },
+};
+WithLabel.storyName = "With label";
+
+export const MultipleWithLabel: Story = {
+  render: (_args, ctx) => {
+    const [dates, setDates] = useState<Date[]>([FIXED_DATE]);
+    return (
+      <Calendar
+        mode="multiple"
+        value={dates}
+        onChange={setDates}
+        theme={resolveStoryTheme(ctx.globals.theme)}
+        appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
+      >
+        <CalendarManualInput label="Dates" />
+      </Calendar>
+    );
+  },
+};
+MultipleWithLabel.storyName = "Multiple — with label";
+
 export const ReadOnly: Story = {
   render: (_args, ctx) => {
     const [date, setDate] = useState<Date | null>(FIXED_DATE);
@@ -351,7 +390,7 @@ export const ReadOnly: Story = {
 ReadOnly.storyName = "readOnly";
 
 export const Playground: Story = {
-  args: { allowClear: true, align: "left" },
+  args: { allowClear: true, align: "left", label: "Date" },
   render: (args, ctx) => {
     const [date, setDate] = useState<Date | null>(FIXED_DATE);
     return (
@@ -362,7 +401,11 @@ export const Playground: Story = {
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
-        <CalendarManualInput allowClear={args.allowClear} align={args.align} />
+        <CalendarManualInput
+          allowClear={args.allowClear}
+          align={args.align}
+          label={args.label}
+        />
       </Calendar>
     );
   },

@@ -774,6 +774,15 @@ Step granularity is configured via the `timeStep` prop on `<Calendar>` and appli
 
 With `minute: 5` the minute drum cycles `0, 5, 10, …, 55`; `minute: 30` cycles `0, 30`; `hour: 2` halves the hour range. `aria-valuemax`, keyboard `Arrow`/`Home`/`End`, and wheel/touch snapping all follow the configured step.
 
+In `mode="range"`, pass `bound="from"` or `bound="to"` when the time grid should edit a specific range boundary:
+
+```tsx
+<Calendar mode="range">
+  <CalendarTimeGrid bound="from" />
+  <CalendarTimeGrid bound="to" />
+</Calendar>
+```
+
 Standalone time picker (no selected date required):
 
 ```tsx
@@ -793,6 +802,7 @@ Standalone time picker (no selected date required):
 
 | Prop           | Type                   | Default | Description                                                                                                                                                                                                                                                                                         |
 | -------------- | ---------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bound`        | `"from" \| "to"`       | —       | Range-only: edit the time of a specific range boundary. Without `bound`, the grid edits whichever selected date matches `viewDate`; if neither boundary matches, time stays pending and does not fire `onChange`                                                                                    |
 | `seconds`      | `boolean`              | `false` | Show a third drum for seconds (0–59)                                                                                                                                                                                                                                                                |
 | `col`          | `number \| string`     | —       | CSS grid `grid-column` value                                                                                                                                                                                                                                                                        |
 | `labels`       | `"short" \| "long"`    | —       | Show a small label above each drum. `"short"` → `HH` / `MM` / `SS` (clock convention, not localized). `"long"` → localized field name via `Intl.DisplayNames(locale, { type: "dateTimeField" })` — e.g. `hour` / `minute` / `second` in EN, `час` / `минута` / `секунда` in RU. Omit to hide labels |
@@ -992,7 +1002,7 @@ Text input that lets the user type a date directly. Adapts shape to the calendar
 - `mode="multiple"` — one "add date" input plus a chip per selected date; each chip is editable.
 
 ```tsx
-<CalendarManualInput allowClear={false} />
+<CalendarManualInput label="Date" allowClear={false} />
 ```
 
 ### Props
@@ -1002,6 +1012,7 @@ Text input that lets the user type a date directly. Adapts shape to the calendar
 | `allowClear` | `boolean`                       | `true`   | Show a top-level clear button that wipes the entire selection |
 | `align`      | `"left" \| "center" \| "right"` | `"left"` | Horizontal alignment of the input content                     |
 | `col`        | `number \| string`              | —        | CSS grid `grid-column` value                                  |
+| `label`      | `React.ReactNode`               | —        | Inline label shown before the input / selected chips          |
 
 ### Input format
 
@@ -1143,14 +1154,14 @@ In multiselect mode the active item follows the date in `selectedDates[]` whose 
 
 ## Design space
 
-12 composable modules, ~80 public props (≈60 boolean), 38 built-in themes, 5 appearances, plus `createTheme`/`createAppearance` for custom tokens.
+12 composable modules, ~80 public props (≈60 boolean), 40 built-in themes, 5 appearances, plus `createTheme`/`createAppearance` for custom tokens.
 
 | Layer | Count |
 |---|---|
 | Module prop combinations (full calendar) | ~10^10 |
-| × built-in themes | × 38 |
+| × built-in themes | × 40 |
 | × appearances | × 5 |
-| **= built-in configurations** | **~1.9 trillion** |
+| **= built-in configurations** | **~2.0 trillion** |
 | + `createTheme` / `createAppearance` | ∞ |
 
 Every configuration is type-safe, tree-shakeable, and SSR-compatible.
@@ -1163,7 +1174,7 @@ Every configuration is type-safe, tree-shakeable, and SSR-compatible.
 
 Three ways to apply a theme.
 
-**Option 1 — pre-built theme object** (one of the 33 built-in palettes):
+**Option 1 — pre-built theme object** (one of the 40 built-in palettes):
 
 ```ts
 // barrel — all themes, bundler tree-shakes to just the one you import
@@ -1554,11 +1565,13 @@ type StartOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 ### Built-in themes
 
-38 named palettes, each exported as a tree-shakeable `CustomTheme` object.
+40 named palettes, each exported as a tree-shakeable `CustomTheme` object.
 
 **Light:** `tide`, `graphite` `amethyst` `mint` `comfy` `neon` `rosa` `snow` `solar` `latte` `slate` `scarlet` `prism` `meadow` `monsoon` `pearl` `chalk` `split` `riso`
 
 **Dark:** `fjord`, `industrial` `midnight` `sandstone` `phosphor` `dracula` `cyber` `temporal` `crimson` `forest` `nebula` `aurora` `espresso` `ember` `flare` `abyss` `cobalt` `velvet` `eclipse`
+
+**Neutral:** `mono` `noir`
 
 **Base (no palette):** `"light"` `"dark"` `"auto"` — passed as strings, no import needed.
 
