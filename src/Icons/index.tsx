@@ -26,3 +26,7 @@ export const ChevronLeft = () =>
   I("M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6z");
 export const ChevronRight = () =>
   I("M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z");
+export const Clock = () =>
+  I(
+    "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z",
+  );

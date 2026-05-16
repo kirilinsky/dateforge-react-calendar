@@ -546,21 +546,17 @@ export const RangeDurationWithTimeGrid: Story = {
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
-        <CalendarNav
-          label="Range duration"
-          showMonthPicker
-          compactYears
-          clear
-        />
+        <CalendarNav label="Range duration" showMonthPicker compactYears />
         <CalendarInfo
           prefix="Elapsed:"
           rangeStyle="duration"
           emptyLabel="Pick a range"
           allowClear
+          showHome
         />
         <CalendarDays col={2} />
-        <CalendarTimeGrid bound="from" labels="short" col={1} />
-        <CalendarTimeGrid bound="to" labels="short" col={1} />
+        <CalendarTimeGrid bound="from" col={1} showReset />
+        <CalendarTimeGrid bound="to" col={1} showReset />
         <CalendarSelectedDates showTime />
       </Calendar>
     );

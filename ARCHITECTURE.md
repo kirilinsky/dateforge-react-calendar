@@ -574,6 +574,8 @@ Time interactions (`CalendarTimeGrid` drums, `CalendarNav.showTime` popup confir
 
 Range-bound time controls (`CalendarTimeGrid bound="from"|"to"` and `CalendarNav bound="from"|"to" showTime`) use `SET_RANGE_BOUND` instead. They intentionally bypass the `viewDate.day` matching heuristic and write to the explicit boundary. If that boundary does not exist yet, the time control is read-only / no-op; time alone must not invent a missing `from` or `to` date.
 
+`<CalendarTimeGrid bound="...">` also renders a small localized date header above the drums (the bound's current date, formatted via `Intl.DateTimeFormat`). Toggle with `showBoundDate` (default `true`). The prop is a no-op without `bound` — there is no implicit date to display in non-bound mode. If the bound exists but has no date yet, the header is hidden.
+
 The reducer's contract:
 
 1. `viewDate` is always updated to `date` — `viewDate` is the source of truth for "current working time" and feeds `CalendarDays.handleSetDay` so a subsequent date click inherits it.

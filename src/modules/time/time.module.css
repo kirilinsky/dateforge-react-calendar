@@ -22,4 +22,63 @@
   }
 }
 
+.resetBtn {
+  align-self: stretch;
+  box-sizing: border-box;
+  gap: 0.4em;
+  margin-top: var(--cal-spacing);
+  background: var(--active-cell-bg, var(--c-h));
+  color: var(--active-cell-color, var(--c-at, var(--c-a)));
+  border: var(--cal-border, 1px) solid transparent;
+  border-radius: var(--cal-radius, 0.5em);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--cal-size-chip, 2.3em);
+  width: 100%;
+  padding: 0 var(--cal-spacing);
+  font-size: 1em;
+  font-weight: var(--cal-weight-semibold);
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+    box-shadow var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+    color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+    opacity var(--cal-transition, 0.2s) ease;
+  box-shadow: var(--active-cell-stroke, var(--cal-shadow-md, 0 0.22em 0.6em var(--c-x)));
+  flex-shrink: 0;
+}
+
+.resetBtn:hover {
+  opacity: var(--cal-opacity-hover, 0.85);
+}
+
+.resetBtn svg {
+  width: 1.1em;
+  height: 1.1em;
+  fill: currentColor;
+}
+
+.boundedDate {
+  align-self: stretch;
+  box-sizing: border-box;
+  height: var(--cal-size-chip, 2.3em);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--cal-spacing);
+  margin-bottom: var(--cal-spacing);
+  border-radius: var(--cal-radius, 0.5em);
+  background: var(--c-t);
+  color: var(--c-c);
+  box-shadow: var(--active-cell-stroke, none);
+  font-size: var(--cal-text-sm);
+  font-weight: var(--cal-weight-semibold);
+  line-height: var(--cal-leading-tight, 1.2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 }
