@@ -1,8 +1,8 @@
 import { getDateTimeFormat, getNumberFormat } from "@/utils/intl-cache";
 
-export const DAY_MS = 86_400_000;
-export const HOUR_MS = 3_600_000;
-export const MINUTE_MS = 60_000;
+const DAY_MS = 86_400_000;
+const HOUR_MS = 3_600_000;
+const MINUTE_MS = 60_000;
 
 type CalendarInfoUnit = "day" | "hour" | "minute";
 export type CalendarInfoRangeStyle = "days" | "duration";
