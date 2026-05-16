@@ -121,6 +121,29 @@ describe("ManualInput — input mask format", () => {
 });
 
 describe("ManualInput — multi mode cap", () => {
+  it("adds a typed date with the Apply button", async () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <Calendar mode="multiple" onChange={onChange}>
+        <CalendarManualInput />
+      </Calendar>,
+    );
+
+    const input = findInput(container);
+    await userEvent.click(input);
+    await userEvent.keyboard("15062024");
+    await userEvent.click(
+      container.querySelector('button[aria-label="Apply"]') as HTMLElement,
+    );
+
+    expect(onChange).toHaveBeenCalledTimes(1);
+    const next = onChange.mock.calls[0][0] as Date[];
+    expect(next).toHaveLength(1);
+    expect(next[0].getFullYear()).toBe(2024);
+    expect(next[0].getMonth()).toBe(5);
+    expect(next[0].getDate()).toBe(15);
+  });
+
   it("hides the add-date input once selectedDates reaches maxDates", () => {
     const { container } = render(
       <Calendar
@@ -138,6 +161,35 @@ describe("ManualInput — multi mode cap", () => {
 });
 
 describe("ManualInput — range constraints", () => {
+  it("clears only the edited range boundary", async () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <Calendar
+        mode="range"
+        value={{
+          from: new Date(2024, 5, 1),
+          to: new Date(2024, 5, 10),
+        }}
+        onChange={onChange}
+      >
+        <CalendarManualInput />
+      </Calendar>,
+    );
+
+    await userEvent.click(container.querySelector("button") as HTMLElement);
+    await userEvent.click(
+      container.querySelector('button[aria-label="Clear"]') as HTMLElement,
+    );
+
+    expect(onChange).toHaveBeenCalledTimes(1);
+    const next = onChange.mock.calls[0][0] as {
+      from: Date | null;
+      to: Date | null;
+    };
+    expect(next.from).toBeNull();
+    expect(next.to?.getDate()).toBe(10);
+  });
+
   it("does not commit a complete range shorter than minRangeDays", async () => {
     const onChange = vi.fn();
     const { container } = render(
@@ -166,6 +218,29 @@ describe("ManualInput — range constraints", () => {
 });
 
 describe("ManualInput — per-chip remove (multiple mode)", () => {
+  it("exits edit mode without onChange when saving the same chip date", async () => {
+    const onChange = vi.fn();
+    const { container } = render(
+      <Calendar
+        mode="multiple"
+        value={[new Date(2024, 5, 1)]}
+        onChange={onChange}
+      >
+        <CalendarManualInput />
+      </Calendar>,
+    );
+
+    await userEvent.click(container.querySelector("button") as HTMLElement);
+    expect(container.querySelectorAll("input")).toHaveLength(2);
+    await userEvent.click(
+      container.querySelector('button[aria-label="Apply"]') as HTMLElement,
+    );
+
+    expect(onChange).not.toHaveBeenCalled();
+    expect(container.querySelectorAll("input")).toHaveLength(1);
+    expect(container.textContent).toContain("01.06.2024");
+  });
+
   it("renders × button per chip and removes only that date", async () => {
     const onChange = vi.fn();
     const { container } = render(
