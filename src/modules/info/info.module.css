@@ -55,6 +55,7 @@
     max-width: 100%;
     display: inline-flex;
     align-items: center;
+    gap: 0.4em;
     padding: 0 0.7em;
     border-radius: var(--cal-radius, 0.5em);
     background: var(--c-t);
@@ -88,6 +89,11 @@
     color: var(--c-dt, var(--c-c));
     cursor: default;
     pointer-events: none;
+  }
+
+  .prefix {
+    opacity: 0.7;
+    font-weight: var(--cal-weight-normal);
   }
 
   .clearBtn {
