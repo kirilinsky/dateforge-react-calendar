@@ -201,6 +201,10 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   useEffect(() => {
     if (!isControlled) return;
     validateCalendarValue(externalValue, mode, "value");
+    // Read latest viewDate via ref — effect deps are [externalKey] only,
+    // so a direct `state.viewDate` read would capture a stale value when
+    // the user has navigated since the last `value` change.
+    const currentViewDate = stateRef.current.viewDate;
     const externalRangeObj = isDateRange(externalValue)
       ? externalValue
       : undefined;
@@ -229,7 +233,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
           : null;
       dispatch({
         type: "SYNC_EXTERNAL",
-        viewDate: from ?? state.viewDate,
+        viewDate: from ?? currentViewDate,
         selectedDates: [],
         rangeStart: from,
         rangeEnd: to,
@@ -238,12 +242,12 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       const nextDates = externalDates
         .map(toValidDateOrNull)
         .filter((d): d is Date => d !== null);
-      const keepView = nextDates.some((d) => isSameDay(d, state.viewDate));
+      const keepView = nextDates.some((d) => isSameDay(d, currentViewDate));
       dispatch({
         type: "SYNC_EXTERNAL",
         viewDate: keepView
-          ? state.viewDate
-          : (nextDates[nextDates.length - 1] ?? state.viewDate),
+          ? currentViewDate
+          : (nextDates[nextDates.length - 1] ?? currentViewDate),
         selectedDates: nextDates,
         rangeStart: null,
         rangeEnd: null,
@@ -252,7 +256,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       const parsed = externalSingle ? toValidDateOrNull(externalSingle) : null;
       dispatch({
         type: "SYNC_EXTERNAL",
-        viewDate: parsed ?? state.viewDate,
+        viewDate: parsed ?? currentViewDate,
         selectedDates: parsed ? [parsed] : [],
         rangeStart: null,
         rangeEnd: null,

@@ -80,8 +80,8 @@ const checkDisabledRule = (d: Date, rule: DisabledRule): boolean => {
   if ("dayOfWeek" in rule) return rule.dayOfWeek.includes(d.getDay());
   if ("from" in rule) return d >= rule.from && d <= rule.to;
   return (
-    (rule.before ? d < rule.before : false) ||
-    (rule.after ? d > rule.after : false)
+    (rule.before ? d <= rule.before : false) ||
+    (rule.after ? d >= rule.after : false)
   );
 };
 

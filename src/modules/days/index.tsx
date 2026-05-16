@@ -434,11 +434,22 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
         r.date.getSeconds(),
         r.date.getMilliseconds(),
       );
+    // Preserve user's H/M/S/ms when clamping to bound. Day is already set
+    // from the click target; only re-clamp if the resulting timestamp falls
+    // outside [minDate, maxDate] purely because of the time component.
     if (r.minDate && next.getTime() < r.minDate.getTime()) {
-      next.setHours(r.minDate.getHours(), r.minDate.getMinutes(), 0, 0);
+      next.setFullYear(
+        r.minDate.getFullYear(),
+        r.minDate.getMonth(),
+        r.minDate.getDate(),
+      );
     }
     if (r.maxDate && next.getTime() > r.maxDate.getTime()) {
-      next.setHours(r.maxDate.getHours(), r.maxDate.getMinutes(), 0, 0);
+      next.setFullYear(
+        r.maxDate.getFullYear(),
+        r.maxDate.getMonth(),
+        r.maxDate.getDate(),
+      );
     }
     r.onChangeDate(next);
   }, []);

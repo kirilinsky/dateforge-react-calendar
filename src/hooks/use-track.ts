@@ -287,8 +287,9 @@ export function useTrack({
         setPosition(p.current.offset / ppi);
       },
       up: () => {
+        const h = handlers.current;
+        if (!h) return;
         p.current.isDragging = false;
-        const h = handlers.current!;
         window.removeEventListener("pointermove", h.move);
         window.removeEventListener("pointerup", h.up);
         window.removeEventListener("pointercancel", h.up);
@@ -305,7 +306,13 @@ export function useTrack({
       window.removeEventListener("pointermove", h.move);
       window.removeEventListener("pointerup", h.up);
       window.removeEventListener("pointercancel", h.up);
+      // Stop any in-flight RAF and null out the handlers ref so a late
+      // pointerup (delivered after unmount) short-circuits instead of
+      // scheduling a new animation frame on a dead component.
+      stopLoop();
+      handlers.current = null;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onPointerDown = (e: React.PointerEvent) => {
