@@ -311,7 +311,7 @@ export const NoTopLevelClear: Story = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
-          gradient={resolveStoryGradient(ctx.globals.gradient)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarManualInput allowClear={false} />
@@ -330,7 +330,7 @@ export const AlignCenter: Story = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
-          gradient={resolveStoryGradient(ctx.globals.gradient)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarManualInput align="center" />
@@ -349,7 +349,7 @@ export const WithLabel: Story = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
-          gradient={resolveStoryGradient(ctx.globals.gradient)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarManualInput label="Date" />
@@ -369,7 +369,7 @@ export const MultipleWithLabel: Story = {
         onChange={setDates}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
-          gradient={resolveStoryGradient(ctx.globals.gradient)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarManualInput label="Dates" />
@@ -415,7 +415,7 @@ export const Playground: Story = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
-          gradient={resolveStoryGradient(ctx.globals.gradient)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarManualInput
