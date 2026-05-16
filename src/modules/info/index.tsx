@@ -56,17 +56,11 @@ export interface CalendarInfoRangeFormatterContext
   to: Date;
   durationDays: number;
   durationMs: number;
-  nights: number;
 }
 
 export interface CalendarInfoCountFormatterContext
   extends CalendarInfoFormatterContext {
   count: number;
-}
-
-export interface CalendarInfoSingleFormatterContext
-  extends CalendarInfoFormatterContext {
-  date: Date;
 }
 
 export interface CalendarInfoProps {
@@ -80,21 +74,14 @@ export interface CalendarInfoProps {
   multipleFormatter?: (
     context: CalendarInfoCountFormatterContext,
   ) => React.ReactNode;
-  rangeDateOptions?: Intl.DateTimeFormatOptions;
+  prefix?: React.ReactNode;
   rangeFormatter?: (
     context: CalendarInfoRangeFormatterContext,
   ) => React.ReactNode;
-  rangeLabel?: string;
   rangeStyle?: CalendarInfoRangeStyle;
   relativeBaseDate?: Date;
   relativeTarget?: CalendarInfoRelativeTarget;
-  showDurationInDays?: boolean;
   showHome?: boolean;
-  showNights?: boolean;
-  showRangeDates?: boolean;
-  singleFormatter?: (
-    context: CalendarInfoSingleFormatterContext,
-  ) => React.ReactNode;
   selectionCountFormatter?: (
     ...args: Parameters<CalendarInfoSelectionCountFormatter>
   ) => ReturnType<CalendarInfoSelectionCountFormatter>;
@@ -113,17 +100,12 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
   formatter,
   label,
   multipleFormatter,
-  rangeDateOptions,
+  prefix,
   rangeFormatter,
-  rangeLabel,
-  rangeStyle = "nights",
+  rangeStyle = "days",
   relativeBaseDate,
   relativeTarget = "selected",
-  showDurationInDays,
   showHome = false,
-  showNights,
-  showRangeDates = false,
-  singleFormatter,
   selectionCountFormatter,
   unitFormatter,
   variant = "summary",
@@ -131,6 +113,8 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
   const [innerHeight, setInnerHeight] = useState<number | null>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const contentGroupRef = useRef<HTMLDivElement>(null);
+  const homeBtnRef = useRef<HTMLButtonElement>(null);
+  const clearBtnRef = useRef<HTMLButtonElement>(null);
   const { hour12, locale, multiselect, range, readOnly, timeZone } =
     useConfig();
   const { viewDate, navigateTo } = useNavigation();
@@ -186,7 +170,7 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
     emptyStateLabel !== undefined &&
     emptyStateLabel !== "";
 
-  const content = shouldShowEmptyStateLabel
+  const summary = shouldShowEmptyStateLabel
     ? emptyStateLabel
     : formatter
       ? formatter(context)
@@ -202,7 +186,7 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
             if (rangeStart && rangeEnd) {
               const from = rangeStart <= rangeEnd ? rangeStart : rangeEnd;
               const to = rangeStart <= rangeEnd ? rangeEnd : rangeStart;
-              const nights = Math.abs(
+              const durationDays = Math.abs(
                 getCalendarDayIndex(to, timeZone) -
                   getCalendarDayIndex(from, timeZone),
               );
@@ -210,23 +194,14 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
                 ...context,
                 from,
                 to,
-                durationDays: nights,
+                durationDays,
                 durationMs: to.getTime() - from.getTime(),
-                nights,
               };
               if (rangeFormatter) return rangeFormatter(rangeContext);
               return formatCalendarInfoRangeSummary({
                 context: rangeContext,
-                hour12,
                 helpers,
-                locale,
-                rangeDateOptions,
-                rangeLabel,
                 rangeStyle,
-                showDurationInDays,
-                showNights,
-                showRangeDates,
-                timeZone,
               });
             }
             return rangeStart || rangeEnd
@@ -246,17 +221,19 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
           }
 
           if (!selectedDate) return emptyStateLabel;
-          const singleContext: CalendarInfoSingleFormatterContext = {
-            ...context,
-            date: selectedDate,
-          };
-          return singleFormatter
-            ? singleFormatter(singleContext)
-            : helpers.formatSelectionCount(1);
+          return helpers.formatSelectionCount(1);
         })();
 
-  const hasContent =
-    content !== null && content !== undefined && content !== "";
+  const hasSummary =
+    summary !== null && summary !== undefined && summary !== "";
+  const hasPrefix =
+    !shouldShowEmptyStateLabel &&
+    hasSummary &&
+    prefix !== null &&
+    prefix !== undefined &&
+    prefix !== "";
+  const hasClearBtn = allowClear && hasSelection;
+  const hasContent = hasSummary || showHome || hasClearBtn;
 
   useIsoLayoutEffect(() => {
     if (!animated) {
@@ -276,7 +253,11 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
     const measure = () => {
       const computedStyle = window.getComputedStyle(inner);
       const paddingY = getTargetPaddingY(inner, computedStyle);
-      const contentHeight = contentGroup.scrollHeight;
+      const contentHeight = Math.max(
+        contentGroup.scrollHeight,
+        homeBtnRef.current?.offsetHeight ?? 0,
+        clearBtnRef.current?.offsetHeight ?? 0,
+      );
 
       setInnerHeight(Math.ceil(contentHeight + paddingY));
     };
@@ -286,9 +267,11 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
 
     const resizeObserver = new ResizeObserver(measure);
     resizeObserver.observe(contentGroup);
+    if (homeBtnRef.current) resizeObserver.observe(homeBtnRef.current);
+    if (clearBtnRef.current) resizeObserver.observe(clearBtnRef.current);
 
     return () => resizeObserver.disconnect();
-  }, [animated, hasContent, align, content]);
+  }, [animated, hasContent, align, summary, hasPrefix]);
 
   const handleClear = () => {
     if (readOnly) return;
@@ -337,14 +320,16 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
           className={styles.contentGroup}
           style={{ justifyContent: alignToJustify[align] }}
         >
-          {hasContent && (
+          {hasSummary && (
             <div className={styles.infoText} role="status" aria-live="polite">
-              {content}
+              {hasPrefix && <span className={styles.prefix}>{prefix}</span>}
+              {summary}
             </div>
           )}
         </div>
         {showHome && (
           <button
+            ref={homeBtnRef}
             type="button"
             aria-label="Go to current month"
             className={`${styles.actionBtn} ${shared.interactive} ${shared.hovered} ${!today || isCurrentMonth ? styles.actionBtnDisabled : ""}`}
@@ -354,8 +339,9 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
             <Home />
           </button>
         )}
-        {allowClear && hasSelection && (
+        {hasClearBtn && (
           <button
+            ref={clearBtnRef}
             type="button"
             aria-label="Clear"
             className={`${styles.clearBtn} ${styles.actionBtn} ${shared.interactive} ${shared.hovered}`}

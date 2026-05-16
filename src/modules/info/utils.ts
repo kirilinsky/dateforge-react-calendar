@@ -4,13 +4,9 @@ export const DAY_MS = 86_400_000;
 export const HOUR_MS = 3_600_000;
 export const MINUTE_MS = 60_000;
 
-export type CalendarInfoUnit = "date" | "day" | "hour" | "minute" | "night";
-type CalendarInfoIntlUnit = Extract<
-  CalendarInfoUnit,
-  "day" | "hour" | "minute"
->;
+export type CalendarInfoUnit = "day" | "hour" | "minute";
 
-export type CalendarInfoRangeStyle = "nights" | "duration";
+export type CalendarInfoRangeStyle = "days" | "duration";
 export type CalendarInfoRelativeTarget =
   | "selected"
   | "range-start"
@@ -24,7 +20,7 @@ export interface CalendarInfoFormatContext {
 
 export interface CalendarInfoFormatHelpers {
   formatRelative: (date: Date, baseDate?: Date) => string;
-  formatSelectionCount: (count: number) => string;
+  formatSelectionCount: (count: number) => string | null;
   formatUnit: (value: number, unit: CalendarInfoUnit) => string;
 }
 
@@ -50,14 +46,8 @@ export interface CalendarInfoRangeSummaryContext {
   durationDays: number;
   durationMs: number;
   from: Date;
-  nights: number;
   to: Date;
 }
-
-const intlUnits = new Set<CalendarInfoUnit>(["day", "hour", "minute"]);
-
-const isIntlUnit = (unit: CalendarInfoUnit): unit is CalendarInfoIntlUnit =>
-  intlUnits.has(unit);
 
 export const isValidDate = (date: Date | null | undefined): date is Date =>
   date instanceof Date && !Number.isNaN(date.getTime());
@@ -68,7 +58,7 @@ const getDatePartValue = (
 ) => Number(parts.find((part) => part.type === type)?.value);
 
 export const getCalendarDayIndex = (date: Date, timeZone?: string) => {
-  const formatter = new Intl.DateTimeFormat("en-US-u-ca-gregory", {
+  const formatter = getDateTimeFormat("en-US-u-ca-gregory", {
     day: "numeric",
     month: "numeric",
     year: "numeric",
@@ -141,22 +131,20 @@ export const createCalendarInfoFormatters = ({
     const custom = unitFormatter?.(value, unit, formatContext);
     if (custom !== undefined) return custom;
 
-    if (isIntlUnit(unit)) {
-      return (
-        getNumberFormat(locale, {
-          maximumFractionDigits: 0,
-          style: "unit",
-          unit,
-          unitDisplay: "long",
-        })?.format(value) ?? formatNumber(value)
-      );
-    }
-
-    return formatNumber(value);
+    return (
+      getNumberFormat(locale, {
+        maximumFractionDigits: 0,
+        style: "unit",
+        unit,
+        unitDisplay: "long",
+      })?.format(value) ?? formatNumber(value)
+    );
   };
 
-  const formatSelectionCount = (count: number) =>
-    selectionCountFormatter?.(count, formatContext) ?? formatNumber(count);
+  const formatSelectionCount = (count: number) => {
+    if (!selectionCountFormatter) return null;
+    return selectionCountFormatter(count, formatContext);
+  };
 
   const formatRelative = (date: Date, baseDate = relativeBaseDate ?? null) => {
     if (!baseDate) return "";
@@ -191,94 +179,19 @@ const formatDuration = (
   return parts.join(" ");
 };
 
-const formatRangeLabelPrefix = (label?: string) => {
-  const normalized = label?.trim();
-  if (!normalized) return "";
-  return normalized.endsWith(":") ? `${normalized} ` : `${normalized}: `;
-};
-
-const formatRangeDates = (
-  from: Date,
-  to: Date,
-  hour12: boolean,
-  locale: string,
-  timeZone: string | undefined,
-  rangeDateOptions?: Intl.DateTimeFormatOptions,
-) => {
-  const formatter = getDateTimeFormat(locale, {
-    day: "numeric",
-    hour12: rangeDateOptions?.hour12 ?? hour12,
-    month: "short",
-    ...rangeDateOptions,
-    ...(timeZone && { timeZone }),
-  });
-  return `${formatter.format(from)} – ${formatter.format(to)}`;
-};
-
 export const formatCalendarInfoRangeSummary = ({
   context,
-  hour12,
   helpers,
-  locale,
-  rangeDateOptions,
-  rangeLabel,
   rangeStyle,
-  showDurationInDays,
-  showNights,
-  showRangeDates,
-  timeZone,
 }: {
   context: CalendarInfoRangeSummaryContext;
-  hour12: boolean;
   helpers: CalendarInfoFormatHelpers;
-  locale: string;
-  rangeDateOptions?: Intl.DateTimeFormatOptions;
-  rangeLabel?: string;
   rangeStyle: CalendarInfoRangeStyle;
-  showDurationInDays?: boolean;
-  showNights?: boolean;
-  showRangeDates?: boolean;
-  timeZone?: string;
 }) => {
-  const hasExplicitMetric =
-    showDurationInDays !== undefined || showNights !== undefined;
-  const shouldShowDurationInDays = hasExplicitMetric
-    ? !!showDurationInDays
-    : false;
-  const shouldShowNights = hasExplicitMetric
-    ? !!showNights
-    : rangeStyle === "nights";
-
-  const metrics: string[] = [];
-  if (shouldShowDurationInDays) {
-    metrics.push(helpers.formatUnit(context.durationDays, "day"));
+  if (rangeStyle === "duration") {
+    return formatDuration(context.durationMs, helpers.formatUnit);
   }
-  if (shouldShowNights) {
-    metrics.push(helpers.formatUnit(context.nights, "night"));
-  }
-
-  if (!hasExplicitMetric && rangeStyle === "duration") {
-    metrics.push(formatDuration(context.durationMs, helpers.formatUnit));
-  }
-
-  if (showRangeDates) {
-    const dates = formatRangeDates(
-      context.from,
-      context.to,
-      hour12,
-      locale,
-      timeZone,
-      rangeDateOptions,
-    );
-    const prefix = formatRangeLabelPrefix(rangeLabel);
-    return metrics.length > 0
-      ? `${prefix}${dates} (${metrics.join(", ")})`
-      : `${prefix}${dates}`;
-  }
-
-  if (metrics.length > 0) return metrics.join(", ");
-
-  return helpers.formatUnit(context.nights, "night");
+  return helpers.formatUnit(context.durationDays, "day");
 };
 
 export const getTargetPaddingY = (

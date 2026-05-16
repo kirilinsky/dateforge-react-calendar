@@ -8,12 +8,6 @@ import { CalendarInfo } from "@/modules/info";
 const D = (y: number, m: number, d: number, h = 0, min = 0) =>
   new Date(y, m, d, h, min);
 
-const englishUnitFormatter = (value: number, unit: string) => {
-  if (unit === "night") return `${value} ${value === 1 ? "night" : "nights"}`;
-  if (unit === "date") return `${value} ${value === 1 ? "date" : "dates"}`;
-  return undefined;
-};
-
 const ViewProbe = () => {
   const { viewDate } = useNavigation();
   return (
@@ -49,27 +43,27 @@ describe("CalendarInfo", () => {
     expect(getByText("Select a date")).toBeTruthy();
   });
 
-  it("renders the single-mode default count with no hardcoded labels", () => {
-    const { getByText } = render(
+  it("renders nothing in single mode without selectionCountFormatter", () => {
+    const { container } = render(
       <Calendar mode="single" value={D(2024, 5, 15)}>
-        <CalendarInfo />
+        <CalendarInfo animated={false} />
       </Calendar>,
     );
 
-    expect(getByText("1")).toBeTruthy();
+    expect(container.querySelector('[data-area="calendar-info"]')).toBeNull();
   });
 
-  it("renders the multiple-mode default count with no hardcoded labels", () => {
-    const { getByText } = render(
+  it("renders nothing in multiple mode without selectionCountFormatter", () => {
+    const { container } = render(
       <Calendar
         mode="multiple"
         value={[D(2024, 5, 15), D(2024, 5, 16), D(2024, 5, 17)]}
       >
-        <CalendarInfo />
+        <CalendarInfo animated={false} />
       </Calendar>,
     );
 
-    expect(getByText("3")).toBeTruthy();
+    expect(container.querySelector('[data-area="calendar-info"]')).toBeNull();
   });
 
   it("uses a custom selection count formatter", () => {
@@ -87,23 +81,25 @@ describe("CalendarInfo", () => {
     expect(getByText("3 dates selected")).toBeTruthy();
   });
 
-  it("renders range nights count by default", () => {
+  it("renders range days count by default via Intl", () => {
     const { getByText } = render(
       <Calendar
         mode="range"
+        locale="en-US"
         value={{ from: D(2024, 5, 10), to: D(2024, 5, 17) }}
       >
         <CalendarInfo />
       </Calendar>,
     );
 
-    expect(getByText("7")).toBeTruthy();
+    expect(getByText("7 days")).toBeTruthy();
   });
 
   it("renders range duration when rangeStyle=duration", () => {
     const { getByText } = render(
       <Calendar
         mode="range"
+        locale="en-US"
         value={{ from: D(2024, 5, 10, 10), to: D(2024, 5, 13, 14) }}
       >
         <CalendarInfo rangeStyle="duration" />
@@ -113,56 +109,19 @@ describe("CalendarInfo", () => {
     expect(getByText("3 days 4 hours")).toBeTruthy();
   });
 
-  it("renders range dates with nights in one summary", () => {
-    const { getByText } = render(
-      <Calendar
-        mode="range"
-        locale="en-GB"
-        value={{ from: D(2024, 4, 14), to: D(2024, 4, 21) }}
-      >
-        <CalendarInfo
-          showRangeDates
-          showNights
-          rangeLabel="Selected"
-          unitFormatter={englishUnitFormatter}
-        />
-      </Calendar>,
-    );
-
-    expect(getByText("Selected: 14 May – 21 May (7 nights)")).toBeTruthy();
-  });
-
-  it("renders range dates with duration in days", () => {
-    const { getByText } = render(
-      <Calendar
-        mode="range"
-        locale="en-GB"
-        value={{ from: D(2024, 4, 14), to: D(2024, 4, 21) }}
-      >
-        <CalendarInfo showRangeDates showDurationInDays rangeLabel="Selected" />
-      </Calendar>,
-    );
-
-    expect(getByText("Selected: 14 May – 21 May (7 days)")).toBeTruthy();
-  });
-
-  it("uses calendar hour12 for range date formatting", () => {
+  it("renders prefix alongside range metric", () => {
     const { getByText } = render(
       <Calendar
         mode="range"
         locale="en-US"
-        hour12
-        value={{ from: D(2024, 4, 14, 13, 5), to: D(2024, 4, 14, 15, 30) }}
+        value={{ from: D(2024, 4, 14), to: D(2024, 4, 21) }}
       >
-        <CalendarInfo
-          showRangeDates
-          showNights={false}
-          rangeDateOptions={{ hour: "numeric", minute: "2-digit" }}
-        />
+        <CalendarInfo prefix="Trip:" />
       </Calendar>,
     );
 
-    expect(getByText("May 14, 1:05 PM – May 14, 3:30 PM")).toBeTruthy();
+    expect(getByText("Trip:")).toBeTruthy();
+    expect(getByText("7 days")).toBeTruthy();
   });
 
   it("uses Intl relative formatting", () => {
@@ -175,22 +134,22 @@ describe("CalendarInfo", () => {
     expect(getByText("in 3 days")).toBeTruthy();
   });
 
-  it("uses custom formatters", () => {
+  it("uses custom range formatter", () => {
     const { getByText } = render(
       <Calendar
         mode="range"
+        locale="en-US"
         value={{ from: D(2024, 5, 10), to: D(2024, 5, 14) }}
       >
         <CalendarInfo
-          unitFormatter={englishUnitFormatter}
-          rangeFormatter={({ formatUnit, nights }) =>
-            `Trip length: ${formatUnit(nights, "night")}`
+          rangeFormatter={({ formatUnit, durationDays }) =>
+            `Trip length: ${formatUnit(durationDays, "day")}`
           }
         />
       </Calendar>,
     );
 
-    expect(getByText("Trip length: 4 nights")).toBeTruthy();
+    expect(getByText("Trip length: 4 days")).toBeTruthy();
   });
 
   it("clear button clears single selection", async () => {
@@ -266,6 +225,64 @@ describe("CalendarInfo", () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
+  it("showHome keeps the block visible without selection or label", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(D(2024, 5, 15));
+    const { container, getByLabelText } = render(
+      <Calendar mode="single">
+        <CalendarInfo animated={false} showHome />
+      </Calendar>,
+    );
+
+    expect(container.querySelector('[data-area="calendar-info"]')).toBeTruthy();
+    expect(getByLabelText("Go to current month")).toBeTruthy();
+    expect(
+      container.querySelector('[data-area="calendar-info"] [role="status"]'),
+    ).toBeNull();
+  });
+
+  it("allowClear with selection keeps the block visible without summary", () => {
+    const { container, getByLabelText } = render(
+      <Calendar mode="single" value={D(2024, 5, 15)}>
+        <CalendarInfo animated={false} allowClear />
+      </Calendar>,
+    );
+
+    expect(container.querySelector('[data-area="calendar-info"]')).toBeTruthy();
+    expect(getByLabelText("Clear")).toBeTruthy();
+    expect(
+      container.querySelector('[data-area="calendar-info"] [role="status"]'),
+    ).toBeNull();
+  });
+
+  it("label renders when nothing selected, summary takes over when selected", () => {
+    const { queryByText, rerender } = render(
+      <Calendar mode="single">
+        <CalendarInfo
+          animated={false}
+          label="Pick a date"
+          selectionCountFormatter={(count) => `${count} selected`}
+        />
+      </Calendar>,
+    );
+
+    expect(queryByText("Pick a date")).toBeTruthy();
+    expect(queryByText("1 selected")).toBeNull();
+
+    rerender(
+      <Calendar mode="single" value={D(2024, 5, 15)}>
+        <CalendarInfo
+          animated={false}
+          label="Pick a date"
+          selectionCountFormatter={(count) => `${count} selected`}
+        />
+      </Calendar>,
+    );
+
+    expect(queryByText("Pick a date")).toBeNull();
+    expect(queryByText("1 selected")).toBeTruthy();
+  });
+
   it("showHome is disabled for the current month", () => {
     vi.useFakeTimers();
     vi.setSystemTime(D(2024, 5, 15));
@@ -304,7 +321,11 @@ describe("CalendarInfo", () => {
     try {
       const renderInfo = (allowClear: boolean, showHome: boolean) => (
         <Calendar mode="single" value={D(2024, 5, 15)}>
-          <CalendarInfo allowClear={allowClear} showHome={showHome} />
+          <CalendarInfo
+            allowClear={allowClear}
+            showHome={showHome}
+            selectionCountFormatter={(count) => `${count}`}
+          />
         </Calendar>
       );
       const { container, rerender } = render(renderInfo(false, false));

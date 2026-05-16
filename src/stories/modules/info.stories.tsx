@@ -4,7 +4,9 @@ import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
 import {
   CalendarInfo,
+  type CalendarInfoProps,
   type CalendarInfoRangeStyle,
+  type CalendarInfoRelativeTarget,
   type CalendarInfoVariant,
 } from "@/modules/info";
 import { FIXED_DATE } from "../_constants";
@@ -18,13 +20,13 @@ type CalendarInfoArgs = {
   allowClear?: boolean;
   align?: "left" | "center" | "right";
   animated?: boolean;
+  hour12?: boolean;
   label?: string;
-  rangeLabel?: string;
+  prefix?: string;
   rangeStyle?: CalendarInfoRangeStyle;
-  showDurationInDays?: boolean;
+  relativeTarget?: CalendarInfoRelativeTarget;
   showHome?: boolean;
-  showNights?: boolean;
-  showRangeDates?: boolean;
+  timeZone?: string;
   variant?: CalendarInfoVariant;
 };
 
@@ -41,37 +43,65 @@ const formatStoryDate = (date: Date, locale: string) =>
     year: "numeric",
   }).format(date);
 
-const formatStoryUnit = (value: number, unit: string) => {
-  if (unit === "night") return `${value} ${value === 1 ? "night" : "nights"}`;
-  return undefined;
-};
+const getCalendarProps = (
+  args: CalendarInfoArgs,
+  ctx: Parameters<NonNullable<Meta<CalendarInfoArgs>["render"]>>[1],
+) => ({
+  appearance: resolveStoryAppearance(ctx.globals.appearance),
+  hour12: args.hour12,
+  locale: resolveStoryLocale(ctx.globals.locale),
+  theme: resolveStoryTheme(ctx.globals.theme),
+  timeZone: args.timeZone || undefined,
+});
+
+const getInfoProps = (args: CalendarInfoArgs): CalendarInfoProps => ({
+  allowClear: args.allowClear,
+  align: args.align,
+  animated: args.animated,
+  label: args.label,
+  prefix: args.prefix,
+  rangeStyle: args.rangeStyle,
+  relativeTarget: args.relativeTarget,
+  showHome: args.showHome,
+  variant: args.variant,
+});
+
+const rangeControls = ["prefix", "rangeStyle"];
+
+const relativeControls = ["relativeTarget", "variant"];
 
 const meta: Meta<CalendarInfoArgs> = {
-  title: "Modules/CalendarInfo",
+  title: "Modules/Info",
   argTypes: {
     allowClear: { control: "boolean" },
     align: { control: "inline-radio", options: ["left", "center", "right"] },
     animated: { control: "boolean" },
+    hour12: { control: "boolean" },
     label: { control: "text" },
-    rangeLabel: { control: "text" },
-    rangeStyle: { control: "inline-radio", options: ["nights", "duration"] },
-    showDurationInDays: { control: "boolean" },
+    prefix: { control: "text" },
+    rangeStyle: {
+      control: "inline-radio",
+      options: ["days", "duration"],
+    },
+    relativeTarget: {
+      control: "inline-radio",
+      options: ["selected", "range-start", "range-end"],
+    },
     showHome: { control: "boolean" },
-    showNights: { control: "boolean" },
-    showRangeDates: { control: "boolean" },
+    timeZone: { control: "text" },
     variant: { control: "inline-radio", options: ["summary", "relative"] },
   },
   args: {
     allowClear: false,
     align: "left",
     animated: true,
+    hour12: false,
     label: undefined,
-    rangeLabel: undefined,
-    rangeStyle: "nights",
-    showDurationInDays: undefined,
+    prefix: undefined,
+    rangeStyle: "days",
+    relativeTarget: "selected",
     showHome: false,
-    showNights: undefined,
-    showRangeDates: false,
+    timeZone: undefined,
     variant: "summary",
   },
   render: (args, ctx) => {
@@ -84,24 +114,9 @@ const meta: Meta<CalendarInfoArgs> = {
         mode="range"
         value={range}
         onChange={setRange}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-        locale={resolveStoryLocale(ctx.globals.locale)}
+        {...getCalendarProps(args, ctx)}
       >
-        <CalendarInfo
-          allowClear={args.allowClear}
-          align={args.align}
-          animated={args.animated}
-          label={args.label}
-          rangeLabel={args.rangeLabel}
-          rangeStyle={args.rangeStyle}
-          showDurationInDays={args.showDurationInDays}
-          showHome={args.showHome}
-          showNights={args.showNights}
-          showRangeDates={args.showRangeDates}
-          unitFormatter={formatStoryUnit}
-          variant={args.variant}
-        />
+        <CalendarInfo {...getInfoProps(args)} />
         <CalendarDays />
       </Calendar>
     );
@@ -112,8 +127,8 @@ export default meta;
 
 type Story = StoryObj<CalendarInfoArgs>;
 
-export const RangeNights: Story = {};
-RangeNights.storyName = "Range — nights";
+export const RangeDays: Story = {};
+RangeDays.storyName = "Range — days";
 
 export const RangeDuration: Story = {
   args: { rangeStyle: "duration" },
@@ -127,23 +142,9 @@ export const RangeDuration: Story = {
         mode="range"
         value={range}
         onChange={setRange}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-        locale={resolveStoryLocale(ctx.globals.locale)}
+        {...getCalendarProps(args, ctx)}
       >
-        <CalendarInfo
-          allowClear={args.allowClear}
-          align={args.align}
-          animated={args.animated}
-          label={args.label}
-          rangeLabel={args.rangeLabel}
-          rangeStyle={args.rangeStyle}
-          showDurationInDays={args.showDurationInDays}
-          showHome={args.showHome}
-          showNights={args.showNights}
-          showRangeDates={args.showRangeDates}
-          unitFormatter={formatStoryUnit}
-        />
+        <CalendarInfo {...getInfoProps(args)} />
         <CalendarDays />
       </Calendar>
     );
@@ -151,23 +152,10 @@ export const RangeDuration: Story = {
 };
 RangeDuration.storyName = "Range — duration";
 
-export const RangeDatesAndNights: Story = {
-  args: {
-    rangeLabel: "Selected",
-    showNights: true,
-    showRangeDates: true,
-  },
+export const RangeWithPrefix: Story = {
+  args: { prefix: "Trip:" },
 };
-RangeDatesAndNights.storyName = "Range — dates and nights";
-
-export const RangeDatesAndDays: Story = {
-  args: {
-    rangeLabel: "Selected",
-    showDurationInDays: true,
-    showRangeDates: true,
-  },
-};
-RangeDatesAndDays.storyName = "Range — dates and days";
+RangeWithPrefix.storyName = "Range — with prefix";
 
 export const Multiple: Story = {
   render: (args, ctx) => {
@@ -181,48 +169,19 @@ export const Multiple: Story = {
         mode="multiple"
         value={dates}
         onChange={setDates}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-        locale={resolveStoryLocale(ctx.globals.locale)}
+        {...getCalendarProps(args, ctx)}
       >
         <CalendarInfo
-          allowClear={args.allowClear}
-          align={args.align}
-          animated={args.animated}
-          label={args.label}
-          showHome={args.showHome}
+          {...getInfoProps(args)}
+          selectionCountFormatter={(count) => `${count} dates selected`}
         />
         <CalendarDays />
       </Calendar>
     );
   },
+  parameters: { controls: { exclude: rangeControls } },
 };
 Multiple.storyName = "Multiple";
-
-export const Single: Story = {
-  render: (args, ctx) => {
-    const [date, setDate] = useState<Date | null>(FIXED_DATE);
-    return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-        locale={resolveStoryLocale(ctx.globals.locale)}
-      >
-        <CalendarInfo
-          allowClear={args.allowClear}
-          align={args.align}
-          animated={args.animated}
-          label={args.label}
-          showHome={args.showHome}
-        />
-        <CalendarDays />
-      </Calendar>
-    );
-  },
-};
-Single.storyName = "Single";
 
 export const WithHome: Story = {
   args: { showHome: true },
@@ -237,20 +196,15 @@ export const EmptyWithLabel: Story = {
       <Calendar
         value={date}
         onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-        locale={resolveStoryLocale(ctx.globals.locale)}
+        {...getCalendarProps(args, ctx)}
       >
-        <CalendarInfo
-          allowClear={args.allowClear}
-          align={args.align}
-          animated={args.animated}
-          label={args.label}
-          showHome={args.showHome}
-        />
+        <CalendarInfo {...getInfoProps(args)} />
         <CalendarDays />
       </Calendar>
     );
+  },
+  parameters: {
+    controls: { exclude: [...rangeControls, ...relativeControls] },
   },
 };
 EmptyWithLabel.storyName = "Empty with label";
@@ -263,27 +217,22 @@ export const Relative: Story = {
       <Calendar
         value={date}
         onChange={setDate}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-        locale={resolveStoryLocale(ctx.globals.locale)}
+        {...getCalendarProps(args, ctx)}
       >
         <CalendarInfo
-          allowClear={args.allowClear}
-          align={args.align}
-          animated={args.animated}
+          {...getInfoProps(args)}
           formatter={({ formatRelative, locale, selectedDate }) =>
             selectedDate
               ? `Today: ${formatStoryDate(FIXED_DATE, locale)} · ${formatRelative(selectedDate, FIXED_DATE)}`
               : args.label
           }
           relativeBaseDate={FIXED_DATE}
-          showHome={args.showHome}
-          variant={args.variant}
         />
         <CalendarDays />
       </Calendar>
     );
   },
+  parameters: { controls: { exclude: rangeControls } },
 };
 Relative.storyName = "Relative to selected date";
 
@@ -298,24 +247,27 @@ export const CustomFormatters: Story = {
         mode="range"
         value={range}
         onChange={setRange}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-        locale={resolveStoryLocale(ctx.globals.locale)}
+        {...getCalendarProps(args, ctx)}
       >
         <CalendarInfo
-          allowClear={args.allowClear}
-          align={args.align}
-          animated={args.animated}
-          label={args.label}
-          showHome={args.showHome}
-          unitFormatter={formatStoryUnit}
-          rangeFormatter={({ formatUnit, nights }) =>
-            `Trip length: ${formatUnit(nights, "night")}`
+          {...getInfoProps(args)}
+          unitFormatter={(value, unit) => {
+            if (unit === "day")
+              return `${value} ${value === 1 ? "night" : "nights"}`;
+            return undefined;
+          }}
+          rangeFormatter={({ formatUnit, durationDays }) =>
+            `Trip length: ${formatUnit(durationDays, "day")}`
           }
         />
         <CalendarDays />
       </Calendar>
     );
+  },
+  parameters: {
+    controls: {
+      exclude: ["prefix", "rangeStyle", "relativeTarget", "variant"],
+    },
   },
 };
 CustomFormatters.storyName = "Custom formatters";
