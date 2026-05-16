@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.5.0
+
+### Minor Changes
+
+- [#72](https://github.com/kirilinsky/dateforge-react-calendar/pull/72) [`4ea631b`](https://github.com/kirilinsky/dateforge-react-calendar/commit/4ea631bb657d44a82268ca6428f77ba3563ba5fb) Thanks [@kirilinsky](https://github.com/kirilinsky)! - `compactTime` prop for Nav module, to get quick access to time popup.
+
+  Add the new `CalendarInfo` module for rendering selection summaries and relative date text.
+
+  Improve time selection workflows with bound range time editing, expanded time grid behavior, and a range duration recipe that combines range selection with time grids.
+
+  Extend tokens for customization and polish across appearances, themes.
+
 ## 1.4.8
 
 ### Patch Changes
