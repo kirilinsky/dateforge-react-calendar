@@ -58,8 +58,14 @@ interface ResolvedRange {
 const isValidDate = (d: Date | null): d is Date =>
   d instanceof Date && !Number.isNaN(d.getTime());
 
-const rangeLengthDays = (from: Date, to: Date) =>
-  Math.round((to.getTime() - from.getTime()) / 86400000) + 1;
+const rangeLengthDays = (from: Date, to: Date) => {
+  // Use UTC day diff to avoid DST off-by-one (23h/25h days otherwise
+  // round to ±1 around spring-forward / fall-back transitions).
+  const utcDiff =
+    Date.UTC(to.getFullYear(), to.getMonth(), to.getDate()) -
+    Date.UTC(from.getFullYear(), from.getMonth(), from.getDate());
+  return utcDiff / 86400000 + 1;
+};
 
 export function validateRange(
   from: Date | null,

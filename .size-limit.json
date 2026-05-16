@@ -11,7 +11,7 @@
       "./dist/index.mjs": "{ Calendar }",
       "./dist/modules/days.mjs": "{ CalendarDays }"
     },
-    "limit": "16 KB",
+    "limit": "17 KB",
     "ignore": ["react", "react-dom"]
   },
   {
