@@ -43,12 +43,11 @@
   }
 
   .currentYear {
-    font-size: var(--cal-text-xl);
     font-weight: var(--cal-weight-bold);
     line-height: var(--cal-leading-none);
     flex: 1 1 auto;
     margin: 0 0.3em;
-    height: 2.3em;
+    height: var(--cal-size-chip, 2.3em);
     white-space: nowrap;
     min-width: 0;
     &:active {
@@ -56,9 +55,13 @@
     }
   }
 
+  .currentYear > * {
+    font-size: var(--cal-text-xl);
+  }
+
   .arrow {
-    width: 2.2em;
-    height: 2.3em;
+    width: var(--cal-size-chip, 2.3em);
+    height: var(--cal-size-chip, 2.3em);
     flex: 0 0 auto;
     padding: 0;
   }

@@ -19,7 +19,6 @@ describe("createAppearance", () => {
       controlFontSize: "0.95em",
       todayOutlineWidth: "0px",
       selectedDayWeight: "500",
-      selectedTextDotSize: "0.2em",
     });
     expect(a.vars["--cal-radius"]).toBe("0.25em");
     expect(a.vars["--cal-border"]).toBe("3px");
@@ -30,7 +29,6 @@ describe("createAppearance", () => {
     expect(a.vars["--cal-text-lg"]).toBe("0.95em");
     expect(a.vars["--cal-today-outline-width"]).toBe("0px");
     expect(a.vars["--cal-selected-day-weight"]).toBe("500");
-    expect(a.vars["--cal-selected-text-dot-size"]).toBe("0.2em");
   });
 
   it("ignores undefined token values", () => {

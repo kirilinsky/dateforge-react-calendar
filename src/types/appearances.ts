@@ -28,10 +28,6 @@ export type AppearanceTokens = {
   letterSpacing: string;
   todayOutlineWidth: string;
   selectedDayWeight: string;
-  selectedTextColor: string;
-  selectedTextDotColor: string;
-  selectedTextDotSize: string;
-  selectedTextDotOffset: string;
 };
 
 export const APPEARANCE_TOKEN_TO_VAR: Record<keyof AppearanceTokens, string> = {
@@ -64,10 +60,6 @@ export const APPEARANCE_TOKEN_TO_VAR: Record<keyof AppearanceTokens, string> = {
   letterSpacing: "--cal-letter-spacing",
   todayOutlineWidth: "--cal-today-outline-width",
   selectedDayWeight: "--cal-selected-day-weight",
-  selectedTextColor: "--cal-selected-text-color",
-  selectedTextDotColor: "--cal-selected-text-dot-color",
-  selectedTextDotSize: "--cal-selected-text-dot-size",
-  selectedTextDotOffset: "--cal-selected-text-dot-offset",
 };
 
 export const CUSTOM_APPEARANCE_BRAND = Symbol.for("rcd.appearance.custom");

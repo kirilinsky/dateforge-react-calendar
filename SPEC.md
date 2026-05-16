@@ -25,7 +25,7 @@ Modular React calendar/datepicker lib. Zero runtime deps. SSR-safe. Composable m
 - I.ctx — `@dateforge/react-calendar/context` (all context hooks: `useConfig`, `useNavigation`, `useSelection`, `useSelectionActions`, `useSelectionHover`, `useSelectionValue`, `useUI`)
 - I.modules — `@dateforge/react-calendar/modules` (all module components)
 - I.themes — `@dateforge/react-calendar/themes` + `themes/<name>` (34 themes)
-- I.appearances — `@dateforge/react-calendar/appearances` + `appearances/<name>` (5 appearances)
+- I.appearances — `@dateforge/react-calendar/appearances` + `appearances/<name>` (6 appearances)
 - I.api — `CalendarProps<M>`, `CalendarValue<M>`, `CalendarMode`, `DateRange`, `DisabledConfig`, `DisabledRule`, `ThemeTokens`
 - I.ci — GitHub Actions: typecheck, lint, build, exports, size, test, SSR, Chromatic, CodeQL, Scorecard
 - I.storybook — Storybook 10 + Chromatic visual regression

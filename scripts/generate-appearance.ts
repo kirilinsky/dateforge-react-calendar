@@ -8,7 +8,7 @@ mkdirSync(distDir, { recursive: true });
 const BRAND_EXPR = `Symbol.for("rcd.appearance.custom")`;
 
 const files = readdirSync(srcDir)
-  .filter((f) => f.endsWith(".css"))
+  .filter((f) => f.endsWith(".css") && !f.startsWith("_"))
   .sort();
 
 type ParsedAppearance = { name: string; vars: Record<string, string> };

@@ -45,14 +45,6 @@ describe("getDayCellClassName", () => {
     expect(cls).toMatch(/activeItem/);
   });
 
-  it("uses selectedTextItem instead of activeItem for text selected days", () => {
-    const cls = getDayCellClassName(
-      make({ isSelected: true, selectedStyle: "text" }),
-    );
-    expect(cls).toMatch(/selectedTextItem/);
-    expect(cls).not.toMatch(/activeItem/);
-  });
-
   it("adds rangeMid when connecting both sides in single-mode", () => {
     const cls = getDayCellClassName(
       make({ connectLeft: true, connectRight: true }),

@@ -466,7 +466,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
               aria-haspopup={yearFixed ? undefined : "dialog"}
               aria-expanded={yearFixed ? undefined : yearPopupOpen}
             >
-              {cur}
+              <span>{cur}</span>
             </button>
             {canGoNext && (
               <button
