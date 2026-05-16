@@ -5,11 +5,19 @@ import {
 } from "@/components/time-track/time-track";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
-import { useSelectionActions } from "@/context/selection-context";
+import {
+  useSelectionActions,
+  useSelectionValue,
+} from "@/context/selection-context";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import styles from "./time.module.css";
 
 export interface CalendarTimeGridProps {
+  /**
+   * Range mode only: edit time on one explicit boundary instead of relying on
+   * the current viewDate to match rangeStart/rangeEnd.
+   */
+  bound?: "from" | "to";
   col?: number | string;
   seconds?: boolean;
   /**
@@ -31,16 +39,29 @@ export interface CalendarTimeGridProps {
 }
 
 export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
+  bound,
   col,
   seconds = false,
   labels,
   onTimeSelect,
 }) => {
-  const { hour12, locale, readOnly, timeStep } = useConfig();
+  const { hour12, locale, range, readOnly, timeStep } = useConfig();
   const { viewDate: date } = useNavigation();
-  const { onChangeTime } = useSelectionActions();
+  const { rangeStart, rangeEnd } = useSelectionValue();
+  const { onChangeTime, onRangeBoundSet } = useSelectionActions();
+  const isBound = !!(range && bound);
+  const boundDate = isBound ? (bound === "from" ? rangeStart : rangeEnd) : null;
+  const displayDate = boundDate ?? date;
 
   const handleChange = (next: Date) => {
+    if (isBound) {
+      if (!boundDate) return;
+      if (onRangeBoundSet(bound!, next)) {
+        onTimeSelect?.(next);
+      }
+      return;
+    }
+
     if (onChangeTime(next)) {
       onTimeSelect?.(next);
     }
@@ -53,11 +74,11 @@ export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
       style={getGridSlotStyle(col)}
     >
       <TimeTrack
-        date={date}
+        date={displayDate}
         hour12={hour12}
         locale={locale}
         showSeconds={seconds}
-        readOnly={readOnly}
+        readOnly={readOnly || (isBound && !boundDate)}
         step={timeStep}
         labels={labels}
         onChange={handleChange}

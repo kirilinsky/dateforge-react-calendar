@@ -34,13 +34,6 @@ const addDays = (date: Date, days: number) => {
   return next;
 };
 
-const formatStoryDate = (date: Date, locale: string) =>
-  new Intl.DateTimeFormat(locale, {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(date);
-
 const getCalendarProps = (
   args: CalendarInfoArgs,
   ctx: Parameters<NonNullable<Meta<CalendarInfoArgs>["render"]>>[1],
@@ -211,12 +204,18 @@ export const Relative: Story = {
         onChange={setDate}
         {...getCalendarProps(args, ctx)}
       >
-        <CalendarInfo {...getInfoProps(args)} />
+        <CalendarInfo
+          {...getInfoProps(args)}
+          showRelative
+          showSummary={false}
+        />
         <CalendarDays />
       </Calendar>
     );
   },
-  parameters: { controls: { exclude: rangeControls } },
+  parameters: {
+    controls: { exclude: [...rangeControls, ...relativeControls] },
+  },
 };
 Relative.storyName = "Relative to selected date";
 
@@ -239,12 +238,11 @@ export const CustomFormatters: Story = {
             if (!value || value instanceof Date || Array.isArray(value)) {
               return null;
             }
-            return [
-              value.from && `from=${formatStoryDate(value.from, "en-US")}`,
-              value.to && `to=${formatStoryDate(value.to, "en-US")}`,
-            ]
-              .filter(Boolean)
-              .join(" · ");
+            if (!value.from || !value.to) return null;
+            const days = Math.round(
+              Math.abs(value.to.getTime() - value.from.getTime()) / 86_400_000,
+            );
+            return `Trip is ${days} ${days === 1 ? "night" : "nights"} long`;
           }}
         />
         <CalendarDays />
@@ -252,9 +250,7 @@ export const CustomFormatters: Story = {
     );
   },
   parameters: {
-    controls: {
-      exclude: ["showRelative", "showSummary"],
-    },
+    controls: { exclude: [...rangeControls, ...relativeControls] },
   },
 };
 CustomFormatters.storyName = "Custom formatter";

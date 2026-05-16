@@ -8,6 +8,18 @@ const findInput = (container: HTMLElement) =>
   container.querySelector("input") as HTMLInputElement;
 
 describe("ManualInput — single mode typing", () => {
+  it("renders an optional label before the editable slot", () => {
+    const { getByText, container } = render(
+      <Calendar mode="single">
+        <CalendarManualInput label="Date" />
+      </Calendar>,
+    );
+
+    expect(getByText("Date")).toBeTruthy();
+    const content = container.querySelector('[class*="contentArea"]');
+    expect(content?.firstElementChild?.textContent).toBe("Date");
+  });
+
   it("does not commit while user is typing — only on Enter", async () => {
     const onChange = vi.fn();
     const { container } = render(

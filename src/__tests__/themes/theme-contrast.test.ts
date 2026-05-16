@@ -93,6 +93,17 @@ describe("built-in theme contrast tokens", () => {
   });
 
   it.each(
+    Object.entries(THEMES_DATA).filter(([, theme]) => theme.outOfMonth),
+  )("%s out-of-month text passes normal text contrast", (_name, theme) => {
+    for (const background of WEEKEND_BACKGROUNDS) {
+      expect(
+        contrastRatio(theme.outOfMonth as string, theme[background]),
+        `outOfMonth on ${background}`,
+      ).toBeGreaterThanOrEqual(MIN_NORMAL_TEXT_CONTRAST);
+    }
+  });
+
+  it.each(
     Object.entries(BASE_THEME_WEEKENDS),
   )("%s base weekend text passes normal text contrast", (_name, theme) => {
     for (const background of WEEKEND_BACKGROUNDS) {
@@ -110,6 +121,9 @@ describe("built-in theme contrast tokens", () => {
       expect(theme.mutedText).toMatch(/^#[0-9a-f]{6}$/i);
       expect(theme.disabledText).toMatch(/^#[0-9a-f]{6}$/i);
       expect(theme.weekend).toMatch(/^#[0-9a-f]{6}$/i);
+      if (theme.outOfMonth) {
+        expect(theme.outOfMonth).toMatch(/^#[0-9a-f]{6}$/i);
+      }
     }
   });
 });

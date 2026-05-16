@@ -285,7 +285,7 @@ CSS wins the race vs JS. Client-side resolution via `useClientValue(matchMedia, 
 
 ## File references
 
-- `themes/themes.ts` — 38 themes, 15 tokens each
+- `themes/themes.ts` — 40 themes, 15 tokens each
 - `appearances/index.ts` — 5 appearances
 - `src/core/layout.module.css` — typography, container query, color defaults
 - `src/hooks/use-client-value.ts` — SSR-safe deferred values

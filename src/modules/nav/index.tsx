@@ -574,9 +574,13 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           date={date}
           hour12={hour12}
           showSeconds={navShowSeconds}
-          readOnly={readOnly}
+          readOnly={readOnly || (isBound && !boundDate)}
           onConfirm={(newDate) => {
-            onChangeTime(newDate);
+            if (isBound) {
+              if (boundDate) onRangeBoundSet(bound!, newDate);
+            } else {
+              onChangeTime(newDate);
+            }
             setTimePopupOpen(false);
           }}
           onClose={() => setTimePopupOpen(false)}

@@ -312,8 +312,8 @@ export function CalendarProvider<M extends CalendarMode = "single">({
 
   const handleRangeBoundSet = useCallback(
     (bound: "from" | "to", date: Date | null) => {
-      if (readOnly) return;
-      commitSelection({
+      if (readOnly) return false;
+      return commitSelection({
         type: "SET_RANGE_BOUND",
         bound,
         date,
