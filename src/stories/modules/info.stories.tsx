@@ -6,8 +6,6 @@ import {
   CalendarInfo,
   type CalendarInfoProps,
   type CalendarInfoRangeStyle,
-  type CalendarInfoRelativeTarget,
-  type CalendarInfoVariant,
 } from "@/modules/info";
 import { FIXED_DATE } from "../_constants";
 import {
@@ -20,14 +18,14 @@ type CalendarInfoArgs = {
   allowClear?: boolean;
   align?: "left" | "center" | "right";
   animated?: boolean;
-  hour12?: boolean;
-  label?: string;
+  col?: string;
+  emptyLabel?: string;
   prefix?: string;
   rangeStyle?: CalendarInfoRangeStyle;
-  relativeTarget?: CalendarInfoRelativeTarget;
   showHome?: boolean;
+  showRelative?: boolean;
+  showSummary?: boolean;
   timeZone?: string;
-  variant?: CalendarInfoVariant;
 };
 
 const addDays = (date: Date, days: number) => {
@@ -48,7 +46,6 @@ const getCalendarProps = (
   ctx: Parameters<NonNullable<Meta<CalendarInfoArgs>["render"]>>[1],
 ) => ({
   appearance: resolveStoryAppearance(ctx.globals.appearance),
-  hour12: args.hour12,
   locale: resolveStoryLocale(ctx.globals.locale),
   theme: resolveStoryTheme(ctx.globals.theme),
   timeZone: args.timeZone || undefined,
@@ -58,17 +55,18 @@ const getInfoProps = (args: CalendarInfoArgs): CalendarInfoProps => ({
   allowClear: args.allowClear,
   align: args.align,
   animated: args.animated,
-  label: args.label,
-  prefix: args.prefix,
+  col: args.col || undefined,
+  emptyLabel: args.emptyLabel || undefined,
+  prefix: args.prefix || undefined,
   rangeStyle: args.rangeStyle,
-  relativeTarget: args.relativeTarget,
   showHome: args.showHome,
-  variant: args.variant,
+  showRelative: args.showRelative,
+  showSummary: args.showSummary,
 });
 
-const rangeControls = ["prefix", "rangeStyle"];
+const rangeControls = ["rangeStyle"];
 
-const relativeControls = ["relativeTarget", "variant"];
+const relativeControls = ["showRelative", "showSummary"];
 
 const meta: Meta<CalendarInfoArgs> = {
   title: "Modules/Info",
@@ -76,33 +74,30 @@ const meta: Meta<CalendarInfoArgs> = {
     allowClear: { control: "boolean" },
     align: { control: "inline-radio", options: ["left", "center", "right"] },
     animated: { control: "boolean" },
-    hour12: { control: "boolean" },
-    label: { control: "text" },
+    col: { control: "text" },
+    emptyLabel: { control: "text" },
     prefix: { control: "text" },
     rangeStyle: {
       control: "inline-radio",
       options: ["days", "duration"],
     },
-    relativeTarget: {
-      control: "inline-radio",
-      options: ["selected", "range-start", "range-end"],
-    },
     showHome: { control: "boolean" },
+    showRelative: { control: "boolean" },
+    showSummary: { control: "boolean" },
     timeZone: { control: "text" },
-    variant: { control: "inline-radio", options: ["summary", "relative"] },
   },
   args: {
     allowClear: false,
     align: "left",
     animated: true,
-    hour12: false,
-    label: undefined,
+    col: undefined,
+    emptyLabel: undefined,
     prefix: undefined,
     rangeStyle: "days",
-    relativeTarget: "selected",
     showHome: false,
+    showRelative: false,
+    showSummary: true,
     timeZone: undefined,
-    variant: "summary",
   },
   render: (args, ctx) => {
     const [range, setRange] = useState<{ from: Date | null; to: Date | null }>({
@@ -171,10 +166,7 @@ export const Multiple: Story = {
         onChange={setDates}
         {...getCalendarProps(args, ctx)}
       >
-        <CalendarInfo
-          {...getInfoProps(args)}
-          selectionCountFormatter={(count) => `${count} dates selected`}
-        />
+        <CalendarInfo {...getInfoProps(args)} />
         <CalendarDays />
       </Calendar>
     );
@@ -189,7 +181,7 @@ export const WithHome: Story = {
 WithHome.storyName = "With home";
 
 export const EmptyWithLabel: Story = {
-  args: { label: "Select a date" },
+  args: { emptyLabel: "Select a date" },
   render: (args, ctx) => {
     const [date, setDate] = useState<Date | null>(null);
     return (
@@ -210,24 +202,16 @@ export const EmptyWithLabel: Story = {
 EmptyWithLabel.storyName = "Empty with label";
 
 export const Relative: Story = {
-  args: { variant: "relative" },
+  args: { showRelative: true, showSummary: false },
   render: (args, ctx) => {
-    const [date, setDate] = useState<Date | null>(addDays(FIXED_DATE, 3));
+    const [date, setDate] = useState<Date | null>(() => addDays(new Date(), 3));
     return (
       <Calendar
         value={date}
         onChange={setDate}
         {...getCalendarProps(args, ctx)}
       >
-        <CalendarInfo
-          {...getInfoProps(args)}
-          formatter={({ formatRelative, locale, selectedDate }) =>
-            selectedDate
-              ? `Today: ${formatStoryDate(FIXED_DATE, locale)} · ${formatRelative(selectedDate, FIXED_DATE)}`
-              : args.label
-          }
-          relativeBaseDate={FIXED_DATE}
-        />
+        <CalendarInfo {...getInfoProps(args)} />
         <CalendarDays />
       </Calendar>
     );
@@ -251,14 +235,17 @@ export const CustomFormatters: Story = {
       >
         <CalendarInfo
           {...getInfoProps(args)}
-          unitFormatter={(value, unit) => {
-            if (unit === "day")
-              return `${value} ${value === 1 ? "night" : "nights"}`;
-            return undefined;
+          formatter={(value) => {
+            if (!value || value instanceof Date || Array.isArray(value)) {
+              return null;
+            }
+            return [
+              value.from && `from=${formatStoryDate(value.from, "en-US")}`,
+              value.to && `to=${formatStoryDate(value.to, "en-US")}`,
+            ]
+              .filter(Boolean)
+              .join(" · ");
           }}
-          rangeFormatter={({ formatUnit, durationDays }) =>
-            `Trip length: ${formatUnit(durationDays, "day")}`
-          }
         />
         <CalendarDays />
       </Calendar>
@@ -266,8 +253,8 @@ export const CustomFormatters: Story = {
   },
   parameters: {
     controls: {
-      exclude: ["prefix", "rangeStyle", "relativeTarget", "variant"],
+      exclude: ["showRelative", "showSummary"],
     },
   },
 };
-CustomFormatters.storyName = "Custom formatters";
+CustomFormatters.storyName = "Custom formatter";

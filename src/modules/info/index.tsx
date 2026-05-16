@@ -13,15 +13,11 @@ import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { type AlignValue, alignToJustify } from "@/utils/layout-utils";
 import styles from "./info.module.css";
 import {
-  type CalendarInfoFormatHelpers,
   type CalendarInfoRangeStyle,
-  type CalendarInfoRelativeTarget,
-  type CalendarInfoSelectionCountFormatter,
-  type CalendarInfoUnitFormatter,
-  createCalendarInfoFormatters,
   formatCalendarInfoRangeSummary,
+  formatCalendarInfoRelative,
+  formatCalendarInfoSelectionSummary,
   getCalendarDayIndex,
-  getRelativeTargetDate,
   getTargetPaddingY,
   isValidDate,
 } from "./utils";
@@ -29,39 +25,24 @@ import {
 const useIsoLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
-export type CalendarInfoVariant = "summary" | "relative";
-export type {
-  CalendarInfoFormatContext,
-  CalendarInfoFormatHelpers,
-  CalendarInfoRangeStyle,
-  CalendarInfoRelativeTarget,
-  CalendarInfoUnit,
-} from "./utils";
+const hasRenderableNode = (node: React.ReactNode) =>
+  node !== null &&
+  node !== undefined &&
+  node !== "" &&
+  typeof node !== "boolean";
 
-export interface CalendarInfoFormatterContext
-  extends CalendarInfoFormatHelpers {
-  hour12: boolean;
-  locale: string;
-  timeZone?: string;
-  selectedDate: Date | null;
-  selectedDates: Date[];
-  rangeStart: Date | null;
-  rangeEnd: Date | null;
-  relativeBaseDate: Date | null;
+export type { CalendarInfoRangeStyle } from "./utils";
+
+export interface CalendarInfoRangeValue {
+  from: Date | null;
+  to: Date | null;
 }
 
-export interface CalendarInfoRangeFormatterContext
-  extends CalendarInfoFormatterContext {
-  from: Date;
-  to: Date;
-  durationDays: number;
-  durationMs: number;
-}
+export type CalendarInfoValue = Date | Date[] | CalendarInfoRangeValue | null;
 
-export interface CalendarInfoCountFormatterContext
-  extends CalendarInfoFormatterContext {
-  count: number;
-}
+export type CalendarInfoFormatter = (
+  value: CalendarInfoValue,
+) => React.ReactNode;
 
 export interface CalendarInfoProps {
   allowClear?: boolean;
@@ -69,26 +50,12 @@ export interface CalendarInfoProps {
   animated?: boolean;
   col?: number | string;
   emptyLabel?: React.ReactNode;
-  formatter?: (context: CalendarInfoFormatterContext) => React.ReactNode;
-  label?: React.ReactNode;
-  multipleFormatter?: (
-    context: CalendarInfoCountFormatterContext,
-  ) => React.ReactNode;
+  formatter?: CalendarInfoFormatter;
   prefix?: React.ReactNode;
-  rangeFormatter?: (
-    context: CalendarInfoRangeFormatterContext,
-  ) => React.ReactNode;
   rangeStyle?: CalendarInfoRangeStyle;
-  relativeBaseDate?: Date;
-  relativeTarget?: CalendarInfoRelativeTarget;
   showHome?: boolean;
-  selectionCountFormatter?: (
-    ...args: Parameters<CalendarInfoSelectionCountFormatter>
-  ) => ReturnType<CalendarInfoSelectionCountFormatter>;
-  unitFormatter?: (
-    ...args: Parameters<CalendarInfoUnitFormatter>
-  ) => ReturnType<CalendarInfoUnitFormatter>;
-  variant?: CalendarInfoVariant;
+  showRelative?: boolean;
+  showSummary?: boolean;
 }
 
 export const CalendarInfo: React.FC<CalendarInfoProps> = ({
@@ -98,142 +65,104 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
   col,
   emptyLabel = null,
   formatter,
-  label,
-  multipleFormatter,
   prefix,
-  rangeFormatter,
   rangeStyle = "days",
-  relativeBaseDate,
-  relativeTarget = "selected",
   showHome = false,
-  selectionCountFormatter,
-  unitFormatter,
-  variant = "summary",
+  showRelative = false,
+  showSummary = true,
 }) => {
   const [innerHeight, setInnerHeight] = useState<number | null>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const contentGroupRef = useRef<HTMLDivElement>(null);
   const homeBtnRef = useRef<HTMLButtonElement>(null);
   const clearBtnRef = useRef<HTMLButtonElement>(null);
-  const { hour12, locale, multiselect, range, readOnly, timeZone } =
-    useConfig();
+  const { locale, multiselect, range, readOnly, timeZone } = useConfig();
   const { viewDate, navigateTo } = useNavigation();
   const today = useToday();
   const { selectedDate, selectedDates, rangeStart, rangeEnd } =
     useSelectionValue();
   const { onChangeDate, onDatesSet, onRangeSet } = useSelectionActions();
 
-  const resolvedRelativeBaseDate = relativeBaseDate ?? today;
-  const helpers = useMemo(
-    () =>
-      createCalendarInfoFormatters({
-        hour12,
-        locale,
-        relativeBaseDate: resolvedRelativeBaseDate,
-        selectionCountFormatter,
-        timeZone,
-        unitFormatter,
-      }),
-    [
-      hour12,
-      locale,
-      resolvedRelativeBaseDate,
-      selectionCountFormatter,
-      timeZone,
-      unitFormatter,
-    ],
+  const selectedValue = useMemo<CalendarInfoValue>(() => {
+    if (range) {
+      return rangeStart || rangeEnd ? { from: rangeStart, to: rangeEnd } : null;
+    }
+    if (multiselect) return selectedDates.length > 0 ? selectedDates : null;
+    return selectedDate;
+  }, [multiselect, range, rangeEnd, rangeStart, selectedDate, selectedDates]);
+
+  const relativeDate = useMemo(
+    () => selectedDate ?? selectedDates[0] ?? rangeStart ?? rangeEnd,
+    [rangeEnd, rangeStart, selectedDate, selectedDates],
   );
 
-  const context: CalendarInfoFormatterContext = {
-    ...helpers,
-    hour12,
-    locale,
-    timeZone,
-    selectedDate,
-    selectedDates,
-    rangeStart,
-    rangeEnd,
-    relativeBaseDate: resolvedRelativeBaseDate,
-  };
-
-  const hasSelection = range
-    ? !!(rangeStart || rangeEnd)
-    : selectedDates.length > 0;
+  const hasSelection = selectedValue !== null;
   const isCurrentMonth =
     !!today &&
     viewDate.getFullYear() === today.getFullYear() &&
     viewDate.getMonth() === today.getMonth();
-  const emptyStateLabel = label ?? emptyLabel;
   const shouldShowEmptyStateLabel =
-    !hasSelection &&
-    emptyStateLabel !== null &&
-    emptyStateLabel !== undefined &&
-    emptyStateLabel !== "";
+    !hasSelection && hasRenderableNode(emptyLabel);
 
-  const summary = shouldShowEmptyStateLabel
-    ? emptyStateLabel
-    : formatter
-      ? formatter(context)
-      : (() => {
-          if (variant === "relative") {
-            const targetDate = getRelativeTargetDate(relativeTarget, context);
-            if (!isValidDate(targetDate)) return emptyStateLabel;
-            const relative = helpers.formatRelative(targetDate);
-            return relative || emptyStateLabel;
-          }
+  const summary = useMemo(() => {
+    if (shouldShowEmptyStateLabel) return emptyLabel;
+    if (!showSummary || !hasSelection) return null;
+    if (formatter) return formatter(selectedValue);
 
-          if (range) {
-            if (rangeStart && rangeEnd) {
-              const from = rangeStart <= rangeEnd ? rangeStart : rangeEnd;
-              const to = rangeStart <= rangeEnd ? rangeEnd : rangeStart;
-              const durationDays = Math.abs(
-                getCalendarDayIndex(to, timeZone) -
-                  getCalendarDayIndex(from, timeZone),
-              );
-              const rangeContext: CalendarInfoRangeFormatterContext = {
-                ...context,
-                from,
-                to,
-                durationDays,
-                durationMs: to.getTime() - from.getTime(),
-              };
-              if (rangeFormatter) return rangeFormatter(rangeContext);
-              return formatCalendarInfoRangeSummary({
-                context: rangeContext,
-                helpers,
-                rangeStyle,
-              });
-            }
-            return rangeStart || rangeEnd
-              ? helpers.formatSelectionCount(1)
-              : emptyStateLabel;
-          }
+    if (range && rangeStart && rangeEnd) {
+      const from = rangeStart <= rangeEnd ? rangeStart : rangeEnd;
+      const to = rangeStart <= rangeEnd ? rangeEnd : rangeStart;
+      const durationDays = Math.abs(
+        getCalendarDayIndex(to, timeZone) - getCalendarDayIndex(from, timeZone),
+      );
+      return formatCalendarInfoRangeSummary({
+        durationDays,
+        durationMs: to.getTime() - from.getTime(),
+        locale,
+        rangeStyle,
+      });
+    }
 
-          if (multiselect) {
-            if (selectedDates.length === 0) return emptyStateLabel;
-            const multipleContext: CalendarInfoCountFormatterContext = {
-              ...context,
-              count: selectedDates.length,
-            };
-            return multipleFormatter
-              ? multipleFormatter(multipleContext)
-              : helpers.formatSelectionCount(selectedDates.length);
-          }
+    if (Array.isArray(selectedValue)) {
+      return formatCalendarInfoSelectionSummary(selectedValue.length, locale);
+    }
 
-          if (!selectedDate) return emptyStateLabel;
-          return helpers.formatSelectionCount(1);
-        })();
+    return formatCalendarInfoSelectionSummary(1, locale);
+  }, [
+    emptyLabel,
+    formatter,
+    hasSelection,
+    locale,
+    range,
+    rangeEnd,
+    rangeStart,
+    rangeStyle,
+    selectedValue,
+    shouldShowEmptyStateLabel,
+    showSummary,
+    timeZone,
+  ]);
 
-  const hasSummary =
-    summary !== null && summary !== undefined && summary !== "";
+  const relativeSummary = useMemo(
+    () =>
+      showRelative && hasSelection && isValidDate(relativeDate)
+        ? formatCalendarInfoRelative({
+            baseDate: today,
+            locale,
+            targetDate: relativeDate,
+            timeZone,
+          })
+        : null,
+    [hasSelection, locale, relativeDate, showRelative, today, timeZone],
+  );
+
+  const hasSummary = hasRenderableNode(summary);
+  const hasRelativeSummary = hasRenderableNode(relativeSummary);
   const hasPrefix =
-    !shouldShowEmptyStateLabel &&
-    hasSummary &&
-    prefix !== null &&
-    prefix !== undefined &&
-    prefix !== "";
+    !shouldShowEmptyStateLabel && hasSummary && hasRenderableNode(prefix);
   const hasClearBtn = allowClear && hasSelection;
-  const hasContent = hasSummary || showHome || hasClearBtn;
+  const hasTextContent = hasSummary || hasRelativeSummary;
+  const hasContent = hasTextContent || showHome || hasClearBtn;
 
   useIsoLayoutEffect(() => {
     if (!animated) {
@@ -271,7 +200,16 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
     if (clearBtnRef.current) resizeObserver.observe(clearBtnRef.current);
 
     return () => resizeObserver.disconnect();
-  }, [animated, hasContent, align, summary, hasPrefix]);
+  }, [
+    animated,
+    hasContent,
+    align,
+    summary,
+    relativeSummary,
+    hasPrefix,
+    hasClearBtn,
+    showHome,
+  ]);
 
   const handleClear = () => {
     if (readOnly) return;
@@ -318,13 +256,18 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
         <div
           ref={contentGroupRef}
           className={styles.contentGroup}
+          role={hasTextContent ? "status" : undefined}
+          aria-live={hasTextContent ? "polite" : undefined}
           style={{ justifyContent: alignToJustify[align] }}
         >
           {hasSummary && (
-            <div className={styles.infoText} role="status" aria-live="polite">
+            <div className={styles.infoText}>
               {hasPrefix && <span className={styles.prefix}>{prefix}</span>}
               {summary}
             </div>
+          )}
+          {hasRelativeSummary && (
+            <div className={styles.infoText}>{relativeSummary}</div>
           )}
         </div>
         {showHome && (

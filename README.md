@@ -24,7 +24,7 @@
 
 Monolithic pickers ship everything. DateForge ships only what you use.
 
-Build exactly the calendar your product needs: start with a tiny date grid, then add navigation, ranges, multi-select, time, presets, manual input, track pickers, themes, appearances, and layout rules as separate modules. The module mix, selection modes, visual tokens, and focused props unlock **1.6M+ unique calendar combinations** without forcing you into one prebuilt picker.
+Build exactly the calendar your product needs: start with a tiny date grid, then add navigation, ranges, multi-select, time, presets, manual input, track pickers, themes, appearances, and layout rules as separate modules. The module mix, selection modes, visual tokens, and focused props unlock **~1.9 trillion built-in calendar configurations** without forcing you into one prebuilt picker.
 
 <div align="center">
 
@@ -63,7 +63,8 @@ No global CSS import is required — styles are bundled into the modules and app
 | ----------------------- | ---------------------------------------------------- |
 | `CalendarNav`           | Month/year navigation, popups, clear, optional time  |
 | `CalendarDays`          | Classic month grid for single, multiple, and range   |
-| `CalendarSelectedDates` | Selected-date chips, summary, overflow, per-chip clear |
+| `CalendarSelectedDates` | Selected-date chips, overflow, per-chip clear |
+| `CalendarInfo`          | Selection metrics, relative hints, empty text, home / clear |
 | `CalendarManualInput`   | Typed dates, keyboard-first editing, per-date remove |
 | `CalendarPresets`       | Shortcuts like Today, Last 7 days, custom ranges     |
 | `CalendarTimeGrid`      | Inline hour/minute/second selection                  |

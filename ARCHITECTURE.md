@@ -19,9 +19,12 @@ The library is built around a strict two-layer model:
 │   │ <Days>  │  │ <Nav>    │  │ <TimeGrid>   │  │   Layer 2 — modules
 │   └─────────┘  └──────────┘  └──────────────┘  │   Each is self-contained
 │                                                 │
-│   ┌────────────────┐  ┌──────────────────────┐ │
-│   │ <SelectedDates>│  │ <ManualInput>       │ │
-│   └────────────────┘  └──────────────────────┘ │
+│   ┌────────────────┐  ┌──────────────┐        │
+│   │ <SelectedDates>│  │ <ManualInput>│        │
+│   └────────────────┘  └──────────────┘        │
+│   ┌────────┐                                    │
+│   │ <Info> │                                    │
+│   └────────┘                                    │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -168,11 +171,16 @@ Use them when you want a month-only / year-only / time-only picker UX without co
 
 > **Definition:** Render a representation of current selection or state. May trigger view navigation as a side effect of clicking on rendered items, but do not commit selection changes themselves.
 
-| Module                    | Role                                                                                                                               |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `<CalendarSelectedDates>` | Chips showing currently selected date(s). Click chip → `navigateTo`. Optional clear button is visible only when `allowClear`; it is disabled and no-ops in `readOnly`. |
+| Module                    | Role                                                                                                                                                                                         |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<CalendarSelectedDates>` | Chips showing currently selected date(s). Click chip → `navigateTo`. Optional clear button is visible only when `allowClear`; it is disabled and no-ops in `readOnly`.                       |
+| `<CalendarInfo>`          | Compact selection feedback: count, range metric, relative time, empty state, optional home navigation, optional clear-all. It does not render date chips or range from–to labels.             |
 
 `allowClear` is only a visibility affordance for the clear button. The `readOnly` contract still unconditionally blocks the clear action.
+
+`CalendarInfo` deliberately overlaps only the **feedback** part of `CalendarSelectedDates`, not its chip UI. It owns summary metrics (`1 day`, `3 days`, `7 days`, `3 days 4 hours`) and relative hints (`in 3 days`). `CalendarSelectedDates` owns exact selected-date labels, overflow, per-chip removal, and chip navigation. A composition can use both: `SelectedDates` for inspectable dates, `Info` for compact metrics/actions.
+
+`CalendarInfo` has one formatter boundary: `formatter(value)`, where `value` is `Date | Date[] | { from, to } | null`. The formatter replaces the summary only. Relative output is separate (`showRelative`) and is derived from selection + today.
 
 ### D. Hybrid modules
 
@@ -257,6 +265,9 @@ The single source of truth for which user actions change view, mutate selection,
 | `<CalendarPresets>` click (range, in `mode="range"`)              | yes                 | yes               | yes              | button disabled                  |
 | `<CalendarSelectedDates>` chip click                              | yes                 | no                | no               | works (navigation)               |
 | `<CalendarSelectedDates>` clear                                   | no                  | yes               | yes              | button disabled, handler no-ops  |
+| `<CalendarInfo>` display / summary / relative text                | no                  | no                | no               | n/a                              |
+| `<CalendarInfo>` `showHome`                                       | yes                 | no                | no               | works                            |
+| `<CalendarInfo>` `allowClear`                                     | no                  | yes               | yes              | button disabled, handler no-ops  |
 | `<CalendarManualInput>` typing                                    | no                  | no                | no               | input HTML `readOnly`            |
 | `<CalendarManualInput>` Enter / apply (✓)                         | maybe               | yes               | yes              | inputs / buttons disabled        |
 | `<CalendarManualInput>` per-chip remove (multi)                   | no                  | yes               | yes              | disabled                         |
@@ -319,7 +330,7 @@ The wrapper exposes four contexts to modules. Each has a clear responsibility:
 
 - Navigational modules touch only `NavigationContext` (writes) and `ConfigContext` (reads).
 - Interactive modules write to `SelectionContext`. They may also `navigateTo` if selection implies a view change.
-- Display modules read from `SelectionContext` and may `navigateTo`. They never write to `SelectionContext` except via explicit opt-in actions such as the `CalendarSelectedDates` clear button, which still obeys `readOnly`.
+- Display modules read from `SelectionContext` and may `navigateTo`. They never write to `SelectionContext` except via explicit opt-in actions such as the `CalendarSelectedDates` / `CalendarInfo` clear buttons, which still obey `readOnly`.
 - Hybrid modules follow navigational rules in their navigational state and interactive rules in their interactive state. Switching is determined by props/mode at render time.
 
 ---
