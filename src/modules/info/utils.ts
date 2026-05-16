@@ -4,49 +4,14 @@ export const DAY_MS = 86_400_000;
 export const HOUR_MS = 3_600_000;
 export const MINUTE_MS = 60_000;
 
-export type CalendarInfoUnit = "day" | "hour" | "minute";
-
+type CalendarInfoUnit = "day" | "hour" | "minute";
 export type CalendarInfoRangeStyle = "days" | "duration";
-export type CalendarInfoRelativeTarget =
-  | "selected"
-  | "range-start"
-  | "range-end";
-
-export interface CalendarInfoFormatContext {
-  hour12: boolean;
-  locale: string;
-  timeZone?: string;
-}
-
-export interface CalendarInfoFormatHelpers {
-  formatRelative: (date: Date, baseDate?: Date) => string;
-  formatSelectionCount: (count: number) => string | null;
-  formatUnit: (value: number, unit: CalendarInfoUnit) => string;
-}
-
-export type CalendarInfoUnitFormatter = (
-  value: number,
-  unit: CalendarInfoUnit,
-  context: CalendarInfoFormatContext,
-) => string | undefined;
-
-export type CalendarInfoSelectionCountFormatter = (
-  count: number,
-  context: CalendarInfoFormatContext,
-) => string;
-
-export interface CalendarInfoTargetContext {
-  rangeEnd: Date | null;
-  rangeStart: Date | null;
-  selectedDate: Date | null;
-  selectedDates: Date[];
-}
 
 export interface CalendarInfoRangeSummaryContext {
   durationDays: number;
   durationMs: number;
-  from: Date;
-  to: Date;
+  locale: string;
+  rangeStyle: CalendarInfoRangeStyle;
 }
 
 export const isValidDate = (date: Date | null | undefined): date is Date =>
@@ -74,20 +39,6 @@ export const getCalendarDayIndex = (date: Date, timeZone?: string) => {
   );
 };
 
-export const getRelativeTargetDate = (
-  target: CalendarInfoRelativeTarget,
-  context: CalendarInfoTargetContext,
-) => {
-  if (target === "range-start") return context.rangeStart;
-  if (target === "range-end") return context.rangeEnd;
-  return (
-    context.selectedDate ??
-    context.selectedDates[0] ??
-    context.rangeStart ??
-    context.rangeEnd
-  );
-};
-
 const getRelativeUnitValue = (
   targetDate: Date,
   baseDate: Date,
@@ -106,93 +57,77 @@ const getRelativeUnitValue = (
   return ["minute", minuteDiff];
 };
 
-export const createCalendarInfoFormatters = ({
-  hour12,
+const formatNumber = (value: number, locale: string) =>
+  getNumberFormat(locale, { maximumFractionDigits: 0 })?.format(value) ??
+  String(value);
+
+const formatUnit = (value: number, unit: CalendarInfoUnit, locale: string) =>
+  getNumberFormat(locale, {
+    maximumFractionDigits: 0,
+    style: "unit",
+    unit,
+    unitDisplay: "long",
+  })?.format(value) ?? formatNumber(value, locale);
+
+export const formatCalendarInfoRelative = ({
+  baseDate,
   locale,
-  relativeBaseDate,
-  selectionCountFormatter,
+  targetDate,
   timeZone,
-  unitFormatter,
 }: {
-  hour12: boolean;
+  baseDate: Date | null;
   locale: string;
-  relativeBaseDate: Date | null;
-  selectionCountFormatter?: CalendarInfoSelectionCountFormatter;
+  targetDate: Date;
   timeZone?: string;
-  unitFormatter?: CalendarInfoUnitFormatter;
-}): CalendarInfoFormatHelpers => {
-  const numberFormat = getNumberFormat(locale, { maximumFractionDigits: 0 });
-  const formatContext = { hour12, locale, timeZone };
-
-  const formatNumber = (value: number) =>
-    numberFormat?.format(value) ?? String(value);
-
-  const formatUnit = (value: number, unit: CalendarInfoUnit) => {
-    const custom = unitFormatter?.(value, unit, formatContext);
-    if (custom !== undefined) return custom;
-
-    return (
-      getNumberFormat(locale, {
-        maximumFractionDigits: 0,
-        style: "unit",
-        unit,
-        unitDisplay: "long",
-      })?.format(value) ?? formatNumber(value)
+}) => {
+  if (!baseDate) return "";
+  const [unit, value] = getRelativeUnitValue(targetDate, baseDate, timeZone);
+  try {
+    return new Intl.RelativeTimeFormat(locale, { numeric: "auto" }).format(
+      value,
+      unit,
     );
-  };
-
-  const formatSelectionCount = (count: number) => {
-    if (!selectionCountFormatter) return null;
-    return selectionCountFormatter(count, formatContext);
-  };
-
-  const formatRelative = (date: Date, baseDate = relativeBaseDate ?? null) => {
-    if (!baseDate) return "";
-    const [unit, value] = getRelativeUnitValue(date, baseDate, timeZone);
-    try {
-      return new Intl.RelativeTimeFormat(locale, { numeric: "auto" }).format(
-        value,
-        unit,
-      );
-    } catch {
-      return formatUnit(value, unit as CalendarInfoUnit);
-    }
-  };
-
-  return { formatRelative, formatSelectionCount, formatUnit };
+  } catch {
+    return formatUnit(value, unit as CalendarInfoUnit, locale);
+  }
 };
 
-const formatDuration = (
-  durationMs: number,
-  formatUnit: CalendarInfoFormatHelpers["formatUnit"],
-) => {
+const formatDuration = ({
+  durationMs,
+  locale,
+}: {
+  durationMs: number;
+  locale: string;
+}) => {
   const ms = Math.abs(durationMs);
   const days = Math.floor(ms / DAY_MS);
   const hours = Math.floor((ms % DAY_MS) / HOUR_MS);
   const minutes = Math.floor((ms % HOUR_MS) / MINUTE_MS);
   const parts: string[] = [];
 
-  if (days > 0) parts.push(formatUnit(days, "day"));
-  if (hours > 0) parts.push(formatUnit(hours, "hour"));
-  if (parts.length === 0) parts.push(formatUnit(minutes, "minute"));
+  if (days > 0) parts.push(formatUnit(days, "day", locale));
+  if (hours > 0) parts.push(formatUnit(hours, "hour", locale));
+  if (parts.length === 0) parts.push(formatUnit(minutes, "minute", locale));
 
   return parts.join(" ");
 };
 
 export const formatCalendarInfoRangeSummary = ({
-  context,
-  helpers,
+  durationDays,
+  durationMs,
+  locale,
   rangeStyle,
-}: {
-  context: CalendarInfoRangeSummaryContext;
-  helpers: CalendarInfoFormatHelpers;
-  rangeStyle: CalendarInfoRangeStyle;
-}) => {
+}: CalendarInfoRangeSummaryContext) => {
   if (rangeStyle === "duration") {
-    return formatDuration(context.durationMs, helpers.formatUnit);
+    return formatDuration({ durationMs, locale });
   }
-  return helpers.formatUnit(context.durationDays, "day");
+  return formatUnit(durationDays, "day", locale);
 };
+
+export const formatCalendarInfoSelectionSummary = (
+  count: number,
+  locale: string,
+) => formatUnit(count, "day", locale);
 
 export const getTargetPaddingY = (
   inner: HTMLDivElement,

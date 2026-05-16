@@ -17,6 +17,7 @@
   - [CalendarTimeGrid](#calendartimegrid)
   - [CalendarPresets](#calendarpresets)
   - [CalendarSelectedDates](#calendarselecteddates)
+  - [CalendarInfo](#calendarinfo)
   - [CalendarManualInput](#calendarmanualinput)
   - [CalendarDaysTrack](#calendardaystrack)
   - [CalendarMonthsTrack](#calendarmonthstrack)
@@ -90,7 +91,8 @@ Pick the modules per the UX you want. All compose under one `<Calendar>` provide
 | Presets (Today, Last 7 days, …) | `CalendarPresets` (+ any picker modules)                                                       |
 | Month / year-only picker        | `CalendarMonthsGrid` or `CalendarYearsGrid` (no `CalendarDays`)                                |
 | Mobile / drum-style picker      | `CalendarDaysTrack`, `CalendarMonthsTrack`, `CalendarYearsTrack` (alone or alongside the grid) |
-| Selected-dates chips / summary  | `CalendarSelectedDates` (best with `mode="multiple"` or `range`)                               |
+| Selected-date chips             | `CalendarSelectedDates` (best with `mode="multiple"` or `range`)                               |
+| Selection metrics / hint text   | `CalendarInfo`                                                                                 |
 
 See [Recommended compositions](#recommended-compositions) for ready-made JSX snippets.
 
@@ -914,6 +916,73 @@ Displays the currently selected dates as chips. Clicking a chip navigates the vi
 
 ---
 
+### CalendarInfo
+
+Displays compact selection feedback: selected count, range length, relative time, empty-state text, a home button, and an optional clear-all button. It is intentionally not a date-chip renderer — use [`CalendarSelectedDates`](#calendarselecteddates) when users need visible dates, per-chip remove, or chip navigation.
+
+```tsx
+<CalendarInfo emptyLabel="Select a date" showRelative allowClear />
+```
+
+### Default summaries
+
+When `showSummary` is `true` and no custom `formatter` is passed:
+
+- `mode="single"` with a selected date shows `1 day`.
+- `mode="multiple"` shows the selected count as localized days, e.g. `3 days`.
+- `mode="range"` with one boundary selected shows `1 day`.
+- `mode="range"` with both boundaries selected shows a range metric controlled by `rangeStyle`.
+
+`showRelative` can be enabled at the same time as `showSummary`; the module renders a second compact text chip such as `in 3 days`. Relative time always uses the current selected value (`selectedDate`, first selected date, `rangeStart`, then `rangeEnd`) and compares it to today.
+
+### Props
+
+| Prop           | Type                                           | Default     | Description                                                                                                                                                       |
+| -------------- | ---------------------------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `allowClear`   | `boolean`                                      | `false`     | Show a clear-all button when there is a selection. Clears `null` in single mode, `[]` in multiple mode, and `{ from: null, to: null }` in range mode. Disabled in `readOnly` |
+| `align`        | `"left" \| "center" \| "right"`                | `"left"`    | Horizontal alignment of the text group                                                                                                                            |
+| `animated`     | `boolean`                                      | `true`      | Animate the module's height when content appears/disappears                                                                                                        |
+| `col`          | `number \| string`                             | —           | CSS grid `grid-column` value                                                                                                                                      |
+| `emptyLabel`   | `React.ReactNode`                              | `null`      | Text/content shown when nothing is selected. Boolean values and empty strings are treated as empty                                                                |
+| `formatter`    | `(value: CalendarInfoValue) => React.ReactNode` | —           | Custom summary renderer. Receives `Date`, `Date[]`, `{ from, to }`, or `null`. Overrides the default summary only; it does not affect `showRelative`               |
+| `prefix`       | `React.ReactNode`                              | —           | Small content rendered before the summary. Hidden for `emptyLabel` and hidden when there is no summary                                                             |
+| `rangeStyle`   | `"days" \| "duration"`                         | `"days"`    | Range-only summary style for complete ranges. `"days"` uses calendar-day difference; `"duration"` uses elapsed time (`3 days 4 hours`, etc.)                       |
+| `showHome`     | `boolean`                                      | `false`     | Show a button that navigates to the current month. Does not change selection                                                                                       |
+| `showRelative` | `boolean`                                      | `false`     | Show relative time for the current selected value, compared to today                                                                                               |
+| `showSummary`  | `boolean`                                      | `true`      | Show the default/custom summary. Set `false` when you only want `emptyLabel`, `showRelative`, `showHome`, or `allowClear`                                          |
+
+`CalendarInfoValue` is exported from the root package and from the module:
+
+```ts
+type CalendarInfoValue =
+  | Date
+  | Date[]
+  | { from: Date | null; to: Date | null }
+  | null;
+```
+
+Custom formatter example:
+
+```tsx
+<CalendarInfo
+  formatter={(value) => {
+    if (Array.isArray(value)) return `${value.length} dates selected`;
+    if (value instanceof Date) return "1 date selected";
+    if (value?.from && value.to) return "Range selected";
+    return null;
+  }}
+/>
+```
+
+Notes:
+
+- `CalendarInfo` is a display / feedback module. `showHome` navigates view only; `allowClear` is the only prop that mutates selection.
+- `rangeStyle="days"` counts calendar-day boundaries, so Jun 10 → Jun 17 is `7 days`.
+- `rangeStyle="duration"` uses timestamps, so Jun 10 10:00 → Jun 13 14:00 is `3 days 4 hours`.
+- Relative output depends on the SSR-safe `useToday()` value. On the server and first client render, today is not available yet, so relative text appears after mount.
+
+---
+
 ### CalendarManualInput
 
 Text input that lets the user type a date directly. Adapts shape to the calendar `mode`:
@@ -1074,7 +1143,7 @@ In multiselect mode the active item follows the date in `selectedDates[]` whose 
 
 ## Design space
 
-11 composable modules, ~80 public props (≈60 boolean), 38 built-in themes, 5 appearances, plus `createTheme`/`createAppearance` for custom tokens.
+12 composable modules, ~80 public props (≈60 boolean), 38 built-in themes, 5 appearances, plus `createTheme`/`createAppearance` for custom tokens.
 
 | Layer | Count |
 |---|---|
@@ -1463,6 +1532,18 @@ type DateRange = {
   to: Date | null;
 };
 ```
+
+### `CalendarInfoValue`
+
+```ts
+type CalendarInfoValue =
+  | Date
+  | Date[]
+  | { from: Date | null; to: Date | null }
+  | null;
+```
+
+Used by `<CalendarInfo formatter={(value) => ...} />`.
 
 ### `StartOfWeek`
 

@@ -22,7 +22,7 @@ afterEach(() => {
 });
 
 describe("CalendarInfo", () => {
-  it("renders nothing when no value, animated=false, and no label", () => {
+  it("renders nothing when no value, animated=false, and no empty label", () => {
     const { container } = render(
       <Calendar mode="single">
         <CalendarInfo animated={false} />
@@ -32,10 +32,10 @@ describe("CalendarInfo", () => {
     expect(container.querySelector('[data-area="calendar-info"]')).toBeNull();
   });
 
-  it("keeps the block visible with label when selection is empty", () => {
+  it("keeps the block visible with emptyLabel when selection is empty", () => {
     const { container, getByText } = render(
       <Calendar mode="single">
-        <CalendarInfo animated={false} label="Select a date" />
+        <CalendarInfo animated={false} emptyLabel="Select a date" />
       </Calendar>,
     );
 
@@ -43,37 +43,58 @@ describe("CalendarInfo", () => {
     expect(getByText("Select a date")).toBeTruthy();
   });
 
-  it("renders nothing in single mode without selectionCountFormatter", () => {
-    const { container } = render(
+  it("treats boolean ReactNode values as empty", () => {
+    const { container, rerender } = render(
+      <Calendar mode="single">
+        <CalendarInfo animated={false} emptyLabel={false} />
+      </Calendar>,
+    );
+
+    expect(container.querySelector('[data-area="calendar-info"]')).toBeNull();
+
+    rerender(
       <Calendar mode="single" value={D(2024, 5, 15)}>
-        <CalendarInfo animated={false} />
+        <CalendarInfo animated={false} formatter={() => false} />
       </Calendar>,
     );
 
     expect(container.querySelector('[data-area="calendar-info"]')).toBeNull();
   });
 
-  it("renders nothing in multiple mode without selectionCountFormatter", () => {
-    const { container } = render(
+  it("renders single selection count by default via Intl", () => {
+    const { getByText } = render(
+      <Calendar mode="single" locale="en-US" value={D(2024, 5, 15)}>
+        <CalendarInfo animated={false} />
+      </Calendar>,
+    );
+
+    expect(getByText("1 day")).toBeTruthy();
+  });
+
+  it("renders multiple selection count by default via Intl", () => {
+    const { getByText } = render(
       <Calendar
         mode="multiple"
+        locale="en-US"
         value={[D(2024, 5, 15), D(2024, 5, 16), D(2024, 5, 17)]}
       >
         <CalendarInfo animated={false} />
       </Calendar>,
     );
 
-    expect(container.querySelector('[data-area="calendar-info"]')).toBeNull();
+    expect(getByText("3 days")).toBeTruthy();
   });
 
-  it("uses a custom selection count formatter", () => {
+  it("uses a custom formatter for selected values", () => {
     const { getByText } = render(
       <Calendar
         mode="multiple"
         value={[D(2024, 5, 15), D(2024, 5, 16), D(2024, 5, 17)]}
       >
         <CalendarInfo
-          selectionCountFormatter={(count) => `${count} dates selected`}
+          formatter={(value) =>
+            Array.isArray(value) ? `${value.length} dates selected` : null
+          }
         />
       </Calendar>,
     );
@@ -125,16 +146,35 @@ describe("CalendarInfo", () => {
   });
 
   it("uses Intl relative formatting", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(D(2024, 5, 10));
     const { getByText } = render(
       <Calendar mode="single" value={D(2024, 5, 13)}>
-        <CalendarInfo variant="relative" relativeBaseDate={D(2024, 5, 10)} />
+        <CalendarInfo showSummary={false} showRelative />
       </Calendar>,
     );
 
     expect(getByText("in 3 days")).toBeTruthy();
   });
 
-  it("uses custom range formatter", () => {
+  it("can show summary and relative together", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(D(2024, 5, 10));
+    const { getByText } = render(
+      <Calendar
+        mode="range"
+        locale="en-US"
+        value={{ from: D(2024, 5, 13), to: D(2024, 5, 17) }}
+      >
+        <CalendarInfo showRelative />
+      </Calendar>,
+    );
+
+    expect(getByText("4 days")).toBeTruthy();
+    expect(getByText("in 3 days")).toBeTruthy();
+  });
+
+  it("uses custom formatter for range values", () => {
     const { getByText } = render(
       <Calendar
         mode="range"
@@ -142,8 +182,14 @@ describe("CalendarInfo", () => {
         value={{ from: D(2024, 5, 10), to: D(2024, 5, 14) }}
       >
         <CalendarInfo
-          rangeFormatter={({ formatUnit, durationDays }) =>
-            `Trip length: ${formatUnit(durationDays, "day")}`
+          formatter={(value) =>
+            value && !Array.isArray(value) && !(value instanceof Date)
+              ? `Trip length: ${
+                  value.from && value.to
+                    ? Math.abs(value.to.getDate() - value.from.getDate())
+                    : 0
+                } days`
+              : null
           }
         />
       </Calendar>,
@@ -199,7 +245,7 @@ describe("CalendarInfo", () => {
   it("does not render clear button while only the empty label is visible", () => {
     const { queryByLabelText } = render(
       <Calendar mode="single">
-        <CalendarInfo allowClear label="Select a date" />
+        <CalendarInfo allowClear emptyLabel="Select a date" />
       </Calendar>,
     );
 
@@ -225,7 +271,7 @@ describe("CalendarInfo", () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it("showHome keeps the block visible without selection or label", () => {
+  it("showHome keeps the block visible without selection or empty label", () => {
     vi.useFakeTimers();
     vi.setSystemTime(D(2024, 5, 15));
     const { container, getByLabelText } = render(
@@ -244,7 +290,7 @@ describe("CalendarInfo", () => {
   it("allowClear with selection keeps the block visible without summary", () => {
     const { container, getByLabelText } = render(
       <Calendar mode="single" value={D(2024, 5, 15)}>
-        <CalendarInfo animated={false} allowClear />
+        <CalendarInfo animated={false} allowClear showSummary={false} />
       </Calendar>,
     );
 
@@ -255,13 +301,13 @@ describe("CalendarInfo", () => {
     ).toBeNull();
   });
 
-  it("label renders when nothing selected, summary takes over when selected", () => {
+  it("emptyLabel renders when nothing selected, summary takes over when selected", () => {
     const { queryByText, rerender } = render(
       <Calendar mode="single">
         <CalendarInfo
           animated={false}
-          label="Pick a date"
-          selectionCountFormatter={(count) => `${count} selected`}
+          emptyLabel="Pick a date"
+          formatter={(value) => (value instanceof Date ? "1 selected" : null)}
         />
       </Calendar>,
     );
@@ -273,8 +319,8 @@ describe("CalendarInfo", () => {
       <Calendar mode="single" value={D(2024, 5, 15)}>
         <CalendarInfo
           animated={false}
-          label="Pick a date"
-          selectionCountFormatter={(count) => `${count} selected`}
+          emptyLabel="Pick a date"
+          formatter={(value) => (value instanceof Date ? "1 selected" : null)}
         />
       </Calendar>,
     );
@@ -324,7 +370,7 @@ describe("CalendarInfo", () => {
           <CalendarInfo
             allowClear={allowClear}
             showHome={showHome}
-            selectionCountFormatter={(count) => `${count}`}
+            formatter={() => "1"}
           />
         </Calendar>
       );
@@ -346,6 +392,64 @@ describe("CalendarInfo", () => {
     } finally {
       getComputedStyleSpy.mockRestore();
       scrollHeightSpy.mockRestore();
+    }
+  });
+
+  it("remeasures animated height when action buttons appear", () => {
+    const originalGetComputedStyle = window.getComputedStyle.bind(window);
+    const getComputedStyleSpy = vi
+      .spyOn(window, "getComputedStyle")
+      .mockImplementation((element) => {
+        const style = originalGetComputedStyle(element);
+        const isPaddingProbe =
+          element instanceof HTMLElement &&
+          element.style.paddingTop === "var(--cal-spacing)";
+
+        return new Proxy(style, {
+          get(target, prop, receiver) {
+            if (prop === "paddingTop" || prop === "paddingBottom") {
+              return isPaddingProbe ? "12px" : "0px";
+            }
+            return Reflect.get(target, prop, receiver);
+          },
+        }) as CSSStyleDeclaration;
+      });
+    const scrollHeightSpy = vi
+      .spyOn(HTMLElement.prototype, "scrollHeight", "get")
+      .mockReturnValue(26);
+    const offsetHeightSpy = vi
+      .spyOn(HTMLElement.prototype, "offsetHeight", "get")
+      .mockImplementation(function (this: HTMLElement) {
+        return this.getAttribute("aria-label") === "Go to current month"
+          ? 60
+          : 0;
+      });
+
+    try {
+      const renderInfo = (showHome: boolean) => (
+        <Calendar mode="single" value={D(2024, 5, 15)}>
+          <CalendarInfo showHome={showHome} formatter={() => "1"} />
+        </Calendar>
+      );
+      const { container, rerender } = render(renderInfo(false));
+      const getInner = () =>
+        container.querySelector(
+          '[data-area="calendar-info"] > div',
+        ) as HTMLElement;
+
+      expect(
+        getInner().style.getPropertyValue("--calendar-info-inner-height"),
+      ).toBe("50px");
+
+      rerender(renderInfo(true));
+
+      expect(
+        getInner().style.getPropertyValue("--calendar-info-inner-height"),
+      ).toBe("84px");
+    } finally {
+      getComputedStyleSpy.mockRestore();
+      scrollHeightSpy.mockRestore();
+      offsetHeightSpy.mockRestore();
     }
   });
 });
