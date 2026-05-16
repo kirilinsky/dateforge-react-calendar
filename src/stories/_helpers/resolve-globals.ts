@@ -34,3 +34,9 @@ export const resolveStoryLocale = (key: unknown): string | undefined => {
   if (key === "default" || typeof key !== "string") return undefined;
   return key;
 };
+
+export const resolveStoryGradient = (key: unknown): boolean | undefined => {
+  if (key === "gradient on") return true;
+  if (key === "gradient off") return false;
+  return undefined;
+};

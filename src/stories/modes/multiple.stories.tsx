@@ -7,6 +7,7 @@ import { FIXED_DATE } from "../_constants";
 import { debugStyle, fmtDate } from "../_helpers/debug";
 import {
   resolveStoryAppearance,
+  resolveStoryGradient,
   resolveStoryLocale,
   resolveStoryTheme,
 } from "../_helpers/resolve-globals";
@@ -33,6 +34,7 @@ export const Default: Story = {
           onChange={setDates}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarNav showMonthPicker compactYears />
@@ -58,6 +60,7 @@ export const Capped: Story = {
           maxDates={3}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarNav showMonthPicker compactYears />
@@ -87,6 +90,7 @@ export const PreSelected: Story = {
           onChange={setDates}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarNav showMonthPicker compactYears />

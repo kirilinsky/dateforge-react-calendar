@@ -8,6 +8,7 @@ import { FIXED_DATE } from "../_constants";
 import { debugStyle } from "../_helpers/debug";
 import {
   resolveStoryAppearance,
+  resolveStoryGradient,
   resolveStoryLocale,
   resolveStoryTheme,
 } from "../_helpers/resolve-globals";
@@ -58,6 +59,7 @@ export const AutoDetect: Story = {
           onChange={setDate}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarNav showMonthPicker compactYears />
@@ -81,6 +83,7 @@ export const ExplicitParis: Story = {
           timeZone="Europe/Paris"
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarNav showMonthPicker compactYears />
@@ -104,6 +107,7 @@ export const ExplicitNewYork: Story = {
           timeZone="America/New_York"
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarNav showMonthPicker compactYears />
@@ -127,6 +131,7 @@ export const FixedOffset: Story = {
           timeZone="UTC+2"
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarNav showMonthPicker compactYears />
@@ -158,6 +163,7 @@ export const OffByOneFix: Story = {
           timeZone="UTC"
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarNav showMonthPicker compactYears />
@@ -185,6 +191,7 @@ export const InvalidTimezone: Story = {
           timeZone="Europe/Wrongville"
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarNav showMonthPicker compactYears />
