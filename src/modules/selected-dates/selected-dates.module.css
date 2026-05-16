@@ -57,7 +57,7 @@
     max-width: 100%;
     padding: 0 0.7em !important;
     font-size: var(--cal-text-md) !important;
-    font-weight: var(--cal-weight-semibold);
+    font-weight: var(--cal-weight-regular);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

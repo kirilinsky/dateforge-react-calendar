@@ -27,6 +27,7 @@ type NavArgs = {
   home?: boolean;
   clear?: boolean;
   themeToggle?: boolean;
+  compactTime?: boolean;
 };
 
 const meta: Meta<NavArgs> = {
@@ -46,6 +47,7 @@ const meta: Meta<NavArgs> = {
     home: { control: "boolean" },
     clear: { control: "boolean" },
     themeToggle: { control: "boolean" },
+    compactTime: { control: "boolean" },
   },
   args: {
     showMonthPicker: false,
@@ -61,6 +63,7 @@ const meta: Meta<NavArgs> = {
     home: false,
     clear: false,
     themeToggle: false,
+    compactTime: false,
   },
   render: (args, ctx) => {
     const [date, setDate] = useState<Date | null>(FIXED_DATE);
@@ -70,7 +73,7 @@ const meta: Meta<NavArgs> = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
-          gradient={resolveStoryGradient(ctx.globals.gradient)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav
@@ -88,6 +91,7 @@ const meta: Meta<NavArgs> = {
           home={args.home}
           clear={args.clear}
           themeToggle={args.themeToggle}
+          compactTime={args.compactTime}
         />
         <CalendarDays />
       </Calendar>
@@ -148,7 +152,7 @@ export const WithThemeToggle: Story = {
         onChange={setDate}
         theme="auto"
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
-          gradient={resolveStoryGradient(ctx.globals.gradient)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav
@@ -166,6 +170,7 @@ export const WithThemeToggle: Story = {
           home={args.home}
           clear={args.clear}
           themeToggle={args.themeToggle}
+          compactTime={args.compactTime}
         />
         <CalendarDays />
       </Calendar>
@@ -185,6 +190,20 @@ export const ShowTimePicker: Story = {
 };
 ShowTimePicker.storyName = "Show time picker popup";
 
+export const CompactTime: Story = {
+  args: { showMonthPicker: true, compactTime: true },
+};
+CompactTime.storyName = "Compact time (icon button)";
+
+export const CompactTimePopupOpen: Story = {
+  args: { showMonthPicker: true, compactTime: true },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByLabelText(/Change time/));
+  },
+};
+CompactTimePopupOpen.storyName = "Compact time popup open";
+
 export const MonthPopupOpen: Story = {
   args: { showMonthPicker: true, showYearPicker: true },
   play: async ({ canvasElement }) => {
@@ -198,3 +217,44 @@ export const WithLabel: Story = {
   args: { label: "This is label" },
 };
 WithLabel.storyName = "With label";
+
+export const NavBottomOnly: Story = {
+  render: (_args, ctx) => {
+    const [date, setDate] = useState<Date | null>(FIXED_DATE);
+    return (
+      <Calendar
+        value={date}
+        onChange={setDate}
+        theme={resolveStoryTheme(ctx.globals.theme)}
+        appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
+      >
+        <CalendarDays />
+        <CalendarNav showMonthPicker showYearPicker home clear />
+      </Calendar>
+    );
+  },
+};
+NavBottomOnly.storyName = "Nav below days";
+
+export const NavTopAndBottom: Story = {
+  render: (_args, ctx) => {
+    const [date, setDate] = useState<Date | null>(FIXED_DATE);
+    return (
+      <Calendar
+        value={date}
+        onChange={setDate}
+        theme={resolveStoryTheme(ctx.globals.theme)}
+        appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
+      >
+        <CalendarNav showMonthPicker showYearPicker themeToggle />
+        <CalendarDays />
+        <CalendarNav compactTime home clear showNowTime />
+      </Calendar>
+    );
+  },
+};
+NavTopAndBottom.storyName = "Nav top + bottom (different props)";

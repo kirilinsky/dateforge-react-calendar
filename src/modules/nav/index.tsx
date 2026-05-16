@@ -23,6 +23,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Clear,
+  Clock,
   Down,
   Home,
   ThemeToggle,
@@ -160,6 +161,7 @@ export interface CalendarNavProps {
   home?: boolean;
   clear?: boolean;
   themeToggle?: boolean;
+  compactTime?: boolean;
   label?: string;
   col?: number | string;
   bound?: "from" | "to";
@@ -180,6 +182,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
   home = false,
   clear = false,
   themeToggle = false,
+  compactTime = false,
   label,
   col,
   bound,
@@ -319,19 +322,19 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
     navigateBoundOrView(next);
   };
 
-  const visible =
-    !!safeLabel ||
-    showTime ||
-    showNowTime ||
-    compactMonths ||
-    showMonthPicker ||
-    showYearPicker ||
-    compactYears ||
-    monthLabel ||
-    yearLabel ||
-    home ||
-    clear ||
-    themeToggle;
+  const slotCount =
+    (safeLabel ? 1 : 0) +
+    (showTime ? 1 : 0) +
+    (showNowTime ? 1 : 0) +
+    (compactMonths ? 1 : 0) +
+    (showMonthPicker ? 1 : 0) +
+    (showYearPicker ? 1 : 0) +
+    (compactYears ? 1 : 0) +
+    (monthLabel ? 1 : 0) +
+    (yearLabel ? 1 : 0) +
+    (themeToggle || home || clear || compactTime ? 1 : 0);
+  const selectorCount = (showMonthPicker ? 1 : 0) + (showYearPicker ? 1 : 0);
+  const visible = slotCount > 0;
   const gridSlot = getGridSlotStyle(col);
 
   if (!visible) return null;
@@ -341,6 +344,8 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
       <div
         className={styles.headerContainer}
         data-area="header"
+        data-slots={slotCount}
+        data-selector-count={selectorCount}
         role="toolbar"
         {...(safeLabel
           ? { "aria-labelledby": labelId }
@@ -515,8 +520,20 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           </span>
         )}
 
-        {(themeToggle || home || clear) && (
+        {(themeToggle || home || clear || compactTime) && (
           <div className={styles.flexWrapper}>
+            {compactTime && (
+              <button
+                type="button"
+                className={`${styles.homeButton} ${shared.interactive} ${shared.hovered}`}
+                aria-label={`Change time, currently ${curTime}`}
+                aria-haspopup="dialog"
+                aria-expanded={timePopupOpen}
+                onClick={openPopup(setTimePopupOpen)}
+              >
+                <Clock />
+              </button>
+            )}
             {themeToggle && (
               <button
                 type="button"

@@ -56,13 +56,28 @@
       color-mix(in srgb, var(--c-h) 50%, transparent);
   }
 
+  .dayGridContainer[data-today-dot] {
+    --today-dot-size: var(--cal-selected-text-dot-size, 0.26em);
+    --today-dot-inset: var(--cal-selected-text-dot-offset, 0.3em);
+    --today-dot-label-shift: var(--cal-selected-text-dot-label-shift, -0.1em);
+    --today-dot-reserved-space: var(
+      --cal-selected-text-dot-reserved-space,
+      0px
+    );
+  }
+
+  .dayGridContainer[data-today-dot] .todayItem {
+    box-sizing: border-box;
+    padding-block-end: var(--today-dot-reserved-space) !important;
+  }
+
   .dayGridContainer[data-today-dot] .todayItem::after {
     content: "";
     position: absolute;
     left: 50%;
-    bottom: 0.3em;
-    width: 0.26em;
-    height: 0.26em;
+    bottom: var(--today-dot-inset);
+    width: var(--today-dot-size);
+    height: var(--today-dot-size);
     border-radius: 50%;
     background: currentColor;
     transform: translateX(-50%);
@@ -70,7 +85,7 @@
   }
 
   .dayGridContainer[data-today-dot] .todayItem[data-selected]::after {
-    background: var(--c-t-d, var(--active-cell-color, var(--c-at, var(--c-a))));
+    background: var(--active-cell-color, var(--c-t-d, var(--c-at, var(--c-a))));
   }
 
   .dayLabel {
@@ -78,7 +93,7 @@
   }
 
   .dayGridContainer[data-today-dot] .todayItem .dayLabel {
-    transform: translateY(-0.1em);
+    transform: translateY(var(--today-dot-label-shift));
   }
 
   .boldWeekend {
@@ -207,14 +222,23 @@
       padding: min(var(--days-wn-padding, 0.5em), 0.3em);
     }
 
-    .dayGridContainer[data-today-dot] .todayItem::after {
-      bottom: 0.14em;
-      width: 0.16em;
-      height: 0.16em;
-    }
-
-    .dayGridContainer[data-today-dot] .todayItem .dayLabel {
-      transform: translateY(-0.08em);
+    .dayGridContainer[data-today-dot] {
+      --today-dot-size: var(
+        --cal-selected-text-dot-size-compact,
+        var(--cal-selected-text-dot-size, 0.16em)
+      );
+      --today-dot-inset: var(
+        --cal-selected-text-dot-offset-compact,
+        var(--cal-selected-text-dot-offset, 0.14em)
+      );
+      --today-dot-label-shift: var(
+        --cal-selected-text-dot-label-shift-compact,
+        var(--cal-selected-text-dot-label-shift, -0.08em)
+      );
+      --today-dot-reserved-space: var(
+        --cal-selected-text-dot-reserved-space-compact,
+        var(--cal-selected-text-dot-reserved-space, 0px)
+      );
     }
   }
 
