@@ -19,6 +19,7 @@ import { FIXED_DATE } from "../_constants";
 import { debugStyle, fmtRange } from "../_helpers/debug";
 import {
   resolveStoryAppearance,
+  resolveStoryGradient,
   resolveStoryLocale,
   resolveStoryTheme,
 } from "../_helpers/resolve-globals";
@@ -44,6 +45,7 @@ export const BasicDatePicker: Story = {
         defaultViewDate={FIXED_DATE}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav showTime showMonthPicker compactYears />
@@ -65,6 +67,7 @@ export const DaysPresetsAndTimeInLine: Story = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
         cols={4}
       >
@@ -94,6 +97,7 @@ export const FeedbackAndClear: Story = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav
@@ -122,6 +126,7 @@ export const RangePicker: Story = {
         defaultViewDate={FIXED_DATE}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav label="Range" showMonthPicker yearLabel clear />
@@ -144,6 +149,7 @@ export const RangeWithShortcuts: Story = {
         defaultViewDate={FIXED_DATE}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav
@@ -174,6 +180,7 @@ export const MultiMonthRange: Story = {
         defaultViewDate={FIXED_DATE}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav showMonthPicker yearLabel col={2} home />
@@ -199,6 +206,7 @@ export const MultipleDatePicker: Story = {
         defaultViewDate={FIXED_DATE}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav label="Select 3" showMonthPicker />
@@ -220,6 +228,7 @@ export const DateAndTimePicker: Story = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav label="Date + time" showTime clear />
@@ -243,6 +252,7 @@ export const TimeOnlyPicker: Story = {
         defaultViewDate={FIXED_DATE}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav label="Select time" themeToggle />
@@ -263,6 +273,7 @@ export const ManualInputAndGrid: Story = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarManualInput />
@@ -282,6 +293,7 @@ export const ReadOnlyDisplay: Story = {
         defaultViewDate={new Date(1990, 4, 1)}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav label="Read-only display" />
@@ -302,6 +314,7 @@ export const TrackDrivenPicker: Story = {
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarYearsTrack />
@@ -325,6 +338,7 @@ export const DaysAndMonthsGrid: Story = {
         cols={3}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav label="Month grid" showMonthPicker compactYears />
@@ -348,6 +362,7 @@ export const DaysAndYearsGrid: Story = {
         cols={3}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav label="Year grid" showMonthPicker compactYears />
@@ -366,10 +381,10 @@ export const DaysAndMonthsTrack: Story = {
       <Calendar
         mode="single"
         value={date}
-        gradient
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient) ?? true}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarMonthsTrack showYearLabel />
@@ -388,9 +403,9 @@ export const WithGradient: Story = {
         mode="single"
         value={date}
         onChange={setDate}
-        gradient
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient) ?? true}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav label="Gradient cells" showMonthPicker compactYears />
@@ -425,6 +440,7 @@ export const FlightTracks: Story = {
           cols={2}
           theme={resolveStoryTheme(ctx.globals.theme)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
           <CalendarNav col={1} label="Departure" bound="from" monthLabel />
@@ -465,6 +481,7 @@ export const HotelBooking: Story = {
         defaultViewDate={FIXED_DATE}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav showMonthPicker compactYears />
@@ -503,6 +520,7 @@ export const TripDuration: Story = {
         defaultViewDate={FIXED_DATE}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav showMonthPicker compactYears clear />
@@ -544,6 +562,7 @@ export const RangeDurationWithTimeGrid: Story = {
         timeStep={{ minute: 5 }}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav label="Range duration" showMonthPicker compactYears />
@@ -580,6 +599,7 @@ export const RelativeDeadline: Story = {
         defaultViewDate={date ?? undefined}
         theme={resolveStoryTheme(ctx.globals.theme)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav showMonthPicker compactYears />

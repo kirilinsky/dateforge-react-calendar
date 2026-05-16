@@ -40,12 +40,22 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    gradient: {
+      description: "Calendar gradient",
+      defaultValue: "off",
+      toolbar: {
+        title: "Gradient",
+        icon: "lightning",
+        items: ["gradient off", "gradient on"],
+        dynamicTitle: true,
+      },
+    },
   },
   decorators: [
     (Story, ctx) => (
       <div style={{ padding: 20, width: ctx.parameters.storyWidth ?? 305 }}>
         <Story
-          key={`${ctx.globals.theme}-${ctx.globals.appearance}-${ctx.globals.locale}`}
+          key={`${ctx.globals.theme}-${ctx.globals.appearance}-${ctx.globals.locale}-${ctx.globals.gradient}`}
         />
       </div>
     ),

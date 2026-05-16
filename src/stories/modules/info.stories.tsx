@@ -10,6 +10,7 @@ import {
 import { FIXED_DATE } from "../_constants";
 import {
   resolveStoryAppearance,
+  resolveStoryGradient,
   resolveStoryLocale,
   resolveStoryTheme,
 } from "../_helpers/resolve-globals";
@@ -39,6 +40,7 @@ const getCalendarProps = (
   ctx: Parameters<NonNullable<Meta<CalendarInfoArgs>["render"]>>[1],
 ) => ({
   appearance: resolveStoryAppearance(ctx.globals.appearance),
+  gradient: resolveStoryGradient(ctx.globals.gradient),
   locale: resolveStoryLocale(ctx.globals.locale),
   theme: resolveStoryTheme(ctx.globals.theme),
   timeZone: args.timeZone || undefined,
