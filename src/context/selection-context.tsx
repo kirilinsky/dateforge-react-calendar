@@ -9,7 +9,7 @@ export interface SelectionState {
 
 export interface SelectionActions {
   setHoverDate: (date: Date | null) => void;
-  onChangeDate: (date: Date | null) => void;
+  onChangeDate: (date: Date | null, options?: { keepView?: boolean }) => void;
   onDatesSet: (dates: Date[]) => void;
   onRangeSet: (from: Date | null, to: Date | null) => void;
   onRangeBoundSet: (bound: "from" | "to", date: Date | null) => boolean;

@@ -26,7 +26,12 @@ export interface SelectConfig {
 
 type CalendarAction =
   | { type: "NAVIGATE"; date: Date }
-  | { type: "SELECT"; date: Date | null; config: SelectConfig }
+  | {
+      type: "SELECT";
+      date: Date | null;
+      config: SelectConfig;
+      keepView?: boolean;
+    }
   | { type: "HOVER"; date: Date | null }
   | { type: "CHANGE_TIME"; date: Date; config: SelectConfig }
   | { type: "SET_DATES"; dates: Date[] }
@@ -209,7 +214,7 @@ export function calendarReducer(
       return { ...state, viewDate: action.date };
 
     case "SELECT": {
-      const { date, config } = action;
+      const { date, config, keepView } = action;
       let next: CalendarState;
       if (config.range) {
         next = !date
@@ -223,6 +228,9 @@ export function calendarReducer(
         next = selectSingle(state, date, config);
       }
       if (next === state) return state;
+      if (keepView && next.viewDate !== state.viewDate) {
+        next = { ...next, viewDate: state.viewDate };
+      }
       return { ...next, notifySeq: state.notifySeq + 1 };
     }
 

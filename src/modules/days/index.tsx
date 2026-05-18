@@ -1,10 +1,5 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import type React from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import {
@@ -25,171 +20,19 @@ import {
 } from "@/utils/date-utils";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { getDateTimeFormat } from "@/utils/intl-cache";
-import { getTodayInTimezone, toTZMidnight } from "@/utils/tz-utils";
-import { getDayCellClassName } from "./day-cell-class-name";
+import { getTodayInTimezone } from "@/utils/tz-utils";
+import { buildCellLabel, DayCell } from "./day-cell";
 import styles from "./days.module.css";
+import {
+  composeSelectionDate,
+  computeEffectiveHoverDate,
+  computeSwipeDirection,
+  getEndOfDayT,
+  getStartOfDayT,
+  isDayHiddenByBounds,
+  passesRangeLimits,
+} from "./helpers";
 import WeekDays from "./week-days";
-
-function buildCellLabel(args: {
-  fullDate: Date;
-  cellFmt: Intl.DateTimeFormat;
-  isDisabled: boolean;
-  isSelected: boolean;
-  isTodayDate: boolean;
-  highlightToday: boolean;
-  isRangeStart: boolean;
-  isRangeEnd: boolean;
-  isInRange: boolean;
-  range: boolean;
-}): string {
-  const parts = [args.cellFmt.format(args.fullDate)];
-  if (args.highlightToday && args.isTodayDate) parts.push("today");
-  if (args.range) {
-    if (args.isRangeStart) parts.push("range start");
-    else if (args.isRangeEnd) parts.push("range end");
-    else if (args.isInRange) parts.push("in range");
-  } else if (args.isSelected) {
-    parts.push("selected");
-  }
-  if (args.isDisabled) parts.push("disabled");
-  return parts.join(", ");
-}
-
-interface DayCellProps {
-  day: number;
-  dateTime: number;
-  isDisabled: boolean;
-  isSelected: boolean;
-  isCurrentMonth: boolean;
-  connectLeft: boolean;
-  connectRight: boolean;
-  isRangeStart: boolean;
-  isRangeEnd: boolean;
-  isInRange: boolean;
-  rangeBridgeLeft: boolean;
-  rangeBridgeRight: boolean;
-  isPreviewStart: boolean;
-  isPreviewEnd: boolean;
-  isPreviewMid: boolean;
-  previewBridgeLeft: boolean;
-  previewBridgeRight: boolean;
-  isTodayDate: boolean;
-  highlightToday: boolean;
-  isWeekend: boolean;
-  boldWeekends: boolean;
-  range: boolean;
-  ariaLabel: string;
-  tabIndex: number;
-  readOnly: boolean;
-  isMaxReachedTarget: boolean;
-  onSelect: (date: Date, isDisabled: boolean) => void;
-  onMouseEnter: (date: Date) => void;
-  onKeyDown: (e: React.KeyboardEvent, date: Date) => void;
-}
-
-const DayCell = React.memo(function DayCell({
-  day,
-  dateTime,
-  isDisabled,
-  isSelected,
-  isCurrentMonth,
-  connectLeft,
-  connectRight,
-  isRangeStart,
-  isRangeEnd,
-  isInRange,
-  rangeBridgeLeft,
-  rangeBridgeRight,
-  isPreviewStart,
-  isPreviewEnd,
-  isPreviewMid,
-  previewBridgeLeft,
-  previewBridgeRight,
-  isTodayDate,
-  highlightToday,
-  isWeekend,
-  boldWeekends,
-  range,
-  ariaLabel,
-  tabIndex,
-  readOnly,
-  isMaxReachedTarget,
-  onSelect,
-  onMouseEnter,
-  onKeyDown,
-}: DayCellProps) {
-  const fullDate = useMemo(() => new Date(dateTime), [dateTime]);
-
-  const isToday = !!highlightToday && isTodayDate;
-
-  const isOtherMonth = !isCurrentMonth;
-  const isHighlighted =
-    isSelected ||
-    isRangeStart ||
-    isRangeEnd ||
-    isInRange ||
-    isPreviewStart ||
-    isPreviewEnd ||
-    isPreviewMid;
-
-  const className = getDayCellClassName({
-    range,
-    isSelected,
-    isDisabled,
-    connectLeft,
-    connectRight,
-    isRangeStart,
-    isRangeEnd,
-    isInRange,
-    rangeBridgeLeft,
-    rangeBridgeRight,
-    isPreviewStart,
-    isPreviewEnd,
-    isPreviewMid,
-    previewBridgeLeft,
-    previewBridgeRight,
-    isToday,
-    boldWeekends,
-    isOtherMonth,
-    isHighlighted,
-    isMaxReachedTarget,
-  });
-
-  return (
-    <div
-      role="gridcell"
-      aria-selected={isSelected}
-      aria-disabled={isDisabled || readOnly || undefined}
-    >
-      <button
-        type="button"
-        tabIndex={tabIndex}
-        onClick={() => {
-          if (readOnly) return;
-          onSelect(fullDate, isDisabled);
-        }}
-        onMouseEnter={() => onMouseEnter(fullDate)}
-        onKeyDown={(e) => onKeyDown(e, fullDate)}
-        aria-label={ariaLabel}
-        aria-disabled={isDisabled || undefined}
-        aria-current={isTodayDate ? "date" : undefined}
-        data-cell=""
-        data-selected={isSelected || undefined}
-        data-today={isToday || undefined}
-        data-disabled={isDisabled || undefined}
-        data-in-range={isInRange || undefined}
-        data-range-start={isRangeStart || undefined}
-        data-range-end={isRangeEnd || undefined}
-        data-weekend={isWeekend || undefined}
-        data-other-month={isOtherMonth || undefined}
-        data-max-reached={isMaxReachedTarget || undefined}
-        className={className}
-      >
-        <span className={styles.dayLabel}>{day}</span>
-      </button>
-    </div>
-  );
-});
 
 export interface CalendarDaysProps {
   offset?: number;
@@ -208,6 +51,13 @@ export interface CalendarDaysProps {
   fixedRows?: boolean;
   blockNavigation?: boolean;
   todayDot?: boolean;
+  /**
+   * When a day is clicked, also move the calendar's viewDate to that day's
+   * month. Defaults to `true` for the primary grid (`offset === 0`) and
+   * `false` for any offset grid — so clicking on a side month in a
+   * multi-month layout no longer steals the primary view.
+   */
+  syncViewOnSelect?: boolean;
 }
 
 export const CalendarDays: React.FC<CalendarDaysProps> = ({
@@ -227,7 +77,9 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   fixedRows = true,
   blockNavigation = false,
   todayDot = true,
+  syncViewOnSelect,
 }) => {
+  const effectiveSyncView = syncViewOnSelect ?? offset === 0;
   const { daysTrackActive } = useUI();
   const {
     minDate,
@@ -244,9 +96,13 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
 
   const { viewDate: rawDate, navigateTo } = useNavigation();
 
-  const date = offset
-    ? new Date(rawDate.getFullYear(), rawDate.getMonth() + offset, 1)
-    : rawDate;
+  const date = useMemo(
+    () =>
+      offset
+        ? new Date(rawDate.getFullYear(), rawDate.getMonth() + offset, 1)
+        : rawDate,
+    [offset, rawDate],
+  );
   const resolvedArea = offset > 0 ? `days-${offset + 1}` : "days";
   const { selectedDates, rangeStart, rangeEnd } = useSelectionValue();
   const { onChangeDate, setHoverDate } = useSelectionActions();
@@ -272,29 +128,11 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   const today = useMemo(() => todayClient ?? new Date(NaN), [todayClient]);
 
   const startT = useMemo(
-    () =>
-      minDate
-        ? new Date(
-            minDate.getFullYear(),
-            minDate.getMonth(),
-            minDate.getDate(),
-          ).getTime()
-        : null,
+    () => (minDate ? getStartOfDayT(minDate) : null),
     [minDate],
   );
   const endT = useMemo(
-    () =>
-      maxDate
-        ? new Date(
-            maxDate.getFullYear(),
-            maxDate.getMonth(),
-            maxDate.getDate(),
-            23,
-            59,
-            59,
-            999,
-          ).getTime()
-        : null,
+    () => (maxDate ? getEndOfDayT(maxDate) : null),
     [maxDate],
   );
 
@@ -307,12 +145,9 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
   useEffect(() => {
-    const isSameMonth =
-      date.getMonth() === prevDate.getMonth() &&
-      date.getFullYear() === prevDate.getFullYear();
-    if (!isSameMonth) {
-      const isForward = date.getTime() > prevDate.getTime();
-      setDirection(isForward ? "right" : "left");
+    const dir = computeSwipeDirection(date, prevDate);
+    if (dir !== "same") {
+      setDirection(dir);
       setPrevDate(date);
     }
   }, [date, prevDate]);
@@ -340,6 +175,28 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
       }
     : undefined;
 
+  const effectiveHoverDate = useMemo(
+    () =>
+      computeEffectiveHoverDate({
+        range,
+        rangeStart,
+        rangeEnd,
+        hoverDate,
+        currentYear,
+        currentMonth,
+        firstDayOffset,
+      }),
+    [
+      range,
+      rangeStart,
+      rangeEnd,
+      hoverDate,
+      currentYear,
+      currentMonth,
+      firstDayOffset,
+    ],
+  );
+
   const weeksData = useMemo(() => {
     return getCalendarData(
       currentYear,
@@ -350,7 +207,13 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
       maxDate,
       disabled,
       range
-        ? { rangeStart, rangeEnd, hoverDate, minRangeDays, maxRangeDays }
+        ? {
+            rangeStart,
+            rangeEnd,
+            hoverDate: effectiveHoverDate,
+            minRangeDays,
+            maxRangeDays,
+          }
         : undefined,
     );
   }, [
@@ -364,7 +227,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
     range,
     rangeStart,
     rangeEnd,
-    hoverDate,
+    effectiveHoverDate,
     minRangeDays,
     maxRangeDays,
   ]);
@@ -390,6 +253,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
     minRangeDays,
     maxRangeDays,
     setHoverDate,
+    effectiveSyncView,
   });
   latestRef.current = {
     readOnly,
@@ -407,67 +271,77 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
     minRangeDays,
     maxRangeDays,
     setHoverDate,
+    effectiveSyncView,
   };
 
   const handleSetDay = useCallback((targetDate: Date, isDisabled: boolean) => {
     const r = latestRef.current;
     if (r.readOnly) return;
+    if (isDisabled) return;
     const alreadySelected = r.selectedDates.some((d) =>
       isSameDay(d, targetDate),
     );
-    if (isDisabled) return;
     if (r.isMultipleMaxReached && !alreadySelected) return;
     if ((r.lockDeselection || r.daysTrackActive) && alreadySelected) return;
-    const next = r.timeZone
-      ? new Date(
-          toTZMidnight(targetDate, r.timeZone).getTime() +
-            r.date.getHours() * 3600000 +
-            r.date.getMinutes() * 60000 +
-            r.date.getSeconds() * 1000 +
-            r.date.getMilliseconds(),
-        )
-      : new Date(targetDate);
-    if (!r.timeZone)
-      next.setHours(
-        r.date.getHours(),
-        r.date.getMinutes(),
-        r.date.getSeconds(),
-        r.date.getMilliseconds(),
-      );
-    // Preserve user's H/M/S/ms when clamping to bound. Day is already set
-    // from the click target; only re-clamp if the resulting timestamp falls
-    // outside [minDate, maxDate] purely because of the time component.
-    if (r.minDate && next.getTime() < r.minDate.getTime()) {
-      next.setFullYear(
-        r.minDate.getFullYear(),
-        r.minDate.getMonth(),
-        r.minDate.getDate(),
-      );
-    }
-    if (r.maxDate && next.getTime() > r.maxDate.getTime()) {
-      next.setFullYear(
-        r.maxDate.getFullYear(),
-        r.maxDate.getMonth(),
-        r.maxDate.getDate(),
-      );
-    }
-    r.onChangeDate(next);
+    const next = composeSelectionDate({
+      targetDate,
+      viewDate: r.date,
+      timeZone: r.timeZone,
+      minDate: r.minDate,
+      maxDate: r.maxDate,
+    });
+    r.onChangeDate(next, r.effectiveSyncView ? undefined : { keepView: true });
+  }, []);
+
+  // rAF-coalesce hover updates: mousemove can fire dozens of times per frame;
+  // only the latest target matters for preview rendering.
+  const hoverRafRef = useRef<number | null>(null);
+  const hoverPendingRef = useRef<Date | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (
+        hoverRafRef.current !== null &&
+        typeof cancelAnimationFrame !== "undefined"
+      ) {
+        cancelAnimationFrame(hoverRafRef.current);
+        hoverRafRef.current = null;
+      }
+    };
   }, []);
 
   const handleMouseEnter = useCallback((fullDate: Date) => {
     const r = latestRef.current;
     if (!r.isPickingRange || !r.rangeStart) return;
-    const diffDays =
-      Math.round(
-        Math.abs(fullDate.getTime() - r.rangeStart.getTime()) / 86400000,
-      ) + 1;
-    if (r.minRangeDays !== undefined && diffDays < r.minRangeDays) return;
-    if (r.maxRangeDays !== undefined && diffDays > r.maxRangeDays) return;
-    r.setHoverDate(fullDate);
+    if (
+      !passesRangeLimits(fullDate, r.rangeStart, r.minRangeDays, r.maxRangeDays)
+    )
+      return;
+    hoverPendingRef.current = fullDate;
+    if (typeof requestAnimationFrame === "undefined") {
+      r.setHoverDate(fullDate);
+      return;
+    }
+    if (hoverRafRef.current !== null) return;
+    hoverRafRef.current = requestAnimationFrame(() => {
+      hoverRafRef.current = null;
+      const pending = hoverPendingRef.current;
+      hoverPendingRef.current = null;
+      if (pending) latestRef.current.setHoverDate(pending);
+    });
   }, []);
 
   const handleMouseLeave = useCallback(() => {
-    if (range) setHoverDate(null);
+    if (!range) return;
+    if (
+      hoverRafRef.current !== null &&
+      typeof cancelAnimationFrame !== "undefined"
+    ) {
+      cancelAnimationFrame(hoverRafRef.current);
+      hoverRafRef.current = null;
+    }
+    hoverPendingRef.current = null;
+    setHoverDate(null);
   }, [range, setHoverDate]);
 
   const animationKey = `${currentMonth}-${currentYear}`;
@@ -489,18 +363,16 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   });
 
   const isDayHidden = useCallback(
-    (d: { fullDate: Date; isDisabled: boolean; isCurrentMonth: boolean }) => {
-      const t = d.fullDate.getTime();
-      if (
-        hideOutOfRange &&
-        ((startT !== null && t < startT) ||
-          (endT !== null && t > endT) ||
-          d.isDisabled)
-      )
-        return true;
-      if (currentMonthOnly && !d.isCurrentMonth) return true;
-      return false;
-    },
+    (d: { fullDate: Date; isDisabled: boolean; isCurrentMonth: boolean }) =>
+      isDayHiddenByBounds({
+        fullDate: d.fullDate,
+        isDisabled: d.isDisabled,
+        isCurrentMonth: d.isCurrentMonth,
+        hideOutOfRange,
+        currentMonthOnly,
+        startT,
+        endT,
+      }),
     [hideOutOfRange, currentMonthOnly, startT, endT],
   );
 
