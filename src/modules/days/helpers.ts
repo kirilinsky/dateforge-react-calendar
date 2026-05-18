@@ -1,4 +1,3 @@
-import type { DisabledConfig } from "@/types/calendar";
 import { toTZMidnight } from "@/utils/tz-utils";
 
 const DAY_MS = 86400000;
@@ -161,7 +160,3 @@ export function isDayHiddenByBounds(args: {
   if (currentMonthOnly && !isCurrentMonth) return true;
   return false;
 }
-
-// Re-export for parity with prior import surface in case callers want the
-// disabled type alongside helpers.
-export type { DisabledConfig };
