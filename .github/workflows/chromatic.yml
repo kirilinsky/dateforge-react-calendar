@@ -18,6 +18,9 @@ on:
       - "package-lock.json"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 # Cancel in-progress runs when new commits land on the same ref, so a
 # rapid sequence of pushes doesn't queue multiple snapshot uploads.
 concurrency:
