@@ -205,6 +205,11 @@ export function CalendarProvider<M extends CalendarMode = "single">({
     // so a direct `state.viewDate` read would capture a stale value when
     // the user has navigated since the last `value` change.
     const currentViewDate = stateRef.current.viewDate;
+    // Consume one-shot keepView flag set by handleChangeDate. When the user
+    // clicked a day in an offset grid with keepView, we must not let the
+    // external value round-trip snap viewDate to the new selection.
+    const consumeKeepView = pendingKeepViewRef.current;
+    pendingKeepViewRef.current = false;
     const externalRangeObj = isDateRange(externalValue)
       ? externalValue
       : undefined;
@@ -233,7 +238,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
           : null;
       dispatch({
         type: "SYNC_EXTERNAL",
-        viewDate: from ?? currentViewDate,
+        viewDate: consumeKeepView ? currentViewDate : (from ?? currentViewDate),
         selectedDates: [],
         rangeStart: from,
         rangeEnd: to,
@@ -242,7 +247,8 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       const nextDates = externalDates
         .map(toValidDateOrNull)
         .filter((d): d is Date => d !== null);
-      const keepView = nextDates.some((d) => isSameDay(d, currentViewDate));
+      const keepView =
+        consumeKeepView || nextDates.some((d) => isSameDay(d, currentViewDate));
       dispatch({
         type: "SYNC_EXTERNAL",
         viewDate: keepView
@@ -256,7 +262,9 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       const parsed = externalSingle ? toValidDateOrNull(externalSingle) : null;
       dispatch({
         type: "SYNC_EXTERNAL",
-        viewDate: parsed ?? currentViewDate,
+        viewDate: consumeKeepView
+          ? currentViewDate
+          : (parsed ?? currentViewDate),
         selectedDates: parsed ? [parsed] : [],
         rangeStart: null,
         rangeEnd: null,
@@ -264,6 +272,11 @@ export function CalendarProvider<M extends CalendarMode = "single">({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [externalKey]);
+
+  // One-shot flag set by handleChangeDate when the caller passed keepView.
+  // Consumed by the SYNC_EXTERNAL effect that fires after the parent updates
+  // `value`, so the external sync doesn't re-snap viewDate to the selection.
+  const pendingKeepViewRef = useRef(false);
 
   const lastNotifySeqRef = useRef(0);
   useEffect(() => {
@@ -279,9 +292,17 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   }, [state.notifySeq]);
 
   const handleChangeDate = useCallback(
-    (d: Date | null) => {
+    (d: Date | null, options?: { keepView?: boolean }) => {
       if (readOnly) return;
-      commitSelection({ type: "SELECT", date: d, config: selectConfig });
+      const didCommit = commitSelection({
+        type: "SELECT",
+        date: d,
+        config: selectConfig,
+        keepView: options?.keepView,
+      });
+      if (options?.keepView && didCommit && isControlledRef.current) {
+        pendingKeepViewRef.current = true;
+      }
     },
     [selectConfig, readOnly, commitSelection],
   );
