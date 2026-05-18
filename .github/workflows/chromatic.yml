@@ -3,14 +3,32 @@ name: Chromatic
 on:
   push:
     branches: [main]
+    paths:
+      - "src/**"
+      - ".storybook/**"
+      - "package.json"
+      - "package-lock.json"
   pull_request:
     types: [opened, reopened, synchronize]
     branches: [main]
+    paths:
+      - "src/**"
+      - ".storybook/**"
+      - "package.json"
+      - "package-lock.json"
   workflow_dispatch:
+
+# Cancel in-progress runs when new commits land on the same ref, so a
+# rapid sequence of pushes doesn't queue multiple snapshot uploads.
+concurrency:
+  group: chromatic-${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   chromatic:
-    if: github.head_ref != 'changeset-release/main'
+    # Skip auto-generated changeset release PRs and dependabot PRs — they
+    # don't touch stories and just re-run the snapshot for no visual delta.
+    if: github.head_ref != 'changeset-release/main' && !startsWith(github.head_ref, 'dependabot/')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4

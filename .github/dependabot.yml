@@ -16,21 +16,15 @@ updates:
       prefix: chore
       include: scope
     groups:
-      storybook:
+      # One PR per week for all dev-deps minor/patch bumps. Major bumps
+      # stay individual so they get their own review.
+      dev-deps:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
         patterns:
-          - "@storybook/*"
-          - "storybook"
-          - "@chromatic-com/*"
-      vitest:
-        patterns:
-          - "vitest"
-          - "@vitest/*"
-      types:
-        patterns:
-          - "@types/*"
-      testing-library:
-        patterns:
-          - "@testing-library/*"
+          - "*"
     ignore:
       - dependency-name: "react"
       - dependency-name: "react-dom"
