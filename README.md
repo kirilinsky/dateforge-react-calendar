@@ -20,11 +20,22 @@
 
 # @dateforge/react-calendar
 
-**Modular · Composable · Tokenized**
+<div align="center">
+  <img src="https://i.ibb.co/pj9WVkSR/image.png" alt="Compact DateForge calendar" width="360" />
+</div>
 
-Monolithic pickers ship everything. DateForge ships only what you use.
+**The modular calendar toolkit that starts tiny and grows into exactly what your product needs.**
 
-Build exactly the calendar your product needs: start with a tiny date grid, then add navigation, ranges, multi-select, time, presets, manual input, track pickers, themes, appearances, and layout rules as separate modules. The module mix, selection modes, visual tokens, and focused props unlock **~2.0 trillion built-in calendar configurations** without forcing you into one prebuilt picker.
+Monolithic pickers ship everything: the grid, the nav, the time picker, the presets, the opinions, the layout, the weight. DateForge ships only what you use.
+
+Start with two components. Add only the pieces your workflow earns: range selection, multi-select, time, presets, manual input, selected-date chips, track pickers, custom layouts, themes, appearances, and tokens. DateForge is not one picker with a long prop list — it is a toolkit of focused modules that share one calendar brain.
+
+**Modular · Composable · Tokenized**  
+**Start minimal. Scale infinitely. Add only the modules you need.**
+
+The module mix, selection modes, visual tokens, and focused props unlock **~2.0 trillion built-in calendar configurations** without forcing you into one prebuilt UI.
+
+Use built-in themes and appearances, or create your own with first-class APIs. Shape selection with flexible presets, disabled rules, min/max bounds, timezone-aware dates, and `single`, `multiple`, or `range` modes. Build a classic picker, a date track, a 12-month range board, a month-only selector, a time-only control, or a fully custom booking flow from the same parts.
 
 <div align="center">
 
@@ -33,21 +44,34 @@ Build exactly the calendar your product needs: start with a tiny date grid, then
 </div>
 
 <div align="center">
-  <img src="https://i.ibb.co/xSDRNqJC/image.png" alt="Calendar dark" width="330" />
-  &nbsp;
-  <img src="https://i.ibb.co/TDY5zb94/image.png" alt="Calendar light" width="330" />
+   <br />
+  <br />
+  <img src="https://i.ibb.co/7Jhq7s0Y/image.png" alt="DateForge date and time calendar flow" width="380" />
 </div>
 
 ---
 
 ## Why DateForge?
 
-- **Modular by design** — compose only the modules you need: days, nav, selected-date chips, presets, manual input, months/years grids, time grids, and mobile-friendly tracks.
-- **Deeply customizable** — mix `single`, `multiple`, and `range` modes with prop-level behavior, CSS-grid placement, themes, appearances, gradients, timezone handling, and tokenized styling.
-- **Scales from minimal to complex** — use two components for a clean date picker, or assemble a full product calendar with time selection, range constraints, shortcuts, read-only states, and custom layouts.
-- **Built for serious apps** — accessible interactions, SSR-safe defaults, React 18/19 support, zero runtime dependencies, and tree-shakeable module entry points.
+Most date pickers ask you to accept their shape. DateForge lets you forge yours.
 
-Start minimal. Scale infinitely. Add only the modules you need.
+- **Ship less by default** — import a tiny `CalendarDays` grid and `CalendarNav`, then stop. No unused time picker, no bundled presets, no hidden panel waiting in your JavaScript.
+- **Compose real product workflows** — add modules when the UX needs them: range previews, multi-month layouts, inline time grids, shortcuts, manual input, selected-date summaries, or mobile-friendly tracks.
+- **Keep one shared state model** — every module plugs into the same provider, so custom layouts feel native instead of stitched together.
+- **Style it like your system** — themes, appearances, gradients, CSS-grid placement, and tokenized styling let the calendar look built-in, not embedded.
+- **Grow without rewriting** — the same API covers a two-component date picker, a booking range calendar, a time-aware scheduler, or a dense operations tool.
+- **Built for serious apps** — accessible interactions, SSR-safe defaults, timezone handling, React 18/19 support, zero runtime dependencies, and tree-shakeable module entry points.
+
+```tsx
+<Calendar mode="range" value={range} onChange={setRange}>
+  <CalendarNav showMonthPicker compactYears />
+  <CalendarDays />
+  <CalendarPresets presets={presets} />
+  <CalendarSelectedDates />
+</Calendar>
+```
+
+Remove a line, remove a feature. Add a module, add a workflow. That is the core idea.
 
 ## Install
 
@@ -59,20 +83,20 @@ No global CSS import is required — styles are bundled into the modules and app
 
 ## Modules
 
-| Module                  | Use it for                                           |
-| ----------------------- | ---------------------------------------------------- |
-| `CalendarNav`           | Month/year navigation, popups, clear, optional time  |
-| `CalendarDays`          | Classic month grid for single, multiple, and range   |
-| `CalendarSelectedDates` | Selected-date chips, overflow, per-chip clear |
+| Module                  | Use it for                                                  |
+| ----------------------- | ----------------------------------------------------------- |
+| `CalendarNav`           | Month/year navigation, popups, clear, optional time         |
+| `CalendarDays`          | Classic month grid for single, multiple, and range          |
+| `CalendarSelectedDates` | Selected-date chips, overflow, per-chip clear               |
 | `CalendarInfo`          | Selection metrics, relative hints, empty text, home / clear |
-| `CalendarManualInput`   | Typed dates, keyboard-first editing, per-date remove |
-| `CalendarPresets`       | Shortcuts like Today, Last 7 days, custom ranges     |
-| `CalendarTimeGrid`      | Inline hour/minute/second selection                  |
-| `CalendarMonthsGrid`    | Month-only picking or fast month jumps               |
-| `CalendarYearsGrid`     | Year-only picking or fast year jumps                 |
-| `CalendarDaysTrack`     | Scrollable day track for compact/mobile layouts      |
-| `CalendarMonthsTrack`   | Scrollable month track                               |
-| `CalendarYearsTrack`    | Scrollable year track                                |
+| `CalendarManualInput`   | Typed dates, keyboard-first editing, per-date remove        |
+| `CalendarPresets`       | Shortcuts like Today, Last 7 days, custom ranges            |
+| `CalendarTimeGrid`      | Inline hour/minute/second selection                         |
+| `CalendarMonthsGrid`    | Month-only picking or fast month jumps                      |
+| `CalendarYearsGrid`     | Year-only picking or fast year jumps                        |
+| `CalendarDaysTrack`     | Scrollable day track for compact/mobile layouts             |
+| `CalendarMonthsTrack`   | Scrollable month track                                      |
+| `CalendarYearsTrack`    | Scrollable year track                                       |
 
 ## Quick start
 
