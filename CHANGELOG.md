@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.1
+
+### Patch Changes
+
+- [#83](https://github.com/kirilinsky/dateforge-react-calendar/pull/83) [`2a9489b`](https://github.com/kirilinsky/dateforge-react-calendar/commit/2a9489b51137bfc6738ecca2f562af6c67bdcf10) Thanks [@kirilinsky](https://github.com/kirilinsky)! - Perf: rAF-coalesce range-hover updates and gate hover-date recomputation per month so multi-month layouts stay under one frame per hover tick.
+
+  Feat: new `syncViewOnSelect` prop on `CalendarDays`. Defaults to `true` for the primary grid and `false` for any `offset` grid, so clicking a day in a side month no longer steals the primary view. Pass `true`/`false` to override.
+
 ## 1.5.0
 
 ### Minor Changes
