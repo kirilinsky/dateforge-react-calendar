@@ -30,6 +30,8 @@ const lightThemeEntries = [
   ["chalk", themes.chalk],
   ["split", themes.split],
   ["riso", themes.riso],
+  ["mono", themes.mono],
+  ["atelier", themes.atelier],
 ] satisfies readonly (readonly [string, CalendarTheme])[];
 
 const darkThemeEntries = [
@@ -52,6 +54,8 @@ const darkThemeEntries = [
   ["fjord", themes.fjord],
   ["velvet", themes.velvet],
   ["eclipse", themes.eclipse],
+  ["noir", themes.noir],
+  ["bauhaus", themes.bauhaus],
 ] satisfies readonly (readonly [string, CalendarTheme])[];
 
 const appearanceEntries = Object.entries(appearances) as [
