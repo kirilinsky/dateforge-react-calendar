@@ -2,8 +2,8 @@
   [data-appearance="press"] {
     --cal-radius: 0.05em;
     --cal-container-radius: 0.1em;
-    --cal-nav-min-height: 4.6em;
-    --cal-nav-padding: 0.5em 0.7em;
+    --cal-nav-min-height: 3.4em;
+    --cal-nav-padding: 0.35em 0.55em;
     --cal-border: 1px;
     --cal-spacing: 0.35em;
     --cal-shadow-sm: none;
@@ -14,10 +14,10 @@
     --cal-text-xs: 0.7em;
     --cal-text-sm: 0.8em;
     --cal-text-md: 0.86em;
-    --cal-text-lg: 1.05em;
-    --cal-nav-meta-font-size: 1.25em;
-    --cal-nav-font-size: 1.55em;
-    --cal-text-day: clamp(1em, 5.2cqi, 1.55em);
+    --cal-text-lg: 1.03em;
+    --cal-nav-meta-font-size: 1em;
+    --cal-nav-font-size: 1.2em;
+    --cal-text-day: clamp(1em, 5.2cqi, 1.54em);
     --cal-weight-semibold: 400;
     --cal-weight-bold: 300;
     --cal-leading-tight: 1;
@@ -30,7 +30,7 @@
     --cal-day-ratio: 1 / 1.15;
     --cal-popup-padding: 0.9em;
     --cal-size-chip: 2.2em;
-    --cal-size-track-item: 3.6em;
+    --cal-size-track-item: 3.58em;
     --cal-opacity-disabled: 0.25;
     --cal-opacity-muted: 0.55;
     --cal-opacity-hover: 0.78;
