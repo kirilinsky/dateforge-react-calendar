@@ -2,7 +2,7 @@
   [data-appearance="loft"] {
     --cal-radius: 1em;
     --cal-container-radius: 2.5em;
-    --header-min-height: 5em;
+    --header-min-height: 4.5em;
     --cal-border: 0px;
     --cal-spacing: 1em;
     --cal-shadow-sm: 0 0.3em 0.9em var(--c-x);
@@ -10,7 +10,7 @@
     --cal-shadow-lg: 0 1.5em 3.5em var(--c-x);
     --cal-font-size: clamp(14px, 3.5cqw, 22px);
     --cal-text-xs: 0.75em;
-    --cal-text-sm: 0.84em;
+    --cal-text-sm: 0.83em;
     --cal-text-md: 0.9em;
     --cal-text-lg: 1em;
     --cal-text-xl: 1.12em;
@@ -22,11 +22,11 @@
     --cal-leading-relaxed: 1.7;
     --cal-transition: 0.35s;
     --cal-days-padding: 1.8em;
-    --cal-track-height: 5em;
+    --cal-track-height: 4.5em;
     --cal-day-ratio: 1 / 1;
     --cal-popup-padding: 1em;
     --cal-size-chip: 2.5em;
-    --cal-size-track-item: 5em;
+    --cal-size-track-item: 4.5em;
     --cal-opacity-disabled: 0.35;
     --cal-opacity-muted: 0.6;
     --cal-opacity-hover: 0.82;

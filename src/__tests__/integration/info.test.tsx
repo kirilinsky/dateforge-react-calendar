@@ -1,4 +1,4 @@
-import { fireEvent, render } from "@testing-library/react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
@@ -299,6 +299,61 @@ describe("CalendarInfo", () => {
     expect(
       container.querySelector('[data-area="calendar-info"] [role="status"]'),
     ).toBeNull();
+  });
+
+  it("marks summary updates as an atomic status message", () => {
+    const { container } = render(
+      <Calendar mode="single" value={D(2024, 5, 15)}>
+        <CalendarInfo animated={false} showRelative />
+      </Calendar>,
+    );
+
+    const status = container.querySelector(
+      '[data-area="calendar-info"] [role="status"]',
+    );
+    expect(status).toHaveAttribute("aria-live", "polite");
+    expect(status).toHaveAttribute("aria-atomic", "true");
+  });
+
+  it("supports arrow, Home, and End navigation between action buttons", async () => {
+    const { getByLabelText } = render(
+      <Calendar mode="single" value={D(2024, 0, 10)}>
+        <CalendarInfo animated={false} showHome allowClear />
+      </Calendar>,
+    );
+
+    const home = getByLabelText("Go to current month");
+    const clear = getByLabelText("Clear");
+
+    home.focus();
+    await userEvent.keyboard("{ArrowRight}");
+    expect(clear).toHaveFocus();
+
+    await userEvent.keyboard("{ArrowLeft}");
+    expect(home).toHaveFocus();
+
+    await userEvent.keyboard("{End}");
+    expect(clear).toHaveFocus();
+
+    await userEvent.keyboard("{Home}");
+    expect(home).toHaveFocus();
+  });
+
+  it("restores focus to the remaining action after clear removes its button", async () => {
+    const { getByLabelText, queryByLabelText } = render(
+      <Calendar mode="single" defaultValue={D(2024, 0, 10)}>
+        <CalendarInfo animated={false} showHome allowClear />
+      </Calendar>,
+    );
+
+    const clear = getByLabelText("Clear");
+    clear.focus();
+    await userEvent.keyboard("{Enter}");
+
+    await waitFor(() => {
+      expect(queryByLabelText("Clear")).toBeNull();
+      expect(getByLabelText("Go to current month")).toHaveFocus();
+    });
   });
 
   it("emptyLabel renders when nothing selected, summary takes over when selected", () => {

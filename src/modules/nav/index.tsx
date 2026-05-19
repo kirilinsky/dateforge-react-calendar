@@ -29,7 +29,32 @@ import {
   ThemeToggle,
 } from "@/Icons";
 import {
-  DEFAULT_CALENDAR_ACTION_LABELS,
+  DEFAULT_CALENDAR_NAVIGATION_LABEL,
+  DEFAULT_CHANGE_MONTH_LABEL,
+  DEFAULT_CHANGE_TIME_LABEL,
+  DEFAULT_CHANGE_YEAR_LABEL,
+  DEFAULT_CLEAR_LABEL,
+  DEFAULT_CONFIRM_LABEL,
+  DEFAULT_HOME_LABEL,
+  DEFAULT_HOURS_LABEL,
+  DEFAULT_MINUTES_LABEL,
+  DEFAULT_MONTH_PICKER_LABEL,
+  DEFAULT_MONTH_TRACK_LABEL,
+  DEFAULT_NEXT_MONTH_LABEL,
+  DEFAULT_NEXT_YEAR_LABEL,
+  DEFAULT_PREVIOUS_MONTH_LABEL,
+  DEFAULT_PREVIOUS_YEAR_LABEL,
+  DEFAULT_SECONDS_LABEL,
+  DEFAULT_SELECT_MONTH_LABEL,
+  DEFAULT_SELECT_TIME_LABEL,
+  DEFAULT_SELECT_YEAR_LABEL,
+  DEFAULT_THEME_SWITCH_TO_DARK_LABEL,
+  DEFAULT_THEME_SWITCH_TO_LIGHT_LABEL,
+  DEFAULT_THEME_TOGGLE_LABEL,
+  DEFAULT_TIME_PERIOD_LABEL,
+  DEFAULT_TIME_PICKER_LABEL,
+  DEFAULT_YEAR_PICKER_LABEL,
+  DEFAULT_YEAR_TRACK_LABEL,
   resolveActionLabel,
 } from "@/utils/action-labels";
 import { clampBoundDate } from "@/utils/clamp-bound-date";
@@ -166,9 +191,33 @@ export interface CalendarNavProps {
   clear?: boolean;
   themeToggle?: boolean;
   compactTime?: boolean;
+  calendarNavigationLabel?: string;
+  changeMonthLabel?: string;
+  changeTimeLabel?: string;
+  changeYearLabel?: string;
   clearLabel?: string;
+  confirmLabel?: string;
   homeLabel?: string;
+  hoursLabel?: string;
   label?: string;
+  minutesLabel?: string;
+  monthPickerLabel?: string;
+  monthTrackLabel?: string;
+  nextMonthLabel?: string;
+  nextYearLabel?: string;
+  previousMonthLabel?: string;
+  previousYearLabel?: string;
+  secondsLabel?: string;
+  selectMonthLabel?: string;
+  selectTimeLabel?: string;
+  selectYearLabel?: string;
+  themeSwitchToDarkLabel?: string;
+  themeSwitchToLightLabel?: string;
+  themeToggleLabel?: string;
+  timePeriodLabel?: string;
+  timePickerLabel?: string;
+  yearPickerLabel?: string;
+  yearTrackLabel?: string;
   col?: number | string;
   bound?: "from" | "to";
 }
@@ -189,9 +238,33 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
   clear = false,
   themeToggle = false,
   compactTime = false,
+  calendarNavigationLabel,
+  changeMonthLabel,
+  changeTimeLabel,
+  changeYearLabel,
   clearLabel,
+  confirmLabel,
   homeLabel,
+  hoursLabel,
   label,
+  minutesLabel,
+  monthPickerLabel,
+  monthTrackLabel,
+  nextMonthLabel,
+  nextYearLabel,
+  previousMonthLabel,
+  previousYearLabel,
+  secondsLabel,
+  selectMonthLabel,
+  selectTimeLabel,
+  selectYearLabel,
+  themeSwitchToDarkLabel,
+  themeSwitchToLightLabel,
+  themeToggleLabel,
+  timePeriodLabel,
+  timePickerLabel,
+  yearPickerLabel,
+  yearTrackLabel,
   col,
   bound,
 }) => {
@@ -223,12 +296,132 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
   const resolvedClearLabel = resolveActionLabel(
     clearLabel,
     actionLabels.clearLabel,
-    DEFAULT_CALENDAR_ACTION_LABELS.clearLabel,
+    DEFAULT_CLEAR_LABEL,
+  );
+  const resolvedConfirmLabel = resolveActionLabel(
+    confirmLabel,
+    actionLabels.confirmLabel,
+    DEFAULT_CONFIRM_LABEL,
   );
   const resolvedHomeLabel = resolveActionLabel(
     homeLabel,
     actionLabels.homeLabel,
-    DEFAULT_CALENDAR_ACTION_LABELS.homeLabel,
+    DEFAULT_HOME_LABEL,
+  );
+  const resolvedCalendarNavigationLabel = resolveActionLabel(
+    calendarNavigationLabel,
+    actionLabels.calendarNavigationLabel,
+    DEFAULT_CALENDAR_NAVIGATION_LABEL,
+  );
+  const resolvedChangeTimeLabel = resolveActionLabel(
+    changeTimeLabel,
+    actionLabels.changeTimeLabel,
+    DEFAULT_CHANGE_TIME_LABEL,
+  );
+  const resolvedChangeMonthLabel = resolveActionLabel(
+    changeMonthLabel,
+    actionLabels.changeMonthLabel,
+    DEFAULT_CHANGE_MONTH_LABEL,
+  );
+  const resolvedChangeYearLabel = resolveActionLabel(
+    changeYearLabel,
+    actionLabels.changeYearLabel,
+    DEFAULT_CHANGE_YEAR_LABEL,
+  );
+  const resolvedMonthPickerLabel = resolveActionLabel(
+    monthPickerLabel,
+    actionLabels.monthPickerLabel,
+    DEFAULT_MONTH_PICKER_LABEL,
+  );
+  const resolvedYearPickerLabel = resolveActionLabel(
+    yearPickerLabel,
+    actionLabels.yearPickerLabel,
+    DEFAULT_YEAR_PICKER_LABEL,
+  );
+  const resolvedPreviousMonthLabel = resolveActionLabel(
+    previousMonthLabel,
+    actionLabels.previousMonthLabel,
+    DEFAULT_PREVIOUS_MONTH_LABEL,
+  );
+  const resolvedNextMonthLabel = resolveActionLabel(
+    nextMonthLabel,
+    actionLabels.nextMonthLabel,
+    DEFAULT_NEXT_MONTH_LABEL,
+  );
+  const resolvedPreviousYearLabel = resolveActionLabel(
+    previousYearLabel,
+    actionLabels.previousYearLabel,
+    DEFAULT_PREVIOUS_YEAR_LABEL,
+  );
+  const resolvedNextYearLabel = resolveActionLabel(
+    nextYearLabel,
+    actionLabels.nextYearLabel,
+    DEFAULT_NEXT_YEAR_LABEL,
+  );
+  const resolvedSelectTimeLabel = resolveActionLabel(
+    selectTimeLabel,
+    actionLabels.selectTimeLabel,
+    DEFAULT_SELECT_TIME_LABEL,
+  );
+  const resolvedSelectMonthLabel = resolveActionLabel(
+    selectMonthLabel,
+    actionLabels.selectMonthLabel,
+    DEFAULT_SELECT_MONTH_LABEL,
+  );
+  const resolvedSelectYearLabel = resolveActionLabel(
+    selectYearLabel,
+    actionLabels.selectYearLabel,
+    DEFAULT_SELECT_YEAR_LABEL,
+  );
+  const resolvedMonthTrackLabel = resolveActionLabel(
+    monthTrackLabel,
+    actionLabels.monthTrackLabel,
+    DEFAULT_MONTH_TRACK_LABEL,
+  );
+  const resolvedYearTrackLabel = resolveActionLabel(
+    yearTrackLabel,
+    actionLabels.yearTrackLabel,
+    DEFAULT_YEAR_TRACK_LABEL,
+  );
+  const resolvedHoursLabel = resolveActionLabel(
+    hoursLabel,
+    actionLabels.hoursLabel,
+    DEFAULT_HOURS_LABEL,
+  );
+  const resolvedMinutesLabel = resolveActionLabel(
+    minutesLabel,
+    actionLabels.minutesLabel,
+    DEFAULT_MINUTES_LABEL,
+  );
+  const resolvedSecondsLabel = resolveActionLabel(
+    secondsLabel,
+    actionLabels.secondsLabel,
+    DEFAULT_SECONDS_LABEL,
+  );
+  const resolvedTimePickerLabel = resolveActionLabel(
+    timePickerLabel,
+    actionLabels.timePickerLabel,
+    DEFAULT_TIME_PICKER_LABEL,
+  );
+  const resolvedTimePeriodLabel = resolveActionLabel(
+    timePeriodLabel,
+    actionLabels.timePeriodLabel,
+    DEFAULT_TIME_PERIOD_LABEL,
+  );
+  const resolvedThemeSwitchToLightLabel = resolveActionLabel(
+    themeSwitchToLightLabel,
+    actionLabels.themeSwitchToLightLabel,
+    DEFAULT_THEME_SWITCH_TO_LIGHT_LABEL,
+  );
+  const resolvedThemeSwitchToDarkLabel = resolveActionLabel(
+    themeSwitchToDarkLabel,
+    actionLabels.themeSwitchToDarkLabel,
+    DEFAULT_THEME_SWITCH_TO_DARK_LABEL,
+  );
+  const resolvedThemeToggleLabel = resolveActionLabel(
+    themeToggleLabel,
+    actionLabels.themeToggleLabel,
+    DEFAULT_THEME_TOGGLE_LABEL,
   );
   const { viewDate, navigateTo } = useNavigation();
   const { selectedDates, rangeStart, rangeEnd } = useSelectionValue();
@@ -335,6 +528,18 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
   const monthNameShort = getDateTimeFormat(locale, { month: "short" }).format(
     date,
   );
+  const changeTimeAriaLabel = resolvedChangeTimeLabel.replaceAll(
+    "{time}",
+    curTime,
+  );
+  const changeMonthAriaLabel = resolvedChangeMonthLabel.replaceAll(
+    "{month}",
+    monthNameLong,
+  );
+  const changeYearAriaLabel = resolvedChangeYearLabel.replaceAll(
+    "{year}",
+    String(cur),
+  );
 
   const ch = (v: number) =>
     navigateBoundOrView(addDate(rawDate, v, "year", minDate, maxDate));
@@ -375,7 +580,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
         role="toolbar"
         {...(safeLabel
           ? { "aria-labelledby": labelId }
-          : { "aria-label": "Calendar navigation" })}
+          : { "aria-label": resolvedCalendarNavigationLabel })}
         style={gridSlot}
       >
         {showNowTime && (
@@ -389,7 +594,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           <button
             type="button"
             className={`${styles.timeButton} ${shared.interactive}`}
-            aria-label={`Change time, currently ${curTime}`}
+            aria-label={changeTimeAriaLabel}
             aria-haspopup="dialog"
             aria-expanded={timePopupOpen}
             onClick={openPopup(setTimePopupOpen)}
@@ -403,7 +608,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
             type="button"
             disabled={monthFixed}
             className={`${styles.monthButton} ${shared.interactive} ${shared.hovered}`}
-            aria-label={`Change month, currently ${monthNameLong}`}
+            aria-label={changeMonthAriaLabel}
             aria-haspopup="dialog"
             aria-expanded={monthPopupOpen}
             onClick={monthFixed ? undefined : openPopup(setMonthPopupOpen)}
@@ -432,13 +637,13 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           <div
             className={styles.yearsSelector}
             role="group"
-            aria-label="Month picker"
+            aria-label={resolvedMonthPickerLabel}
           >
             {canGoPrevMonth && (
               <button
                 type="button"
                 className={`${styles.arrow} ${shared.interactive} ${shared.hovered}`}
-                aria-label="Previous month"
+                aria-label={resolvedPreviousMonthLabel}
                 onClick={() => cm(-1)}
               >
                 <ChevronLeft />
@@ -449,7 +654,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
               disabled={monthFixed}
               onClick={monthFixed ? undefined : openPopup(setMonthPopupOpen)}
               className={`${styles.currentYear} ${shared.interactive} ${shared.hovered} ${monthFixed ? styles.staticButton : ""}`}
-              aria-label={`Change month, currently ${monthNameLong}`}
+              aria-label={changeMonthAriaLabel}
               aria-haspopup={monthFixed ? undefined : "dialog"}
               aria-expanded={monthFixed ? undefined : monthPopupOpen}
             >
@@ -463,7 +668,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
               <button
                 type="button"
                 className={`${styles.arrow} ${shared.interactive} ${shared.hovered}`}
-                aria-label="Next month"
+                aria-label={resolvedNextMonthLabel}
                 onClick={() => cm(1)}
               >
                 <ChevronRight />
@@ -476,13 +681,13 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           <div
             className={styles.yearsSelector}
             role="group"
-            aria-label="Year picker"
+            aria-label={resolvedYearPickerLabel}
           >
             {canGoPrev && (
               <button
                 type="button"
                 className={`${styles.arrow} ${shared.interactive} ${shared.hovered}`}
-                aria-label="Previous year"
+                aria-label={resolvedPreviousYearLabel}
                 onClick={() => ch(-1)}
               >
                 <ChevronLeft />
@@ -493,7 +698,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
               disabled={yearFixed}
               onClick={yearFixed ? undefined : openPopup(setYearPopupOpen)}
               className={`${styles.currentYear} ${shared.interactive} ${shared.hovered} ${yearFixed ? styles.staticButton : ""}`}
-              aria-label={`Change year, currently ${cur}`}
+              aria-label={changeYearAriaLabel}
               aria-haspopup={yearFixed ? undefined : "dialog"}
               aria-expanded={yearFixed ? undefined : yearPopupOpen}
             >
@@ -503,7 +708,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
               <button
                 type="button"
                 className={`${styles.arrow} ${shared.interactive} ${shared.hovered}`}
-                aria-label="Next year"
+                aria-label={resolvedNextYearLabel}
                 onClick={() => ch(1)}
               >
                 <ChevronRight />
@@ -517,7 +722,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
             type="button"
             disabled={yearFixed}
             className={`${styles.monthButton} ${shared.interactive} ${shared.hovered}`}
-            aria-label={`Change year, currently ${cur}`}
+            aria-label={changeYearAriaLabel}
             aria-haspopup="dialog"
             aria-expanded={yearPopupOpen}
             onClick={yearFixed ? undefined : openPopup(setYearPopupOpen)}
@@ -552,7 +757,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
               <button
                 type="button"
                 className={`${styles.homeButton} ${shared.interactive} ${shared.hovered}`}
-                aria-label={`Change time, currently ${curTime}`}
+                aria-label={changeTimeAriaLabel}
                 aria-haspopup="dialog"
                 aria-expanded={timePopupOpen}
                 onClick={openPopup(setTimePopupOpen)}
@@ -566,10 +771,10 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
                 className={`${styles.homeButton} ${shared.interactive} ${shared.hovered}`}
                 aria-label={
                   activeTheme === "dark"
-                    ? "Switch to light mode"
+                    ? resolvedThemeSwitchToLightLabel
                     : activeTheme === "light"
-                      ? "Switch to dark mode"
-                      : "Toggle theme"
+                      ? resolvedThemeSwitchToDarkLabel
+                      : resolvedThemeToggleLabel
                 }
                 aria-pressed={activeTheme === "dark"}
                 onClick={toggleTheme}
@@ -617,7 +822,14 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           date={date}
           hour12={hour12}
           showSeconds={navShowSeconds}
+          confirmLabel={resolvedConfirmLabel}
+          hoursLabel={resolvedHoursLabel}
+          label={resolvedSelectTimeLabel}
+          minutesLabel={resolvedMinutesLabel}
           readOnly={readOnly || (isBound && !boundDate)}
+          secondsLabel={resolvedSecondsLabel}
+          timePeriodLabel={resolvedTimePeriodLabel}
+          timePickerLabel={resolvedTimePickerLabel}
           onConfirm={(newDate) => {
             if (isBound) {
               if (boundDate) onRangeBoundSet(bound!, newDate);
@@ -635,6 +847,9 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           locale={locale}
           minDate={minDate}
           maxDate={maxDate}
+          confirmLabel={resolvedConfirmLabel}
+          label={resolvedSelectMonthLabel}
+          monthTrackLabel={resolvedMonthTrackLabel}
           onConfirm={(newDate) => {
             navigateBoundOrView(newDate);
             setMonthPopupOpen(false);
@@ -647,6 +862,9 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           date={date}
           minDate={minDate}
           maxDate={maxDate}
+          confirmLabel={resolvedConfirmLabel}
+          label={resolvedSelectYearLabel}
+          yearTrackLabel={resolvedYearTrackLabel}
           onConfirm={(newDate) => {
             navigateBoundOrView(newDate);
             setYearPopupOpen(false);

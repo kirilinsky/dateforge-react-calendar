@@ -9,7 +9,9 @@ import { MaskedDateInput } from "./masked-date-input";
 interface DateSlotProps {
   date: Date | null;
   isAllowed: (d: Date) => boolean;
+  applyLabel: string;
   clearLabel: string;
+  removeLabel: string;
   onSave: (d: Date) => void;
   onClear?: () => void;
   onRemove?: () => void;
@@ -22,7 +24,9 @@ interface DateSlotProps {
 export const DateSlot: React.FC<DateSlotProps> = ({
   date,
   isAllowed,
+  applyLabel,
   clearLabel,
+  removeLabel,
   onSave,
   onClear,
   onRemove,
@@ -130,7 +134,7 @@ export const DateSlot: React.FC<DateSlotProps> = ({
             type="button"
             className={styles.chipRemove}
             onClick={onRemove}
-            aria-label="Remove"
+            aria-label={removeLabel}
             disabled={readOnly}
           >
             <Clear />
@@ -178,7 +182,7 @@ export const DateSlot: React.FC<DateSlotProps> = ({
       {hasText && (
         <button
           type="button"
-          aria-label="Apply"
+          aria-label={applyLabel}
           className={[styles.saveBtn, !saveAllowed && styles.saveBtnInvalid]
             .filter(Boolean)
             .join(" ")}

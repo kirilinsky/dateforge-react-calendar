@@ -7,6 +7,10 @@ import {
   useSelectionValue,
 } from "@/context/selection-context";
 import { useBoundDateView } from "@/hooks/use-bound-date-view";
+import {
+  DEFAULT_MONTH_TRACK_LABEL,
+  resolveActionLabel,
+} from "@/utils/action-labels";
 import { clampBoundDate, computeBoundLimits } from "@/utils/clamp-bound-date";
 import { getDateTimeFormat } from "@/utils/intl-cache";
 import { getMonthNames } from "@/utils/month-utils";
@@ -17,6 +21,7 @@ export interface CalendarMonthsTrackProps {
   showYearLabel?: boolean;
   bound?: "from" | "to";
   col?: number | string;
+  monthTrackLabel?: string;
   /**
    * Fires after the user lands on a month via the track. Receives the
    * navigated date (or clamped bound date in range mode). Use for standalone
@@ -30,10 +35,17 @@ export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({
   showYearLabel = false,
   bound,
   col,
+  monthTrackLabel,
   onMonthSelect,
 }) => {
   const { viewDate, navigateTo } = useNavigation();
-  const { minDate, maxDate, locale, range, readOnly } = useConfig();
+  const { minDate, maxDate, locale, range, readOnly, actionLabels } =
+    useConfig();
+  const resolvedMonthTrackLabel = resolveActionLabel(
+    monthTrackLabel,
+    actionLabels.monthTrackLabel,
+    DEFAULT_MONTH_TRACK_LABEL,
+  );
   const { rangeStart, rangeEnd } = useSelectionValue();
   const { onRangeBoundSet } = useSelectionActions();
   const { isBound, setLocalView, refDate } = useBoundDateView({
@@ -105,7 +117,7 @@ export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({
       maxIndex={maxIndex}
       half={4}
       initialItemWidth={52}
-      ariaLabel="Month"
+      ariaLabel={resolvedMonthTrackLabel}
       getAriaValueNow={(i) => i + 1}
       getAriaValueMin={() => minIdx + 1}
       getAriaValueMax={() => maxIdx + 1}

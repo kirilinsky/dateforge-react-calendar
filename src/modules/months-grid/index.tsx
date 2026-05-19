@@ -5,6 +5,11 @@ import { useNavigation } from "@/context/navigation-context";
 import { useSelectionValue } from "@/context/selection-context";
 import shared from "@/global/global.module.css";
 import { useRovingTileFocus } from "@/hooks/use-roving-tile-focus";
+import {
+  DEFAULT_MONTH_GRID_LABEL,
+  formatActionLabel,
+  resolveActionLabel,
+} from "@/utils/action-labels";
 import { getMonthListData, setMonth } from "@/utils/date-utils";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { getDateTimeFormat } from "@/utils/intl-cache";
@@ -15,6 +20,7 @@ export interface CalendarMonthsGridProps {
   disableOutOfRange?: boolean;
   hideOutOfRange?: boolean;
   col?: number | string;
+  monthGridLabel?: string;
   /**
    * Fires after the user clicks a month cell. Receives the navigated viewDate
    * (first day of the picked month, same year). Use this to drive a standalone
@@ -28,9 +34,15 @@ export const CalendarMonthsGrid: React.FC<CalendarMonthsGridProps> = ({
   disableOutOfRange = true,
   hideOutOfRange = false,
   col,
+  monthGridLabel,
   onMonthSelect,
 }) => {
-  const { locale, minDate, maxDate, disabled } = useConfig();
+  const { locale, minDate, maxDate, disabled, actionLabels } = useConfig();
+  const resolvedMonthGridLabel = resolveActionLabel(
+    monthGridLabel,
+    actionLabels.monthGridLabel,
+    DEFAULT_MONTH_GRID_LABEL,
+  );
   const { viewDate, navigateTo } = useNavigation();
   const { selectedDates, rangeStart, rangeEnd } = useSelectionValue();
 
@@ -96,7 +108,11 @@ export const CalendarMonthsGrid: React.FC<CalendarMonthsGridProps> = ({
         ref={containerRef}
         className={styles.monthsContainer}
         role="group"
-        aria-label={`Select month, ${gridLabel}`}
+        aria-label={formatActionLabel(
+          resolvedMonthGridLabel,
+          "year",
+          gridLabel,
+        )}
         onKeyDown={handleKeyDown}
       >
         {mNames.map((n, i) => {

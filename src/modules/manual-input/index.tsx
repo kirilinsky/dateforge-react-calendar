@@ -9,7 +9,9 @@ import {
 import shared from "@/global/global.module.css";
 import { Check, Clear } from "@/Icons";
 import {
-  DEFAULT_CALENDAR_ACTION_LABELS,
+  DEFAULT_APPLY_LABEL,
+  DEFAULT_CLEAR_LABEL,
+  DEFAULT_REMOVE_LABEL,
   resolveActionLabel,
 } from "@/utils/action-labels";
 import { checkIsDateDisabled } from "@/utils/date-core";
@@ -22,17 +24,21 @@ import { MaskedDateInput } from "./masked-date-input";
 export interface CalendarManualInputProps {
   allowClear?: boolean;
   align?: AlignValue;
+  applyLabel?: string;
   clearLabel?: string;
   col?: number | string;
   label?: React.ReactNode;
+  removeLabel?: string;
 }
 
 export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
   allowClear = true,
   align = "left",
+  applyLabel,
   clearLabel,
   col,
   label,
+  removeLabel,
 }) => {
   const {
     range,
@@ -46,7 +52,17 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
   const resolvedClearLabel = resolveActionLabel(
     clearLabel,
     actionLabels.clearLabel,
-    DEFAULT_CALENDAR_ACTION_LABELS.clearLabel,
+    DEFAULT_CLEAR_LABEL,
+  );
+  const resolvedApplyLabel = resolveActionLabel(
+    applyLabel,
+    actionLabels.applyLabel,
+    DEFAULT_APPLY_LABEL,
+  );
+  const resolvedRemoveLabel = resolveActionLabel(
+    removeLabel,
+    actionLabels.removeLabel,
+    DEFAULT_REMOVE_LABEL,
   );
   const { viewDate: date } = useNavigation();
   const { rangeStart, rangeEnd, selectedDates } = useSelectionValue();
@@ -160,7 +176,7 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
               {addHasText && (
                 <button
                   type="button"
-                  aria-label="Apply"
+                  aria-label={resolvedApplyLabel}
                   className={[
                     styles.saveBtn,
                     !addSaveAllowed && styles.saveBtnInvalid,
@@ -180,7 +196,9 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
               key={d.getTime()}
               date={d}
               isAllowed={isAllowed}
+              applyLabel={resolvedApplyLabel}
               clearLabel={resolvedClearLabel}
+              removeLabel={resolvedRemoveLabel}
               onSave={(newDate) => {
                 const orig = selectedDates[i];
                 onDatesSet(
@@ -219,7 +237,9 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
           <DateSlot
             date={rangeStart}
             isAllowed={isAllowed}
+            applyLabel={resolvedApplyLabel}
             clearLabel={resolvedClearLabel}
+            removeLabel={resolvedRemoveLabel}
             onSave={(d) => onRangeSet(withTime(d), rangeEnd)}
             onClear={() => onRangeSet(null, rangeEnd)}
             placeholder="DD.MM.YYYY"
@@ -229,7 +249,9 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
           <DateSlot
             date={rangeEnd}
             isAllowed={isAllowed}
+            applyLabel={resolvedApplyLabel}
             clearLabel={resolvedClearLabel}
+            removeLabel={resolvedRemoveLabel}
             onSave={(d) => onRangeSet(rangeStart, withTime(d))}
             onClear={() => onRangeSet(rangeStart, null)}
             placeholder="DD.MM.YYYY"
@@ -252,7 +274,9 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
         <DateSlot
           date={selectedDates[0] ?? null}
           isAllowed={isAllowed}
+          applyLabel={resolvedApplyLabel}
           clearLabel={resolvedClearLabel}
+          removeLabel={resolvedRemoveLabel}
           onSave={(d) => onChangeDate(withTime(d))}
           onClear={() => onChangeDate(null)}
           readOnly={readOnly}
