@@ -29,8 +29,10 @@ import {
   computeSwipeDirection,
   getEndOfDayT,
   getStartOfDayT,
+  getWeekAriaLabel,
   isDayHiddenByBounds,
   passesRangeLimits,
+  resolveWeekLabel,
 } from "./helpers";
 import WeekDays from "./week-days";
 
@@ -51,6 +53,7 @@ export interface CalendarDaysProps {
   fixedRows?: boolean;
   blockNavigation?: boolean;
   todayDot?: boolean;
+  weekLabel?: string;
   /**
    * When a day is clicked, also move the calendar's viewDate to that day's
    * month. Defaults to `true` for the primary grid (`offset === 0`) and
@@ -77,6 +80,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   fixedRows = true,
   blockNavigation = false,
   todayDot = true,
+  weekLabel,
   syncViewOnSelect,
 }) => {
   const effectiveSyncView = syncViewOnSelect ?? offset === 0;
@@ -92,7 +96,9 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
     timeZone,
     readOnly,
     multiselect,
+    actionLabels,
   } = useConfig();
+  const resolvedWeekLabel = resolveWeekLabel(weekLabel, actionLabels.weekLabel);
 
   const { viewDate: rawDate, navigateTo } = useNavigation();
 
@@ -455,14 +461,20 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
             ? { role: "presentation" as const }
             : {
                 role: "row" as const,
-                "aria-label": `Week ${week.weekNumber}`,
+                "aria-label": getWeekAriaLabel(
+                  resolvedWeekLabel,
+                  week.weekNumber,
+                ),
               };
           return (
             <div key={wIndex} {...rowA11y} className={styles.weekRow}>
               {weekNumbers && (
                 <div
                   role="rowheader"
-                  aria-label={`Week ${week.weekNumber}`}
+                  aria-label={getWeekAriaLabel(
+                    resolvedWeekLabel,
+                    week.weekNumber,
+                  )}
                   className={styles.weekNumberItem}
                 >
                   {week.weekNumber}

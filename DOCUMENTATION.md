@@ -167,11 +167,12 @@ Template labels support named placeholders:
 <Calendar
   clearLabel="Auswahl löschen"
   changeMonthLabel="Monat öffnen: {month}"
+  weekLabel="Woche"
   showMoreSelectedDatesLabel="{count} weitere ausgewählte Daten anzeigen"
 />
 ```
 
-Date labels remain locale-derived through `Intl` where the label describes an actual date, month, year, weekday, or week number.
+Date labels remain locale-derived through `Intl` where the label describes an actual date, month, year, or weekday. Week number labels use `weekLabel`.
 
 #### Root label props
 
@@ -215,6 +216,7 @@ All of these props can be passed to `<Calendar>`.
 | `themeToggleLabel` | `"Toggle theme"` | — | Theme toggle while theme is still auto/unresolved |
 | `timePeriodLabel` | `"Time period, currently {period}"` | `{period}` | AM/PM switch |
 | `timePickerLabel` | `"Time picker"` | — | Time track group |
+| `weekLabel` | `"Week"` | — | Days grid week-number rows and row headers |
 | `yearGridLabel` | `"Select year, showing {from} to {to}"` | `{from}`, `{to}` | Years grid group |
 | `yearPageNavigationLabel` | `"Year page navigation"` | — | Years grid page controls group |
 | `yearPickerLabel` | `"Year picker"` | — | Nav year picker group |
@@ -227,6 +229,7 @@ Module props use the same names and override the matching root prop only for tha
 | Module | Override props |
 | ------ | -------------- |
 | `CalendarNav` | `calendarNavigationLabel`, `changeMonthLabel`, `changeTimeLabel`, `changeYearLabel`, `clearLabel`, `confirmLabel`, `homeLabel`, `hoursLabel`, `minutesLabel`, `monthPickerLabel`, `monthTrackLabel`, `nextMonthLabel`, `nextYearLabel`, `previousMonthLabel`, `previousYearLabel`, `secondsLabel`, `selectMonthLabel`, `selectTimeLabel`, `selectYearLabel`, `themeSwitchToDarkLabel`, `themeSwitchToLightLabel`, `themeToggleLabel`, `timePeriodLabel`, `timePickerLabel`, `yearPickerLabel`, `yearTrackLabel` |
+| `CalendarDays` | `weekLabel` |
 | `CalendarInfo` | `clearLabel`, `homeLabel` |
 | `CalendarManualInput` | `applyLabel`, `clearLabel`, `removeLabel` |
 | `CalendarSelectedDates` | `clearLabel`, `removeRangeEndLabel`, `removeRangeStartLabel`, `removeSelectedDateLabel`, `showMoreSelectedDatesLabel` |
@@ -692,6 +695,7 @@ Renders the month grid — weekday headers, week numbers (optional), and the day
 | `boldWeekends`      | `boolean`                       | `false`   | Render Saturday and Sunday in bold with the weekend accent color (`--c-we`)                                                                                                                                                                                                                                                      |
 | `highlightToday`    | `boolean`                       | `true`    | Highlight today's date                                                                                                                                                                                                                                                                                                           |
 | `todayDot`          | `boolean`                       | `true`    | Render a small dot under today's digit. Selected-today dot color uses gradient/active text color first, then the theme `todayDot` token. Dot size and lower inset can be tuned by appearance tokens.                                                                                                                             |
+| `weekLabel`         | `string`                        | `"Week"`  | Aria-label prefix for week-number rows and row headers. The root `Calendar` `weekLabel` applies globally; this prop overrides it for this days grid                                                                                                                                                                             |
 | `fixedRows`         | `boolean`                       | `true`    | Always render 6 rows of day cells                                                                                                                                                                                                                                                                                                |
 | `weekNumbers`       | `boolean`                       | `false`   | Show ISO week numbers in the leftmost column                                                                                                                                                                                                                                                                                     |
 | `hideWeekdays`      | `boolean`                       | `false`   | Hide the row of weekday name headers                                                                                                                                                                                                                                                                                             |

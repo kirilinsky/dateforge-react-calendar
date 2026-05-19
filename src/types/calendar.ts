@@ -66,6 +66,7 @@ export interface CalendarActionLabels {
   themeToggleLabel?: string;
   timePeriodLabel?: string;
   timePickerLabel?: string;
+  weekLabel?: string;
   yearGridLabel?: string;
   yearPageNavigationLabel?: string;
   yearPickerLabel?: string;
@@ -121,6 +122,7 @@ export interface CalendarProps<M extends CalendarMode = "single"> {
   themeToggleLabel?: string;
   timePeriodLabel?: string;
   timePickerLabel?: string;
+  weekLabel?: string;
   yearGridLabel?: string;
   yearPageNavigationLabel?: string;
   yearPickerLabel?: string;

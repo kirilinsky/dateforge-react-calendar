@@ -1,6 +1,19 @@
+import { DEFAULT_WEEK_LABEL, resolveActionLabel } from "@/utils/action-labels";
 import { toTZMidnight } from "@/utils/tz-utils";
 
 const DAY_MS = 86400000;
+
+export function resolveWeekLabel(
+  moduleLabel: string | undefined,
+  globalLabel: string | undefined,
+): string {
+  return resolveActionLabel(moduleLabel, globalLabel, DEFAULT_WEEK_LABEL);
+}
+
+export function getWeekAriaLabel(label: string, weekNumber: string): string {
+  return `${label} ${weekNumber}`;
+}
+
 export function getStartOfDayT(d: Date): number {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
 }
