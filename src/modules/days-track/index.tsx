@@ -1,5 +1,6 @@
 import type React from "react";
 import { useEffect, useMemo } from "react";
+import "@/styles/layers.css";
 import { VirtualTrack } from "@/components/virtual-track/virtual-track";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";

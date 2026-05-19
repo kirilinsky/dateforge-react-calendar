@@ -1,4 +1,5 @@
 import type React from "react";
+import "@/styles/layers.css";
 import {
   type TimeLabelStyle,
   TimeTrack,

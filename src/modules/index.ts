@@ -1,3 +1,5 @@
+import "@/styles/layers.css";
+
 export { CalendarDays } from "./days";
 export { CalendarDaysTrack } from "./days-track";
 export { CalendarInfo } from "./info";
