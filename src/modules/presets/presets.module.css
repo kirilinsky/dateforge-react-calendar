@@ -1,6 +1,7 @@
 @layer cal-module {
   .presetsContainer {
     container-type: inline-size;
+    container-name: cal-presets;
     z-index: 3;
     display: flex;
     flex-direction: column;
@@ -39,7 +40,7 @@
   .presetsGrid[data-count="12"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
   /* Wide: single row for common counts */
-  @container (min-width: 40em) {
+  @container cal-presets (min-width: 40em) {
     .presetsGrid[data-count="6"] { grid-template-columns: repeat(6, minmax(0, 1fr)); }
     .presetsGrid[data-count="8"] { grid-template-columns: repeat(8, minmax(0, 1fr)); }
     .presetsGrid[data-count="9"] { grid-template-columns: repeat(9, minmax(0, 1fr)); }
@@ -48,7 +49,7 @@
   }
 
   /* Narrow: collapse to 2 cols, overrides all data-count rules above */
-  @container (max-width: 16em) {
+  @container cal-presets (max-width: 16em) {
     .presetsGrid,
     .presetsGrid[data-count] {
       grid-template-columns: repeat(2, minmax(0, 1fr));

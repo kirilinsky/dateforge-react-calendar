@@ -7,6 +7,7 @@
 
   .monthsContainer {
     container-type: inline-size;
+    container-name: cal-months-grid;
     flex: 1;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -18,7 +19,7 @@
   }
 
   /* 12 months: 4×3 on medium+ */
-  @container (min-width: 18em) {
+  @container cal-months-grid (min-width: 18em) {
     .monthsContainer {
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }

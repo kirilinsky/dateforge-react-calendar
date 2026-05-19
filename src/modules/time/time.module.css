@@ -2,6 +2,7 @@
 
 .timeContainer {
   container-type: inline-size;
+  container-name: cal-time;
   position: relative;
   padding: var(--cal-spacing);
   min-height: 10em;
@@ -15,7 +16,7 @@
   justify-content: flex-start;
 }
 
-@container (min-width: 15em) {
+@container cal-time (min-width: 15em) {
   .timeContainer {
     min-height: 8em;
     align-items: center;

@@ -91,6 +91,7 @@
     --cal-shadow-lg: 0 0.2em 0.8em var(--c-x);
 
     container-type: inline-size;
+    container-name: cal-root;
     display: grid;
     gap: var(--cal-container-gap, 1px);
     position: relative;
