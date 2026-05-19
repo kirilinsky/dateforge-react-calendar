@@ -11,9 +11,9 @@
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 0.35em;
-    font-size: var(--cal-text-2xl);
-    padding: var(--header-padding, 0.45em 0.7em);
-    min-height: var(--header-min-height, 3.2em);
+    font-size: var(--cal-nav-font-size);
+    padding: var(--cal-nav-padding, 0.45em 0.7em);
+    min-height: var(--cal-nav-min-height, 3.2em);
     height: auto;
     z-index: 3;
     position: relative;
@@ -70,7 +70,7 @@
   }
 
   .currentYear > * {
-    font-size: var(--cal-text-xl);
+    font-size: var(--cal-nav-meta-font-size);
   }
 
   .arrow {

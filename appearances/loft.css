@@ -2,8 +2,8 @@
   [data-appearance="loft"] {
     --cal-radius: 1em;
     --cal-container-radius: 2.5em;
-    --header-min-height: 4.5em;
-    --header-padding: 0.45em 0.55em;
+    --cal-nav-min-height: 4.5em;
+    --cal-nav-padding: 0.45em 0.55em;
     --cal-border: 0px;
     --cal-spacing: 1em;
     --cal-shadow-sm: 0 0.3em 0.9em var(--c-x);
@@ -14,8 +14,8 @@
     --cal-text-sm: 0.83em;
     --cal-text-md: 0.9em;
     --cal-text-lg: 1em;
-    --cal-text-xl: 1.05em;
-    --cal-text-2xl: 1.1em;
+    --cal-nav-meta-font-size: 1.05em;
+    --cal-nav-font-size: 1.1em;
     --cal-text-day: clamp(0.82em, 4.8cqi, 1.28em);
     --cal-weight-semibold: 500;
     --cal-weight-bold: 600;
