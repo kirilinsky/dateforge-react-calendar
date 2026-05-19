@@ -83,13 +83,13 @@ Source: `appearances/index.ts`.
 
 ---
 
-## Themes (38)
+## Themes (42)
 
 Generated via `scripts/generate-theme.ts` → `themes/<name>.ts`. Do **not** hand-edit generated files; re-run `npm run build`.
 
-**Light / bright:** `tide`, `graphite`, `mint`, `snow`, `solar`, `slate`, `neon`, `prism`, `meadow`, `latte`, `split`, `riso`, `monsoon`, `pearl`, `chalk`, `comfy`.
+**Light / bright:** `tide`, `graphite`, `mint`, `snow`, `solar`, `slate`, `neon`, `prism`, `meadow`, `latte`, `split`, `riso`, `monsoon`, `pearl`, `chalk`, `comfy`, `mono`, `atelier`.
 
-**Dark / vibrant:** `fjord`, `industrial`, `crimson`, `amethyst`, `cyber`, `espresso`, `ember`, `phosphor`, `midnight`, `sandstone`, `rosa`, `dracula`, `nebula`, `aurora`, `forest`, `scarlet`, `temporal`, `flare`, `abyss`.
+**Dark / vibrant:** `fjord`, `industrial`, `crimson`, `amethyst`, `cyber`, `espresso`, `ember`, `phosphor`, `midnight`, `sandstone`, `rosa`, `dracula`, `nebula`, `aurora`, `forest`, `scarlet`, `temporal`, `flare`, `abyss`, `cobalt`, `velvet`, `eclipse`, `noir`, `bauhaus`.
 
 Range covers muted pastels (`latte`, `comfy`), neon/cyber (`phosphor`, `neon`, `abyss`), earth tones (`sandstone`, `forest`).
 
