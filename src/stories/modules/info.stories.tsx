@@ -183,6 +183,7 @@ export const EmptyWithLabel: Story = {
       <Calendar
         value={date}
         onChange={setDate}
+        defaultViewDate={FIXED_DATE}
         {...getCalendarProps(args, ctx)}
       >
         <CalendarInfo {...getInfoProps(args)} />
@@ -199,7 +200,7 @@ EmptyWithLabel.storyName = "Empty with label";
 export const Relative: Story = {
   args: { showRelative: true, showSummary: false },
   render: (args, ctx) => {
-    const [date, setDate] = useState<Date | null>(() => addDays(new Date(), 3));
+    const [date, setDate] = useState<Date | null>(() => addDays(FIXED_DATE, 3));
     return (
       <Calendar
         value={date}

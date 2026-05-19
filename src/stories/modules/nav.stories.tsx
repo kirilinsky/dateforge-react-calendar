@@ -4,6 +4,7 @@ import { userEvent, within } from "storybook/test";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
 import { CalendarNav } from "@/modules/nav";
+import { useFrozenTime } from "../../../.storybook/helpers/use-frozen-time";
 import { FIXED_DATE } from "../_constants";
 import {
   resolveStoryAppearance,
@@ -240,6 +241,7 @@ NavBottomOnly.storyName = "Nav below days";
 
 export const NavTopAndBottom: Story = {
   render: (_args, ctx) => {
+    useFrozenTime(FIXED_DATE);
     const [date, setDate] = useState<Date | null>(FIXED_DATE);
     return (
       <Calendar

@@ -52,15 +52,54 @@ const preview: Preview = {
     },
   },
   decorators: [
-    (Story, ctx) => (
-      <div style={{ padding: 20, width: ctx.parameters.storyWidth ?? 305 }}>
-        <Story
-          key={`${ctx.globals.theme}-${ctx.globals.appearance}-${ctx.globals.locale}-${ctx.globals.gradient}`}
-        />
-      </div>
-    ),
+    (Story, ctx) => {
+      const viewportActive = Boolean(
+        (ctx.globals.viewport as { value?: string } | undefined)?.value,
+      );
+      const style: React.CSSProperties = viewportActive
+        ? { padding: 8, width: "100%", boxSizing: "border-box" }
+        : { padding: 20, width: ctx.parameters.storyWidth ?? 305 };
+      return (
+        <div style={style}>
+          <Story
+            key={`${ctx.globals.theme}-${ctx.globals.appearance}-${ctx.globals.locale}-${ctx.globals.gradient}`}
+          />
+        </div>
+      );
+    },
   ],
   parameters: {
+    viewport: {
+      // Tuned to the calendar's container-query breakpoints
+      // (13.75em / 16.25em / 21.25em ≈ 220 / 260 / 340 px at 16px root).
+      options: {
+        narrow: {
+          name: "Narrow (220px)",
+          styles: { width: "220px", height: "640px" },
+          type: "mobile",
+        },
+        compact: {
+          name: "Compact (260px)",
+          styles: { width: "260px", height: "640px" },
+          type: "mobile",
+        },
+        medium: {
+          name: "Medium (340px)",
+          styles: { width: "340px", height: "720px" },
+          type: "mobile",
+        },
+        comfortable: {
+          name: "Comfortable (480px)",
+          styles: { width: "480px", height: "720px" },
+          type: "tablet",
+        },
+        full: {
+          name: "Full (800px)",
+          styles: { width: "800px", height: "900px" },
+          type: "desktop",
+        },
+      },
+    },
     controls: {
       disableSaveFromUI: true,
       matchers: {
@@ -83,7 +122,11 @@ const preview: Preview = {
         ],
       },
     },
-    layout: "centered",
+    // Default Storybook layout is "padded". We avoid "centered" globally
+    // because it wraps `<body>` in a flex container that collapses our
+    // viewport-driven `width: 100%` wrapper to 0px (storybook-root is itself
+    // a flex child with no intrinsic width).
+    layout: "padded",
     options: {
       storySort: {
         method: "alphabetical",
