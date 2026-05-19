@@ -33,30 +33,30 @@ User layer wins over `themes` and `appearances`; both win over base/component/mo
 
 Source: `themes/themes.ts`. 15 tokens per theme.
 
-| Token   | Role                                          |
-| ------- | --------------------------------------------- |
-| `--c-a` | accent — primary action                       |
-| `--c-at`| activeText — text on active/pressed           |
+| Token     | Role                                        |
+| --------- | ------------------------------------------- |
+| `--c-a`   | accent — primary action                     |
+| `--c-at`  | activeText — text on active/pressed         |
 | `--c-t-d` | todayDot — dot under selected today         |
-| `--c-b` | backdrop — dialog/overlay background          |
-| `--c-h` | highlight — hover/focus indicator, selected   |
-| `--c-t` | tone — calendar grid background subtone       |
-| `--c-c` | text — primary text                           |
-| `--c-s` | stroke — border, divider, outline             |
-| `--c-x` | shadow — shadow tint (alpha-blended)          |
-| `--c-d` | disabled — disabled control background        |
-| `--c-m` | mutedText — secondary/hint text               |
-| `--c-dt`| disabledText                                  |
-| `--c-we`| weekend — weekend cell highlight              |
-| `--c-r` | range — range selection background            |
-| `--c-e` | error — invalid state                         |
+| `--c-b`   | backdrop — dialog/overlay background        |
+| `--c-h`   | highlight — hover/focus indicator, selected |
+| `--c-t`   | tone — calendar grid background subtone     |
+| `--c-c`   | text — primary text                         |
+| `--c-s`   | stroke — border, divider, outline           |
+| `--c-x`   | shadow — shadow tint (alpha-blended)        |
+| `--c-d`   | disabled — disabled control background      |
+| `--c-m`   | mutedText — secondary/hint text             |
+| `--c-dt`  | disabledText                                |
+| `--c-we`  | weekend — weekend cell highlight            |
+| `--c-r`   | range — range selection background          |
+| `--c-e`   | error — invalid state                       |
 
 ### Typography tokens
 
 Source: `src/core/layout.module.css`.
 
 - `--cal-font-size`: `clamp(11px, 2.7cqw, 18px)` — container-relative base
-- `--cal-text-2xs … --cal-text-2xl`: semantic scale (0.6em–1.1em)
+- `--cal-text-2xs … --cal-text-lg`: semantic scale (0.6em–0.95em). `xl`/`2xl` were retired in favor of `--cal-nav-meta-font-size` / `--cal-nav-font-size` since they were nav-only.
 - `--cal-text-day`: `clamp(0.72em, …, 1.15em)` — adaptive day-cell sizing
 - `--cal-weight-{regular,medium,semibold,bold}`: 400–700
 - `--cal-leading-{tight,normal,relaxed}`: 1 → 1.6
@@ -65,17 +65,21 @@ Source: `src/core/layout.module.css`.
 
 Source: `appearances/index.ts`.
 
-| Token                   | Purpose                                         |
-| ----------------------- | ----------------------------------------------- |
-| `--cal-radius`          | base border-radius                              |
-| `--cal-container-radius`| outer container radius (multiplier of radius)   |
-| `--cal-spacing`         | base gap/padding unit                           |
-| `--cal-border`          | stroke width                                    |
-| `--cal-shadow-{sm,md,lg}`| shadow depth (uses `var(--c-x)`)               |
-| `--cal-transition`      | animation duration                              |
-| `--cal-days-padding`    | day-cell padding                                |
-| `--cal-track-height`    | scrollable track height                         |
-| `--cal-day-ratio`       | day-cell aspect ratio                           |
+| Token                      | Purpose                                                           |
+| -------------------------- | ----------------------------------------------------------------- |
+| `--cal-radius`             | base border-radius                                                |
+| `--cal-container-radius`   | outer container radius (multiplier of radius)                     |
+| `--cal-spacing`            | base gap/padding unit                                             |
+| `--cal-border`             | stroke width                                                      |
+| `--cal-shadow-{sm,md,lg}`  | shadow depth (uses `var(--c-x)`)                                  |
+| `--cal-transition`         | animation duration                                                |
+| `--cal-days-padding`       | day-cell padding                                                  |
+| `--cal-track-height`       | scrollable track height                                           |
+| `--cal-day-ratio`          | day-cell aspect ratio                                             |
+| `--cal-nav-padding`        | padding of `CalendarNav` container (was `--header-padding`)       |
+| `--cal-nav-min-height`     | minimum height of `CalendarNav` (was `--header-min-height`)       |
+| `--cal-nav-font-size`      | nav container root font-size; cascades to all nav children via em |
+| `--cal-nav-meta-font-size` | font-size of `.currentYear` children (year/month text in nav)     |
 
 ---
 
@@ -91,16 +95,17 @@ Range covers muted pastels (`latte`, `comfy`), neon/cyber (`phosphor`, `neon`, `
 
 ---
 
-## Appearances (5)
+## Appearances (7)
 
-| Appearance | Character                                       | Key tokens                                                          |
-| ---------- | ----------------------------------------------- | ------------------------------------------------------------------- |
-| `compact`  | Dense, minimal padding, tight                   | radius 0.3em, spacing 0.35em, transition 0.15s, day-ratio 1/0.7     |
-| `square`   | Sharp corners, tight, minimal shadows           | radius 0, spacing 0.5em, transition 0.12s                            |
-| `soft`     | Subtle rounding, balanced, gentle shadows       | radius 0.75em, spacing 0.7em, transition 0.25s                       |
-| `bubble`   | Rounded, spacious, prominent shadows            | radius 1.5em, spacing 0.7em, transition 0.28s, header 4em           |
-| `loft`     | Large, relaxed                                  | radius 1em, spacing 1em, transition 0.35s, day-padding 1.8em        |
-| `airy`     | Borderless, light weights, generous spacing     | radius 0.4em, border 1px, spacing 1em, weights 300, no shadows      |
+| Appearance | Character                                     | Key tokens                                                               |
+| ---------- | --------------------------------------------- | ------------------------------------------------------------------------ |
+| `compact`  | Dense, minimal padding, tight                 | radius 0.3em, spacing 0.35em, transition 0.15s, day-ratio 1/0.7          |
+| `square`   | Sharp corners, tight, minimal shadows         | radius 0, spacing 0.5em, transition 0.12s                                |
+| `soft`     | Subtle rounding, balanced, gentle shadows     | radius 0.75em, spacing 0.7em, transition 0.25s                           |
+| `bubble`   | Rounded, spacious, prominent shadows          | radius 1.5em, spacing 0.7em, transition 0.28s, nav-min-height 4em        |
+| `loft`     | Large, relaxed                                | radius 1em, spacing 1em, transition 0.35s, day-padding 1.8em             |
+| `airy`     | light weights, generous spacing               | radius 0.4em, border 1px, spacing 1em, weights 300, no shadows           |
+| `press`    | Newspaper serif, sharp corners, wide tracking | radius 0.05em, serif font, letter-spacing 0.18em, no shadows, border 1px |
 
 ---
 
@@ -134,19 +139,19 @@ Source: `src/core/layout.module.css`.
 
 ### Transition durations (per appearance)
 
-`compact 0.15s`, `square 0.12s`, `soft 0.25s`, `bubble 0.28s`, `loft 0.35s`, `airy 0.2s`. Used by CSS transitions on opacity / transform / colors via `var(--cal-transition)`.
+`compact 0.15s`, `square 0.12s`, `soft 0.25s`, `bubble 0.28s`, `loft 0.35s`, `airy 0.2s`, `press 0.18s`. Used by CSS transitions on opacity / transform / colors via `var(--cal-transition)`.
 
 ### Track scroll physics
 
 Source: `src/hooks/use-track.ts`.
 
-| Constant       | Value | Role                              |
-| -------------- | ----- | --------------------------------- |
-| `FRICTION`     | 0.95  | velocity decay (inertia)          |
-| `SPRING_K`     | 0.08  | snap stiffness                    |
-| `SPRING_DAMP`  | 0.82  | underdamped bounce                |
-| `RUBBER_K`     | 0.12  | boundary resistance               |
-| `RUBBER_DAMP`  | 0.75  | rubber-band damping               |
+| Constant      | Value | Role                     |
+| ------------- | ----- | ------------------------ |
+| `FRICTION`    | 0.95  | velocity decay (inertia) |
+| `SPRING_K`    | 0.08  | snap stiffness           |
+| `SPRING_DAMP` | 0.82  | underdamped bounce       |
+| `RUBBER_K`    | 0.12  | boundary resistance      |
+| `RUBBER_DAMP` | 0.75  | rubber-band damping      |
 
 Snap threshold ~3.5px/frame; settle tolerance 0.4px. Pointer events drive position updates.
 
@@ -162,14 +167,14 @@ Snap threshold ~3.5px/frame; settle tolerance 0.4px. Pointer events drive positi
 
 ARIA grid pattern (https://www.w3.org/WAI/ARIA/apg/patterns/grid/). Source: `src/hooks/use-calendar-keyboard.ts`.
 
-| Key                  | Action                               |
-| -------------------- | ------------------------------------ |
-| Arrow Left / Right   | Move focus by one day                |
-| Arrow Up / Down      | Move focus by one week               |
-| Home / End           | First / last day of focused week     |
-| Page Up / Page Down  | Previous / next month                |
-| Shift + Page Up/Down | Previous / next year                 |
-| Enter or Space       | Select focused day                   |
+| Key                  | Action                           |
+| -------------------- | -------------------------------- |
+| Arrow Left / Right   | Move focus by one day            |
+| Arrow Up / Down      | Move focus by one week           |
+| Home / End           | First / last day of focused week |
+| Page Up / Page Down  | Previous / next month            |
+| Shift + Page Up/Down | Previous / next year             |
+| Enter or Space       | Select focused day               |
 
 Roving tabindex: focused day = `tabindex="0"`, others `-1`. Focus crosses month boundaries via `navigateTo` unless `blockNavigation` is set.
 
@@ -182,11 +187,11 @@ Roving tabindex: focused day = `tabindex="0"`, others `-1`. Focus crosses month 
 
 Tracks (`<CalendarDaysTrack>`, `<CalendarMonthsTrack>`, `<CalendarYearsTrack>`):
 
-| Key                | Action                             |
-| ------------------ | ---------------------------------- |
-| Arrow Left / Right | Step backwards / forwards          |
-| Page Up / Down     | Jump 7 items (DaysTrack)           |
-| Home / End         | First / last allowed item          |
+| Key                | Action                    |
+| ------------------ | ------------------------- |
+| Arrow Left / Right | Step backwards / forwards |
+| Page Up / Down     | Jump 7 items (DaysTrack)  |
+| Home / End         | First / last allowed item |
 
 ### Focus management
 

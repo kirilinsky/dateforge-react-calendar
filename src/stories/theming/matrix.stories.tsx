@@ -149,7 +149,7 @@ AppearancesOverview.storyName = "All appearances (default theme)";
 
 // Proof that theme + appearance token cascades reach the rendered DOM.
 // Without this, `toBeVisible` passes on an unstyled component — we'd have
-// no signal if a token regressed (e.g. loft skipping `--cal-text-2xl`).
+// no signal if a token regressed (e.g. loft skipping `--cal-nav-font-size`).
 export const CssCheck: Story = {
   render: () => {
     const [date, setDate] = useState<Date | null>(FIXED_DATE);
@@ -176,8 +176,10 @@ export const CssCheck: Story = {
     await expect(style.getPropertyValue("--c-h").trim()).toBe(
       "rgb(255, 94, 94)",
     );
-    // Loft appearance must override --cal-text-2xl on .calendarContainer.
-    await expect(style.getPropertyValue("--cal-text-2xl").trim()).toBe("1.1em");
+    // Loft appearance must override --cal-nav-font-size on .calendarContainer.
+    await expect(style.getPropertyValue("--cal-nav-font-size").trim()).toBe(
+      "1.1em",
+    );
   },
 };
 CssCheck.storyName = "CssCheck — theme + appearance cascade";

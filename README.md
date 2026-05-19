@@ -24,6 +24,12 @@
   <img src="https://i.ibb.co/pj9WVkSR/image.png" alt="Compact DateForge calendar" width="360" />
 </div>
 
+<div align="center">
+
+### [🚀 Live Demo](https://calendar-demo-pi.vercel.app/) &nbsp;·&nbsp; [📖 Docs](https://calendar-demo-pi.vercel.app/docs) &nbsp;·&nbsp; [📚 Storybook](https://kirilinsky.github.io/dateforge-react-calendar/)
+
+</div>
+
 **A modular calendar toolkit that starts tiny and grows with your product.**
 
 Monolithic pickers ship the grid, nav, time picker, presets, layout opinions, and weight. DateForge ships only what you use.
@@ -31,6 +37,10 @@ Monolithic pickers ship the grid, nav, time picker, presets, layout opinions, an
 Start with two components. Add range selection, multi-select, time, presets, manual input, chips, tracks, custom layouts, themes, and tokens.
 
 DateForge is not one picker with a long prop list. It is a set of focused modules that share one calendar brain.
+
+<div align="center">
+  <img src="https://i.ibb.co/hxRcVz03/dateforge-modular-architecture.png" alt="DateForge modular architecture" width="720" />
+</div>
 
 **Modular · Composable · Tokenized**  
 **Start minimal. Scale infinitely. Add only the modules you need.**
@@ -43,18 +53,39 @@ Use built-in themes and appearances, or create your own. Shape selection with pr
 Build a classic picker, date track, 12-month board, month-only selector, time-only control, or custom booking flow from the same parts.
 
 <div align="center">
-
-### [📖 Docs](https://calendar-demo-pi.vercel.app/docs) &nbsp;·&nbsp; [🚀 Live Demo](https://calendar-demo-pi.vercel.app/) &nbsp;·&nbsp; [📚 Storybook](https://kirilinsky.github.io/dateforge-react-calendar/)
-
-</div>
-
-<div align="center">
    <br />
   <br />
   <img src="https://i.ibb.co/7Jhq7s0Y/image.png" alt="DateForge date and time calendar flow" width="380" />
 </div>
 
 ---
+
+## Install
+
+```bash
+npm i @dateforge/react-calendar
+```
+
+No global CSS import is required — styles are bundled into the modules and apply automatically.
+
+## Quick start
+
+```tsx
+import { useState } from "react";
+import { Calendar } from "@dateforge/react-calendar";
+import { CalendarNav, CalendarDays } from "@dateforge/react-calendar/modules";
+
+export function Example() {
+  const [date, setDate] = useState<Date | null>(null);
+
+  return (
+    <Calendar mode="single" value={date} onChange={setDate}>
+      <CalendarNav showMonthPicker compactYears />
+      <CalendarDays />
+    </Calendar>
+  );
+}
+```
 
 ## Why DateForge?
 
@@ -78,14 +109,6 @@ Most date pickers ask you to accept their shape. DateForge lets you forge yours.
 
 Remove a line, remove a feature. Add a module, add a workflow. That is the core idea.
 
-## Install
-
-```bash
-npm i @dateforge/react-calendar
-```
-
-No global CSS import is required — styles are bundled into the modules and apply automatically.
-
 ## Modules
 
 | Module                  | Use it for                                                  |
@@ -102,25 +125,6 @@ No global CSS import is required — styles are bundled into the modules and app
 | `CalendarDaysTrack`     | Scrollable day track for compact/mobile layouts             |
 | `CalendarMonthsTrack`   | Scrollable month track                                      |
 | `CalendarYearsTrack`    | Scrollable year track                                       |
-
-## Quick start
-
-```tsx
-import { useState } from "react";
-import { Calendar } from "@dateforge/react-calendar";
-import { CalendarNav, CalendarDays } from "@dateforge/react-calendar/modules";
-
-export function Example() {
-  const [date, setDate] = useState<Date | null>(null);
-
-  return (
-    <Calendar mode="single" value={date} onChange={setDate}>
-      <CalendarNav showMonthPicker compactYears />
-      <CalendarDays />
-    </Calendar>
-  );
-}
-```
 
 ---
 

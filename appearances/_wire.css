@@ -5,8 +5,8 @@
     --cal-border: 0px;
     --cal-container-gap: 0px;
     --cal-spacing: 1em;
-    --header-padding: 0.35em 1em 0.75em;
-    --header-min-height: 3.2em;
+    --cal-nav-padding: 0.35em 1em 0.75em;
+    --cal-nav-min-height: 3.2em;
     --cal-nav-button-bg: transparent;
     --cal-shadow-sm: none;
     --cal-shadow-md: none;
@@ -25,8 +25,8 @@
     --cal-text-sm: 0.78em;
     --cal-text-md: 0.88em;
     --cal-text-lg: 0.92em;
-    --cal-text-xl: 1em;
-    --cal-text-2xl: 1em;
+    --cal-nav-meta-font-size: 1em;
+    --cal-nav-font-size: 1em;
     --cal-text-day: clamp(0.9em, 4.7cqi, 1.25em);
     --cal-day-weight: 300;
     --cal-weight-regular: 300;

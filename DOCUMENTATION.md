@@ -1388,8 +1388,10 @@ const myAppearance = createAppearance({
 | `border`          | Border width for the container and internal dividers                                |
 | `containerGap`    | Gap between calendar module areas. Use `"0px"` for borderless layouts              |
 | `spacing`         | Internal padding / gap between elements                                             |
-| `headerPadding`   | Padding for `CalendarNav`                                                           |
-| `headerMinHeight` | Minimum height for `CalendarNav`                                                    |
+| `navPadding`      | Padding for `CalendarNav`                                                           |
+| `navMinHeight`    | Minimum height for `CalendarNav`                                                    |
+| `navFontSize`     | Root font-size of `CalendarNav` container — cascades to all nav children via `em`   |
+| `navMetaFontSize` | Font-size of the year/month text inside the nav's current selector                  |
 | `navButtonBg`     | Background for month/year picker buttons in `CalendarNav`                           |
 | `font`            | Font family                                                                         |
 | `fontSize`        | Base font size                                                                      |

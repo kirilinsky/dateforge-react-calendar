@@ -12,8 +12,8 @@
     --cal-text-sm: 0.78em;
     --cal-text-md: 0.86em;
     --cal-text-lg: 1em;
-    --cal-text-xl: 1.18em;
-    --cal-text-2xl: 1.35em;
+    --cal-nav-meta-font-size: 1.18em;
+    --cal-nav-font-size: 1.35em;
     --cal-text-day: clamp(0.9em, 5.2cqi, 1.4em);
     --cal-weight-regular: 300;
     --cal-weight-semibold: 300;
