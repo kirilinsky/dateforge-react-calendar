@@ -28,6 +28,10 @@ import {
   Home,
   ThemeToggle,
 } from "@/Icons";
+import {
+  DEFAULT_CALENDAR_ACTION_LABELS,
+  resolveActionLabel,
+} from "@/utils/action-labels";
 import { clampBoundDate } from "@/utils/clamp-bound-date";
 import {
   addDate,
@@ -162,6 +166,8 @@ export interface CalendarNavProps {
   clear?: boolean;
   themeToggle?: boolean;
   compactTime?: boolean;
+  clearLabel?: string;
+  homeLabel?: string;
   label?: string;
   col?: number | string;
   bound?: "from" | "to";
@@ -183,6 +189,8 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
   clear = false,
   themeToggle = false,
   compactTime = false,
+  clearLabel,
+  homeLabel,
   label,
   col,
   bound,
@@ -202,8 +210,26 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
 
   const safeLabel = useMemo(() => (label ? sanitizeLabel(label) : ""), [label]);
   const labelId = useId();
-  const { minDate, maxDate, locale, hour12, disabled, readOnly, range } =
-    useConfig();
+  const {
+    minDate,
+    maxDate,
+    locale,
+    hour12,
+    disabled,
+    readOnly,
+    range,
+    actionLabels,
+  } = useConfig();
+  const resolvedClearLabel = resolveActionLabel(
+    clearLabel,
+    actionLabels.clearLabel,
+    DEFAULT_CALENDAR_ACTION_LABELS.clearLabel,
+  );
+  const resolvedHomeLabel = resolveActionLabel(
+    homeLabel,
+    actionLabels.homeLabel,
+    DEFAULT_CALENDAR_ACTION_LABELS.homeLabel,
+  );
   const { viewDate, navigateTo } = useNavigation();
   const { selectedDates, rangeStart, rangeEnd } = useSelectionValue();
   const { onChangeDate, onChangeTime, onRangeBoundSet } = useSelectionActions();
@@ -556,7 +582,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
                 type="button"
                 className={`${styles.homeButton} ${shared.interactive} ${shared.hovered} ${isCurrentMonth ? styles.homeButtonDisabled : ""}`}
                 disabled={isCurrentMonth}
-                aria-label="Go to current month"
+                aria-label={resolvedHomeLabel}
                 onClick={goHome}
               >
                 <Home />
@@ -575,7 +601,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
                   (isBound ? !boundDate : selectedDates.length === 0) ||
                   readOnly
                 }
-                aria-label="Clear selection"
+                aria-label={resolvedClearLabel}
                 onClick={() =>
                   isBound ? onRangeBoundSet(bound!, null) : onChangeDate(null)
                 }

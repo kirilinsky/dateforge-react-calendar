@@ -8,6 +8,10 @@ import {
 } from "@/context/selection-context";
 import shared from "@/global/global.module.css";
 import { Check, Clear } from "@/Icons";
+import {
+  DEFAULT_CALENDAR_ACTION_LABELS,
+  resolveActionLabel,
+} from "@/utils/action-labels";
 import { checkIsDateDisabled } from "@/utils/date-core";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { type AlignValue, alignToJustify } from "@/utils/layout-utils";
@@ -18,6 +22,7 @@ import { MaskedDateInput } from "./masked-date-input";
 export interface CalendarManualInputProps {
   allowClear?: boolean;
   align?: AlignValue;
+  clearLabel?: string;
   col?: number | string;
   label?: React.ReactNode;
 }
@@ -25,11 +30,24 @@ export interface CalendarManualInputProps {
 export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
   allowClear = true,
   align = "left",
+  clearLabel,
   col,
   label,
 }) => {
-  const { range, multiselect, disabled, minDate, maxDate, readOnly } =
-    useConfig();
+  const {
+    range,
+    multiselect,
+    disabled,
+    minDate,
+    maxDate,
+    readOnly,
+    actionLabels,
+  } = useConfig();
+  const resolvedClearLabel = resolveActionLabel(
+    clearLabel,
+    actionLabels.clearLabel,
+    DEFAULT_CALENDAR_ACTION_LABELS.clearLabel,
+  );
   const { viewDate: date } = useNavigation();
   const { rangeStart, rangeEnd, selectedDates } = useSelectionValue();
   const { onChangeDate, onRangeSet, onDatesSet } = useSelectionActions();
@@ -71,7 +89,7 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
   const clearBtn = (
     <button
       type="button"
-      aria-label="Clear"
+      aria-label={resolvedClearLabel}
       className={`${styles.clearBtn} ${shared.interactive} ${shared.hovered}`}
       onClick={() => {
         if (readOnly) return;
@@ -162,6 +180,7 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
               key={d.getTime()}
               date={d}
               isAllowed={isAllowed}
+              clearLabel={resolvedClearLabel}
               onSave={(newDate) => {
                 const orig = selectedDates[i];
                 onDatesSet(
@@ -200,6 +219,7 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
           <DateSlot
             date={rangeStart}
             isAllowed={isAllowed}
+            clearLabel={resolvedClearLabel}
             onSave={(d) => onRangeSet(withTime(d), rangeEnd)}
             onClear={() => onRangeSet(null, rangeEnd)}
             placeholder="DD.MM.YYYY"
@@ -209,6 +229,7 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
           <DateSlot
             date={rangeEnd}
             isAllowed={isAllowed}
+            clearLabel={resolvedClearLabel}
             onSave={(d) => onRangeSet(rangeStart, withTime(d))}
             onClear={() => onRangeSet(rangeStart, null)}
             placeholder="DD.MM.YYYY"
@@ -231,6 +252,7 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
         <DateSlot
           date={selectedDates[0] ?? null}
           isAllowed={isAllowed}
+          clearLabel={resolvedClearLabel}
           onSave={(d) => onChangeDate(withTime(d))}
           onClear={() => onChangeDate(null)}
           readOnly={readOnly}

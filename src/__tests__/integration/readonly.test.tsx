@@ -21,7 +21,7 @@ describe("readOnly — Nav clear", () => {
         <CalendarNav clear />
       </Calendar>,
     );
-    const btn = within(container).getByLabelText("Clear selection");
+    const btn = within(container).getByLabelText("Clear");
     expect(btn).toBeDisabled();
     await userEvent.click(btn);
     expect(onChange).not.toHaveBeenCalled();
@@ -33,7 +33,7 @@ describe("readOnly — Nav clear", () => {
         <CalendarNav clear />
       </Calendar>,
     );
-    const btn = within(container).getByLabelText("Clear selection");
+    const btn = within(container).getByLabelText("Clear");
     expect(btn).not.toBeDisabled();
   });
 });

@@ -60,7 +60,7 @@ describe("CalendarNav — bound prop", () => {
         <CalendarNav bound="from" clear yearLabel />
       </Calendar>,
     );
-    fireEvent.click(getByLabelText("Clear selection"));
+    fireEvent.click(getByLabelText("Clear"));
     expect(onChange).toHaveBeenCalled();
     const last = onChange.mock.calls.at(-1)?.[0];
     // bound=from clear → from=null, to preserved
@@ -78,7 +78,7 @@ describe("CalendarNav — bound prop", () => {
         <CalendarNav bound="from" clear />
       </Calendar>,
     );
-    const btn = getByLabelText("Clear selection") as HTMLButtonElement;
+    const btn = getByLabelText("Clear") as HTMLButtonElement;
     expect(btn.disabled).toBe(true);
   });
 

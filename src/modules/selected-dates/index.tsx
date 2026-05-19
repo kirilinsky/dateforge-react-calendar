@@ -8,6 +8,10 @@ import {
 } from "@/context/selection-context";
 import shared from "@/global/global.module.css";
 import { Clear } from "@/Icons";
+import {
+  DEFAULT_CALENDAR_ACTION_LABELS,
+  resolveActionLabel,
+} from "@/utils/action-labels";
 import { isSameDay } from "@/utils/date-core";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { getDateTimeFormat } from "@/utils/intl-cache";
@@ -47,6 +51,7 @@ export interface CalendarSelectedDatesProps {
   allowNavigate?: boolean;
   animated?: boolean;
   align?: AlignValue;
+  clearLabel?: string;
   maxVisibleChips?: number;
   overflowLabel?: string;
   showTime?: boolean;
@@ -93,6 +98,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
   allowNavigate = true,
   animated = true,
   align = "left",
+  clearLabel,
   maxVisibleChips,
   overflowLabel = "+{count}",
   showTime = false,
@@ -103,8 +109,20 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
   const innerRef = useRef<HTMLDivElement>(null);
   const chipsGroupRef = useRef<HTMLDivElement>(null);
   const clearBtnRef = useRef<HTMLButtonElement>(null);
-  const { locale, range, multiselect, hour12, timeZone, readOnly } =
-    useConfig();
+  const {
+    locale,
+    range,
+    multiselect,
+    hour12,
+    timeZone,
+    readOnly,
+    actionLabels,
+  } = useConfig();
+  const resolvedClearLabel = resolveActionLabel(
+    clearLabel,
+    actionLabels.clearLabel,
+    DEFAULT_CALENDAR_ACTION_LABELS.clearLabel,
+  );
   const { viewDate: date, navigateTo } = useNavigation();
   const { selectedDates, rangeStart, rangeEnd } = useSelectionValue();
   const { onChangeDate, onDatesSet, onRangeSet } = useSelectionActions();
@@ -303,7 +321,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
       <button
         ref={clearBtnRef}
         type="button"
-        aria-label="Clear"
+        aria-label={resolvedClearLabel}
         className={`${styles.clearBtn} ${shared.interactive} ${shared.hovered}`}
         onClick={handleClear}
         disabled={readOnly}

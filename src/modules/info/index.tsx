@@ -9,6 +9,10 @@ import {
 import shared from "@/global/global.module.css";
 import { useToday } from "@/hooks/use-today";
 import { Home } from "@/Icons";
+import {
+  DEFAULT_CALENDAR_ACTION_LABELS,
+  resolveActionLabel,
+} from "@/utils/action-labels";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { type AlignValue, alignToJustify } from "@/utils/layout-utils";
 import styles from "./info.module.css";
@@ -48,9 +52,11 @@ export interface CalendarInfoProps {
   allowClear?: boolean;
   align?: AlignValue;
   animated?: boolean;
+  clearLabel?: string;
   col?: number | string;
   emptyLabel?: React.ReactNode;
   formatter?: CalendarInfoFormatter;
+  homeLabel?: string;
   prefix?: React.ReactNode;
   rangeStyle?: CalendarInfoRangeStyle;
   showHome?: boolean;
@@ -62,9 +68,11 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
   allowClear = false,
   align = "left",
   animated = true,
+  clearLabel,
   col,
   emptyLabel = null,
   formatter,
+  homeLabel,
   prefix,
   rangeStyle = "days",
   showHome = false,
@@ -76,7 +84,18 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
   const contentGroupRef = useRef<HTMLDivElement>(null);
   const homeBtnRef = useRef<HTMLButtonElement>(null);
   const clearBtnRef = useRef<HTMLButtonElement>(null);
-  const { locale, multiselect, range, readOnly, timeZone } = useConfig();
+  const { locale, multiselect, range, readOnly, timeZone, actionLabels } =
+    useConfig();
+  const resolvedClearLabel = resolveActionLabel(
+    clearLabel,
+    actionLabels.clearLabel,
+    DEFAULT_CALENDAR_ACTION_LABELS.clearLabel,
+  );
+  const resolvedHomeLabel = resolveActionLabel(
+    homeLabel,
+    actionLabels.homeLabel,
+    DEFAULT_CALENDAR_ACTION_LABELS.homeLabel,
+  );
   const { viewDate, navigateTo } = useNavigation();
   const today = useToday();
   const { selectedDate, selectedDates, rangeStart, rangeEnd } =
@@ -275,7 +294,7 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
           <button
             ref={homeBtnRef}
             type="button"
-            aria-label="Go to current month"
+            aria-label={resolvedHomeLabel}
             className={`${styles.actionBtn} ${shared.interactive} ${shared.hovered} ${!today || isCurrentMonth ? styles.actionBtnDisabled : ""}`}
             onClick={goHome}
             disabled={!today || isCurrentMonth}
@@ -287,7 +306,7 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
           <button
             ref={clearBtnRef}
             type="button"
-            aria-label="Clear"
+            aria-label={resolvedClearLabel}
             className={`${styles.clearBtn} ${styles.actionBtn} ${shared.interactive} ${shared.hovered}`}
             onClick={handleClear}
             disabled={readOnly}
