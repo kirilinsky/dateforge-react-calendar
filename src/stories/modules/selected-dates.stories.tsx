@@ -163,6 +163,48 @@ export const Overflow: Story = {
 };
 Overflow.storyName = "Overflow";
 
+export const NarrowContainer: Story = {
+  args: {
+    allowClear: true,
+    allowClearPerChip: true,
+    showTime: true,
+  },
+  render: (args, ctx) => {
+    const [dates, setDates] = useState([
+      FIXED_DATE,
+      new Date(2024, 5, 16, 11, 30),
+      new Date(2024, 5, 17, 16, 45),
+    ]);
+    return (
+      <Calendar
+        mode="multiple"
+        value={dates}
+        onChange={setDates}
+        theme={resolveStoryTheme(ctx.globals.theme)}
+        appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
+      >
+        <CalendarSelectedDates
+          allowClear={args.allowClear}
+          allowClearPerChip={args.allowClearPerChip}
+          allowNavigate={args.allowNavigate}
+          animated={args.animated}
+          align={args.align}
+          maxVisibleChips={args.maxVisibleChips}
+          overflowLabel={args.overflowLabel}
+          showTime={args.showTime}
+        />
+      </Calendar>
+    );
+  },
+  parameters: {
+    storyWidth: 220,
+    viewport: { defaultViewport: "narrow" },
+  },
+};
+NarrowContainer.storyName = "Narrow container";
+
 export const AnimatedOff: Story = {
   args: { animated: false },
 };

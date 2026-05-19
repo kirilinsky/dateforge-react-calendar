@@ -379,6 +379,33 @@ export const MultipleWithLabel: Story = {
 };
 MultipleWithLabel.storyName = "Multiple — with label";
 
+export const NarrowContainer: Story = {
+  render: (_args, ctx) => {
+    const [dates, setDates] = useState<Date[]>([
+      FIXED_DATE,
+      new Date(2016, 1, 12),
+    ]);
+    return (
+      <Calendar
+        mode="multiple"
+        value={dates}
+        onChange={setDates}
+        theme={resolveStoryTheme(ctx.globals.theme)}
+        appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
+      >
+        <CalendarManualInput label="Dates" />
+      </Calendar>
+    );
+  },
+  parameters: {
+    storyWidth: 220,
+    viewport: { defaultViewport: "narrow" },
+  },
+};
+NarrowContainer.storyName = "Narrow container";
+
 export const ReadOnly: Story = {
   render: (_args, ctx) => {
     const [date, setDate] = useState<Date | null>(FIXED_DATE);

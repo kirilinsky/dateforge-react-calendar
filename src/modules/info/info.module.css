@@ -2,6 +2,8 @@
   .infoContainer {
     --calendar-info-transition: var(--cal-transition, 0.2s);
 
+    container-type: inline-size;
+    container-name: cal-info;
     z-index: 3;
     display: grid;
     grid-template-rows: 1fr;
@@ -48,6 +50,30 @@
     min-width: 0;
     align-items: center;
     gap: 0.35em;
+  }
+
+  @container cal-info (max-width: 18em) {
+    .inner {
+      align-items: stretch;
+      flex-direction: column;
+      gap: 0.32em;
+    }
+
+    .contentGroup {
+      flex-wrap: wrap;
+      gap: 0.32em;
+      width: 100%;
+    }
+
+    .infoText {
+      flex: 1 1 100%;
+      justify-content: center;
+    }
+
+    .actionsGroup {
+      justify-content: flex-end;
+      width: 100%;
+    }
   }
 
   .infoText {

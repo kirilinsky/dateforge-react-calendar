@@ -16,6 +16,8 @@
 
   .container {
     --manual-input-slot-height: var(--cal-size-chip, 2.1em);
+    container-type: inline-size;
+    container-name: cal-manual-input;
     display: flex;
     align-items: center;
     flex-wrap: wrap;
@@ -34,6 +36,35 @@
     gap: 0.4em;
     flex: 1;
     min-width: 0;
+  }
+
+  @container cal-manual-input (max-width: 18em) {
+    .container {
+      align-items: stretch;
+      gap: 0.32em;
+    }
+
+    .datesArea,
+    .contentArea {
+      flex: 1 1 100%;
+      gap: 0.32em;
+      width: 100%;
+    }
+
+    .inputWrapper,
+    .chipWrapper {
+      flex: 1 1 100%;
+      max-width: none;
+    }
+
+    .chip {
+      flex: 1 1 auto;
+    }
+
+    .clearBtn {
+      width: 100%;
+      margin-left: 0;
+    }
   }
 
   .inputWrapper {
