@@ -1,0 +1,17 @@
+@layer cal-tokens {
+  @property --c-a { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
+  @property --c-at { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
+  @property --c-t-d { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
+  @property --c-b { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
+  @property --c-h { syntax: "<color>"; inherits: true; initial-value: #1a1a1c; }
+  @property --c-t { syntax: "<color>"; inherits: true; initial-value: #f4f4f4; }
+  @property --c-c { syntax: "<color>"; inherits: true; initial-value: #1a1a1c; }
+  @property --c-s { syntax: "<color>"; inherits: true; initial-value: #e8e8e8; }
+  @property --c-x { syntax: "<color>"; inherits: true; initial-value: rgba(26,26,28,0.078); }
+  @property --c-d { syntax: "<color>"; inherits: true; initial-value: #a0a0a2; }
+  @property --c-m { syntax: "<color>"; inherits: true; initial-value: #6e6e6f; }
+  @property --c-dt { syntax: "<color>"; inherits: true; initial-value: #686869; }
+  @property --c-we { syntax: "<color>"; inherits: true; initial-value: #c62828; }
+  @property --c-r { syntax: "<color>"; inherits: true; initial-value: #4a90d9; }
+  @property --c-e { syntax: "<color>"; inherits: true; initial-value: #dc2626; }
+}

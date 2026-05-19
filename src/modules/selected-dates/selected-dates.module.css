@@ -1,4 +1,4 @@
-@layer cal-base {
+@layer cal-module {
   .selectedContainer {
     --selected-dates-transition: 0.2s;
 

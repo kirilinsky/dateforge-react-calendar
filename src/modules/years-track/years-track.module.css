@@ -1,4 +1,4 @@
-@layer cal-base {
+@layer cal-module {
 
 .container {
   --track-item-width: 4.5em;

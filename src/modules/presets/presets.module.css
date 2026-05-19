@@ -1,4 +1,4 @@
-@layer cal-base {
+@layer cal-module {
   .presetsContainer {
     container-type: inline-size;
     z-index: 3;

@@ -1,6 +1,7 @@
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import "@/styles/layers.css";
+import "@/styles/tokens.css";
 import { validateTheme } from "@/core/dev-warn";
 import { CalendarLayout } from "@/core/layout";
 import { CalendarProvider } from "@/core/provider";
