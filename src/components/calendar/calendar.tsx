@@ -8,7 +8,11 @@ import {
   CUSTOM_APPEARANCE_BRAND,
   type CustomAppearance,
 } from "@/types/appearances";
-import type { CalendarMode, CalendarProps } from "@/types/calendar";
+import type {
+  CalendarActionLabels,
+  CalendarMode,
+  CalendarProps,
+} from "@/types/calendar";
 import { CUSTOM_THEME_BRAND, type CustomTheme } from "@/types/themes";
 
 const isCustomTheme = (t: unknown): t is CustomTheme =>
@@ -124,6 +128,7 @@ export function Calendar<M extends CalendarMode = "single">({
       containerWidth={containerWidth}
       toggleTheme={toggleTheme}
       activeTheme={activeTheme}
+      actionLabels={restProps as CalendarActionLabels}
       {...(restProps as import("@/types/calendar").CalendarProps<CalendarMode>)}
     >
       <div

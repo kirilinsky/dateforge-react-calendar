@@ -9,7 +9,12 @@ import {
 import shared from "@/global/global.module.css";
 import { Clear } from "@/Icons";
 import {
-  DEFAULT_CALENDAR_ACTION_LABELS,
+  DEFAULT_CLEAR_LABEL,
+  DEFAULT_REMOVE_RANGE_END_LABEL,
+  DEFAULT_REMOVE_RANGE_START_LABEL,
+  DEFAULT_REMOVE_SELECTED_DATE_LABEL,
+  DEFAULT_SHOW_MORE_SELECTED_DATES_LABEL,
+  formatActionLabel,
   resolveActionLabel,
 } from "@/utils/action-labels";
 import { isSameDay } from "@/utils/date-core";
@@ -54,6 +59,10 @@ export interface CalendarSelectedDatesProps {
   clearLabel?: string;
   maxVisibleChips?: number;
   overflowLabel?: string;
+  removeRangeEndLabel?: string;
+  removeRangeStartLabel?: string;
+  removeSelectedDateLabel?: string;
+  showMoreSelectedDatesLabel?: string;
   showTime?: boolean;
   col?: number | string;
 }
@@ -101,6 +110,10 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
   clearLabel,
   maxVisibleChips,
   overflowLabel = "+{count}",
+  removeRangeEndLabel,
+  removeRangeStartLabel,
+  removeSelectedDateLabel,
+  showMoreSelectedDatesLabel,
   showTime = false,
   col,
 }) => {
@@ -121,7 +134,27 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
   const resolvedClearLabel = resolveActionLabel(
     clearLabel,
     actionLabels.clearLabel,
-    DEFAULT_CALENDAR_ACTION_LABELS.clearLabel,
+    DEFAULT_CLEAR_LABEL,
+  );
+  const resolvedRemoveRangeStartLabel = resolveActionLabel(
+    removeRangeStartLabel,
+    actionLabels.removeRangeStartLabel,
+    DEFAULT_REMOVE_RANGE_START_LABEL,
+  );
+  const resolvedRemoveRangeEndLabel = resolveActionLabel(
+    removeRangeEndLabel,
+    actionLabels.removeRangeEndLabel,
+    DEFAULT_REMOVE_RANGE_END_LABEL,
+  );
+  const resolvedRemoveSelectedDateLabel = resolveActionLabel(
+    removeSelectedDateLabel,
+    actionLabels.removeSelectedDateLabel,
+    DEFAULT_REMOVE_SELECTED_DATE_LABEL,
+  );
+  const resolvedShowMoreSelectedDatesLabel = resolveActionLabel(
+    showMoreSelectedDatesLabel,
+    actionLabels.showMoreSelectedDatesLabel,
+    DEFAULT_SHOW_MORE_SELECTED_DATES_LABEL,
   );
   const { viewDate: date, navigateTo } = useNavigation();
   const { selectedDates, rangeStart, rangeEnd } = useSelectionValue();
@@ -339,7 +372,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
           className: chipClass(rangeStart),
           label: fmtChip(rangeStart),
           onNavigate: () => allowNavigate && navigateTo(rangeStart),
-          removeLabel: "Remove range start",
+          removeLabel: resolvedRemoveRangeStartLabel,
           bound: "from",
         })}
         <span className={styles.rangeSep}>
@@ -352,7 +385,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
             className: chipClass(rangeEnd),
             label: fmtChip(rangeEnd),
             onNavigate: () => allowNavigate && navigateTo(rangeEnd),
-            removeLabel: "Remove range end",
+            removeLabel: resolvedRemoveRangeEndLabel,
             bound: "to",
           })}
       </>
@@ -370,7 +403,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
           dataSelectedDateChip: true,
           label: fmtChip(d),
           onNavigate: () => allowNavigate && navigateTo(d),
-          removeLabel: "Remove selected date",
+          removeLabel: resolvedRemoveSelectedDateLabel,
           className: [
             styles.chip,
             allowClearPerChip ? styles.chipWithRemove : shared.interactive,
@@ -387,7 +420,11 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
         <button
           type="button"
           className={`${styles.chip} ${styles.overflowChip} ${shared.interactive} ${shared.hovered}`}
-          aria-label={`Show ${overflowCount} more selected dates`}
+          aria-label={formatActionLabel(
+            resolvedShowMoreSelectedDatesLabel,
+            "count",
+            overflowCount,
+          )}
           onClick={() => setIsExpanded(true)}
           title={`${overflowCount} more selected dates`}
         >

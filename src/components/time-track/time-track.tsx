@@ -19,6 +19,11 @@ interface TimeTrackProps {
   readOnly?: boolean;
   step?: TimeStep;
   labels?: TimeLabelStyle;
+  hoursLabel?: string;
+  minutesLabel?: string;
+  secondsLabel?: string;
+  timePeriodLabel?: string;
+  timePickerLabel?: string;
   onChange: (date: Date) => void;
 }
 
@@ -58,6 +63,11 @@ export const TimeTrack = ({
   readOnly = false,
   step,
   labels,
+  hoursLabel = "Hours",
+  minutesLabel = "Minutes",
+  secondsLabel = "Seconds",
+  timePeriodLabel = "Time period, currently {period}",
+  timePickerLabel = "Time picker",
   onChange,
 }: TimeTrackProps) => {
   const resolveLabel = (field: "hour" | "minute" | "second") => {
@@ -91,13 +101,16 @@ export const TimeTrack = ({
   };
 
   return (
-    <div className={styles.root} role="group" aria-label="Time picker">
+    <div className={styles.root} role="group" aria-label={timePickerLabel}>
       {hour12 && (
         <button
           type="button"
           role="switch"
           aria-checked={period === "PM"}
-          aria-label={`Time period, currently ${period === "AM" ? "before noon" : "after noon"}`}
+          aria-label={timePeriodLabel.replaceAll(
+            "{period}",
+            period === "AM" ? "before noon" : "after noon",
+          )}
           className={styles.period}
           data-period={period}
           onClick={() =>
@@ -125,7 +138,7 @@ export const TimeTrack = ({
             value={hour12 ? hours - 1 : hours}
             max={hourMax}
             step={hourStep}
-            label="Hours"
+            label={hoursLabel}
             getValueText={hour12 ? (v) => hourText(v + 1) : hourText}
             format={hour12 ? (v) => padTime(v + 1) : undefined}
             readOnly={readOnly}
@@ -146,7 +159,7 @@ export const TimeTrack = ({
             value={minutes}
             max={60}
             step={minuteStep}
-            label="Minutes"
+            label={minutesLabel}
             getValueText={minuteText}
             readOnly={readOnly}
             onChange={(m) => emit(hours, m, seconds, period)}
@@ -168,7 +181,7 @@ export const TimeTrack = ({
                 value={seconds}
                 max={60}
                 step={secondStep}
-                label="Seconds"
+                label={secondsLabel}
                 getValueText={secondText}
                 readOnly={readOnly}
                 onChange={(s) => emit(hours, minutes, s, period)}

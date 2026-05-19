@@ -10,7 +10,8 @@ import shared from "@/global/global.module.css";
 import { useToday } from "@/hooks/use-today";
 import { Home } from "@/Icons";
 import {
-  DEFAULT_CALENDAR_ACTION_LABELS,
+  DEFAULT_CLEAR_LABEL,
+  DEFAULT_HOME_LABEL,
   resolveActionLabel,
 } from "@/utils/action-labels";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
@@ -34,6 +35,14 @@ const hasRenderableNode = (node: React.ReactNode) =>
   node !== undefined &&
   node !== "" &&
   typeof node !== "boolean";
+
+const isActionKey = (key: string) =>
+  key === "ArrowLeft" ||
+  key === "ArrowRight" ||
+  key === "ArrowUp" ||
+  key === "ArrowDown" ||
+  key === "Home" ||
+  key === "End";
 
 export type { CalendarInfoRangeStyle } from "./utils";
 
@@ -84,17 +93,18 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
   const contentGroupRef = useRef<HTMLDivElement>(null);
   const homeBtnRef = useRef<HTMLButtonElement>(null);
   const clearBtnRef = useRef<HTMLButtonElement>(null);
+  const shouldRestoreActionFocusRef = useRef(false);
   const { locale, multiselect, range, readOnly, timeZone, actionLabels } =
     useConfig();
   const resolvedClearLabel = resolveActionLabel(
     clearLabel,
     actionLabels.clearLabel,
-    DEFAULT_CALENDAR_ACTION_LABELS.clearLabel,
+    DEFAULT_CLEAR_LABEL,
   );
   const resolvedHomeLabel = resolveActionLabel(
     homeLabel,
     actionLabels.homeLabel,
-    DEFAULT_CALENDAR_ACTION_LABELS.homeLabel,
+    DEFAULT_HOME_LABEL,
   );
   const { viewDate, navigateTo } = useNavigation();
   const today = useToday();
@@ -183,6 +193,35 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
   const hasClearBtn = allowClear && hasSelection;
   const hasTextContent = hasSummary || hasRelativeSummary;
   const hasContent = hasTextContent || showHome || hasClearBtn;
+  const hasActionGroup = showHome || hasClearBtn;
+
+  const getEnabledActionButtons = () =>
+    [homeBtnRef.current, clearBtnRef.current].filter(
+      (button): button is HTMLButtonElement => !!button && !button.disabled,
+    );
+
+  const handleActionsKeyDown = (event: React.KeyboardEvent) => {
+    if (!isActionKey(event.key)) return;
+
+    const target = event.target as HTMLElement | null;
+    const current = target?.closest("button") as HTMLButtonElement | null;
+    const buttons = getEnabledActionButtons();
+    const currentIndex = current ? buttons.indexOf(current) : -1;
+    if (currentIndex < 0 || buttons.length < 2) return;
+
+    event.preventDefault();
+
+    const nextIndex =
+      event.key === "Home"
+        ? 0
+        : event.key === "End"
+          ? buttons.length - 1
+          : event.key === "ArrowRight" || event.key === "ArrowDown"
+            ? Math.min(buttons.length - 1, currentIndex + 1)
+            : Math.max(0, currentIndex - 1);
+
+    buttons[nextIndex]?.focus();
+  };
 
   useIsoLayoutEffect(() => {
     if (!animated) {
@@ -231,8 +270,20 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
     showHome,
   ]);
 
+  useIsoLayoutEffect(() => {
+    if (!shouldRestoreActionFocusRef.current) return;
+    shouldRestoreActionFocusRef.current = false;
+    getEnabledActionButtons()[0]?.focus();
+  }, [hasClearBtn, showHome]);
+
   const handleClear = () => {
     if (readOnly) return;
+    if (
+      typeof document !== "undefined" &&
+      document.activeElement === clearBtnRef.current
+    ) {
+      shouldRestoreActionFocusRef.current = true;
+    }
     if (range) {
       onRangeSet(null, null);
       return;
@@ -278,6 +329,7 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
           className={styles.contentGroup}
           role={hasTextContent ? "status" : undefined}
           aria-live={hasTextContent ? "polite" : undefined}
+          aria-atomic={hasTextContent ? "true" : undefined}
           style={{ justifyContent: alignToJustify[align] }}
         >
           {hasSummary && (
@@ -290,29 +342,33 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
             <div className={styles.infoText}>{relativeSummary}</div>
           )}
         </div>
-        {showHome && (
-          <button
-            ref={homeBtnRef}
-            type="button"
-            aria-label={resolvedHomeLabel}
-            className={`${styles.actionBtn} ${shared.interactive} ${shared.hovered} ${!today || isCurrentMonth ? styles.actionBtnDisabled : ""}`}
-            onClick={goHome}
-            disabled={!today || isCurrentMonth}
-          >
-            <Home />
-          </button>
-        )}
-        {hasClearBtn && (
-          <button
-            ref={clearBtnRef}
-            type="button"
-            aria-label={resolvedClearLabel}
-            className={`${styles.clearBtn} ${styles.actionBtn} ${shared.interactive} ${shared.hovered}`}
-            onClick={handleClear}
-            disabled={readOnly}
-          >
-            ×
-          </button>
+        {hasActionGroup && (
+          <div className={styles.actionsGroup} onKeyDown={handleActionsKeyDown}>
+            {showHome && (
+              <button
+                ref={homeBtnRef}
+                type="button"
+                aria-label={resolvedHomeLabel}
+                className={`${styles.actionBtn} ${shared.interactive} ${shared.hovered} ${!today || isCurrentMonth ? styles.actionBtnDisabled : ""}`}
+                onClick={goHome}
+                disabled={!today || isCurrentMonth}
+              >
+                <Home />
+              </button>
+            )}
+            {hasClearBtn && (
+              <button
+                ref={clearBtnRef}
+                type="button"
+                aria-label={resolvedClearLabel}
+                className={`${styles.clearBtn} ${styles.actionBtn} ${shared.interactive} ${shared.hovered}`}
+                onClick={handleClear}
+                disabled={readOnly}
+              >
+                ×
+              </button>
+            )}
+          </div>
         )}
       </div>
     </div>

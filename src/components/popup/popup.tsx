@@ -11,6 +11,7 @@ interface PopupProps {
   onConfirm: () => void;
   onClose: () => void;
   label?: string;
+  confirmLabel?: string;
 }
 
 export const Popup = ({
@@ -18,6 +19,7 @@ export const Popup = ({
   onConfirm,
   onClose,
   label = "Dialog",
+  confirmLabel = "Confirm",
 }: PopupProps) => {
   const { popupAnchorEl, setPopupAnchorEl, containerRef } = useUI();
   const backdropRef = useRef<HTMLDivElement>(null);
@@ -94,7 +96,7 @@ export const Popup = ({
         <button
           type="button"
           className={styles.confirm}
-          aria-label="Confirm"
+          aria-label={confirmLabel}
           onClick={onConfirm}
         >
           <Check />

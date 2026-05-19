@@ -24,18 +24,23 @@
   <img src="https://i.ibb.co/pj9WVkSR/image.png" alt="Compact DateForge calendar" width="360" />
 </div>
 
-**The modular calendar toolkit that starts tiny and grows into exactly what your product needs.**
+**A modular calendar toolkit that starts tiny and grows with your product.**
 
-Monolithic pickers ship everything: the grid, the nav, the time picker, the presets, the opinions, the layout, the weight. DateForge ships only what you use.
+Monolithic pickers ship the grid, nav, time picker, presets, layout opinions, and weight. DateForge ships only what you use.
 
-Start with two components. Add only the pieces your workflow earns: range selection, multi-select, time, presets, manual input, selected-date chips, track pickers, custom layouts, themes, appearances, and tokens. DateForge is not one picker with a long prop list — it is a toolkit of focused modules that share one calendar brain.
+Start with two components. Add range selection, multi-select, time, presets, manual input, chips, tracks, custom layouts, themes, and tokens.
+
+DateForge is not one picker with a long prop list. It is a set of focused modules that share one calendar brain.
 
 **Modular · Composable · Tokenized**  
 **Start minimal. Scale infinitely. Add only the modules you need.**
 
-The module mix, selection modes, visual tokens, and focused props unlock **~2.0 trillion built-in calendar configurations** without forcing you into one prebuilt UI.
+The module mix, selection modes, tokens, and focused props unlock **~2.0 trillion built-in calendar configurations** without forcing one prebuilt UI.
 
-Use built-in themes and appearances, or create your own with first-class APIs. Shape selection with flexible presets, disabled rules, min/max bounds, timezone-aware dates, and `single`, `multiple`, or `range` modes. Build a classic picker, a date track, a 12-month range board, a month-only selector, a time-only control, or a fully custom booking flow from the same parts.
+Use built-in themes and appearances, or create your own. Shape selection with presets, disabled rules, min/max bounds, timezones, and modes:
+`single`, `multiple`, or `range`.
+
+Build a classic picker, date track, 12-month board, month-only selector, time-only control, or custom booking flow from the same parts.
 
 <div align="center">
 
@@ -55,12 +60,12 @@ Use built-in themes and appearances, or create your own with first-class APIs. S
 
 Most date pickers ask you to accept their shape. DateForge lets you forge yours.
 
-- **Ship less by default** — import a tiny `CalendarDays` grid and `CalendarNav`, then stop. No unused time picker, no bundled presets, no hidden panel waiting in your JavaScript.
-- **Compose real product workflows** — add modules when the UX needs them: range previews, multi-month layouts, inline time grids, shortcuts, manual input, selected-date summaries, or mobile-friendly tracks.
+- **Ship less by default** — import `CalendarDays` and `CalendarNav`, then stop. No unused time picker, presets, or hidden panel.
+- **Compose real workflows** — add modules for range previews, multi-month layouts, inline time, shortcuts, manual input, summaries, or tracks.
 - **Keep one shared state model** — every module plugs into the same provider, so custom layouts feel native instead of stitched together.
-- **Style it like your system** — themes, appearances, gradients, CSS-grid placement, and tokenized styling let the calendar look built-in, not embedded.
-- **Grow without rewriting** — the same API covers a two-component date picker, a booking range calendar, a time-aware scheduler, or a dense operations tool.
-- **Built for serious apps** — accessible interactions, SSR-safe defaults, timezone handling, React 18/19 support, zero runtime dependencies, and tree-shakeable module entry points.
+- **Style it like your system** — themes, appearances, gradients, CSS-grid placement, and tokens help it feel built-in.
+- **Grow without rewriting** — the same API covers a tiny picker, booking range calendar, scheduler, or dense operations tool.
+- **Built for serious apps** — a11y, SSR-safe defaults, timezones, React 18/19, zero runtime dependencies, and tree-shakeable modules.
 
 ```tsx
 <Calendar mode="range" value={range} onChange={setRange}>

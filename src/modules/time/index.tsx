@@ -11,6 +11,16 @@ import {
 } from "@/context/selection-context";
 import { useToday } from "@/hooks/use-today";
 import { Clock } from "@/Icons";
+import {
+  DEFAULT_HOURS_LABEL,
+  DEFAULT_MINUTES_LABEL,
+  DEFAULT_RESET_TIME_LABEL,
+  DEFAULT_SECONDS_LABEL,
+  DEFAULT_TIME_PERIOD_LABEL,
+  DEFAULT_TIME_PICKER_LABEL,
+  formatActionLabel,
+  resolveActionLabel,
+} from "@/utils/action-labels";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { getDateTimeFormat } from "@/utils/intl-cache";
 import styles from "./time.module.css";
@@ -22,6 +32,10 @@ export interface CalendarTimeGridProps {
    */
   bound?: "from" | "to";
   col?: number | string;
+  hoursLabel?: string;
+  minutesLabel?: string;
+  resetTimeLabel?: string;
+  secondsLabel?: string;
   seconds?: boolean;
   /**
    * Render a localized date header above the TimeTrack for the bound's
@@ -41,6 +55,8 @@ export interface CalendarTimeGridProps {
    * "now" word via `Intl.RelativeTimeFormat`.
    */
   resetLabel?: React.ReactNode;
+  timePeriodLabel?: string;
+  timePickerLabel?: string;
   /**
    * Show a small label above each drum.
    * - `"short"` renders `HH` / `MM` / `SS` (clock convention, not localized).
@@ -62,14 +78,51 @@ export interface CalendarTimeGridProps {
 export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
   bound,
   col,
+  hoursLabel,
+  minutesLabel,
+  resetTimeLabel,
+  secondsLabel,
   seconds = false,
   labels,
   onTimeSelect,
   showBoundDate = true,
   showReset = false,
   resetLabel,
+  timePeriodLabel,
+  timePickerLabel,
 }) => {
-  const { hour12, locale, range, readOnly, timeStep, timeZone } = useConfig();
+  const { hour12, locale, range, readOnly, timeStep, timeZone, actionLabels } =
+    useConfig();
+  const resolvedHoursLabel = resolveActionLabel(
+    hoursLabel,
+    actionLabels.hoursLabel,
+    DEFAULT_HOURS_LABEL,
+  );
+  const resolvedMinutesLabel = resolveActionLabel(
+    minutesLabel,
+    actionLabels.minutesLabel,
+    DEFAULT_MINUTES_LABEL,
+  );
+  const resolvedSecondsLabel = resolveActionLabel(
+    secondsLabel,
+    actionLabels.secondsLabel,
+    DEFAULT_SECONDS_LABEL,
+  );
+  const resolvedResetTimeLabel = resolveActionLabel(
+    resetTimeLabel,
+    actionLabels.resetTimeLabel,
+    DEFAULT_RESET_TIME_LABEL,
+  );
+  const resolvedTimePeriodLabel = resolveActionLabel(
+    timePeriodLabel,
+    actionLabels.timePeriodLabel,
+    DEFAULT_TIME_PERIOD_LABEL,
+  );
+  const resolvedTimePickerLabel = resolveActionLabel(
+    timePickerLabel,
+    actionLabels.timePickerLabel,
+    DEFAULT_TIME_PICKER_LABEL,
+  );
   const { viewDate: date } = useNavigation();
   const { rangeStart, rangeEnd } = useSelectionValue();
   const { onChangeTime, onRangeBoundSet } = useSelectionActions();
@@ -147,6 +200,11 @@ export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
         readOnly={readOnly || (isBound && !boundDate)}
         step={timeStep}
         labels={labels}
+        hoursLabel={resolvedHoursLabel}
+        minutesLabel={resolvedMinutesLabel}
+        secondsLabel={resolvedSecondsLabel}
+        timePeriodLabel={resolvedTimePeriodLabel}
+        timePickerLabel={resolvedTimePickerLabel}
         onChange={handleChange}
       />
       {resetContent && (
@@ -154,7 +212,11 @@ export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
           type="button"
           className={styles.resetBtn}
           onClick={handleReset}
-          aria-label={nowWord ? `Reset to ${nowWord}` : "Reset"}
+          aria-label={
+            nowWord
+              ? formatActionLabel(resolvedResetTimeLabel, "time", nowWord)
+              : resolvedResetTimeLabel
+          }
         >
           {resetContent}
         </button>

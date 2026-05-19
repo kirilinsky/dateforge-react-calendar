@@ -11,6 +11,12 @@ import { useUI } from "@/context/ui-context";
 import shared from "@/global/global.module.css";
 import { useBoundDateView } from "@/hooks/use-bound-date-view";
 import { Check, Clear } from "@/Icons";
+import {
+  DEFAULT_DAY_TRACK_LABEL,
+  DEFAULT_REMOVE_SELECTED_DATE_LABEL,
+  DEFAULT_SAVE_SELECTED_DATE_LABEL,
+  resolveActionLabel,
+} from "@/utils/action-labels";
 import { clampBoundDate, computeBoundLimits } from "@/utils/clamp-bound-date";
 import { isSameDay } from "@/utils/date-core";
 import { getDateTimeFormat } from "@/utils/intl-cache";
@@ -24,19 +30,47 @@ export interface CalendarDaysTrackProps {
   showMonthLabel?: boolean;
   bound?: "from" | "to";
   col?: number | string;
+  dayTrackLabel?: string;
+  removeSelectedDateLabel?: string;
+  saveSelectedDateLabel?: string;
 }
 
 export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
   showMonthLabel = false,
   bound,
   col,
+  dayTrackLabel,
+  removeSelectedDateLabel,
+  saveSelectedDateLabel,
 }) => {
   const { viewDate, navigateTo } = useNavigation();
   const { selectedDate, selectedDates, rangeStart, rangeEnd } =
     useSelectionValue();
   const { onChangeDate, onRangeBoundSet } = useSelectionActions();
-  const { minDate, maxDate, locale, range, multiselect, readOnly } =
-    useConfig();
+  const {
+    minDate,
+    maxDate,
+    locale,
+    range,
+    multiselect,
+    readOnly,
+    actionLabels,
+  } = useConfig();
+  const resolvedDayTrackLabel = resolveActionLabel(
+    dayTrackLabel,
+    actionLabels.dayTrackLabel,
+    DEFAULT_DAY_TRACK_LABEL,
+  );
+  const resolvedSaveSelectedDateLabel = resolveActionLabel(
+    saveSelectedDateLabel,
+    actionLabels.saveSelectedDateLabel,
+    DEFAULT_SAVE_SELECTED_DATE_LABEL,
+  );
+  const resolvedRemoveSelectedDateLabel = resolveActionLabel(
+    removeSelectedDateLabel,
+    actionLabels.removeSelectedDateLabel,
+    DEFAULT_REMOVE_SELECTED_DATE_LABEL,
+  );
   const { setDaysTrackActive } = useUI();
   const isMulti = !!multiselect;
 
@@ -149,7 +183,7 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
       half={5}
       initialItemWidth={44}
       pageStep={7}
-      ariaLabel="Day"
+      ariaLabel={resolvedDayTrackLabel}
       getAriaValueNow={(i) => i + 1}
       getAriaValueMin={() => minIdx + 1}
       getAriaValueMax={() => maxIdx + 1}
@@ -190,7 +224,9 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
             type="button"
             className={`${styles.confirmBtn} ${shared.interactive} ${shared.hovered} ${matchesExisting ? styles.removeBtn : ""}`}
             aria-label={
-              matchesExisting ? "Remove selected date" : "Save selected date"
+              matchesExisting
+                ? resolvedRemoveSelectedDateLabel
+                : resolvedSaveSelectedDateLabel
             }
             onClick={handleConfirm}
             onPointerDown={(e) => e.stopPropagation()}

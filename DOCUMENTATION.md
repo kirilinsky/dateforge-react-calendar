@@ -157,6 +157,86 @@ import { CalendarNav, CalendarDays } from "@dateforge/react-calendar/modules";
 | `disabled`        | `DisabledConfig`                                      | —          | Rules for disabling specific dates. Build with `createDisabled()`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | `children`        | `React.ReactNode`                                     | —          | Module components that compose the calendar UI                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
+### Action aria labels
+
+Control aria-labels resolve as `module prop → Calendar prop → built-in default`. Use root props for a whole calendar, then override a specific module only when needed.
+
+Template labels support named placeholders:
+
+```tsx
+<Calendar
+  clearLabel="Auswahl löschen"
+  changeMonthLabel="Monat öffnen: {month}"
+  showMoreSelectedDatesLabel="{count} weitere ausgewählte Daten anzeigen"
+/>
+```
+
+Date labels remain locale-derived through `Intl` where the label describes an actual date, month, year, weekday, or week number.
+
+#### Root label props
+
+All of these props can be passed to `<Calendar>`.
+
+| Prop | Default | Placeholders | Used for |
+| ---- | ------- | ------------ | -------- |
+| `applyLabel` | `"Apply"` | — | Manual input apply buttons |
+| `calendarNavigationLabel` | `"Calendar navigation"` | — | Nav toolbar when no visible `label` prop is provided |
+| `changeMonthLabel` | `"Change month, currently {month}"` | `{month}` | Nav month popup trigger |
+| `changeTimeLabel` | `"Change time, currently {time}"` | `{time}` | Nav time popup trigger |
+| `changeYearLabel` | `"Change year, currently {year}"` | `{year}` | Nav year popup trigger |
+| `clearLabel` | `"Clear"` | — | Clear buttons |
+| `confirmLabel` | `"Confirm"` | — | Popup confirm buttons |
+| `dayTrackLabel` | `"Day"` | — | Days track spinbutton |
+| `homeLabel` | `"Go to current month"` | — | Home/current-month buttons |
+| `hoursLabel` | `"Hours"` | — | Time hour drum |
+| `minutesLabel` | `"Minutes"` | — | Time minute drum |
+| `monthGridLabel` | `"Select month, {year}"` | `{year}` | Months grid group |
+| `monthPickerLabel` | `"Month picker"` | — | Nav month picker group |
+| `monthTrackLabel` | `"Month"` | — | Month track / month popup drum |
+| `nextMonthLabel` | `"Next month"` | — | Nav next-month button |
+| `nextYearLabel` | `"Next year"` | — | Nav next-year button |
+| `nextYearsLabel` | `"Next years"` | — | Years grid next-page button |
+| `previousMonthLabel` | `"Previous month"` | — | Nav previous-month button |
+| `previousYearLabel` | `"Previous year"` | — | Nav previous-year button |
+| `previousYearsLabel` | `"Previous years"` | — | Years grid previous-page button |
+| `removeLabel` | `"Remove"` | — | Manual input per-chip remove button |
+| `removeRangeEndLabel` | `"Remove range end"` | — | Selected-dates range-end remove button |
+| `removeRangeStartLabel` | `"Remove range start"` | — | Selected-dates range-start remove button |
+| `removeSelectedDateLabel` | `"Remove selected date"` | — | Selected date remove/toggle buttons |
+| `resetTimeLabel` | `"Reset to {time}"` | `{time}` | Time reset button |
+| `saveSelectedDateLabel` | `"Save selected date"` | — | Days track multi-mode save button |
+| `secondsLabel` | `"Seconds"` | — | Time second drum |
+| `selectMonthLabel` | `"Select month"` | — | Month popup dialog |
+| `selectTimeLabel` | `"Select time"` | — | Time popup dialog |
+| `selectYearLabel` | `"Select year"` | — | Year popup dialog |
+| `showMoreSelectedDatesLabel` | `"Show {count} more selected dates"` | `{count}` | Selected-dates overflow chip |
+| `themeSwitchToDarkLabel` | `"Switch to dark mode"` | — | Theme toggle when current theme is light |
+| `themeSwitchToLightLabel` | `"Switch to light mode"` | — | Theme toggle when current theme is dark |
+| `themeToggleLabel` | `"Toggle theme"` | — | Theme toggle while theme is still auto/unresolved |
+| `timePeriodLabel` | `"Time period, currently {period}"` | `{period}` | AM/PM switch |
+| `timePickerLabel` | `"Time picker"` | — | Time track group |
+| `yearGridLabel` | `"Select year, showing {from} to {to}"` | `{from}`, `{to}` | Years grid group |
+| `yearPageNavigationLabel` | `"Year page navigation"` | — | Years grid page controls group |
+| `yearPickerLabel` | `"Year picker"` | — | Nav year picker group |
+| `yearTrackLabel` | `"Year"` | — | Year track / year popup drum |
+
+#### Module override props
+
+Module props use the same names and override the matching root prop only for that module instance.
+
+| Module | Override props |
+| ------ | -------------- |
+| `CalendarNav` | `calendarNavigationLabel`, `changeMonthLabel`, `changeTimeLabel`, `changeYearLabel`, `clearLabel`, `confirmLabel`, `homeLabel`, `hoursLabel`, `minutesLabel`, `monthPickerLabel`, `monthTrackLabel`, `nextMonthLabel`, `nextYearLabel`, `previousMonthLabel`, `previousYearLabel`, `secondsLabel`, `selectMonthLabel`, `selectTimeLabel`, `selectYearLabel`, `themeSwitchToDarkLabel`, `themeSwitchToLightLabel`, `themeToggleLabel`, `timePeriodLabel`, `timePickerLabel`, `yearPickerLabel`, `yearTrackLabel` |
+| `CalendarInfo` | `clearLabel`, `homeLabel` |
+| `CalendarManualInput` | `applyLabel`, `clearLabel`, `removeLabel` |
+| `CalendarSelectedDates` | `clearLabel`, `removeRangeEndLabel`, `removeRangeStartLabel`, `removeSelectedDateLabel`, `showMoreSelectedDatesLabel` |
+| `CalendarDaysTrack` | `dayTrackLabel`, `removeSelectedDateLabel`, `saveSelectedDateLabel` |
+| `CalendarMonthsTrack` | `monthTrackLabel` |
+| `CalendarYearsTrack` | `yearTrackLabel` |
+| `CalendarTimeGrid` | `hoursLabel`, `minutesLabel`, `resetTimeLabel`, `secondsLabel`, `timePeriodLabel`, `timePickerLabel` |
+| `CalendarMonthsGrid` | `monthGridLabel` |
+| `CalendarYearsGrid` | `nextYearsLabel`, `previousYearsLabel`, `yearGridLabel`, `yearPageNavigationLabel` |
+
 ### When does each action fire `onChange`?
 
 The complete cross-module matrix lives in `ARCHITECTURE.md → Module behavior matrix`. It tells you for every public action — Nav arrows, day click, preset click, drum scroll, manual input commit, etc. — whether it changes the view, mutates the selection, fires the consumer callback, and how it behaves under `readOnly`.
@@ -950,6 +1030,8 @@ When `showSummary` is `true` and no custom `formatter` is passed:
 - `mode="range"` with both boundaries selected shows a range metric controlled by `rangeStyle`.
 
 `showRelative` can be enabled at the same time as `showSummary`; the module renders a second compact text chip such as `in 3 days`. Relative time always uses the current selected value (`selectedDate`, first selected date, `rangeStart`, then `rangeEnd`) and compares it to today.
+
+Keyboard: `showHome` and `allowClear` render native buttons. When both actions are available, `ArrowLeft` / `ArrowUp`, `ArrowRight` / `ArrowDown`, `Home`, and `End` move focus between them; `Enter` / `Space` activate the focused button.
 
 ### Props
 
