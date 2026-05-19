@@ -1,4 +1,4 @@
-@layer cal-base {
+@layer cal-component {
 
   @keyframes popupSlideDown {
     from { opacity: 0; transform: translateY(-6px) scale(0.97); }

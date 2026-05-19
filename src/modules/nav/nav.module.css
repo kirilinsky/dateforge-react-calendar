@@ -1,4 +1,4 @@
-@layer cal-base {
+@layer cal-module {
   .headerContainer button {
     height: 2.3em;
   }

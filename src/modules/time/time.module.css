@@ -1,4 +1,4 @@
-@layer cal-base {
+@layer cal-module {
 
 .timeContainer {
   container-type: inline-size;

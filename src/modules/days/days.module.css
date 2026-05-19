@@ -1,4 +1,4 @@
-@layer cal-base {
+@layer cal-module {
   .daysArea {
     display: flex;
     align-items: stretch;

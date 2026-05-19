@@ -1,4 +1,4 @@
-@layer cal-base {
+@layer cal-module {
   .infoContainer {
     --calendar-info-transition: var(--cal-transition, 0.2s);
 
