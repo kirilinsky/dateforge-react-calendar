@@ -166,7 +166,7 @@ DateAndTimePicker.storyName = "Single / Date + time";
 export const RelativeDeadline: Story = {
   render: (_args, ctx) => {
     const [date, setDate] = useState<Date | null>(() => {
-      const tomorrow = new Date();
+      const tomorrow = new Date(FIXED_DATE);
       tomorrow.setHours(0, 0, 0, 0);
       tomorrow.setDate(tomorrow.getDate() + 1);
       return tomorrow;
@@ -488,7 +488,7 @@ export const FlightTracks: Story = {
       to: null,
     });
     const noPast = useMemo(() => {
-      const today = new Date();
+      const today = new Date(FIXED_DATE);
       today.setHours(0, 0, 0, 0);
       return createDisabled({ before: today });
     }, []);
