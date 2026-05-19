@@ -35,6 +35,7 @@ export const DEFAULT_THEME_SWITCH_TO_LIGHT_LABEL = "Switch to light mode";
 export const DEFAULT_THEME_TOGGLE_LABEL = "Toggle theme";
 export const DEFAULT_TIME_PERIOD_LABEL = "Time period, currently {period}";
 export const DEFAULT_TIME_PICKER_LABEL = "Time picker";
+export const DEFAULT_WEEK_LABEL = "Week";
 export const DEFAULT_YEAR_GRID_LABEL = "Select year, showing {from} to {to}";
 export const DEFAULT_YEAR_PAGE_NAVIGATION_LABEL = "Year page navigation";
 export const DEFAULT_YEAR_PICKER_LABEL = "Year picker";

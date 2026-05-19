@@ -1,6 +1,7 @@
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
+import { CalendarDays } from "@/modules/days";
 import { CalendarDaysTrack } from "@/modules/days-track";
 import { CalendarInfo } from "@/modules/info";
 import { CalendarManualInput } from "@/modules/manual-input";
@@ -61,7 +62,7 @@ describe("action aria labels", () => {
   });
 
   it("uses global Calendar labels for module controls", () => {
-    const { getByLabelText } = render(
+    const { getAllByLabelText, getByLabelText } = render(
       <Calendar
         mode="multiple"
         value={[D(2024, 5, 15)]}
@@ -85,12 +86,14 @@ describe("action aria labels", () => {
         removeSelectedDateLabel="Remove day"
         saveSelectedDateLabel="Save day"
         timePickerLabel="Time controls"
+        weekLabel="Week row"
         yearGridLabel="Year grid {from}-{to}"
         yearPageNavigationLabel="Year pages"
         yearPickerLabel="Year controls"
         yearTrackLabel="Year rail"
       >
         <CalendarNav showTime showMonthPicker showYearPicker />
+        <CalendarDays weekNumbers />
         <CalendarDaysTrack />
         <CalendarMonthsTrack />
         <CalendarYearsTrack />
@@ -115,6 +118,7 @@ describe("action aria labels", () => {
     expect(getByLabelText("Month rail")).toBeTruthy();
     expect(getByLabelText("Year rail")).toBeTruthy();
     expect(getByLabelText("Time controls")).toBeTruthy();
+    expect(getAllByLabelText(/Week row \d+/).length).toBeGreaterThan(0);
     expect(getByLabelText("Hour drum")).toBeTruthy();
     expect(getByLabelText("Minute drum")).toBeTruthy();
     expect(getByLabelText("Month grid 2024")).toBeTruthy();

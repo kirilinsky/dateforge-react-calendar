@@ -55,6 +55,7 @@ import {
   DEFAULT_TIME_PICKER_LABEL,
   DEFAULT_YEAR_PICKER_LABEL,
   DEFAULT_YEAR_TRACK_LABEL,
+  formatActionLabel,
   resolveActionLabel,
 } from "@/utils/action-labels";
 import { clampBoundDate } from "@/utils/clamp-bound-date";
@@ -528,18 +529,6 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
   const monthNameShort = getDateTimeFormat(locale, { month: "short" }).format(
     date,
   );
-  const changeTimeAriaLabel = resolvedChangeTimeLabel.replaceAll(
-    "{time}",
-    curTime,
-  );
-  const changeMonthAriaLabel = resolvedChangeMonthLabel.replaceAll(
-    "{month}",
-    monthNameLong,
-  );
-  const changeYearAriaLabel = resolvedChangeYearLabel.replaceAll(
-    "{year}",
-    String(cur),
-  );
 
   const ch = (v: number) =>
     navigateBoundOrView(addDate(rawDate, v, "year", minDate, maxDate));
@@ -594,7 +583,11 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           <button
             type="button"
             className={`${styles.timeButton} ${shared.interactive}`}
-            aria-label={changeTimeAriaLabel}
+            aria-label={formatActionLabel(
+              resolvedChangeTimeLabel,
+              "time",
+              curTime,
+            )}
             aria-haspopup="dialog"
             aria-expanded={timePopupOpen}
             onClick={openPopup(setTimePopupOpen)}
@@ -608,7 +601,11 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
             type="button"
             disabled={monthFixed}
             className={`${styles.monthButton} ${shared.interactive} ${shared.hovered}`}
-            aria-label={changeMonthAriaLabel}
+            aria-label={formatActionLabel(
+              resolvedChangeMonthLabel,
+              "month",
+              monthNameLong,
+            )}
             aria-haspopup="dialog"
             aria-expanded={monthPopupOpen}
             onClick={monthFixed ? undefined : openPopup(setMonthPopupOpen)}
@@ -654,7 +651,11 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
               disabled={monthFixed}
               onClick={monthFixed ? undefined : openPopup(setMonthPopupOpen)}
               className={`${styles.currentYear} ${shared.interactive} ${shared.hovered} ${monthFixed ? styles.staticButton : ""}`}
-              aria-label={changeMonthAriaLabel}
+              aria-label={formatActionLabel(
+                resolvedChangeMonthLabel,
+                "month",
+                monthNameLong,
+              )}
               aria-haspopup={monthFixed ? undefined : "dialog"}
               aria-expanded={monthFixed ? undefined : monthPopupOpen}
             >
@@ -698,7 +699,11 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
               disabled={yearFixed}
               onClick={yearFixed ? undefined : openPopup(setYearPopupOpen)}
               className={`${styles.currentYear} ${shared.interactive} ${shared.hovered} ${yearFixed ? styles.staticButton : ""}`}
-              aria-label={changeYearAriaLabel}
+              aria-label={formatActionLabel(
+                resolvedChangeYearLabel,
+                "year",
+                cur,
+              )}
               aria-haspopup={yearFixed ? undefined : "dialog"}
               aria-expanded={yearFixed ? undefined : yearPopupOpen}
             >
@@ -722,7 +727,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
             type="button"
             disabled={yearFixed}
             className={`${styles.monthButton} ${shared.interactive} ${shared.hovered}`}
-            aria-label={changeYearAriaLabel}
+            aria-label={formatActionLabel(resolvedChangeYearLabel, "year", cur)}
             aria-haspopup="dialog"
             aria-expanded={yearPopupOpen}
             onClick={yearFixed ? undefined : openPopup(setYearPopupOpen)}
@@ -757,7 +762,11 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
               <button
                 type="button"
                 className={`${styles.homeButton} ${shared.interactive} ${shared.hovered}`}
-                aria-label={changeTimeAriaLabel}
+                aria-label={formatActionLabel(
+                  resolvedChangeTimeLabel,
+                  "time",
+                  curTime,
+                )}
                 aria-haspopup="dialog"
                 aria-expanded={timePopupOpen}
                 onClick={openPopup(setTimePopupOpen)}
