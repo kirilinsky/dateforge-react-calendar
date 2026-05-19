@@ -2,6 +2,8 @@
   .selectedContainer {
     --selected-dates-transition: 0.2s;
 
+    container-type: inline-size;
+    container-name: cal-selected-dates;
     display: grid;
     grid-template-rows: 1fr;
     padding: 0;
@@ -61,6 +63,25 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  @container cal-selected-dates (max-width: 18em) {
+    .inner {
+      gap: 0.32em;
+    }
+
+    .chipsGroup {
+      gap: 0.32em;
+    }
+
+    .chip {
+      flex: 1 1 100%;
+      justify-content: center;
+    }
+
+    .chipMain {
+      flex: 1 1 auto;
+    }
   }
 
   .chipWithRemove {

@@ -175,6 +175,19 @@ export const WithHome: Story = {
 };
 WithHome.storyName = "With home";
 
+export const NarrowContainer: Story = {
+  args: {
+    allowClear: true,
+    prefix: "Trip:",
+    showHome: true,
+  },
+  parameters: {
+    storyWidth: 220,
+    viewport: { defaultViewport: "narrow" },
+  },
+};
+NarrowContainer.storyName = "Narrow container";
+
 export const EmptyWithLabel: Story = {
   args: { emptyLabel: "Select a date" },
   render: (args, ctx) => {
