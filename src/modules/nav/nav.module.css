@@ -5,6 +5,7 @@
 
   .headerContainer {
     container-type: inline-size;
+    container-name: cal-nav;
     grid-column: 1 / -1;
     display: flex;
     align-items: center;
@@ -266,7 +267,7 @@
     pointer-events: none;
   }
 
-  @container (max-width: 16.25em) {
+  @container cal-nav (max-width: 16.25em) {
     .monthNameLong {
       display: none;
     }
@@ -275,7 +276,7 @@
     }
   }
 
-  @container (max-width: 21.25em) {
+  @container cal-nav (max-width: 21.25em) {
     .headerContainer {
       font-size: 1em;
       padding: 0.5em;
@@ -291,7 +292,7 @@
     }
   }
 
-  @container (max-width: 13.75em) {
+  @container cal-nav (max-width: 13.75em) {
     .headerContainer {
       font-size: var(--cal-text-md);
       padding: 0.4em;

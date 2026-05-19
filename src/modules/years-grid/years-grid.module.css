@@ -24,6 +24,7 @@
     --adaptive-tile-min-height: 3.15em;
     --adaptive-tile-padding: 0.35em 0.55em;
     container-type: inline-size;
+    container-name: cal-years-grid;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-auto-rows: auto;
@@ -40,7 +41,7 @@
   .grid[data-count="15"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .grid[data-count="20"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
-  @container (min-width: 18em) {
+  @container cal-years-grid (min-width: 18em) {
     /* generic: bump to 4 cols */
     .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     /* count-specific clean layouts */

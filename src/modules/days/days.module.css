@@ -7,6 +7,7 @@
 
   .dayGridContainer {
     container-type: inline-size;
+    container-name: cal-days;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -214,7 +215,7 @@
       calc(-1 * var(--day-gap) / 2) 0 0 0 var(--rng-prev) !important;
   }
 
-  @container (max-width: 14em) {
+  @container cal-days (max-width: 14em) {
     .dayGridContainer {
       padding: min(var(--cal-days-padding, 0.85em), 0.5em);
     }
