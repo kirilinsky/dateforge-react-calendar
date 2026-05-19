@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.6.0
+
+### Minor Changes
+
+- [#94](https://github.com/kirilinsky/dateforge-react-calendar/pull/94) [`2364da7`](https://github.com/kirilinsky/dateforge-react-calendar/commit/2364da749e710dc8a6053cb79e4351549932e809) Thanks [@kirilinsky](https://github.com/kirilinsky)! - Add cascading `actionLabels` config to `<Calendar>` for centralized aria-label customization across all modules.
+
+  Add `press` appearance — newspaper-style serif with sharp corners, wide letter-spacing, and flat shadows.
+
+  Add `atelier` (light) and `bauhaus` (dark) themes — paired warm cream / cool ink palette with red dateline accent.
+
+  Rename appearance tokens for clarity: `--header-padding` → `--cal-nav-padding`, `--header-min-height` → `--cal-nav-min-height`, `--cal-text-2xl` → `--cal-nav-font-size`, `--cal-text-xl` → `--cal-nav-meta-font-size`. The `headerPadding` / `headerMinHeight` TS keys become `navPadding` / `navMinHeight`, with new `navFontSize` / `navMetaFontSize` added.
+
 ## 1.5.1
 
 ### Patch Changes
