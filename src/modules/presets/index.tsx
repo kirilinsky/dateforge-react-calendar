@@ -1,5 +1,6 @@
 import type React from "react";
 import { useMemo } from "react";
+import "@/styles/layers.css";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import {
