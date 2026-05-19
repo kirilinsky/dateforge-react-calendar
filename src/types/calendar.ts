@@ -29,6 +29,11 @@ export type CalendarValue<M extends CalendarMode> = M extends "range"
     ? Date[]
     : Date | null;
 
+export interface CalendarActionLabels {
+  clearLabel?: string;
+  homeLabel?: string;
+}
+
 export interface CalendarProps<M extends CalendarMode = "single"> {
   children?: React.ReactNode;
   cols?: number;
@@ -42,6 +47,8 @@ export interface CalendarProps<M extends CalendarMode = "single"> {
   onChange?: (value: CalendarValue<M>) => void;
   minRangeDays?: number;
   maxRangeDays?: number;
+  clearLabel?: string;
+  homeLabel?: string;
   locale?: string;
   timeZone?: string;
   readOnly?: boolean;
