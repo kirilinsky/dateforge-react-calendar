@@ -19,7 +19,7 @@
     border-radius: var(--cal-radius, 0.5em);
   }
 
-  .hovered:hover:not([disabled]):not([aria-disabled="true"]) {
+  .hovered:hover:not([disabled]):not([aria-disabled="true"]):not(.activeItem) {
     background: var(--hover-bg, var(--c-t));
     color: var(--hover-color, inherit);
     box-shadow: var(--hover-shadow, 0 0.1em 0.3em var(--c-x));
@@ -41,8 +41,8 @@
   }
 
   .activeItem {
-    background: var(--active-cell-bg, var(--c-h)) !important;
-    color: var(--active-cell-color, var(--c-at, var(--c-a))) !important;
+    background: var(--active-cell-bg, var(--c-h));
+    color: var(--active-cell-color, var(--c-at, var(--c-a)));
     box-shadow: var(--active-cell-stroke, var(--active-shadow, 0 0.2em 0.6em var(--c-x)));
   }
 
@@ -75,12 +75,12 @@
     flex: 1 1 var(--adaptive-tile-min-width, 6.25em);
     max-width: var(--adaptive-tile-max-width, 9.75em);
     width: 100%;
-    height: auto !important;
+    height: auto;
     min-height: var(--adaptive-tile-min-height, 4.1em);
-    padding: var(--adaptive-tile-padding, 0.55em 0.75em) !important;
+    padding: var(--adaptive-tile-padding, 0.55em 0.75em);
     border: none;
     border-radius: calc(var(--cal-radius, 0.5em) * 0.85);
-    font-size: var(--adaptive-tile-font-size, var(--cal-text-sm)) !important;
+    font-size: var(--adaptive-tile-font-size, var(--cal-text-sm));
     line-height: var(--cal-leading-normal);
     white-space: normal;
     text-align: center;
