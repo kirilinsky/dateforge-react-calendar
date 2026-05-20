@@ -11,6 +11,7 @@ import {
   resolveStoryGradient,
   resolveStoryLocale,
   resolveStoryTheme,
+  resolveStoryThemeMode,
 } from "../_helpers/resolve-globals";
 
 type RangeValue = { from: Date | null; to: Date | null };
@@ -37,6 +38,7 @@ export const Default: Story = {
           value={range}
           onChange={setRange}
           theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
@@ -72,6 +74,7 @@ export const WithMinRangeDays: Story = {
           minRangeDays={3}
           defaultViewDate={FIXED_DATE}
           theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
@@ -108,6 +111,7 @@ export const WithMaxRangeDays: Story = {
           maxRangeDays={7}
           defaultViewDate={FIXED_DATE}
           theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
@@ -136,6 +140,7 @@ export const HoverPreview: Story = {
           onChange={setRange}
           defaultViewDate={FIXED_DATE}
           theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
@@ -183,6 +188,7 @@ export const DisabledInsideRange: Story = {
           disabled={disabled}
           defaultViewDate={FIXED_DATE}
           theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
@@ -211,6 +217,7 @@ export const TwoMonths: Story = {
           onChange={setRange}
           cols={4}
           theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
@@ -236,6 +243,7 @@ export const ReadOnly: Story = {
         onChange={() => {}}
         readOnly
         theme={resolveStoryTheme(ctx.globals.theme)}
+        {...resolveStoryThemeMode(ctx.globals.themeMode)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}

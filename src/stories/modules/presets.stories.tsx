@@ -10,6 +10,7 @@ import {
   resolveStoryGradient,
   resolveStoryLocale,
   resolveStoryTheme,
+  resolveStoryThemeMode,
 } from "../_helpers/resolve-globals";
 
 const meta: Meta = {
@@ -28,6 +29,7 @@ export const Default: Story = {
         value={date}
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
+        {...resolveStoryThemeMode(ctx.globals.themeMode)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
@@ -56,6 +58,7 @@ export const CustomResolvers: Story = {
         value={date}
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
+        {...resolveStoryThemeMode(ctx.globals.themeMode)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
@@ -88,6 +91,7 @@ export const WithRangeMode: Story = {
         value={range}
         onChange={setRange}
         theme={resolveStoryTheme(ctx.globals.theme)}
+        {...resolveStoryThemeMode(ctx.globals.themeMode)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
@@ -112,6 +116,7 @@ export const ComboBasicAndCustom: Story = {
         value={date}
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
+        {...resolveStoryThemeMode(ctx.globals.themeMode)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
@@ -136,6 +141,7 @@ export const IdCollision: Story = {
         value={date}
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
+        {...resolveStoryThemeMode(ctx.globals.themeMode)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
@@ -165,6 +171,7 @@ export const BadInputThrows: Story = {
         value={date}
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
+        {...resolveStoryThemeMode(ctx.globals.themeMode)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
@@ -192,6 +199,7 @@ export const BadInputInvalidDate: Story = {
         value={date}
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
+        {...resolveStoryThemeMode(ctx.globals.themeMode)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}

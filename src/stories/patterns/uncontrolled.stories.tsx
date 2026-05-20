@@ -10,6 +10,7 @@ import {
   resolveStoryGradient,
   resolveStoryLocale,
   resolveStoryTheme,
+  resolveStoryThemeMode,
 } from "../_helpers/resolve-globals";
 
 const meta: Meta = {
@@ -43,6 +44,7 @@ export const Uncontrolled: Story = {
           onChange={setLast}
           defaultViewDate={FIXED_DATE}
           theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}

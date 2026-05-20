@@ -9,6 +9,7 @@ import {
   resolveStoryGradient,
   resolveStoryLocale,
   resolveStoryTheme,
+  resolveStoryThemeMode,
 } from "../_helpers/resolve-globals";
 
 type YearsGridArgs = {
@@ -47,6 +48,7 @@ const meta: Meta<YearsGridArgs> = {
         value={date}
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
+        {...resolveStoryThemeMode(ctx.globals.themeMode)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
@@ -94,6 +96,7 @@ export const WithDisabledRange: Story = {
         minDate={new Date(2014, 0, 1)}
         maxDate={new Date(2020, 11, 31)}
         theme={resolveStoryTheme(ctx.globals.theme)}
+        {...resolveStoryThemeMode(ctx.globals.themeMode)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
@@ -122,6 +125,7 @@ export const HideOutOfRange: Story = {
         minDate={new Date(2014, 0, 1)}
         maxDate={new Date(2020, 11, 31)}
         theme={resolveStoryTheme(ctx.globals.theme)}
+        {...resolveStoryThemeMode(ctx.globals.themeMode)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
@@ -149,6 +153,7 @@ export const StandaloneYearPicker: Story = {
         </div>
         <Calendar
           theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}

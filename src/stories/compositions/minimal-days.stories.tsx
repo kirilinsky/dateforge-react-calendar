@@ -8,6 +8,7 @@ import {
   resolveStoryGradient,
   resolveStoryLocale,
   resolveStoryTheme,
+  resolveStoryThemeMode,
 } from "../_helpers/resolve-globals";
 
 const meta: Meta = {
@@ -24,6 +25,7 @@ export const Default: StoryObj = {
         value={date}
         onChange={setDate}
         theme={resolveStoryTheme(ctx.globals.theme)}
+        {...resolveStoryThemeMode(ctx.globals.themeMode)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}

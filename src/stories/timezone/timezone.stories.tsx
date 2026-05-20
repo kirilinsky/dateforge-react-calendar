@@ -11,6 +11,7 @@ import {
   resolveStoryGradient,
   resolveStoryLocale,
   resolveStoryTheme,
+  resolveStoryThemeMode,
 } from "../_helpers/resolve-globals";
 
 // Probe shows the timeZone that Calendar resolves: explicit IANA (validated),
@@ -58,6 +59,7 @@ export const AutoDetect: Story = {
           value={date}
           onChange={setDate}
           theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
@@ -82,6 +84,7 @@ export const ExplicitParis: Story = {
           onChange={setDate}
           timeZone="Europe/Paris"
           theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
@@ -106,6 +109,7 @@ export const ExplicitNewYork: Story = {
           onChange={setDate}
           timeZone="America/New_York"
           theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
@@ -130,6 +134,7 @@ export const FixedOffset: Story = {
           onChange={setDate}
           timeZone="UTC+2"
           theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
@@ -162,6 +167,7 @@ export const OffByOneFix: Story = {
           onChange={setDate}
           timeZone="UTC"
           theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
@@ -190,6 +196,7 @@ export const InvalidTimezone: Story = {
           onChange={setDate}
           timeZone="Europe/Wrongville"
           theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}

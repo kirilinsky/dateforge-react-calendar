@@ -10,6 +10,7 @@ import {
   resolveStoryGradient,
   resolveStoryLocale,
   resolveStoryTheme,
+  resolveStoryThemeMode,
 } from "../_helpers/resolve-globals";
 
 const meta: Meta = {
@@ -33,6 +34,7 @@ export const Default: Story = {
           value={dates}
           onChange={setDates}
           theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
@@ -59,6 +61,7 @@ export const Capped: Story = {
           onChange={setDates}
           maxDates={3}
           theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
@@ -89,6 +92,7 @@ export const PreSelected: Story = {
           value={dates}
           onChange={setDates}
           theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}

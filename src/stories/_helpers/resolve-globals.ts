@@ -4,9 +4,15 @@ import type { CalendarAppearance } from "../../types/appearances";
 import type { CalendarTheme } from "../../types/themes";
 
 export const resolveStoryTheme = (key: unknown): CalendarTheme | undefined => {
-  if (key === "auto" || key === "light" || key === "dark") return key;
-  if (typeof key !== "string") return undefined;
+  if (key === "default" || typeof key !== "string") return undefined;
   return (themes as Record<string, CalendarTheme>)[key];
+};
+
+export const resolveStoryThemeMode = (
+  key: unknown,
+): { light?: boolean; dark?: boolean } => {
+  if (key === "dark" || key === "dark mode") return { dark: true };
+  return { light: true };
 };
 
 export const resolveStoryAppearance = (
@@ -36,7 +42,7 @@ export const resolveStoryLocale = (key: unknown): string | undefined => {
 };
 
 export const resolveStoryGradient = (key: unknown): boolean | undefined => {
-  if (key === "gradient on") return true;
-  if (key === "gradient off") return false;
+  if (key === "on" || key === "gradient on") return true;
+  if (key === "off" || key === "gradient off") return false;
   return undefined;
 };

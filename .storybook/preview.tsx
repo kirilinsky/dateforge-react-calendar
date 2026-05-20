@@ -4,19 +4,34 @@ import { STORY_LOCALES } from "../src/stories/_helpers/resolve-globals";
 import * as themes from "../themes/index";
 import "../dist/style.css";
 
-const themeNames = ["auto", "light", "dark", ...Object.keys(themes)];
+const themeNames = ["default", ...Object.keys(themes)];
 const appearanceNames = ["default", ...Object.keys(appearances)];
 const localeNames = [...STORY_LOCALES];
+const toToolbarItems = (label: string, values: readonly string[]) =>
+  values.map((value) => ({
+    value,
+    title: `${label}: ${value}`,
+  }));
 
 const preview: Preview = {
   globalTypes: {
     theme: {
-      description: "Calendar theme",
-      defaultValue: "auto",
+      description: "Calendar theme family",
+      defaultValue: "default",
       toolbar: {
         title: "Theme",
         icon: "paintbrush",
-        items: themeNames,
+        items: toToolbarItems("theme", themeNames),
+        dynamicTitle: true,
+      },
+    },
+    themeMode: {
+      description: "Calendar theme mode",
+      defaultValue: "light",
+      toolbar: {
+        title: "Mode",
+        icon: "circlehollow",
+        items: toToolbarItems("mode", ["light", "dark"]),
         dynamicTitle: true,
       },
     },
@@ -26,7 +41,7 @@ const preview: Preview = {
       toolbar: {
         title: "Appearance",
         icon: "component",
-        items: appearanceNames,
+        items: toToolbarItems("appearance", appearanceNames),
         dynamicTitle: true,
       },
     },
@@ -36,7 +51,7 @@ const preview: Preview = {
       toolbar: {
         title: "Locale",
         icon: "globe",
-        items: localeNames,
+        items: toToolbarItems("locale", localeNames),
         dynamicTitle: true,
       },
     },
@@ -46,7 +61,7 @@ const preview: Preview = {
       toolbar: {
         title: "Gradient",
         icon: "lightning",
-        items: ["gradient off", "gradient on"],
+        items: toToolbarItems("gradient", ["off", "on"]),
         dynamicTitle: true,
       },
     },
@@ -62,7 +77,7 @@ const preview: Preview = {
       return (
         <div style={style}>
           <Story
-            key={`${ctx.globals.theme}-${ctx.globals.appearance}-${ctx.globals.locale}-${ctx.globals.gradient}`}
+            key={`${ctx.globals.theme}-${ctx.globals.themeMode}-${ctx.globals.appearance}-${ctx.globals.locale}-${ctx.globals.gradient}`}
           />
         </div>
       );
