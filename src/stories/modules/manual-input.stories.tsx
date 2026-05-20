@@ -16,6 +16,7 @@ type ManualInputArgs = {
   allowClear?: boolean;
   align?: "left" | "center" | "right";
   label?: string;
+  format?: string;
 };
 
 const meta: Meta<ManualInputArgs> = {
@@ -24,6 +25,10 @@ const meta: Meta<ManualInputArgs> = {
     allowClear: { control: "boolean" },
     align: { control: "inline-radio", options: ["left", "center", "right"] },
     label: { control: "text" },
+    format: {
+      control: "inline-radio",
+      options: ["DD.MM.YYYY", "MM/DD/YYYY", "YYYY-MM-DD", "DD-MM-YYYY"],
+    },
   },
 };
 
@@ -449,8 +454,63 @@ export const ReadOnly: Story = {
 };
 ReadOnly.storyName = "readOnly";
 
+export const FormatUS: Story = {
+  render: (_args, ctx) => {
+    const [date, setDate] = useState<Date | null>(FIXED_DATE);
+    return (
+      <>
+        <p style={debugStyle}>format: MM/DD/YYYY</p>
+        <Calendar
+          value={date}
+          onChange={setDate}
+          theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
+          appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          gradient={resolveStoryGradient(ctx.globals.gradient)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
+        >
+          <CalendarManualInput format="MM/DD/YYYY" />
+        </Calendar>
+      </>
+    );
+  },
+};
+FormatUS.storyName = "Format — MM/DD/YYYY (US)";
+
+export const FormatISO: Story = {
+  render: (_args, ctx) => {
+    const [range, setRange] = useState<{ from: Date | null; to: Date | null }>({
+      from: FIXED_DATE,
+      to: new Date(2016, 1, 20),
+    });
+    return (
+      <>
+        <p style={debugStyle}>format: YYYY-MM-DD</p>
+        <Calendar
+          mode="range"
+          value={range}
+          onChange={setRange}
+          theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
+          appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          gradient={resolveStoryGradient(ctx.globals.gradient)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
+        >
+          <CalendarManualInput format="YYYY-MM-DD" />
+        </Calendar>
+      </>
+    );
+  },
+};
+FormatISO.storyName = "Format — YYYY-MM-DD (ISO, range)";
+
 export const Playground: Story = {
-  args: { allowClear: true, align: "left", label: "Date" },
+  args: {
+    allowClear: true,
+    align: "left",
+    label: "Date",
+    format: "DD.MM.YYYY",
+  },
   render: (args, ctx) => {
     const [date, setDate] = useState<Date | null>(FIXED_DATE);
     return (
@@ -467,6 +527,7 @@ export const Playground: Story = {
           allowClear={args.allowClear}
           align={args.align}
           label={args.label}
+          format={args.format}
         />
       </Calendar>
     );

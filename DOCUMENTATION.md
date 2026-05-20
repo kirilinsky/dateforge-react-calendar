@@ -1110,16 +1110,32 @@ Text input that lets the user type a date directly. Adapts shape to the calendar
 | `clearLabel` | `string`                        | global / `"Clear"` | aria-label for clear controls. Overrides `<Calendar clearLabel>` |
 | `col`        | `number \| string`              | —        | CSS grid `grid-column` value                                  |
 | `label`      | `React.ReactNode`               | —        | Inline label shown before the input / selected chips          |
+| `format`     | `string`                        | `"DD.MM.YYYY"` | Date input format. Token string with `DD`, `MM`, `YYYY` + any single-char separator(s). See [Input format](#input-format). |
 
 ### Input format
 
-The format is **fixed `DD.MM.YYYY`** — day, month, year separated by dots. It does **not** vary by `locale`. The input applies a digit-only mask: dots are inserted automatically as the user types digits, non-digit input is rejected, and at most 8 digits are accepted.
+The format is controlled by the `format` prop. Default: `"DD.MM.YYYY"`. The format string accepts three tokens (`DD`, `MM`, `YYYY`) and any non-token characters as separators. Invalid format strings fall back to the default with no error.
+
+```tsx
+<CalendarManualInput format="DD.MM.YYYY" />   // 15.06.2024 (default)
+<CalendarManualInput format="MM/DD/YYYY" />   // 06/15/2024 (US)
+<CalendarManualInput format="YYYY-MM-DD" />   // 2024-06-15 (ISO)
+<CalendarManualInput format="DD-MM-YYYY" />   // 15-06-2024 (EU dash)
+```
+
+The input applies a digit-only mask: separators are inserted automatically as the user types digits, non-digit input is rejected, and exactly 8 digits are accepted (4 for the year, 2 each for day and month). The format string also serves as the placeholder.
 
 ```text
+format="DD.MM.YYYY"
 "1"        → "1"
 "15"       → "15"
 "156"      → "15.6"
 "15062024" → "15.06.2024"
+
+format="YYYY-MM-DD"
+"2024"     → "2024"
+"202406"   → "2024-06"
+"20240615" → "2024-06-15"
 ```
 
 Time is **not** parseable from the input. To set time use `<CalendarTimeGrid>` or `<CalendarNav showTime>`.
