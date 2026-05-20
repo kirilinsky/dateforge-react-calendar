@@ -1,4 +1,4 @@
-@layer cal-component {
+@layer cal-base {
   .flexCenter {
     display: flex;
     align-items: center;

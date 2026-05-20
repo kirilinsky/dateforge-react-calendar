@@ -1,4 +1,4 @@
-@layer appearances {
+@layer cal-appearances {
   [data-appearance="bubble"] {
     --cal-radius: 1.5em;
     --cal-container-radius: 2.2em;

@@ -30,6 +30,8 @@ jobs:
 
       - run: npm run check
 
+      - run: npm run check:css
+
       - run: npm run knip
 
       - name: Get Playwright version

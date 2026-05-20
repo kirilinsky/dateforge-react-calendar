@@ -1,4 +1,4 @@
-@layer appearances {
+@layer cal-appearances {
   [data-appearance="square"] {
     --cal-radius: 0;
     --cal-border: 1px;

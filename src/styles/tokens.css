@@ -1,4 +1,4 @@
-@layer cal-tokens {
+@layer cal-base {
   @property --c-a { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
   @property --c-at { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
   @property --c-t-d { syntax: "<color>"; inherits: true; initial-value: #ffffff; }
