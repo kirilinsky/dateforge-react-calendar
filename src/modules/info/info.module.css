@@ -88,7 +88,7 @@
     background: var(--c-t);
     color: var(--c-c);
     box-shadow: var(--active-cell-stroke, none);
-    font-size: var(--cal-text-md) !important;
+    font-size: var(--cal-text-md);
     font-weight: var(--cal-weight-semibold);
     line-height: var(--cal-leading-tight);
     overflow: hidden;
@@ -99,9 +99,9 @@
   .actionBtn {
     box-sizing: border-box;
     width: var(--cal-size-chip, 2.3em);
-    height: var(--cal-size-chip, 2.3em) !important;
-    padding: 0 !important;
-    font-size: var(--cal-text-base) !important;
+    height: var(--cal-size-chip, 2.3em);
+    padding: 0;
+    font-size: var(--cal-text-base);
     line-height: var(--cal-leading-none);
     color: var(--c-m, var(--c-c));
     flex-shrink: 0;
@@ -131,7 +131,7 @@
   }
 
   .clearBtn {
-    padding: 0 0.6em !important;
+    padding: 0 0.6em;
   }
 
   .clearBtn:hover {
