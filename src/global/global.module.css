@@ -40,12 +40,6 @@
     flex-shrink: 0;
   }
 
-  .activeItem {
-    background: var(--active-cell-bg, var(--c-h));
-    color: var(--active-cell-color, var(--c-at, var(--c-a)));
-    box-shadow: var(--active-cell-stroke, var(--active-shadow, 0 0.2em 0.6em var(--c-x)));
-  }
-
   .otherItem {
     color: var(--c-oom, var(--c-m, var(--c-c)));
     &:hover {
@@ -96,5 +90,14 @@
     transition:
       background var(--cal-transition, 0.2s) ease,
       color var(--cal-transition, 0.2s) ease;
+  }
+
+  /* Declared last so its background/color/box-shadow win over composed
+     primitives in the same layer (`.adaptiveTile`, `.selectedItem`) without
+     needing `!important`. Same specificity (0,1,0), later source order wins. */
+  .activeItem {
+    background: var(--active-cell-bg, var(--c-h));
+    color: var(--active-cell-color, var(--c-at, var(--c-a)));
+    box-shadow: var(--active-cell-stroke, var(--active-shadow, 0 0.2em 0.6em var(--c-x)));
   }
 }

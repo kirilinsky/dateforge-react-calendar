@@ -4,7 +4,6 @@ export interface CalendarUI {
   containerRef: RefObject<HTMLDivElement | null>;
   toggleTheme: () => void;
   activeTheme: "light" | "dark" | "auto";
-  containerWidth: number;
   showTimePopup: boolean;
   setShowTimePopup: (v: boolean) => void;
   showMonthPopup: boolean;
