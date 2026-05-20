@@ -9,6 +9,6 @@ export { CalendarMonthsTrack } from "./months-track";
 export { CalendarNav } from "./nav";
 export { CalendarPresets } from "./presets";
 export { CalendarSelectedDates } from "./selected-dates";
-export { CalendarTimeGrid } from "./time";
+export { CalendarTimeWheel } from "./time";
 export { CalendarYearsGrid } from "./years-grid";
 export { CalendarYearsTrack } from "./years-track";

@@ -1,7 +1,7 @@
 import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
-import { CalendarTimeGrid } from "@/modules/time";
+import { CalendarTimeWheel } from "@/modules/time";
 import { createDisabled } from "@/utils/create-disabled";
 
 const drumByLabel = (container: HTMLElement, label: string) =>
@@ -19,7 +19,7 @@ describe("CHANGE_TIME respects min/max/disabled", () => {
         onChange={onChange}
         disabled={disabled}
       >
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>,
     );
     const hour = drumByLabel(container, "Hours");
@@ -40,7 +40,7 @@ describe("CHANGE_TIME respects min/max/disabled", () => {
         onChange={onChange}
         disabled={disabled}
       >
-        <CalendarTimeGrid onTimeSelect={onTimeSelect} />
+        <CalendarTimeWheel onTimeSelect={onTimeSelect} />
       </Calendar>,
     );
     const hour = drumByLabel(container, "Hours");
@@ -61,7 +61,7 @@ describe("CHANGE_TIME respects min/max/disabled", () => {
         onChange={onChange}
         disabled={disabled}
       >
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>,
     );
     const hour = drumByLabel(container, "Hours");
@@ -82,7 +82,7 @@ describe("CHANGE_TIME respects min/max/disabled", () => {
         onChange={onChange}
         disabled={disabled}
       >
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>,
     );
     const hour = drumByLabel(container, "Hours");
@@ -105,7 +105,7 @@ describe("CHANGE_TIME respects min/max/disabled", () => {
         onChange={onChange}
         disabled={disabled}
       >
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>,
     );
     const hour = drumByLabel(container, "Hours");
@@ -122,7 +122,7 @@ describe("CHANGE_TIME respects min/max/disabled", () => {
     };
     const { container } = render(
       <Calendar mode="range" value={value} onChange={onChange}>
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>,
     );
     const hour = drumByLabel(container, "Hours");

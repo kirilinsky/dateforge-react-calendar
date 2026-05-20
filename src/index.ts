@@ -14,7 +14,7 @@ export type { CalendarNavProps } from "./modules/nav/index";
 export type { CalendarPresetsProps } from "./modules/presets/index";
 export { basicPresets } from "./modules/presets/presets-pack";
 export type { CalendarSelectedDatesProps } from "./modules/selected-dates/index";
-export type { CalendarTimeGridProps } from "./modules/time/index";
+export type { CalendarTimeWheelProps } from "./modules/time/index";
 export type { CalendarYearsGridProps } from "./modules/years-grid/index";
 export type { CalendarYearsTrackProps } from "./modules/years-track/index";
 export type {

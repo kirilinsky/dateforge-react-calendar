@@ -145,7 +145,7 @@ export interface CalendarProps<M extends CalendarMode = "single"> {
   hour12?: boolean;
   /**
    * Step (granularity) for time drums. Hours/minutes/seconds. Default 1.
-   * Affects both inline TimeGrid and nav time popup.
+   * Affects both inline TimeWheel and nav time popup.
    * @example timeStep={{ minute: 5 }}
    */
   timeStep?: { hour?: number; minute?: number; second?: number };

@@ -2,7 +2,7 @@ import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
-import { CalendarTimeGrid } from "@/modules/time";
+import { CalendarTimeWheel } from "@/modules/time";
 
 const ARROW_DOWN = { key: "ArrowDown" };
 
@@ -17,7 +17,7 @@ describe("Time semantics — single mode", () => {
     const onChange = vi.fn();
     const { container } = render(
       <Calendar mode="single" onChange={onChange}>
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>,
     );
     const drum = focusFirstDrum(container);
@@ -38,7 +38,7 @@ describe("Time semantics — single mode", () => {
         defaultViewDate={new Date(2024, 11, 1)}
         onChange={onChange}
       >
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
         <CalendarDays />
       </Calendar>,
     );
@@ -57,7 +57,7 @@ describe("Time semantics — multiple mode", () => {
     const onChange = vi.fn();
     const { container } = render(
       <Calendar mode="multiple" onChange={onChange}>
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>,
     );
     const drum = focusFirstDrum(container);
@@ -74,7 +74,7 @@ describe("Time semantics — multiple mode", () => {
         defaultViewDate={new Date(2024, 5, 15, 10, 0, 0)}
         onChange={onChange}
       >
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>,
     );
     const drum = focusFirstDrum(container);
@@ -88,7 +88,7 @@ describe("Time semantics — range mode", () => {
     const onChange = vi.fn();
     const { container } = render(
       <Calendar mode="range" onChange={onChange}>
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>,
     );
     const drum = focusFirstDrum(container);
@@ -102,7 +102,7 @@ describe("Time semantics — range mode", () => {
     const to = new Date(2024, 5, 13, 14, 0, 0);
     const { container } = render(
       <Calendar mode="range" value={{ from, to }} onChange={onChange}>
-        <CalendarTimeGrid bound="to" />
+        <CalendarTimeWheel bound="to" />
       </Calendar>,
     );
     const minute = container.querySelector(
@@ -129,7 +129,7 @@ describe("Time semantics — range mode", () => {
         value={{ from: new Date(2024, 5, 10), to: null }}
         onChange={onChange}
       >
-        <CalendarTimeGrid bound="to" />
+        <CalendarTimeWheel bound="to" />
       </Calendar>,
     );
     const drum = focusFirstDrum(container);

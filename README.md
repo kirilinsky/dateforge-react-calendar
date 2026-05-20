@@ -140,7 +140,7 @@ const brand = createTheme({
 | `CalendarInfo`          | Selection metrics, relative hints, empty text, home / clear |
 | `CalendarManualInput`   | Typed dates, keyboard-first editing, per-date remove        |
 | `CalendarPresets`       | Shortcuts like Today, Last 7 days, custom ranges            |
-| `CalendarTimeGrid`      | Inline hour/minute/second selection                         |
+| `CalendarTimeWheel`      | Inline hour/minute/second selection                         |
 | `CalendarMonthsGrid`    | Month-only picking or fast month jumps                      |
 | `CalendarYearsGrid`     | Year-only picking or fast year jumps                        |
 | `CalendarDaysTrack`     | Scrollable day track for compact/mobile layouts             |

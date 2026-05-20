@@ -11,7 +11,7 @@ import { CalendarNav } from "@/modules/nav";
 import { CalendarPresets } from "@/modules/presets";
 import { basicPresets } from "@/modules/presets/presets-pack";
 import { CalendarSelectedDates } from "@/modules/selected-dates";
-import { CalendarTimeGrid } from "@/modules/time";
+import { CalendarTimeWheel } from "@/modules/time";
 import { CalendarYearsGrid } from "@/modules/years-grid";
 import { CalendarYearsTrack } from "@/modules/years-track";
 import { createDisabled } from "@/utils/create-disabled";
@@ -162,7 +162,7 @@ export const DateAndTimePicker: Story = {
       >
         <CalendarNav label="Date + time" showTime clear />
         <CalendarDays />
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>
     );
   },
@@ -450,7 +450,7 @@ export const TripDuration: Story = {
 };
 TripDuration.storyName = "Range / Trip duration (rangeStyle=duration)";
 
-export const RangeDurationWithTimeGrid: Story = {
+export const RangeDurationWithTimeWheel: Story = {
   parameters: { storyWidth: 900 },
   render: (_args, ctx) => {
     const [range, setRange] = useState<RangeValue>(() => {
@@ -487,14 +487,14 @@ export const RangeDurationWithTimeGrid: Story = {
           showHome
         />
         <CalendarDays col={2} />
-        <CalendarTimeGrid bound="from" col={1} showReset />
-        <CalendarTimeGrid bound="to" col={1} showReset />
+        <CalendarTimeWheel bound="from" col={1} showReset />
+        <CalendarTimeWheel bound="to" col={1} showReset />
         <CalendarSelectedDates showTime />
       </Calendar>
     );
   },
 };
-RangeDurationWithTimeGrid.storyName = "Range / Duration + time grid";
+RangeDurationWithTimeWheel.storyName = "Range / Duration + time grid";
 
 export const FlightTracks: Story = {
   render: (_args, ctx) => {
@@ -710,7 +710,7 @@ export const TimeOnlyPicker: Story = {
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
         <CalendarNav label="Select time" themeToggle />
-        <CalendarTimeGrid seconds />
+        <CalendarTimeWheel seconds />
       </Calendar>
     );
   },

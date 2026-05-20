@@ -9,7 +9,7 @@ import { CalendarMonthsGrid } from "@/modules/months-grid";
 import { CalendarMonthsTrack } from "@/modules/months-track";
 import { CalendarNav } from "@/modules/nav";
 import { CalendarSelectedDates } from "@/modules/selected-dates";
-import { CalendarTimeGrid } from "@/modules/time";
+import { CalendarTimeWheel } from "@/modules/time";
 import { CalendarYearsGrid } from "@/modules/years-grid";
 import { CalendarYearsTrack } from "@/modules/years-track";
 
@@ -97,7 +97,7 @@ describe("action aria labels", () => {
         <CalendarDaysTrack />
         <CalendarMonthsTrack />
         <CalendarYearsTrack />
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
         <CalendarMonthsGrid />
         <CalendarYearsGrid />
       </Calendar>,

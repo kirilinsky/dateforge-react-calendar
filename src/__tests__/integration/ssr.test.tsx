@@ -13,7 +13,7 @@ import { CalendarMonthsTrack } from "@/modules/months-track";
 import { CalendarNav } from "@/modules/nav";
 import { CalendarPresets } from "@/modules/presets";
 import { CalendarSelectedDates } from "@/modules/selected-dates";
-import { CalendarTimeGrid } from "@/modules/time";
+import { CalendarTimeWheel } from "@/modules/time";
 import { CalendarYearsGrid } from "@/modules/years-grid";
 import { CalendarYearsTrack } from "@/modules/years-track";
 
@@ -49,10 +49,10 @@ describe("SSR — renderToString", () => {
     expect(html).toContain("aria-hidden");
   });
 
-  it("renders TimeGrid without crashing", () => {
+  it("renders TimeWheel without crashing", () => {
     const html = renderToString(
       <Calendar value={D}>
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>,
     );
     expect(html).toContain('role="group"');

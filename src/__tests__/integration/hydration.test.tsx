@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
 import { CalendarNav } from "@/modules/nav";
-import { CalendarTimeGrid } from "@/modules/time";
+import { CalendarTimeWheel } from "@/modules/time";
 
 const D = new Date(2024, 5, 15);
 
@@ -87,10 +87,10 @@ describe("Hydration — no mismatch warnings", () => {
     await teardown(root, errorSpy);
   });
 
-  it("Calendar with TimeGrid hydrates cleanly", async () => {
+  it("Calendar with TimeWheel hydrates cleanly", async () => {
     const { errorSpy, root } = await setup(
       <Calendar value={D}>
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>,
     );
     expect(hydrationWarnings(errorSpy)).toEqual([]);
