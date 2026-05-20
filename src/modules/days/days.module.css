@@ -49,7 +49,7 @@
     padding: 0.5em 0.25em !important;
   }
 
-  .todayItem {
+  .dayItem[data-today] {
     outline: var(--cal-today-outline-width, 1px) solid
       color-mix(in srgb, var(--c-h) 50%, transparent);
     outline-offset: -1px;
@@ -67,12 +67,12 @@
     );
   }
 
-  .dayGridContainer[data-today-dot] .todayItem {
+  .dayGridContainer[data-today-dot] .dayItem[data-today] {
     box-sizing: border-box;
     padding-block-end: var(--today-dot-reserved-space) !important;
   }
 
-  .dayGridContainer[data-today-dot] .todayItem::after {
+  .dayGridContainer[data-today-dot] .dayItem[data-today]::after {
     content: "";
     position: absolute;
     left: 50%;
@@ -85,7 +85,7 @@
     pointer-events: none;
   }
 
-  .dayGridContainer[data-today-dot] .todayItem[data-selected]::after {
+  .dayGridContainer[data-today-dot] .dayItem[data-today][data-selected]::after {
     background: var(--active-cell-color, var(--c-t-d, var(--c-at, var(--c-a))));
   }
 
@@ -93,15 +93,15 @@
     display: inline-block;
   }
 
-  .dayGridContainer[data-today-dot] .todayItem .dayLabel {
+  .dayGridContainer[data-today-dot] .dayItem[data-today] .dayLabel {
     transform: translateY(var(--today-dot-label-shift));
   }
 
-  .boldWeekend {
+  .dayItem[data-bold-weekend] {
     font-weight: var(--cal-weight-bold);
   }
 
-  .boldWeekend[data-weekend]:not([aria-selected="true"]) {
+  .dayItem[data-bold-weekend][data-weekend]:not([aria-selected="true"]) {
     color: var(--c-we) !important;
   }
 
@@ -146,71 +146,99 @@
     ) !important;
   }
 
-  .rangeStart {
+  .dayItem[data-selected][data-connect-right]:not(
+      [data-connect-left]
+    ):not([data-range-mode]) {
     border-radius: var(--cal-radius, 0.5em) 0 0 var(--cal-radius, 0.5em) !important;
     box-shadow: calc(var(--day-gap) / 2) 0 0 0 var(--c-h) !important;
   }
 
-  .rangeEnd {
+  .dayItem[data-selected][data-connect-left]:not(
+      [data-connect-right]
+    ):not([data-range-mode]) {
     border-radius: 0 var(--cal-radius, 0.5em) var(--cal-radius, 0.5em) 0 !important;
     box-shadow: calc(-1 * var(--day-gap) / 2) 0 0 0 var(--c-h) !important;
   }
 
-  .rangeMid {
+  .dayItem[data-selected][data-connect-left][data-connect-right]:not(
+      [data-range-mode]
+    ) {
     border-radius: 0 !important;
     box-shadow: calc(var(--day-gap) / 2) 0 0 0 var(--c-h),
       calc(-1 * var(--day-gap) / 2) 0 0 0 var(--c-h) !important;
   }
 
-  .rStart {
+  .dayItem[data-range-start]:not([data-range-end]),
+  .dayItem[data-preview-start][data-selected] {
     border-radius: var(--cal-radius, 0.5em) 0 0 var(--cal-radius, 0.5em) !important;
   }
-  .rEnd {
+
+  .dayItem[data-range-end]:not([data-range-start]),
+  .dayItem[data-preview-end][data-selected] {
     border-radius: 0 var(--cal-radius, 0.5em) var(--cal-radius, 0.5em) 0 !important;
   }
 
-  .rBridgeRight {
+  .dayItem[data-range-start][data-range-bridge-right],
+  .dayItem[data-in-range][data-range-bridge-right]:not(
+      [data-range-bridge-left]
+    ) {
     box-shadow: calc(var(--day-gap) / 2) 0 0 0 var(--rng-bg) !important;
   }
-  .rBridgeLeft {
+
+  .dayItem[data-range-end][data-range-bridge-left],
+  .dayItem[data-in-range][data-range-bridge-left]:not(
+      [data-range-bridge-right]
+    ) {
     box-shadow: calc(-1 * var(--day-gap) / 2) 0 0 0 var(--rng-bg) !important;
   }
-  .rBridgeBoth {
+
+  .dayItem[data-in-range][data-range-bridge-left][data-range-bridge-right] {
     box-shadow: calc(var(--day-gap) / 2) 0 0 0 var(--rng-bg),
       calc(-1 * var(--day-gap) / 2) 0 0 0 var(--rng-bg) !important;
   }
 
-  .rIn {
+  .dayItem[data-in-range]:not([data-disabled]) {
     background: var(--rng-bg) !important;
     color: var(--c-c) !important;
     border-radius: 0 !important;
   }
 
-  .rInDisabled {
+  .dayItem:is([data-in-range], [data-preview-mid])[data-disabled] {
     background: color-mix(in srgb, var(--c-we) 32%, var(--rng-bg)) !important;
     color: var(--c-c) !important;
     border-radius: 0 !important;
   }
 
-  .rPreviewStart {
+  .dayItem[data-preview-start]:not([data-selected]) {
     background: var(--rng-prev) !important;
     border-radius: var(--cal-radius, 0.5em) 0 0 var(--cal-radius, 0.5em) !important;
   }
-  .rPreviewEnd {
+
+  .dayItem[data-preview-end]:not([data-selected]) {
     background: var(--rng-prev) !important;
     border-radius: 0 var(--cal-radius, 0.5em) var(--cal-radius, 0.5em) 0 !important;
   }
-  .rPreview {
+
+  .dayItem[data-preview-mid]:not([data-disabled]) {
     background: var(--rng-prev) !important;
     border-radius: 0 !important;
   }
-  .rPreviewBridgeRight {
+
+  .dayItem[data-preview-bridge-right]:not(
+      [data-preview-bridge-left]
+    ):not([data-disabled]) {
     box-shadow: calc(var(--day-gap) / 2) 0 0 0 var(--rng-prev) !important;
   }
-  .rPreviewBridgeLeft {
+
+  .dayItem[data-preview-bridge-left]:not(
+      [data-preview-bridge-right]
+    ):not([data-disabled]) {
     box-shadow: calc(-1 * var(--day-gap) / 2) 0 0 0 var(--rng-prev) !important;
   }
-  .rPreviewBridgeBoth {
+
+  .dayItem[data-preview-bridge-left][data-preview-bridge-right]:not(
+      [data-disabled]
+    ) {
     box-shadow: calc(var(--day-gap) / 2) 0 0 0 var(--rng-prev),
       calc(-1 * var(--day-gap) / 2) 0 0 0 var(--rng-prev) !important;
   }
@@ -273,11 +301,9 @@
     animation: slideInLeft 0.31s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   }
 
-  .maxReachedTarget {
-    &:hover:not(:disabled) {
-      background: color-mix(in srgb, var(--c-e) 12%, transparent) !important;
-      color: var(--c-e) !important;
-      cursor: not-allowed;
-    }
+  .dayItem[data-max-reached]:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--c-e) 12%, transparent) !important;
+    color: var(--c-e) !important;
+    cursor: not-allowed;
   }
 }
