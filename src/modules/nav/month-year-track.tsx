@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { Popup } from "@/components/popup/popup";
-import { useScrollAccumulator } from "@/hooks/use-scroll-accumulator";
+import { useItemHeight } from "@/hooks/use-item-width";
+import { useTrack } from "@/hooks/use-track";
 import type { CalendarTheme } from "@/types/themes";
 import {
   setMonth as applyMonth,
@@ -16,18 +17,15 @@ type DrumItemStyle = React.CSSProperties & {
   "--drum-item-active": string;
   "--drum-item-opacity": number;
   "--drum-item-scale": number;
-  "--drum-item-shift": string;
   "--drum-item-y": string;
   "--drum-item-z": string;
   "--drum-item-tilt": string;
 };
 
 const getDrumItemStyle = (
-  offset: number,
-  dragOffset: number,
+  signedOffset: number,
   disabled: boolean,
 ): DrumItemStyle => {
-  const signedOffset = offset - dragOffset;
   const distance = Math.abs(signedOffset);
   const activeMix = Math.max(0, Math.min(1, 1 - distance * 0.85));
   const opacity = Math.max(0.18, 1 - distance * 0.28);
@@ -40,7 +38,6 @@ const getDrumItemStyle = (
     "--drum-item-active": `${Math.round(activeMix * 100)}%`,
     "--drum-item-opacity": disabled ? opacity * 0.4 : opacity,
     "--drum-item-scale": scale,
-    "--drum-item-shift": `${dragOffset * -100}%`,
     "--drum-item-y": `${y}em`,
     "--drum-item-z": `${z}em`,
     "--drum-item-tilt": `${tilt}deg`,
@@ -52,23 +49,50 @@ function SelectDrum({
   getLabel,
   getOffsetVal,
   isDisabled,
-  onStep,
   onJump,
   label,
+  count,
+  circular,
+  minIndex,
+  maxIndex,
 }: {
   val: number;
   getLabel: (v: number) => string;
   getOffsetVal: (v: number, offset: number) => number;
   isDisabled: (v: number) => boolean;
-  onStep: (dir: 1 | -1) => void;
   onJump: (target: number) => void;
   label: string;
+  count?: number;
+  circular?: boolean;
+  minIndex?: number;
+  maxIndex?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const itemHeight = useItemHeight(ref, 28);
 
-  const { dragOffset, isDragging } = useScrollAccumulator(ref, onStep, {
-    dragThreshold: 24,
+  const {
+    position,
+    scrollTo,
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
+    onPointerCancel,
+    isInteracting,
+  } = useTrack({
+    axis: "y",
+    circular,
+    count,
+    initialIndex: val,
+    maxIndex,
+    minIndex,
+    onChange: (next) => {
+      if (!isDisabled(next)) onJump(next);
+    },
+    pixelsPerItem: itemHeight,
+    ref,
   });
+  const round = Math.round(position);
+  const activeValue = getOffsetVal(0, round);
 
   return (
     <div
@@ -77,32 +101,38 @@ function SelectDrum({
       role="spinbutton"
       tabIndex={0}
       aria-label={label}
-      aria-valuenow={val}
-      aria-valuetext={getLabel(val)}
-      data-dragging={isDragging || undefined}
+      aria-valuenow={activeValue}
+      aria-valuetext={getLabel(activeValue)}
+      data-dragging={isInteracting || undefined}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerCancel}
       onKeyDown={(e) => {
         if (e.key === "ArrowUp") {
           e.preventDefault();
-          onStep(-1);
+          scrollTo(round - 1);
         }
         if (e.key === "ArrowDown") {
           e.preventDefault();
-          onStep(1);
+          scrollTo(round + 1);
         }
       }}
     >
       <div className={styles.highlight} />
       {OFFSETS.map((o) => {
-        const isActive = o === 0;
-        const dispVal = getOffsetVal(val, o);
+        const raw = round + o;
+        const signedDistance = raw - position;
+        const isActive = Math.abs(signedDistance) < 0.5;
+        const dispVal = getOffsetVal(0, raw);
         const disabled = isDisabled(dispVal);
         return (
           <div
             key={o}
             className={`${styles.item} ${isActive ? styles.active : ""} ${disabled ? styles.disabled : ""}`}
-            style={getDrumItemStyle(o, dragOffset, disabled)}
+            style={getDrumItemStyle(signedDistance, disabled)}
             aria-hidden={!isActive}
-            onClick={isActive || disabled ? undefined : () => onJump(dispVal)}
+            onClick={isActive || disabled ? undefined : () => scrollTo(raw)}
           >
             {getLabel(dispVal)}
           </div>
@@ -143,26 +173,23 @@ function MonthTrack({
   const getOffsetVal = (v: number, offset: number) =>
     getDrumValue(v, offset, 12);
   const getLabel = (v: number) => monthsData[((v % 12) + 12) % 12].label;
-
-  const step = (dir: 1 | -1) => {
-    let next = getDrumValue(month, dir, 12);
-    let attempts = 0;
-    while (monthsData[next].disabled && attempts < 12) {
-      next = getDrumValue(next, dir, 12);
-      attempts++;
-    }
-    if (!monthsData[next].disabled) onChange(next);
-  };
+  const enabledMonths = monthsData
+    .map((item, index) => (item.disabled ? null : index))
+    .filter((item): item is number => item !== null);
+  const bounded = enabledMonths.length > 0 && enabledMonths.length < 12;
 
   return (
     <div className={styles.root}>
       <SelectDrum
+        circular={!bounded}
+        count={12}
         val={month}
         getLabel={getLabel}
         getOffsetVal={getOffsetVal}
         isDisabled={isDisabled}
-        onStep={step}
         onJump={onChange}
+        minIndex={bounded ? enabledMonths[0] : undefined}
+        maxIndex={bounded ? enabledMonths.at(-1) : undefined}
         label={label}
       />
     </div>
@@ -189,11 +216,6 @@ function YearTrack({
   const getOffsetVal = (v: number, offset: number) => v + offset;
   const getLabel = (v: number) => String(v);
 
-  const step = (dir: 1 | -1) => {
-    const next = year + dir;
-    if (!isDisabled(next)) onChange(next);
-  };
-
   return (
     <div className={styles.root}>
       <SelectDrum
@@ -201,8 +223,9 @@ function YearTrack({
         getLabel={getLabel}
         getOffsetVal={getOffsetVal}
         isDisabled={isDisabled}
-        onStep={step}
         onJump={onChange}
+        minIndex={Number.isFinite(minYear) ? minYear : undefined}
+        maxIndex={Number.isFinite(maxYear) ? maxYear : undefined}
         label={label}
       />
     </div>

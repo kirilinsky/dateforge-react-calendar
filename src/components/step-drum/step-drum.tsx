@@ -1,6 +1,7 @@
 import type React from "react";
 import { useRef } from "react";
-import { useScrollAccumulator } from "@/hooks/use-scroll-accumulator";
+import { useItemHeight } from "@/hooks/use-item-width";
+import { useTrack } from "@/hooks/use-track";
 import { getDrumValue, padTime } from "@/utils/time-utils";
 import styles from "./step-drum.module.css";
 
@@ -17,10 +18,9 @@ type DrumItemStyle = React.CSSProperties & {
 };
 
 const getDrumItemStyle = (
-  offset: number,
-  dragOffset: number,
+  signedOffset: number,
+  wheelOffset: number,
 ): DrumItemStyle => {
-  const signedOffset = offset - dragOffset;
   const distance = Math.abs(signedOffset);
   const activeMix = Math.max(0, Math.min(1, 1 - distance * 0.85));
   const opacity = Math.max(0.18, 1 - distance * 0.28);
@@ -33,7 +33,7 @@ const getDrumItemStyle = (
     "--drum-item-active": `${Math.round(activeMix * 100)}%`,
     "--drum-item-opacity": opacity,
     "--drum-item-scale": scale,
-    "--drum-item-shift": `${dragOffset * -100}%`,
+    "--drum-item-shift": `${wheelOffset * -100}%`,
     "--drum-item-y": `${y}em`,
     "--drum-item-z": `${z}em`,
     "--drum-item-tilt": `${tilt}deg`,
@@ -64,6 +64,7 @@ export const StepDrum: React.FC<StepDrumProps> = ({
   className,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
+  const itemHeight = useItemHeight(ref, 28);
 
   const safeStep = step > 0 ? step : 1;
   const count = Math.max(1, Math.floor(max / safeStep));
@@ -77,11 +78,26 @@ export const StepDrum: React.FC<StepDrumProps> = ({
     onChange(getDrumValue(index, delta, count) * safeStep);
   };
 
-  const { dragOffset, isDragging } = useScrollAccumulator(ref, moveByIdx, {
+  const {
+    position,
+    scrollTo,
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
+    onPointerCancel,
+    isInteracting,
+  } = useTrack({
+    axis: "y",
+    circular: true,
+    count,
     disabled: readOnly,
-    dragThreshold: 24,
-    requireHover: true,
+    initialIndex: index,
+    onChange: (next) => onChange(next * safeStep),
+    pixelsPerItem: itemHeight,
+    ref,
   });
+  const round = Math.round(position);
+  const wheelOffset = position - round;
 
   return (
     <div
@@ -95,7 +111,11 @@ export const StepDrum: React.FC<StepDrumProps> = ({
       aria-valuemax={valueMax}
       aria-valuetext={getValueText(aligned)}
       aria-disabled={readOnly || undefined}
-      data-dragging={isDragging || undefined}
+      data-dragging={isInteracting || undefined}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerCancel}
       onKeyDown={(e) => {
         if (e.key === "ArrowUp") {
           e.preventDefault();
@@ -114,16 +134,18 @@ export const StepDrum: React.FC<StepDrumProps> = ({
     >
       <div className={styles.highlight} aria-hidden />
       {OFFSETS.map((o) => {
-        const isActive = o === 0;
-        const idx = getDrumValue(index, o, count);
+        const raw = round + o;
+        const signedDistance = raw - position;
+        const isActive = Math.abs(signedDistance) < 0.5;
+        const idx = getDrumValue(raw, 0, count);
         const v = idx * safeStep;
         return (
           <div
             key={o}
             className={`${styles.item} ${isActive ? styles.active : ""}`}
-            style={getDrumItemStyle(o, dragOffset)}
+            style={getDrumItemStyle(signedDistance, wheelOffset)}
             aria-hidden={!isActive}
-            onClick={isActive ? undefined : () => moveByIdx(o)}
+            onClick={isActive ? undefined : () => scrollTo(raw)}
           >
             {format(v)}
           </div>
