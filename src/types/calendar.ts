@@ -155,4 +155,10 @@ export interface CalendarProps<M extends CalendarMode = "single"> {
   appearance?: CalendarAppearance;
   gradient?: boolean;
   disabled?: DisabledConfig;
+  /**
+   * `data-testid` applied to the calendar root wrapper. Defaults to
+   * `"dateforge-calendar"`. Override per-instance for tests that mount
+   * multiple calendars.
+   */
+  "data-testid"?: string;
 }

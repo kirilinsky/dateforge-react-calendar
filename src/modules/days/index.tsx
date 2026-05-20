@@ -24,7 +24,10 @@ import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { getDateTimeFormat } from "@/utils/intl-cache";
 import { resolveThemeScope } from "@/utils/resolve-theme-scope";
 import { getTodayInTimezone } from "@/utils/tz-utils";
-import { buildCellLabel, DayCell } from "./day-cell";
+import { buildCellLabel, DayCell, type RenderDay } from "./day-cell";
+
+export type { DayState, RenderDay } from "./day-cell";
+
 import styles from "./days.module.css";
 import {
   composeSelectionDate,
@@ -65,6 +68,13 @@ export interface CalendarDaysProps {
    * multi-month layout no longer steals the primary view.
    */
   syncViewOnSelect?: boolean;
+  /**
+   * Custom renderer for the day cell inner content. Receives the cell `Date`
+   * and a `DayState` flag bag. Return any `ReactNode` to replace the default
+   * day-number label. The button shell, data attributes, keyboard handlers,
+   * and a11y stay owned by the library.
+   */
+  renderDay?: RenderDay;
 }
 
 export const CalendarDays: React.FC<CalendarDaysProps> = ({
@@ -87,6 +97,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   todayDot = true,
   weekLabel,
   syncViewOnSelect,
+  renderDay,
 }) => {
   const effectiveSyncView = syncViewOnSelect ?? offset === 0;
   const { activeTheme, daysTrackActive } = useUI();
@@ -572,6 +583,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
                       onSelect={handleSetDay}
                       onMouseEnter={handleMouseEnter}
                       onKeyDown={handleKeyDown}
+                      renderDay={renderDay}
                     />
                   );
                 },
