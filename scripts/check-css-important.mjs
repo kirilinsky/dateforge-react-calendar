@@ -25,9 +25,13 @@ function collectCssModules(dir) {
 
 const failures = [];
 
+// Strip `/* ... */` block comments so mentions of `!important` inside docs
+// don't trigger the hard ban.
+const stripBlockComments = (source) => source.replace(/\/\*[\s\S]*?\*\//g, "");
+
 for (const file of collectCssModules(SRC_DIR)) {
   const rel = relative(ROOT, file);
-  const source = readFileSync(file, "utf8");
+  const source = stripBlockComments(readFileSync(file, "utf8"));
   const count = source.match(/!important/g)?.length ?? 0;
   if (count > 0) {
     failures.push(`${rel}: found ${count} !important — not allowed`);
