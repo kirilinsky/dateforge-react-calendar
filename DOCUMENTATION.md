@@ -15,7 +15,7 @@
   - [CalendarNav](#calendarnav)
   - [CalendarMonthsGrid](#CalendarMonthsGrid)
   - [CalendarYearsGrid](#calendaryearsgrid)
-  - [CalendarTimeGrid](#calendartimegrid)
+  - [CalendarTimeWheel](#calendartimegrid)
   - [CalendarPresets](#calendarpresets)
   - [CalendarSelectedDates](#calendarselecteddates)
   - [CalendarInfo](#calendarinfo)
@@ -86,8 +86,8 @@ Pick the modules per the UX you want. All compose under one `<Calendar>` provide
 | ------------------------------- | ---------------------------------------------------------------------------------------------- |
 | Basic date picker               | `CalendarNav`, `CalendarDays`                                                                  |
 | Date range picker               | `CalendarNav`, `CalendarDays` (set `mode="range"` on `<Calendar>`)                             |
-| Date + time picker              | `CalendarNav` (with `showTime`) + `CalendarDays`, or inline `CalendarTimeGrid`                 |
-| Time-only picker                | `CalendarTimeGrid` (no `CalendarDays`)                                                         |
+| Date + time picker              | `CalendarNav` (with `showTime`) + `CalendarDays`, or inline `CalendarTimeWheel`                 |
+| Time-only picker                | `CalendarTimeWheel` (no `CalendarDays`)                                                         |
 | Manual typing / keyboard-first  | `CalendarManualInput` (alone or with `CalendarDays`)                                           |
 | Presets (Today, Last 7 days, …) | `CalendarPresets` (+ any picker modules)                                                       |
 | Month / year-only picker        | `CalendarMonthsGrid` or `CalendarYearsGrid` (no `CalendarDays`)                                |
@@ -104,14 +104,14 @@ Three subpaths, each tree-shakeable:
 | Import from                                 | What's there                                                                                   | When to use                                                                   |
 | ------------------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | `@dateforge/react-calendar`                 | `Calendar`, `createTheme`, `createDisabled`, `createAppearance`, all public types              | Always — the root provider lives here.                                        |
-| `@dateforge/react-calendar/modules`         | All `Calendar*` module components (Days, Nav, Presets, TimeGrid, …)                            | When pulling in the visible UI pieces.                                        |
+| `@dateforge/react-calendar/modules`         | All `Calendar*` module components (Days, Nav, Presets, TimeWheel, …)                            | When pulling in the visible UI pieces.                                        |
 | `@dateforge/react-calendar/context`         | Context hooks: `useConfig`, `useNavigation`, `useSelection`, `useSelectionActions`, `useUI`, … | When building custom modules that need to read or dispatch calendar state.    |
 | `@dateforge/react-calendar/themes`          | All theme families re-exported together                                                        | Quick prototyping; pulls every theme family into the bundle.                  |
 | `@dateforge/react-calendar/themes/<name>`   | A single theme family (e.g. `…/themes/nebula`)                                                 | Production — only the theme families you actually use end up in the bundle.   |
 | `@dateforge/react-calendar/appearances`     | All appearance objects together                                                                | Same trade-off as themes — prefer the per-name subpath for production builds. |
 | `@dateforge/react-calendar/appearances/<n>` | A single appearance (`loft`, `compact`, `square`, `soft`, `bubble`, `airy`)                    | Production.                                                                   |
 
-Each module is its own bundle, so importing `CalendarPresets` does not pull `CalendarTimeGrid` or any other unused module. The `modules` aggregate subpath is still tree-shakeable under ESM — bundlers drop unused named exports.
+Each module is its own bundle, so importing `CalendarPresets` does not pull `CalendarTimeWheel` or any other unused module. The `modules` aggregate subpath is still tree-shakeable under ESM — bundlers drop unused named exports.
 
 ## Styling override contract
 
@@ -158,11 +158,12 @@ import { CalendarNav, CalendarDays } from "@dateforge/react-calendar/modules";
 | `clearLabel`      | `string`                                              | `"Clear"`  | Global aria-label for clear buttons. Module-level `clearLabel` props override it                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `homeLabel`       | `string`                                              | `"Go to current month"` | Global aria-label for home/current-month buttons. Module-level `homeLabel` props override it                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | `hour12`          | `boolean`                                             | `false`    | Use 12-hour time format instead of 24-hour                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `timeStep`        | `{ hour?: number; minute?: number; second?: number }` | `{1,1,1}`  | Granularity (step) for time drums. Affects both inline `CalendarTimeGrid` and `CalendarNav` time popup. Example: `timeStep={{ minute: 5 }}` snaps minutes to 0/5/10/.../55. Step values divide the unit range; `aria-valuemax`, keyboard `±step`, and scroll snap follow the step. Default `1` (no snapping)                                                                                                                                                                                                                                                   |
+| `timeStep`        | `{ hour?: number; minute?: number; second?: number }` | `{1,1,1}`  | Granularity (step) for time drums. Affects both inline `CalendarTimeWheel` and `CalendarNav` time popup. Example: `timeStep={{ minute: 5 }}` snaps minutes to 0/5/10/.../55. Step values divide the unit range; `aria-valuemax`, keyboard `±step`, and scroll snap follow the step. Default `1` (no snapping)                                                                                                                                                                                                                                                   |
 | `theme`           | `CalendarTheme`                                       | `"auto"`   | Base mode string (`"auto"` / `"light"` / `"dark"`) or a theme family from `@dateforge/react-calendar/themes[/name]` or `createTheme()`. Named string themes (e.g. `"nebula"`) are not supported — import the family object instead.                                                                                                                                                                                                                                                                                                                               |
 | `light`           | `boolean`                                             | `false`    | Start in light mode. Works with the default palette and imported/custom theme families.                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | `dark`            | `boolean`                                             | `false`    | Start in dark mode. If both `light` and `dark` are passed, dark wins and a dev warning is emitted.                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | `appearance`      | `CalendarAppearance`                                  | —          | Pre-built appearance object from `@dateforge/react-calendar/appearances[/name]`, or a `CustomAppearance` from `createAppearance()`. Omit the prop entirely for the default appearance.                                                                                                                                                                                                                                                                                                                                                                         |
+| `motion`          | `"none" \| "view-transition"`                         | `"none"`   | Opt into browser View Transitions for calendar navigation and popup open/close. Browsers without `document.startViewTransition` fall back to regular updates. Disabled automatically when the OS requests reduced motion.                                                                                                                                                                                                                                                                                                                                       |
 | `gradient`        | `boolean`                                             | `false`    | Enable gradient backgrounds on selected cells                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | `width`           | `string \| number`                                    | `"100%"`   | Container width                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | `minDate`         | `Date`                                                | —          | Earliest selectable date                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
@@ -253,7 +254,7 @@ Module props use the same names and override the matching root prop only for tha
 | `CalendarDaysTrack` | `dayTrackLabel`, `removeSelectedDateLabel`, `saveSelectedDateLabel` |
 | `CalendarMonthsTrack` | `monthTrackLabel` |
 | `CalendarYearsTrack` | `yearTrackLabel` |
-| `CalendarTimeGrid` | `hoursLabel`, `minutesLabel`, `resetTimeLabel`, `secondsLabel`, `timePeriodLabel`, `timePickerLabel` |
+| `CalendarTimeWheel` | `hoursLabel`, `minutesLabel`, `resetTimeLabel`, `secondsLabel`, `timePeriodLabel`, `timePickerLabel` |
 | `CalendarMonthsGrid` | `monthGridLabel` |
 | `CalendarYearsGrid` | `nextYearsLabel`, `previousYearsLabel`, `yearGridLabel`, `yearPageNavigationLabel` |
 
@@ -332,7 +333,7 @@ That's it — `value` is `null` on the server (no day selected in SSR HTML), `to
 
 ### Time semantics — when does time editing fire `onChange`?
 
-`CalendarTimeGrid` and `CalendarNav.showTime` both edit time. They share the same rules. The principle is:
+`CalendarTimeWheel` and `CalendarNav.showTime` both edit time. They share the same rules. The principle is:
 
 > `viewDate` always carries the **current working time**. A selection's time is updated only when the selection corresponds to `viewDate`'s day. Otherwise the time stays "pending" — applied to the next date the user selects in `CalendarDays` (because Days commits a new date with `viewDate.hours / minutes / seconds`).
 
@@ -351,7 +352,7 @@ Per-mode behavior:
 | `range`    | `rangeEnd` day matches `viewDate`         | updates `rangeEnd`'s time                               | yes               |
 | `range`    | neither matches                           | pending                                                 | no                |
 
-¹ This makes `<Calendar mode="single"><CalendarNav showTime /><CalendarTimeGrid /></Calendar>` work as a **time-only picker**: scrolling time drums commits a date for today (or whatever `viewDate` defaults to). For `multiple` and `range` modes time-only pickers are not supported by design — the user must select a date first because there is no unambiguous boundary to attach time to.
+¹ This makes `<Calendar mode="single"><CalendarNav showTime /><CalendarTimeWheel /></Calendar>` work as a **time-only picker**: scrolling time drums commits a date for today (or whatever `viewDate` defaults to). For `multiple` and `range` modes time-only pickers are not supported by design — the user must select a date first because there is no unambiguous boundary to attach time to.
 
 **Pending vs committed.** "Pending" means `viewDate.hours / minutes / seconds` are updated for display and for the next selection, but the existing committed selection is not mutated and `onChange` is not called. The next click in `CalendarDays` will pick up the pending time automatically.
 
@@ -488,11 +489,13 @@ The library is **inclusive-first** — keyboard, screen reader, and reduced-moti
 
 **Live region.** The root mounts an off-screen `role="status" aria-live="polite"` element that announces the most recently committed date — selecting a day or applying a range is audible without re-reading the grid.
 
-**`readOnly`.** Adds `data-readonly` + `aria-readonly="true"` to the root, and disables every state-changing button / input visually and semantically.
+**`readOnly`.** Adds `data-readonly` to the root and disables every state-changing button / input visually and semantically. The root wrapper intentionally does not use `aria-readonly` because plain `<div>` does not support it.
+
+`prefers-reduced-motion: reduce` is honored across CSS transitions, keyframe
+module animations, drum/track motion, and opt-in View Transitions.
 
 **Known limitations.**
 
-- `prefers-reduced-motion` is not yet honored. Drum flip, month slide, and chip fade animations run regardless of the OS setting. Tracked as a TODO in `ARCHITECTURE.md → Accessibility`.
 - `hideOutOfRange` removes hidden cells from the AT tree but keyboard arrow navigation still computes by date math; pair with `blockNavigation` for full traversal predictability (see "`hideOutOfRange` accessibility").
 
 If you find an a11y regression, open an issue — these are treated as bugs, not enhancements.
@@ -505,7 +508,7 @@ When `readOnly` is `true`:
 
 - Selecting a date in `CalendarDays`, `CalendarDaysTrack`, `CalendarPresets`, `CalendarManualInput`.
 - Setting a range boundary in `CalendarDaysTrack` / `CalendarMonthsTrack` / `CalendarYearsTrack` with `bound`.
-- Changing time in `CalendarTimeGrid` and the time popup of `CalendarNav`.
+- Changing time in `CalendarTimeWheel` and the time popup of `CalendarNav`.
 - Clearing selection from `CalendarNav` (`clear`), `CalendarSelectedDates` (`allowClear`), `CalendarManualInput` (`allowClear`).
 - Editing a date chip in `CalendarManualInput`.
 
@@ -536,9 +539,9 @@ A consolidated checklist of non-obvious cases the library handles, with pointers
 | `mode="range"` with `minRangeDays` / `maxRangeDays`                         | Hover preview is gated by these; commit also rejected                                                                                                           | Calendar props                      |
 | `mode="range"` + `<CalendarDaysTrack bound="from">` only (no `to` boundary) | User can set `from` but never `to`. Renders but UX incomplete.                                                                                                  | "Any subset … not every is UX"      |
 | `mode="multiple"` + `maxDates` reached                                      | Click on new date silently ignored; click on already-selected toggles off; ManualInput add input hidden                                                         | Calendar props                      |
-| `mode="multiple"` + `<CalendarTimeGrid>` without selection                  | Time changes are pending, never commit (no unambiguous date)                                                                                                    | Time semantics                      |
-| `mode="single"` + `<CalendarTimeGrid>` without selection (time-only picker) | First time interaction auto-creates a date for `viewDate.day`                                                                                                   | Time semantics                      |
-| `mode="range"` + `<CalendarTimeGrid>` + viewDate matches neither boundary   | Time pending; no commit                                                                                                                                         | Time semantics                      |
+| `mode="multiple"` + `<CalendarTimeWheel>` without selection                  | Time changes are pending, never commit (no unambiguous date)                                                                                                    | Time semantics                      |
+| `mode="single"` + `<CalendarTimeWheel>` without selection (time-only picker) | First time interaction auto-creates a date for `viewDate.day`                                                                                                   | Time semantics                      |
+| `mode="range"` + `<CalendarTimeWheel>` + viewDate matches neither boundary   | Time pending; no commit                                                                                                                                         | Time semantics                      |
 | `timeZone="auto"` (default) on SSR                                          | First render uses no TZ; resolved post-hydration via `Intl`                                                                                                     | Timezone, SSR / hydration           |
 | Explicit `timeZone="UTC+2"` / `"UTC-5"`                                     | Normalized internally to `Etc/GMT∓N`                                                                                                                            | Timezone                            |
 | Invalid `timeZone` string (e.g. `"Europe/Wrongville"`)                      | Falls back to auto-detect; dev warn                                                                                                                             | Timezone                            |
@@ -636,7 +639,7 @@ const [dates, setDates] = useState<Date[]>([]);
 <Calendar mode="single" value={date} onChange={setDate}>
   <CalendarNav />
   <CalendarDays />
-  <CalendarTimeGrid />
+  <CalendarTimeWheel />
 </Calendar>
 ```
 
@@ -647,7 +650,7 @@ Single mode auto-creates a date from `viewDate.day` + the new time on the first 
 ```tsx
 <Calendar mode="single" value={date} onChange={setDate}>
   <CalendarNav showNowTime />
-  <CalendarTimeGrid />
+  <CalendarTimeWheel />
 </Calendar>
 ```
 
@@ -907,19 +910,19 @@ Standalone year picker:
 
 ---
 
-### CalendarTimeGrid
+### CalendarTimeWheel
 
 Time picker — hours, minutes, optional seconds, AM/PM toggle when `hour12` is enabled.
 
 ```tsx
-<CalendarTimeGrid seconds />
+<CalendarTimeWheel seconds />
 ```
 
 Step granularity is configured via the `timeStep` prop on `<Calendar>` and applies to both this inline grid and the `CalendarNav` time popup:
 
 ```tsx
 <Calendar timeStep={{ minute: 5 }}>
-  <CalendarTimeGrid />
+  <CalendarTimeWheel />
 </Calendar>
 ```
 
@@ -929,8 +932,8 @@ In `mode="range"`, pass `bound="from"` or `bound="to"` when the time grid should
 
 ```tsx
 <Calendar mode="range">
-  <CalendarTimeGrid bound="from" />
-  <CalendarTimeGrid bound="to" />
+  <CalendarTimeWheel bound="from" />
+  <CalendarTimeWheel bound="to" />
 </Calendar>
 ```
 
@@ -938,7 +941,7 @@ Standalone time picker (no selected date required):
 
 ```tsx
 <Calendar>
-  <CalendarTimeGrid
+  <CalendarTimeWheel
     seconds
     onTimeSelect={(d) =>
       setTime({ h: d.getHours(), m: d.getMinutes(), s: d.getSeconds() })
@@ -1198,7 +1201,7 @@ format="YYYY-MM-DD"
 "20240615" → "2024-06-15"
 ```
 
-Time is **not** parseable from the input. To set time use `<CalendarTimeGrid>` or `<CalendarNav showTime>`.
+Time is **not** parseable from the input. To set time use `<CalendarTimeWheel>` or `<CalendarNav showTime>`.
 
 ### When `onChange` fires
 
@@ -1405,7 +1408,7 @@ Three ways to apply an appearance.
 <Calendar /> // default appearance, nothing to import
 ```
 
-**Pre-built appearance object** (one of 5 presets):
+**Pre-built appearance object** (one of 7 presets):
 
 ```ts
 // barrel — bundler tree-shakes to just the one you import
@@ -1417,7 +1420,7 @@ import { compact } from "@dateforge/react-calendar/appearances/compact";
 <Calendar appearance={compact} />;
 ```
 
-Available presets: `soft` `compact` `square` `bubble` `loft`
+Available presets: `soft` `compact` `square` `bubble` `loft` `airy` `press`
 
 Each preset is a self-contained object. Vars are applied as inline CSS custom properties — no extra CSS file required.
 
@@ -1767,9 +1770,9 @@ import { nebula } from "@dateforge/react-calendar/themes/nebula";
 
 ### Built-in appearances
 
-5 presets, each a tree-shakeable `CustomAppearance` object. Omitting the prop gives the default appearance.
+7 presets, each a tree-shakeable `CustomAppearance` object. Omitting the prop gives the default appearance.
 
-`soft` `compact` `square` `bubble` `loft`
+`soft` `compact` `square` `bubble` `loft` `airy` `press`
 
 ```ts
 // barrel

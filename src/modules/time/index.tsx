@@ -29,7 +29,7 @@ import { getDateTimeFormat } from "@/utils/intl-cache";
 import { resolveThemeScope } from "@/utils/resolve-theme-scope";
 import styles from "./time.module.css";
 
-export interface CalendarTimeGridProps {
+export interface CalendarTimeWheelProps {
   /**
    * Range mode only: edit time on one explicit boundary instead of relying on
    * the current viewDate to match rangeStart/rangeEnd.
@@ -80,7 +80,7 @@ export interface CalendarTimeGridProps {
   onTimeSelect?: (date: Date) => void;
 }
 
-export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
+export const CalendarTimeWheel: React.FC<CalendarTimeWheelProps> = ({
   bound,
   col,
   theme,

@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
 import { CalendarNav } from "@/modules/nav";
-import { CalendarTimeGrid } from "@/modules/time";
+import { CalendarTimeWheel } from "@/modules/time";
 import { createDisabled } from "@/utils/create-disabled";
 import { FIXED_DATE } from "../_constants";
 import { debugStyle, fmtDate } from "../_helpers/debug";
@@ -106,7 +106,7 @@ export const WithTime: Story = {
         >
           <CalendarNav showMonthPicker compactYears />
           <CalendarDays />
-          <CalendarTimeGrid />
+          <CalendarTimeWheel />
         </Calendar>
       </>
     );

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
-import { CalendarTimeGrid } from "@/modules/time";
+import { CalendarTimeWheel } from "@/modules/time";
 import { FIXED_DATE } from "../_constants";
 import {
   resolveStoryAppearance,
@@ -11,7 +11,7 @@ import {
   resolveStoryThemeMode,
 } from "../_helpers/resolve-globals";
 
-type TimeGridArgs = {
+type TimeWheelArgs = {
   seconds?: boolean;
   hour12?: boolean;
   hourStep?: number;
@@ -20,8 +20,8 @@ type TimeGridArgs = {
   labels?: "short" | "long" | "none";
 };
 
-const meta: Meta<TimeGridArgs> = {
-  title: "Modules/TimeGrid",
+const meta: Meta<TimeWheelArgs> = {
+  title: "Modules/TimeWheel",
   argTypes: {
     seconds: { control: "boolean" },
     hour12: { control: "boolean" },
@@ -59,7 +59,7 @@ const meta: Meta<TimeGridArgs> = {
         gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
-        <CalendarTimeGrid
+        <CalendarTimeWheel
           seconds={args.seconds}
           labels={args.labels === "none" ? undefined : args.labels}
         />
@@ -70,7 +70,7 @@ const meta: Meta<TimeGridArgs> = {
 
 export default meta;
 
-type Story = StoryObj<TimeGridArgs>;
+type Story = StoryObj<TimeWheelArgs>;
 
 export const Default: Story = {};
 Default.storyName = "Default (24h)";
@@ -146,7 +146,7 @@ export const StandaloneTimePicker: Story = {
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
-          <CalendarTimeGrid
+          <CalendarTimeWheel
             seconds={args.seconds}
             onTimeSelect={(d) =>
               setPicked({

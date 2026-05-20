@@ -9,7 +9,7 @@ import { CalendarNav } from "@/modules/nav";
 import { CalendarPresets } from "@/modules/presets";
 import { basicPresets } from "@/modules/presets/presets-pack";
 import { CalendarSelectedDates } from "@/modules/selected-dates";
-import { CalendarTimeGrid } from "@/modules/time";
+import { CalendarTimeWheel } from "@/modules/time";
 
 const D = new Date(2024, 5, 15);
 
@@ -150,12 +150,12 @@ describe("readOnly — DaysTrack multi confirm", () => {
   });
 });
 
-describe("readOnly — TimeGrid", () => {
+describe("readOnly — TimeWheel", () => {
   it("drum has aria-disabled and arrow keys do not fire onChange", async () => {
     const onChange = vi.fn();
     const { container } = render(
       <Calendar value={D} onChange={onChange} readOnly>
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>,
     );
     const drums = container.querySelectorAll('[role="spinbutton"]');

@@ -2,7 +2,7 @@ import { fireEvent, render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
-import { CalendarTimeGrid } from "@/modules/time";
+import { CalendarTimeWheel } from "@/modules/time";
 
 const D = (y: number, m: number, d: number, h = 0, min = 0, s = 0) =>
   new Date(y, m, d, h, min, s);
@@ -11,7 +11,7 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe("CalendarTimeGrid — showBoundDate", () => {
+describe("CalendarTimeWheel — showBoundDate", () => {
   it("renders bound date header when bound and boundDate exist", () => {
     const { container } = render(
       <Calendar
@@ -19,7 +19,7 @@ describe("CalendarTimeGrid — showBoundDate", () => {
         locale="en-US"
         value={{ from: D(2024, 5, 15, 10, 0), to: D(2024, 5, 18, 14, 0) }}
       >
-        <CalendarTimeGrid bound="from" />
+        <CalendarTimeWheel bound="from" />
       </Calendar>,
     );
 
@@ -38,7 +38,7 @@ describe("CalendarTimeGrid — showBoundDate", () => {
         locale="en-US"
         value={{ from: D(2024, 5, 15), to: D(2024, 5, 18) }}
       >
-        <CalendarTimeGrid bound="to" />
+        <CalendarTimeWheel bound="to" />
       </Calendar>,
     );
 
@@ -52,7 +52,7 @@ describe("CalendarTimeGrid — showBoundDate", () => {
         mode="range"
         value={{ from: D(2024, 5, 15), to: D(2024, 5, 18) }}
       >
-        <CalendarTimeGrid bound="from" showBoundDate={false} />
+        <CalendarTimeWheel bound="from" showBoundDate={false} />
       </Calendar>,
     );
 
@@ -62,7 +62,7 @@ describe("CalendarTimeGrid — showBoundDate", () => {
   it("hides header when no bound prop is set (no-op)", () => {
     const { container } = render(
       <Calendar mode="single" value={D(2024, 5, 15, 10, 0)}>
-        <CalendarTimeGrid showBoundDate />
+        <CalendarTimeWheel showBoundDate />
       </Calendar>,
     );
 
@@ -72,7 +72,7 @@ describe("CalendarTimeGrid — showBoundDate", () => {
   it("hides header when bound is set but boundDate is null", () => {
     const { container } = render(
       <Calendar mode="range" value={{ from: null, to: D(2024, 5, 18) }}>
-        <CalendarTimeGrid bound="from" />
+        <CalendarTimeWheel bound="from" />
       </Calendar>,
     );
 
@@ -82,7 +82,7 @@ describe("CalendarTimeGrid — showBoundDate", () => {
   it("hides header outside range mode even with bound", () => {
     const { container } = render(
       <Calendar mode="single" value={D(2024, 5, 15)}>
-        <CalendarTimeGrid bound="from" />
+        <CalendarTimeWheel bound="from" />
       </Calendar>,
     );
 
@@ -90,11 +90,11 @@ describe("CalendarTimeGrid — showBoundDate", () => {
   });
 });
 
-describe("CalendarTimeGrid — showReset", () => {
+describe("CalendarTimeWheel — showReset", () => {
   it("does not render the reset button by default", () => {
     const { container } = render(
       <Calendar mode="single" value={D(2024, 5, 15, 10, 0)}>
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>,
     );
 
@@ -106,7 +106,7 @@ describe("CalendarTimeGrid — showReset", () => {
   it("renders a localized 'now' button when showReset is true", () => {
     const { container } = render(
       <Calendar mode="single" locale="en-US" value={D(2024, 5, 15, 10, 0)}>
-        <CalendarTimeGrid showReset />
+        <CalendarTimeWheel showReset />
       </Calendar>,
     );
 
@@ -121,7 +121,7 @@ describe("CalendarTimeGrid — showReset", () => {
   it("renders Russian 'сейчас' for ru locale", () => {
     const { container } = render(
       <Calendar mode="single" locale="ru-RU" value={D(2024, 5, 15, 10, 0)}>
-        <CalendarTimeGrid showReset />
+        <CalendarTimeWheel showReset />
       </Calendar>,
     );
 
@@ -134,7 +134,7 @@ describe("CalendarTimeGrid — showReset", () => {
   it("uses custom resetLabel when provided", () => {
     const { getByText, container } = render(
       <Calendar mode="single" value={D(2024, 5, 15, 10, 0)}>
-        <CalendarTimeGrid showReset resetLabel="Сбросить" />
+        <CalendarTimeWheel showReset resetLabel="Сбросить" />
       </Calendar>,
     );
 
@@ -148,7 +148,7 @@ describe("CalendarTimeGrid — showReset", () => {
     const onChange = vi.fn();
     const { container } = render(
       <Calendar mode="single" value={D(2024, 5, 15, 10, 0)} onChange={onChange}>
-        <CalendarTimeGrid showReset />
+        <CalendarTimeWheel showReset />
       </Calendar>,
     );
 
@@ -177,7 +177,7 @@ describe("CalendarTimeGrid — showReset", () => {
         value={D(2024, 5, 15, 10, 0, 0)}
         onChange={onChange}
       >
-        <CalendarTimeGrid showReset seconds />
+        <CalendarTimeWheel showReset seconds />
       </Calendar>,
     );
 
@@ -202,7 +202,7 @@ describe("CalendarTimeGrid — showReset", () => {
         value={{ from: D(2024, 5, 10, 10, 0), to: D(2024, 5, 18, 18, 0) }}
         onChange={onChange}
       >
-        <CalendarTimeGrid bound="from" showReset />
+        <CalendarTimeWheel bound="from" showReset />
       </Calendar>,
     );
 
@@ -224,7 +224,7 @@ describe("CalendarTimeGrid — showReset", () => {
   it("does not render reset button when bound is set but boundDate is null", () => {
     const { container } = render(
       <Calendar mode="range" value={{ from: null, to: D(2024, 5, 18) }}>
-        <CalendarTimeGrid bound="from" showReset />
+        <CalendarTimeWheel bound="from" showReset />
       </Calendar>,
     );
 
@@ -236,7 +236,7 @@ describe("CalendarTimeGrid — showReset", () => {
   it("does not render reset button when readOnly", () => {
     const { container } = render(
       <Calendar mode="single" value={D(2024, 5, 15, 10, 0)} readOnly>
-        <CalendarTimeGrid showReset />
+        <CalendarTimeWheel showReset />
       </Calendar>,
     );
 
@@ -248,7 +248,7 @@ describe("CalendarTimeGrid — showReset", () => {
   it("aria-label includes localized 'now' word", () => {
     const { container } = render(
       <Calendar mode="single" locale="en-US" value={D(2024, 5, 15, 10, 0)}>
-        <CalendarTimeGrid showReset />
+        <CalendarTimeWheel showReset />
       </Calendar>,
     );
 
@@ -263,7 +263,7 @@ describe("Clock icon", () => {
   it("is rendered inside the default reset button content", () => {
     const { container } = render(
       <Calendar mode="single" value={D(2024, 5, 15, 10, 0)}>
-        <CalendarTimeGrid showReset />
+        <CalendarTimeWheel showReset />
       </Calendar>,
     );
 
@@ -272,14 +272,14 @@ describe("Clock icon", () => {
   });
 });
 
-describe("CalendarTimeGrid — header chip background", () => {
+describe("CalendarTimeWheel — header chip background", () => {
   it("applies the chip background class on the bounded date header", () => {
     const { container } = render(
       <Calendar
         mode="range"
         value={{ from: D(2024, 5, 15), to: D(2024, 5, 18) }}
       >
-        <CalendarTimeGrid bound="from" />
+        <CalendarTimeWheel bound="from" />
       </Calendar>,
     );
 
@@ -289,10 +289,10 @@ describe("CalendarTimeGrid — header chip background", () => {
 });
 
 describe("openTimePopup smoke — keeps existing behavior", () => {
-  it("CalendarTimeGrid still renders TimeTrack content", async () => {
+  it("CalendarTimeWheel still renders TimeTrack content", async () => {
     const { container } = render(
       <Calendar mode="single" value={D(2024, 5, 15, 10, 0)}>
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>,
     );
 
@@ -304,7 +304,7 @@ describe("openTimePopup smoke — keeps existing behavior", () => {
     expect(() =>
       render(
         <Calendar mode="single" locale="xx-YY" value={D(2024, 5, 15, 10, 0)}>
-          <CalendarTimeGrid showReset />
+          <CalendarTimeWheel showReset />
         </Calendar>,
       ),
     ).not.toThrow();
@@ -316,7 +316,7 @@ describe("openTimePopup smoke — keeps existing behavior", () => {
     const onChange = vi.fn();
     const { container } = render(
       <Calendar mode="single" value={D(2024, 5, 15, 9, 0)} onChange={onChange}>
-        <CalendarTimeGrid showReset />
+        <CalendarTimeWheel showReset />
       </Calendar>,
     );
 

@@ -1,7 +1,7 @@
 import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
-import { CalendarTimeGrid } from "@/modules/time";
+import { CalendarTimeWheel } from "@/modules/time";
 
 const getDrum = (container: HTMLElement, label: string) =>
   container.querySelector(`[aria-label="${label}"]`) as HTMLElement;
@@ -17,7 +17,7 @@ describe("timeStep config", () => {
         onChange={onChange}
         timeStep={{ minute: 5 }}
       >
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>,
     );
     const minute = getDrum(container, "Minutes");
@@ -39,7 +39,7 @@ describe("timeStep config", () => {
         onChange={onChange}
         timeStep={{ minute: 30 }}
       >
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>,
     );
     const minute = getDrum(container, "Minutes");
@@ -61,7 +61,7 @@ describe("timeStep config", () => {
         onChange={onChange}
         timeStep={{ hour: 2 }}
       >
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>,
     );
     const hour = getDrum(container, "Hours");
@@ -76,7 +76,7 @@ describe("timeStep config", () => {
     const value = new Date(2024, 0, 1, 0, 5, 0);
     const { container } = render(
       <Calendar mode="single" value={value} onChange={onChange}>
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>,
     );
     const minute = getDrum(container, "Minutes");
@@ -94,7 +94,7 @@ describe("timeStep config", () => {
         onChange={onChange}
         timeStep={{ minute: 15 }}
       >
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>,
     );
     const minute = getDrum(container, "Minutes");

@@ -130,9 +130,21 @@ Source: `src/core/layout.module.css`.
 
 ### Grid systems
 
-- Days: `grid-template-columns: repeat(7, 1fr)` (+ optional week-number column).
-- Years grid: 3 → 4 → 5-col responsive via `@container` queries.
-- Months grid: 2 → 3-col responsive.
+- Calendar shell: CSS grid with `grid-column: 1 / -1` defaults for each
+  `[data-area]`; module `col` props opt individual areas into narrower grid
+  slots.
+- Days: fixed 7-column calendar grid, or `2.2em + 7 columns` when week numbers
+  are enabled. Narrow `cal-days` containers tighten cell sizing via container
+  queries.
+- Months grid: 12 months render as 3 columns by default, 4 columns at
+  `cal-months-grid >= 18em`.
+- Years grid: column count depends on `yearsPerPage` and container width:
+  narrow/default layouts use 2-4 columns; `cal-years-grid >= 18em` promotes to
+  4-5 columns.
+- Presets: count-aware grid (`data-count`) with compact 2-column fallback and
+  wider single-row layouts when `cal-presets >= 40em`.
+- Info / SelectedDates animated sections use `grid-template-rows: 0fr → 1fr`
+  for collapse/reveal, not absolute height animation.
 
 ### Data attributes (root)
 
@@ -150,7 +162,7 @@ Source: `src/core/layout.module.css`.
 
 `compact 0.15s`, `square 0.12s`, `soft 0.25s`, `bubble 0.28s`, `loft 0.35s`, `airy 0.2s`, `press 0.18s`. Used by CSS transitions on opacity / transform / colors via `var(--cal-transition)`.
 
-### Track scroll physics
+### Shared track / drum physics
 
 Source: `src/hooks/use-track.ts`.
 
@@ -162,11 +174,58 @@ Source: `src/hooks/use-track.ts`.
 | `RUBBER_K`    | 0.12  | boundary resistance      |
 | `RUBBER_DAMP` | 0.75  | rubber-band damping      |
 
-Snap threshold ~3.5px/frame; settle tolerance 0.4px. Pointer events drive position updates.
+`useTrack` is the shared motion layer for horizontal track modules and vertical
+drums. It exposes a continuous `position` float, pointer/wheel handlers,
+inertia, snapping, and interaction state. Consumers choose the axis:
+`axis: "x"` for rails, `axis: "y"` for drums.
+
+Supported modes:
+- circular lists (`count` + `circular`) for months and time values;
+- bounded lists (`minIndex` / `maxIndex`) for constrained month/year ranges;
+- unbounded vertical wheels for years when no bounds are set.
+
+Snap threshold is ~3.5px/frame; settle tolerance is 0.4px. Pointer events drive
+position updates, wheel input feeds the same physics path, and dragging disables
+item transitions while the user is actively moving the control.
+
+### Drum visual model
+
+Source: `src/components/step-drum/step-drum.tsx`,
+`src/modules/nav/month-year-track.tsx`.
+
+Time drums and Nav month/year drums are separate components, but share the same
+visual vocabulary:
+
+| CSS variable | Role |
+|---|---|
+| `--drum-item-active` | mixes active text color into the centered item |
+| `--drum-item-opacity` | fades items by distance from center |
+| `--drum-item-scale` | subtly enlarges the active row |
+| `--drum-item-shift` | fractional wheel offset for continuous roll motion |
+| `--drum-item-y` | local vertical lift by signed distance |
+| `--drum-item-z` | depth cue with perspective |
+| `--drum-item-tilt` | `rotateX()` cue for iOS-style wheel curvature |
+
+The active highlight stays fixed in the center; item transforms create the
+feeling of a round, continuous drum moving behind it.
+
+### View Transitions
+
+`<Calendar motion="view-transition" />` opts into browser View Transitions for
+calendar navigation and popup open/close. The default is `motion="none"` so the
+library does not affect host app page transitions unless requested. Browsers
+without `document.startViewTransition` run the same state update directly.
 
 ### Reduced motion
 
-**Not yet enforced globally.** `src/modules/nav/nav.module.css` honors `@media (prefers-reduced-motion: reduce)` for drum/pulse animations; other animations (month slide, chip fade, AnimatedTime) currently run regardless. **TODO:** wrap remaining animations behind the same media query, or expose a `reducedMotion` prop / context flag.
+Global reduced motion is enforced through the shared transition tokens:
+`--cal-transition`, `--cal-paint-transition`, press durations, and press scale
+collapse inside `@media (prefers-reduced-motion: reduce)`. Keyframe-based
+module animations (day/year slides, nav pulse/drums, chip reveal) have local
+reduced-motion overrides.
+
+Browser View Transitions are opt-in via `<Calendar motion="view-transition" />`
+and are also disabled under `prefers-reduced-motion: reduce`.
 
 ---
 
@@ -231,7 +290,7 @@ Tracks (`<CalendarDaysTrack>`, `<CalendarMonthsTrack>`, `<CalendarYearsTrack>`):
 | Hidden out-of-range cell (`hideOutOfRange`) | `presentation` | Not exposed to AT; preserves grid layout only                                          |
 | Empty week row (all cells hidden)           | `presentation` | Whole row dropped from AT                                                              |
 
-### Time picker (`<CalendarTimeGrid>` and `<TimeTrack>` inside Nav popup)
+### Time picker (`<CalendarTimeWheel>` and `<TimeTrack>` inside Nav popup)
 
 Each drum (hour / minute / second) is `role="spinbutton"` with `aria-label`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, `aria-valuetext`. AM/PM buttons use `aria-pressed`. Under `readOnly` the spinbutton gets `aria-disabled="true"` and all keyboard / scroll / click handlers no-op.
 
@@ -245,7 +304,10 @@ Same `role="spinbutton"` pattern as time drums; values reflect highlighted item.
 
 ### Calendar root and `readOnly`
 
-Root gets `data-readonly` and `aria-readonly="true"` when `readOnly` is set. Every interactive module additionally renders its UI as `disabled` / `aria-disabled` so screen reader announcements stay consistent. See ARCHITECTURE.md → "`readOnly` contract" for the full disable matrix.
+Root gets `data-readonly` when `readOnly` is set. Every interactive module
+additionally renders its UI as `disabled` / `aria-disabled` so screen reader
+announcements stay consistent. The root wrapper intentionally does not use
+`aria-readonly` because plain `<div>` does not support it.
 
 ### Live region for selection changes
 
@@ -273,11 +335,12 @@ Keyboard navigation does not currently skip over hidden positions (computed by d
 
 ### Reduced motion
 
-Not yet implemented as an explicit guard. See "Motion → Reduced motion" above.
+Covered by CSS `prefers-reduced-motion` guards. There is no explicit
+`reducedMotion` prop yet; the current contract follows the OS preference.
 
 ### Testing
 
-`a11y.test.tsx` runs `jest-axe` on representative module compositions (default Days, with selection, with min/max, range mode, `hideOutOfRange`, `currentMonthOnly`, TimeGrid). Any axe violation fails CI. New modules MUST land with their own axe test cases.
+`a11y.test.tsx` runs `jest-axe` on representative module compositions (default Days, with selection, with min/max, range mode, `hideOutOfRange`, `currentMonthOnly`, TimeWheel). Any axe violation fails CI. New modules MUST land with their own axe test cases.
 
 Manual SR coverage: NVDA (Windows), VoiceOver (macOS / iOS), TalkBack (Android) are supported targets.
 

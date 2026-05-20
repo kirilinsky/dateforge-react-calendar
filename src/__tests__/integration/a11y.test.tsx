@@ -3,7 +3,7 @@ import { axe, toHaveNoViolations } from "jest-axe";
 import { describe, expect, it } from "vitest";
 import { CalendarProvider } from "@/core/provider";
 import { CalendarDays } from "@/modules/days";
-import { CalendarTimeGrid } from "@/modules/time";
+import { CalendarTimeWheel } from "@/modules/time";
 
 expect.extend(toHaveNoViolations);
 
@@ -267,7 +267,7 @@ describe("Calendar time picker — ARIA", () => {
     const { container } = render(
       <CalendarProvider value={new Date(2024, 5, 15)}>
         <div>
-          <CalendarTimeGrid />
+          <CalendarTimeWheel />
         </div>
       </CalendarProvider>,
     );
@@ -280,7 +280,7 @@ describe("Calendar time picker — ARIA", () => {
     const { container } = render(
       <CalendarProvider value={new Date(2024, 5, 15)}>
         <div>
-          <CalendarTimeGrid />
+          <CalendarTimeWheel />
         </div>
       </CalendarProvider>,
     );

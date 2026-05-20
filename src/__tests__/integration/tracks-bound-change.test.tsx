@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDaysTrack } from "@/modules/days-track";
 import { CalendarMonthsTrack } from "@/modules/months-track";
-import { CalendarTimeGrid } from "@/modules/time";
+import { CalendarTimeWheel } from "@/modules/time";
 import { CalendarYearsTrack } from "@/modules/years-track";
 
 const drum = (container: HTMLElement, label: string) =>
@@ -76,7 +76,7 @@ describe("StepDrum Home/End keys", () => {
         value={new Date(2024, 0, 1, 10, 35, 0)}
         onChange={onChange}
       >
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>,
     );
     const minute = drum(container, "Minutes");
@@ -93,7 +93,7 @@ describe("StepDrum Home/End keys", () => {
         value={new Date(2024, 0, 1, 10, 0, 0)}
         onChange={onChange}
       >
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>,
     );
     const minute = drum(container, "Minutes");
@@ -113,7 +113,7 @@ describe("CHANGE_TIME multi-mode invalid path", () => {
         onChange={onChange}
         minDate={new Date(2024, 5, 16)}
       >
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>,
     );
     const minute = drum(container, "Minutes");
@@ -131,7 +131,7 @@ describe("CHANGE_TIME multi-mode invalid path", () => {
         onChange={onChange}
         maxDate={new Date(1990, 0, 1)}
       >
-        <CalendarTimeGrid />
+        <CalendarTimeWheel />
       </Calendar>,
     );
     const minute = drum(container, "Minutes");

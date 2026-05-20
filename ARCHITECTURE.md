@@ -16,7 +16,7 @@ The library is built around a strict two-layer model:
 │    state, contexts, theme, locale, timezone     │   No UI of its own
 │                                                 │
 │   ┌─────────┐  ┌──────────┐  ┌──────────────┐  │
-│   │ <Days>  │  │ <Nav>    │  │ <TimeGrid>   │  │   Layer 2 — modules
+│   │ <Days>  │  │ <Nav>    │  │ <TimeWheel>   │  │   Layer 2 — modules
 │   └─────────┘  └──────────┘  └──────────────┘  │   Each is self-contained
 │                                                 │
 │   ┌────────────────┐  ┌──────────────┐        │
@@ -61,7 +61,7 @@ This is the central design promise — with a small honesty clause:
 The wrapper does not assume any particular module is present. Composition is pushed onto the consumer: deciding what makes sense as a UI is part of designing your calendar. Some examples that render fine but are not very useful by themselves:
 
 - `<Calendar mode="range"><CalendarDaysTrack bound="from" /></Calendar>` — user can set `from` but never `to`.
-- `<Calendar mode="multiple"><CalendarTimeGrid /></Calendar>` — there is no unambiguous date for the time to attach to (see "Time editing semantics").
+- `<Calendar mode="multiple"><CalendarTimeWheel /></Calendar>` — there is no unambiguous date for the time to attach to (see "Time editing semantics").
 - `<Calendar><CalendarSelectedDates /></Calendar>` — chips display whatever you pass via `value`, but there is no way to pick anything.
 - `<Calendar><CalendarNav clear /></Calendar>` — you can clear a selection that nothing in the UI lets you create.
 
@@ -105,7 +105,7 @@ Common layouts:
   <CalendarNav />
   <CalendarPresets col={1} />
   <CalendarDays col={2} />
-  <CalendarTimeGrid col={1} />
+  <CalendarTimeWheel col={1} />
 </Calendar>
 ```
 
@@ -145,9 +145,9 @@ Their job is to let the user _navigate_ through the calendar — to find the dat
 | `<CalendarYearsGrid>`   | `onYearSelect`  | navigated `viewDate` (same month/day, picked year)       |
 | `<CalendarMonthsTrack>` | `onMonthSelect` | navigated date (clamped to bound in range mode)          |
 | `<CalendarYearsTrack>`  | `onYearSelect`  | navigated date (clamped to bound in range mode)          |
-| `<CalendarTimeGrid>`    | `onTimeSelect`  | Date built from `viewDate` with new time set             |
+| `<CalendarTimeWheel>`    | `onTimeSelect`  | Date built from `viewDate` with new time set             |
 
-Use them when you want a month-only / year-only / time-only picker UX without committing to the full date-selection pipeline. The contract is unchanged — these callbacks fire alongside `navigateTo` (or alongside an accepted `onChangeTime` for `TimeGrid`); they do **not** trigger calendar-level `onChange`. Rejected no-op time changes (`disabled` / `minDate` / `maxDate` / invalid range constraints / `readOnly`) do not fire `onTimeSelect`.
+Use them when you want a month-only / year-only / time-only picker UX without committing to the full date-selection pipeline. The contract is unchanged — these callbacks fire alongside `navigateTo` (or alongside an accepted `onChangeTime` for `TimeWheel`); they do **not** trigger calendar-level `onChange`. Rejected no-op time changes (`disabled` / `minDate` / `maxDate` / invalid range constraints / `readOnly`) do not fire `onTimeSelect`.
 
 ### B. Interactive modules
 
@@ -156,7 +156,7 @@ Use them when you want a month-only / year-only / time-only picker UX without co
 | Module                  | Role                                                                     | Notes                                                  |
 | ----------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------ |
 | `<CalendarDays>`        | The day grid. Click → select day.                                        | Most common interactive module.                        |
-| `<CalendarTimeGrid>`    | Hour/minute drums (and seconds). Change → updates time on selected date. | Interactive at finer granularity than days.            |
+| `<CalendarTimeWheel>`    | Hour/minute drums (and seconds). Change → updates time on selected date. | Interactive at finer granularity than days.            |
 | `<CalendarManualInput>` | Masked text input(s) for typing dates directly.                          | Interactive via keyboard.                              |
 | `<CalendarPresets>`     | Preset shortcuts (Today, Last 7 days, This month).                       | Interactive — applies a whole range/date in one click. |
 
@@ -260,7 +260,7 @@ The single source of truth for which user actions change view, mutate selection,
 | `<CalendarDays>` swipe (touch)                                    | yes                 | no                | no               | works                            |
 | `<CalendarMonthsGrid>` cell click                                 | yes                 | no                | no               | works (navigation only)          |
 | `<CalendarYearsGrid>` cell click / page nav                       | yes                 | no                | no               | works                            |
-| `<CalendarTimeGrid>` drum scroll / arrow keys                     | yes (time-of-day)   | maybe ¹           | maybe ¹          | aria-disabled, blocked           |
+| `<CalendarTimeWheel>` drum scroll / arrow keys                     | yes (time-of-day)   | maybe ¹           | maybe ¹          | aria-disabled, blocked           |
 | `<CalendarPresets>` click (single date)                           | yes                 | yes               | yes              | button disabled                  |
 | `<CalendarPresets>` click (range, in `mode="range"`)              | yes                 | yes               | yes              | button disabled                  |
 | `<CalendarSelectedDates>` chip click                              | yes                 | no                | no               | works (navigation)               |
@@ -518,7 +518,7 @@ Used by:
 ### Test coverage
 
 - `src/__tests__/integration/ssr.test.tsx` — runs `renderToString` on representative compositions, asserts the markup is valid (correct ARIA roles, no `NaN` / `undefined` text leaking into the DOM).
-- `src/__tests__/integration/hydration.test.tsx` — runs the SSR HTML through `hydrateRoot` and asserts no React hydration warnings (`console.error` content scanned for "did not match" / "Hydration"). Covers Calendar + Days, Nav with `showNowTime`, default auto theme mode, `timeZone="auto"`, and TimeGrid.
+- `src/__tests__/integration/hydration.test.tsx` — runs the SSR HTML through `hydrateRoot` and asserts no React hydration warnings (`console.error` content scanned for "did not match" / "Hydration"). Covers Calendar + Days, Nav with `showNowTime`, default auto theme mode, `timeZone="auto"`, and TimeWheel.
 
 ### Known SSR caveats
 
@@ -570,11 +570,11 @@ Timezone-dependent operations live in `src/utils/tz-utils.ts` (`getTodayInTimezo
 
 ## Time editing semantics
 
-Time interactions (`CalendarTimeGrid` drums, `CalendarNav.showTime` popup confirm) usually flow through one reducer action: `CHANGE_TIME { date, config }`. The action is dispatched by `provider.handleChangeTime`, which always passes the current `selectConfig`.
+Time interactions (`CalendarTimeWheel` drums, `CalendarNav.showTime` popup confirm) usually flow through one reducer action: `CHANGE_TIME { date, config }`. The action is dispatched by `provider.handleChangeTime`, which always passes the current `selectConfig`.
 
-Range-bound time controls (`CalendarTimeGrid bound="from"|"to"` and `CalendarNav bound="from"|"to" showTime`) use `SET_RANGE_BOUND` instead. They intentionally bypass the `viewDate.day` matching heuristic and write to the explicit boundary. If that boundary does not exist yet, the time control is read-only / no-op; time alone must not invent a missing `from` or `to` date.
+Range-bound time controls (`CalendarTimeWheel bound="from"|"to"` and `CalendarNav bound="from"|"to" showTime`) use `SET_RANGE_BOUND` instead. They intentionally bypass the `viewDate.day` matching heuristic and write to the explicit boundary. If that boundary does not exist yet, the time control is read-only / no-op; time alone must not invent a missing `from` or `to` date.
 
-`<CalendarTimeGrid bound="...">` also renders a small localized date header above the drums (the bound's current date, formatted via `Intl.DateTimeFormat`). Toggle with `showBoundDate` (default `true`). The prop is a no-op without `bound` — there is no implicit date to display in non-bound mode. If the bound exists but has no date yet, the header is hidden.
+`<CalendarTimeWheel bound="...">` also renders a small localized date header above the drums (the bound's current date, formatted via `Intl.DateTimeFormat`). Toggle with `showBoundDate` (default `true`). The prop is a no-op without `bound` — there is no implicit date to display in non-bound mode. If the bound exists but has no date yet, the header is hidden.
 
 The reducer's contract:
 
@@ -582,7 +582,7 @@ The reducer's contract:
 2. Selection is mutated **only** when there is a meaningful match between `viewDate.day` and an existing selected slot.
    - `range` mode: matches against `rangeStart` then `rangeEnd`; updates whichever matches.
    - `multiple` mode: matches against an entry in `selectedDates`; updates only that entry, never replaces the array.
-   - `single` mode: matches the only `selectedDate`; updates it. **Special case:** if `selectedDates` is empty, single mode auto-creates `[date]` to keep time-only picker compositions (`<CalendarNav showTime />` + `<CalendarTimeGrid />` without `<CalendarDays />`) functional.
+   - `single` mode: matches the only `selectedDate`; updates it. **Special case:** if `selectedDates` is empty, single mode auto-creates `[date]` to keep time-only picker compositions (`<CalendarNav showTime />` + `<CalendarTimeWheel />` without `<CalendarDays />`) functional.
 3. `notifySeq` (the trigger for the consumer's `onChange`) is incremented **only when selection actually changed**. Pure `viewDate` time updates ("pending time") do not fire `onChange`.
 
 This rule set replaces the earlier behavior where `notifySeq` always incremented (firing spurious `onChange(null)` when no selection existed) and where a non-matching `viewDate` would overwrite the entire selection. Both were latent bugs surfaced while documenting the time contract.
