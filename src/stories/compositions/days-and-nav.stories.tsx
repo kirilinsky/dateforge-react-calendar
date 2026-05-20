@@ -30,7 +30,12 @@ export const Default: StoryObj = {
         gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
-        <CalendarNav showTime showMonthPicker yearLabel />
+        <CalendarNav
+          themeToggle={true}
+          showTime={true}
+          showMonthPicker={true}
+          yearLabel={true}
+        />
         <CalendarDays />
         <CalendarSelectedDates showTime />
       </Calendar>

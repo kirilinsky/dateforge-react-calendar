@@ -7,8 +7,10 @@ import {
   useSelectionActions,
   useSelectionValue,
 } from "@/context/selection-context";
+import { useUI } from "@/context/ui-context";
 import shared from "@/global/global.module.css";
 import { Clear } from "@/Icons";
+import type { CalendarTheme } from "@/types/themes";
 import {
   DEFAULT_CLEAR_LABEL,
   DEFAULT_REMOVE_RANGE_END_LABEL,
@@ -22,6 +24,7 @@ import { isSameDay } from "@/utils/date-core";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { getDateTimeFormat } from "@/utils/intl-cache";
 import { type AlignValue, alignToJustify } from "@/utils/layout-utils";
+import { resolveThemeScope } from "@/utils/resolve-theme-scope";
 import styles from "./selected-dates.module.css";
 
 const useIsoLayoutEffect =
@@ -66,6 +69,7 @@ export interface CalendarSelectedDatesProps {
   showMoreSelectedDatesLabel?: string;
   showTime?: boolean;
   col?: number | string;
+  theme?: CalendarTheme;
 }
 
 const formatOverflowLabel = (label: string, count: number) =>
@@ -117,6 +121,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
   showMoreSelectedDatesLabel,
   showTime = false,
   col,
+  theme,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [innerHeight, setInnerHeight] = useState<number | null>(null);
@@ -132,6 +137,8 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
     readOnly,
     actionLabels,
   } = useConfig();
+  const { activeTheme } = useUI();
+  const themeScope = resolveThemeScope(theme, activeTheme);
   const resolvedClearLabel = resolveActionLabel(
     clearLabel,
     actionLabels.clearLabel,
@@ -182,6 +189,7 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
 
   const hasContent = range ? !!rangeStart : selectedDates.length > 0;
   const gridSlot = getGridSlotStyle(col);
+  const rootStyle = { ...gridSlot, ...themeScope.style };
 
   const visibleChipsCount =
     maxVisibleChips === undefined || !Number.isFinite(maxVisibleChips)
@@ -451,7 +459,8 @@ export const CalendarSelectedDates: React.FC<CalendarSelectedDatesProps> = ({
         .filter(Boolean)
         .join(" ")}
       data-area="selected-dates"
-      style={gridSlot}
+      data-theme={themeScope.dataTheme}
+      style={rootStyle}
     >
       <div ref={innerRef} className={styles.inner} style={innerStyle}>
         <div

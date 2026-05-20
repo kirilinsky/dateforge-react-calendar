@@ -4,6 +4,8 @@ import { createPortal } from "react-dom";
 import { useUI } from "@/context/ui-context";
 import { useFocusTrap } from "@/hooks/use-focus-trap";
 import { Check } from "@/Icons";
+import type { CalendarTheme } from "@/types/themes";
+import { resolveThemeScope } from "@/utils/resolve-theme-scope";
 import styles from "./popup.module.css";
 
 interface PopupProps {
@@ -12,6 +14,7 @@ interface PopupProps {
   onClose: () => void;
   label?: string;
   confirmLabel?: string;
+  theme?: CalendarTheme;
 }
 
 export const Popup = ({
@@ -20,8 +23,11 @@ export const Popup = ({
   onClose,
   label = "Dialog",
   confirmLabel = "Confirm",
+  theme,
 }: PopupProps) => {
-  const { popupAnchorEl, setPopupAnchorEl, containerRef } = useUI();
+  const { popupAnchorEl, setPopupAnchorEl, containerRef, activeTheme } =
+    useUI();
+  const themeScope = resolveThemeScope(theme, activeTheme);
   const backdropRef = useRef<HTMLDivElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
 
@@ -81,7 +87,13 @@ export const Popup = ({
   }
 
   const content = (
-    <div ref={backdropRef} className={styles.backdrop} onClick={handleClose}>
+    <div
+      ref={backdropRef}
+      className={styles.backdrop}
+      data-theme={themeScope.dataTheme}
+      style={themeScope.style}
+      onClick={handleClose}
+    >
       <div
         ref={popupRef}
         className={styles.popup}

@@ -12,6 +12,7 @@ import { useUI } from "@/context/ui-context";
 import shared from "@/global/global.module.css";
 import { useBoundDateView } from "@/hooks/use-bound-date-view";
 import { Check, Clear } from "@/Icons";
+import type { CalendarTheme } from "@/types/themes";
 import {
   DEFAULT_DAY_TRACK_LABEL,
   DEFAULT_REMOVE_SELECTED_DATE_LABEL,
@@ -31,6 +32,7 @@ export interface CalendarDaysTrackProps {
   showMonthLabel?: boolean;
   bound?: "from" | "to";
   col?: number | string;
+  theme?: CalendarTheme;
   dayTrackLabel?: string;
   removeSelectedDateLabel?: string;
   saveSelectedDateLabel?: string;
@@ -40,6 +42,7 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
   showMonthLabel = false,
   bound,
   col,
+  theme,
   dayTrackLabel,
   removeSelectedDateLabel,
   saveSelectedDateLabel,
@@ -199,6 +202,7 @@ export const CalendarDaysTrack: React.FC<CalendarDaysTrackProps> = ({
         return Number.isNaN(d.getTime()) ? "" : fullDateFmt.format(d);
       }}
       col={col}
+      theme={theme}
       onChange={handleChange}
       renderItem={({ idx, isActive }) =>
         isActive && shortMonth ? (

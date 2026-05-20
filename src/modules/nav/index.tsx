@@ -29,6 +29,7 @@ import {
   Home,
   ThemeToggle,
 } from "@/Icons";
+import type { CalendarTheme } from "@/types/themes";
 import {
   DEFAULT_CALENDAR_NAVIGATION_LABEL,
   DEFAULT_CHANGE_MONTH_LABEL,
@@ -69,6 +70,7 @@ import {
 } from "@/utils/date-utils";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { getDateTimeFormat } from "@/utils/intl-cache";
+import { resolveThemeScope } from "@/utils/resolve-theme-scope";
 import { MonthPopup, YearPopup } from "./month-year-track";
 import styles from "./nav.module.css";
 import { TimePopup } from "./time-popup";
@@ -221,6 +223,7 @@ export interface CalendarNavProps {
   yearPickerLabel?: string;
   yearTrackLabel?: string;
   col?: number | string;
+  theme?: CalendarTheme;
   bound?: "from" | "to";
 }
 
@@ -268,6 +271,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
   yearPickerLabel,
   yearTrackLabel,
   col,
+  theme,
   bound,
 }) => {
   if (showMonthPicker && compactMonths) {
@@ -464,6 +468,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
     setNavShowSeconds,
     navShowSeconds,
   } = useUI();
+  const themeScope = resolveThemeScope(theme, activeTheme);
   const usesLocalPopupState = offset !== 0;
   const {
     timePopupOpen,
@@ -557,6 +562,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
   const selectorCount = (showMonthPicker ? 1 : 0) + (showYearPicker ? 1 : 0);
   const visible = slotCount > 0;
   const gridSlot = getGridSlotStyle(col);
+  const rootStyle = { ...gridSlot, ...themeScope.style };
 
   if (!visible) return null;
 
@@ -567,11 +573,12 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
         data-area="header"
         data-slots={slotCount}
         data-selector-count={selectorCount}
+        data-theme={themeScope.dataTheme}
         role="toolbar"
         {...(safeLabel
           ? { "aria-labelledby": labelId }
           : { "aria-label": resolvedCalendarNavigationLabel })}
-        style={gridSlot}
+        style={rootStyle}
       >
         {showNowTime && (
           <span className={styles.nowTimeDisplay} aria-hidden="true">
@@ -840,6 +847,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           secondsLabel={resolvedSecondsLabel}
           timePeriodLabel={resolvedTimePeriodLabel}
           timePickerLabel={resolvedTimePickerLabel}
+          theme={theme}
           onConfirm={(newDate) => {
             if (isBound) {
               if (boundDate) onRangeBoundSet(bound!, newDate);
@@ -860,6 +868,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           confirmLabel={resolvedConfirmLabel}
           label={resolvedSelectMonthLabel}
           monthTrackLabel={resolvedMonthTrackLabel}
+          theme={theme}
           onConfirm={(newDate) => {
             navigateBoundOrView(newDate);
             setMonthPopupOpen(false);
@@ -875,6 +884,7 @@ export const CalendarNav: React.FC<CalendarNavProps> = ({
           confirmLabel={resolvedConfirmLabel}
           label={resolvedSelectYearLabel}
           yearTrackLabel={resolvedYearTrackLabel}
+          theme={theme}
           onConfirm={(newDate) => {
             navigateBoundOrView(newDate);
             setYearPopupOpen(false);

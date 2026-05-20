@@ -1,57 +1,87 @@
 import { describe, expect, it } from "vitest";
-import { CUSTOM_THEME_BRAND } from "@/types/themes";
 import { createTheme } from "@/utils/create-theme";
 
 describe("createTheme", () => {
-  it("returns object with brand symbol set to true", () => {
-    const theme = createTheme({ accent: "#fff" });
-    expect(theme[CUSTOM_THEME_BRAND]).toBe(true);
+  it("creates a light/dark theme family from nested variant tokens", () => {
+    const family = createTheme({
+      light: { accent: "#14b8a6" },
+      dark: { accent: "#0f766e" },
+    });
+
+    expect(family.kind).toBe("family");
+    expect(family.light.vars["--c-a"]).toBe("#14b8a6");
+    expect(family.dark.vars["--c-a"]).toBe("#0f766e");
   });
 
   it("maps known tokens to css var keys", () => {
-    const theme = createTheme({
-      accent: "#ff6600",
-      activeText: "#111111",
-      todayDot: "#fefefe",
-      backdrop: "#000",
-      mutedText: "#667085",
-      disabledText: "#7a8190",
+    const family = createTheme({
+      light: {
+        accent: "#ff6600",
+        activeText: "#111111",
+        todayDot: "#fefefe",
+        backdrop: "#000",
+        mutedText: "#667085",
+        disabledText: "#7a8190",
+      },
+      dark: {},
     });
-    expect(theme.vars["--c-a"]).toBe("#ff6600");
-    expect(theme.vars["--c-at"]).toBe("#111111");
-    expect(theme.vars["--c-t-d"]).toBe("#fefefe");
-    expect(theme.vars["--c-b"]).toBe("#000");
-    expect(theme.vars["--c-m"]).toBe("#667085");
-    expect(theme.vars["--c-dt"]).toBe("#7a8190");
+
+    expect(family.light.vars["--c-a"]).toBe("#ff6600");
+    expect(family.light.vars["--c-at"]).toBe("#111111");
+    expect(family.light.vars["--c-t-d"]).toBe("#fefefe");
+    expect(family.light.vars["--c-b"]).toBe("#000");
+    expect(family.light.vars["--c-m"]).toBe("#667085");
+    expect(family.light.vars["--c-dt"]).toBe("#7a8190");
   });
 
-  it("ignores undefined token values", () => {
-    const theme = createTheme({ accent: undefined, backdrop: "#000" });
-    expect(theme.vars["--c-a"]).toBeUndefined();
-    expect(theme.vars["--c-b"]).toBe("#000");
-  });
-
-  it("ignores null token values", () => {
-    const theme = createTheme({
-      accent: null as unknown as string,
-      backdrop: "#abc",
+  it("ignores undefined, null, and unknown token values", () => {
+    const family = createTheme({
+      light: {
+        accent: undefined,
+        backdrop: "#000",
+        bogus: "x",
+      } as never,
+      dark: {
+        accent: null,
+        backdrop: "#abc",
+      } as never,
     });
-    expect(theme.vars["--c-a"]).toBeUndefined();
-    expect(theme.vars["--c-b"]).toBe("#abc");
+
+    expect(family.light.vars["--c-a"]).toBe("#ffffff");
+    expect(family.light.vars["--c-b"]).toBe("#000");
+    expect(family.light.vars.bogus).toBeUndefined();
+    expect(family.dark.vars["--c-a"]).toBe("#1a1a1c");
+    expect(family.dark.vars["--c-b"]).toBe("#abc");
   });
 
-  it("returns empty vars for empty token object", () => {
-    const theme = createTheme({});
-    expect(theme.vars).toEqual({});
-    expect(theme[CUSTOM_THEME_BRAND]).toBe(true);
+  it("merges shared tokens into both variants and lets mode overrides win", () => {
+    const family = createTheme({
+      highlight: "#14b8a6",
+      range: "#0ea5e9",
+      weekend: "#be123c",
+      light: { backdrop: "#f0fdff" },
+      dark: { backdrop: "#061a1d", highlight: "#2dd4bf" },
+    });
+
+    expect(family.light.vars["--c-h"]).toBe("#14b8a6");
+    expect(family.dark.vars["--c-h"]).toBe("#2dd4bf");
+    expect(family.light.vars["--c-r"]).toBe("#0ea5e9");
+    expect(family.dark.vars["--c-r"]).toBe("#0ea5e9");
+    expect(family.light.vars["--c-we"]).toBe("#be123c");
+    expect(family.dark.vars["--c-we"]).toBe("#be123c");
+    expect(family.light.vars["--c-b"]).toBe("#f0fdff");
+    expect(family.dark.vars["--c-b"]).toBe("#061a1d");
   });
 
-  it("ignores keys not present in TOKEN_TO_VAR", () => {
-    const tokens = { accent: "#fff", bogus: "x" } as unknown as Parameters<
-      typeof createTheme
-    >[0];
-    const theme = createTheme(tokens);
-    expect(theme.vars["--c-a"]).toBe("#fff");
-    expect(Object.keys(theme.vars)).toHaveLength(1);
+  it("fills missing tokens from base light/dark defaults", () => {
+    const family = createTheme({
+      light: {},
+      dark: {},
+    });
+
+    expect(family.light.vars["--c-b"]).toBe("#ffffff");
+    expect(family.light.vars["--c-c"]).toBe("#1a1a1c");
+    expect(family.dark.vars["--c-b"]).toBe("#1a1a1c");
+    expect(family.dark.vars["--c-c"]).toBe("#f0f0f0");
   });
 });

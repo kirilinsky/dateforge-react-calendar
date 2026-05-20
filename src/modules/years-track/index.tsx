@@ -8,6 +8,7 @@ import {
   useSelectionValue,
 } from "@/context/selection-context";
 import { useBoundDateView } from "@/hooks/use-bound-date-view";
+import type { CalendarTheme } from "@/types/themes";
 import {
   DEFAULT_YEAR_TRACK_LABEL,
   resolveActionLabel,
@@ -24,6 +25,7 @@ const YEARS = Array.from(
 export interface CalendarYearsTrackProps {
   bound?: "from" | "to";
   col?: number | string;
+  theme?: CalendarTheme;
   yearTrackLabel?: string;
   /**
    * Fires after the user lands on a year via the track. Receives the
@@ -36,6 +38,7 @@ export interface CalendarYearsTrackProps {
 export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({
   bound,
   col,
+  theme,
   yearTrackLabel,
   onYearSelect,
 }) => {
@@ -133,6 +136,7 @@ export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({
       getAriaValueMax={() => YEARS[maxIdx]}
       getAriaValueText={(i) => String(YEARS[i])}
       col={col}
+      theme={theme}
       onChange={handleChange}
       renderItem={({ idx }) => YEARS[idx]}
     />

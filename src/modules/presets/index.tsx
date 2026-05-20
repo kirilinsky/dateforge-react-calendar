@@ -7,11 +7,14 @@ import {
   useSelectionActions,
   useSelectionValue,
 } from "@/context/selection-context";
+import { useUI } from "@/context/ui-context";
 import shared from "@/global/global.module.css";
 import { useRovingTileFocus } from "@/hooks/use-roving-tile-focus";
 import type { PresetEntry } from "@/types/presets";
+import type { CalendarTheme } from "@/types/themes";
 import { isSameDay } from "@/utils/date-core";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
+import { resolveThemeScope } from "@/utils/resolve-theme-scope";
 import { getResolvedPresets } from "./preset-utils";
 import styles from "./presets.module.css";
 
@@ -26,6 +29,7 @@ export interface CalendarPresetsProps {
    */
   presets?: PresetEntry[];
   col?: number | string;
+  theme?: CalendarTheme;
 }
 
 const EMPTY: PresetEntry[] = [];
@@ -33,6 +37,7 @@ const EMPTY: PresetEntry[] = [];
 export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
   presets = EMPTY,
   col,
+  theme,
 }) => {
   const {
     minDate,
@@ -45,6 +50,8 @@ export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
     readOnly,
   } = useConfig();
   const { viewDate } = useNavigation();
+  const { activeTheme } = useUI();
+  const themeScope = resolveThemeScope(theme, activeTheme);
   const { selectedDate, rangeStart, rangeEnd } = useSelectionValue();
   const { onChangeDate, onRangeSet } = useSelectionActions();
 
@@ -74,6 +81,7 @@ export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
     ],
   );
   const gridSlot = getGridSlotStyle(col);
+  const rootStyle = { ...gridSlot, ...themeScope.style };
   const isPresetActive = (p: (typeof resolved)[number]) =>
     p.isRange
       ? !!rangeStart &&
@@ -93,7 +101,8 @@ export const CalendarPresets: React.FC<CalendarPresetsProps> = ({
     <div
       className={styles.presetsContainer}
       data-area="presets"
-      style={gridSlot}
+      data-theme={themeScope.dataTheme}
+      style={rootStyle}
     >
       <div
         ref={containerRef}

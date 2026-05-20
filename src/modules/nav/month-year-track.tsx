@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { Popup } from "@/components/popup/popup";
 import { useScrollAccumulator } from "@/hooks/use-scroll-accumulator";
+import type { CalendarTheme } from "@/types/themes";
 import {
   setMonth as applyMonth,
   setYear as applyYear,
@@ -186,6 +187,7 @@ interface MonthPopupProps {
   confirmLabel?: string;
   label?: string;
   monthTrackLabel?: string;
+  theme?: CalendarTheme;
   onConfirm: (date: Date) => void;
   onClose: () => void;
 }
@@ -199,6 +201,7 @@ export const MonthPopup = ({
   confirmLabel,
   label = "Select month",
   monthTrackLabel = "Month",
+  theme,
   onConfirm,
   onClose,
 }: MonthPopupProps) => {
@@ -207,6 +210,7 @@ export const MonthPopup = ({
     <Popup
       label={label}
       confirmLabel={confirmLabel}
+      theme={theme}
       onConfirm={() => onConfirm(applyMonth(date, month))}
       onClose={onClose}
     >
@@ -231,6 +235,7 @@ interface YearPopupProps {
   confirmLabel?: string;
   label?: string;
   yearTrackLabel?: string;
+  theme?: CalendarTheme;
   onConfirm: (date: Date) => void;
   onClose: () => void;
 }
@@ -242,6 +247,7 @@ export const YearPopup = ({
   confirmLabel,
   label = "Select year",
   yearTrackLabel = "Year",
+  theme,
   onConfirm,
   onClose,
 }: YearPopupProps) => {
@@ -250,6 +256,7 @@ export const YearPopup = ({
     <Popup
       label={label}
       confirmLabel={confirmLabel}
+      theme={theme}
       onConfirm={() => onConfirm(applyYear(date, year))}
       onClose={onClose}
     >

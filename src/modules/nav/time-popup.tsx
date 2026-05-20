@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { Popup } from "@/components/popup/popup";
 import { TimeTrack } from "@/components/time-track/time-track";
 import { useConfig } from "@/context/config-context";
+import type { CalendarTheme } from "@/types/themes";
 
 interface TimePopupProps {
   date: Date;
@@ -17,6 +18,7 @@ interface TimePopupProps {
   secondsLabel?: string;
   timePeriodLabel?: string;
   timePickerLabel?: string;
+  theme?: CalendarTheme;
 }
 
 export const TimePopup = ({
@@ -33,6 +35,7 @@ export const TimePopup = ({
   secondsLabel,
   timePeriodLabel,
   timePickerLabel,
+  theme,
 }: TimePopupProps) => {
   const { locale, timeStep } = useConfig();
   const [current, setCurrent] = useState(date);
@@ -47,6 +50,7 @@ export const TimePopup = ({
     <Popup
       label={label}
       confirmLabel={confirmLabel}
+      theme={theme}
       onConfirm={() => onConfirm(currentRef.current)}
       onClose={onClose}
     >

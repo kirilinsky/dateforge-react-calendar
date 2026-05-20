@@ -12,6 +12,7 @@ import { useUI } from "@/context/ui-context";
 import { useCalendarKeyboard } from "@/hooks/use-calendar-keyboard";
 import { useClientValue } from "@/hooks/use-client-value";
 import type { StartOfWeek } from "@/types/calendar";
+import type { CalendarTheme } from "@/types/themes";
 import {
   getCalendarData,
   getFirstDayOffset,
@@ -21,6 +22,7 @@ import {
 } from "@/utils/date-utils";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { getDateTimeFormat } from "@/utils/intl-cache";
+import { resolveThemeScope } from "@/utils/resolve-theme-scope";
 import { getTodayInTimezone } from "@/utils/tz-utils";
 import { buildCellLabel, DayCell } from "./day-cell";
 import styles from "./days.module.css";
@@ -41,6 +43,7 @@ export interface CalendarDaysProps {
   offset?: number;
   currentMonthOnly?: boolean;
   col?: number | string;
+  theme?: CalendarTheme;
   startOfWeek?: StartOfWeek;
   highlightWeekends?: boolean;
   boldWeekends?: boolean;
@@ -68,6 +71,7 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   offset = 0,
   currentMonthOnly = false,
   col,
+  theme,
   startOfWeek = 1,
   highlightWeekends = true,
   boldWeekends = false,
@@ -85,7 +89,8 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   syncViewOnSelect,
 }) => {
   const effectiveSyncView = syncViewOnSelect ?? offset === 0;
-  const { daysTrackActive } = useUI();
+  const { activeTheme, daysTrackActive } = useUI();
+  const themeScope = resolveThemeScope(theme, activeTheme);
   const {
     minDate,
     maxDate,
@@ -415,11 +420,12 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   return (
     <div
       data-area={resolvedArea}
+      data-theme={themeScope.dataTheme}
       className={styles.daysArea}
       onTouchEnd={handleTouchEnd}
       onTouchStart={handleTouchStart}
       onMouseLeave={handleMouseLeave}
-      style={getGridSlotStyle(col)}
+      style={{ ...getGridSlotStyle(col), ...themeScope.style }}
     >
       <div
         ref={gridRef}

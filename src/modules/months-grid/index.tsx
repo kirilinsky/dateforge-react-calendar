@@ -4,8 +4,10 @@ import "@/styles/layers.css";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import { useSelectionValue } from "@/context/selection-context";
+import { useUI } from "@/context/ui-context";
 import shared from "@/global/global.module.css";
 import { useRovingTileFocus } from "@/hooks/use-roving-tile-focus";
+import type { CalendarTheme } from "@/types/themes";
 import {
   DEFAULT_MONTH_GRID_LABEL,
   formatActionLabel,
@@ -14,6 +16,7 @@ import {
 import { getMonthListData, setMonth } from "@/utils/date-utils";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { getDateTimeFormat } from "@/utils/intl-cache";
+import { resolveThemeScope } from "@/utils/resolve-theme-scope";
 import styles from "./months-grid.module.css";
 
 export interface CalendarMonthsGridProps {
@@ -21,6 +24,7 @@ export interface CalendarMonthsGridProps {
   disableOutOfRange?: boolean;
   hideOutOfRange?: boolean;
   col?: number | string;
+  theme?: CalendarTheme;
   monthGridLabel?: string;
   /**
    * Fires after the user clicks a month cell. Receives the navigated viewDate
@@ -35,6 +39,7 @@ export const CalendarMonthsGrid: React.FC<CalendarMonthsGridProps> = ({
   disableOutOfRange = true,
   hideOutOfRange = false,
   col,
+  theme,
   monthGridLabel,
   onMonthSelect,
 }) => {
@@ -45,6 +50,8 @@ export const CalendarMonthsGrid: React.FC<CalendarMonthsGridProps> = ({
     DEFAULT_MONTH_GRID_LABEL,
   );
   const { viewDate, navigateTo } = useNavigation();
+  const { activeTheme } = useUI();
+  const themeScope = resolveThemeScope(theme, activeTheme);
   const { selectedDates, rangeStart, rangeEnd } = useSelectionValue();
 
   const currentMonth = viewDate.getMonth();
@@ -103,7 +110,8 @@ export const CalendarMonthsGrid: React.FC<CalendarMonthsGridProps> = ({
     <div
       className={styles.monthsWrapper}
       data-area="months"
-      style={getGridSlotStyle(col)}
+      data-theme={themeScope.dataTheme}
+      style={{ ...getGridSlotStyle(col), ...themeScope.style }}
     >
       <div
         ref={containerRef}

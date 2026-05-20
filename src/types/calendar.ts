@@ -131,11 +131,14 @@ export interface CalendarProps<M extends CalendarMode = "single"> {
   timeZone?: string;
   readOnly?: boolean;
   /**
-   * @example theme="midnight"
-   * @example import { midnight } from "@dateforge/react-calendar/themes"; <Calendar theme={midnight} />
-   * @example import { abyss } from "@dateforge/react-calendar/themes/abyss"; <Calendar theme={abyss} />
+   * @example <Calendar /> // default palette, auto mode
+   * @example <Calendar dark /> // default palette, dark mode
+   * @example import { slate } from "@dateforge/react-calendar/themes"; <Calendar theme={slate} />
+   * @example import { abyss } from "@dateforge/react-calendar/themes/abyss"; <Calendar theme={abyss} light />
    */
   theme?: CalendarTheme;
+  light?: boolean;
+  dark?: boolean;
   width?: string | number;
   hour12?: boolean;
   /**

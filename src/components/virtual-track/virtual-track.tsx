@@ -1,8 +1,11 @@
 import type React from "react";
 import { useRef } from "react";
+import { useUI } from "@/context/ui-context";
 import { useItemWidth } from "@/hooks/use-item-width";
 import { useTrack } from "@/hooks/use-track";
+import type { CalendarTheme } from "@/types/themes";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
+import { resolveThemeScope } from "@/utils/resolve-theme-scope";
 import styles from "./virtual-track.module.css";
 
 interface VirtualTrackRenderArgs {
@@ -32,6 +35,7 @@ interface VirtualTrackProps {
   getAriaValueText: (idx: number) => string;
 
   col?: number | string;
+  theme?: CalendarTheme;
   className?: string;
   itemClassName?: string;
   activeClassName?: string;
@@ -62,6 +66,7 @@ export const VirtualTrack: React.FC<VirtualTrackProps> = ({
   getAriaValueMax,
   getAriaValueText,
   col,
+  theme,
   className,
   itemClassName,
   activeClassName,
@@ -72,6 +77,8 @@ export const VirtualTrack: React.FC<VirtualTrackProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const itemWidth = useItemWidth(containerRef, initialItemWidth);
+  const { activeTheme } = useUI();
+  const themeScope = resolveThemeScope(theme, activeTheme);
 
   const offsets = Array.from({ length: half * 2 + 1 }, (_, i) => i - half);
 
@@ -143,7 +150,8 @@ export const VirtualTrack: React.FC<VirtualTrackProps> = ({
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerCancel}
-      style={getGridSlotStyle(col)}
+      data-theme={themeScope.dataTheme}
+      style={{ ...getGridSlotStyle(col), ...themeScope.style }}
     >
       <div className={cx(styles.highlight, highlightClassName)} aria-hidden />
       {renderOverlay?.({ activeIndex })}

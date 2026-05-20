@@ -1,44 +1,12 @@
-/**
- * token keys map directly to CSS variable suffixes: --c-{key}
- * accent=a, activeText=at, todayDot=t-d, backdrop=b, highlight=h, tone=t, text=c, stroke=s, shadow=x, disabled=d,
- * mutedText=m, disabledText=dt, weekend=we, range=r, error=e, outOfMonth=oom
- */
-export type ThemeTokens = {
-  accent: string;
-  activeText: string;
-  todayDot: string;
-  backdrop: string;
-  highlight: string;
-  tone: string;
-  text: string;
-  stroke: string;
-  shadow: string;
-  disabled: string;
-  mutedText: string;
-  disabledText: string;
-  weekend: string;
-  range: string;
-  error: string;
-  outOfMonth?: string;
-};
+import type { ThemeTokens } from "../src/types/theme-tokens";
+import { TOKEN_TO_VAR } from "../src/types/theme-tokens";
 
-export const TOKEN_TO_VAR: Record<keyof ThemeTokens, string> = {
-  accent:      "--c-a",
-  activeText:  "--c-at",
-  todayDot:    "--c-t-d",
-  backdrop:    "--c-b",
-  highlight:   "--c-h",
-  tone:        "--c-t",
-  text:        "--c-c",
-  stroke:      "--c-s",
-  shadow:      "--c-x",
-  disabled:    "--c-d",
-  mutedText:   "--c-m",
-  disabledText:"--c-dt",
-  weekend:     "--c-we",
-  range:       "--c-r",
-  error:       "--c-e",
-  outOfMonth:  "--c-oom",
+export type { ThemeTokens };
+export { TOKEN_TO_VAR };
+
+export type ThemeFamilyTokens = {
+  light: ThemeTokens;
+  dark: ThemeTokens;
 };
 
 const W = "#ffffff";
@@ -87,4 +55,154 @@ export const THEMES_DATA: Record<string, ThemeTokens> = {
   noir:       { accent: "#111111", activeText: "#111111", todayDot: "#111111", backdrop: "#111111", highlight: W,         tone: "#1c1c1c",  text: "#e8e8e8", stroke: "#2a2a2a", shadow: "#ffffff08", disabled: "#444444", mutedText: "#858585", disabledText: "#858585", weekend: "#e8e8e8", range: "#e8e8e8", error: "#ff4444", outOfMonth: "#858585" },
 atelier:    { accent: "#1a1c2a", activeText: "#ede2c2", todayDot: "#ede2c2", backdrop: "#ede2c2", highlight: "#1a1c2a", tone: "#e2d4ad",  text: "#1a1c2a", stroke: "#b29766", shadow: "#1a1c2a1c", disabled: "#c6b687", mutedText: "#4d4530", disabledText: "#5a4f30", weekend: "#971c14", range: "#d4a84a", error: "#9a1f17", outOfMonth: "#5a4f30" },
 bauhaus:   { accent: "#d8d1b8", activeText: "#161420", todayDot: "#161420", backdrop: "#161420", highlight: "#d8d1b8", tone: "#21202e",  text: "#d8d1b8", stroke: "#363448", shadow: "#1614202a", disabled: "#2e2d3c", mutedText: "#9a98a8", disabledText: "#8a8898", weekend: "#ef6e58", range: "#5a7090", error: "#ff6b6b", outOfMonth: "#8a8898" },
+};
+
+const hexToRgb = (hex: string): [number, number, number] => {
+  const value = hex.replace("#", "").slice(0, 6);
+  return [0, 2, 4].map((i) => Number.parseInt(value.slice(i, i + 2), 16)) as [
+    number,
+    number,
+    number,
+  ];
+};
+
+const channelToLinear = (value: number): number => {
+  const normalized = value / 255;
+  return normalized <= 0.03928
+    ? normalized / 12.92
+    : ((normalized + 0.055) / 1.055) ** 2.4;
+};
+
+const luminance = (hex: string): number => {
+  const [red, green, blue] = hexToRgb(hex).map(channelToLinear);
+  return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+};
+
+const contrastRatio = (foreground: string, background: string): number => {
+  const fg = luminance(foreground);
+  const bg = luminance(background);
+  const lighter = Math.max(fg, bg);
+  const darker = Math.min(fg, bg);
+  return (lighter + 0.05) / (darker + 0.05);
+};
+
+const bestTextOn = (background: string): string =>
+  contrastRatio("#111111", background) >= contrastRatio(W, background)
+    ? "#111111"
+    : W;
+
+const passesSurfaces = (
+  foreground: string,
+  surfaces: readonly string[],
+): boolean =>
+  surfaces.every((surface) => contrastRatio(foreground, surface) >= 4.5);
+
+const shadowFrom = (hex: string, alpha = "28"): string =>
+  `${hex.slice(0, 7)}${alpha}`;
+
+const darkCompanion = (source: ThemeTokens): ThemeTokens => {
+  const backdrop = "#0b1014";
+  const tone = "#151c22";
+  const highlight = source.highlight;
+  const activeText = bestTextOn(highlight);
+  return {
+    accent: activeText,
+    activeText,
+    todayDot: activeText,
+    backdrop,
+    highlight,
+    tone,
+    text: "#eef4f2",
+    stroke: "#26333a",
+    shadow: shadowFrom(highlight),
+    disabled: "#334047",
+    mutedText: "#91a19f",
+    disabledText: "#98a8a6",
+    weekend: passesSurfaces(source.weekend, [backdrop, tone])
+      ? source.weekend
+      : "#ff7a7a",
+    range: source.range,
+    error: "#ff6b6b",
+    outOfMonth: "#98a8a6",
+  };
+};
+
+const lightCompanion = (source: ThemeTokens): ThemeTokens => {
+  const backdrop = "#f8fafc";
+  const tone = "#eef2f6";
+  const highlight = source.highlight;
+  const activeText = bestTextOn(highlight);
+  return {
+    accent: activeText,
+    activeText,
+    todayDot: activeText,
+    backdrop,
+    highlight,
+    tone,
+    text: "#101820",
+    stroke: "#ccd6df",
+    shadow: shadowFrom(highlight, "22"),
+    disabled: "#95a2af",
+    mutedText: "#5b6672",
+    disabledText: "#56616d",
+    weekend: passesSurfaces(source.weekend, [backdrop, tone])
+      ? source.weekend
+      : "#b91c1c",
+    range: source.range,
+    error: "#dc2626",
+    outOfMonth: "#56616d",
+  };
+};
+
+export const COMPLEMENTARY_THEMES_DATA: Record<string, ThemeTokens> = {
+  monsoonDark: darkCompanion(THEMES_DATA.monsoon),
+  industrialLight: lightCompanion(THEMES_DATA.industrial),
+  snowDark: darkCompanion(THEMES_DATA.snow),
+  eclipseLight: lightCompanion(THEMES_DATA.eclipse),
+  chalkDark: darkCompanion(THEMES_DATA.chalk),
+  temporalLight: lightCompanion(THEMES_DATA.temporal),
+  risoDark: darkCompanion(THEMES_DATA.riso),
+  cyberLight: lightCompanion(THEMES_DATA.cyber),
+  splitDark: darkCompanion(THEMES_DATA.split),
+  auroraLight: lightCompanion(THEMES_DATA.aurora),
+  graphiteDark: darkCompanion(THEMES_DATA.graphite),
+  draculaLight: lightCompanion(THEMES_DATA.dracula),
+  mintDark: darkCompanion(THEMES_DATA.mint),
+  abyssLight: lightCompanion(THEMES_DATA.abyss),
+};
+
+export const THEME_VARIANTS_DATA: Record<string, ThemeTokens> = {
+  ...THEMES_DATA,
+  ...COMPLEMENTARY_THEMES_DATA,
+};
+
+export const THEME_FAMILIES_DATA: Record<string, ThemeFamilyTokens> = {
+  noir: { light: THEMES_DATA.mono, dark: THEMES_DATA.noir },
+  espresso: { light: THEMES_DATA.latte, dark: THEMES_DATA.espresso },
+  meadow: { light: THEMES_DATA.meadow, dark: THEMES_DATA.forest },
+  fjord: { light: THEMES_DATA.tide, dark: THEMES_DATA.fjord },
+  velvet: { light: THEMES_DATA.rosa, dark: THEMES_DATA.velvet },
+  crimson: { light: THEMES_DATA.scarlet, dark: THEMES_DATA.crimson },
+  solar: { light: THEMES_DATA.solar, dark: THEMES_DATA.ember },
+  nebula: { light: THEMES_DATA.amethyst, dark: THEMES_DATA.nebula },
+  neon: { light: THEMES_DATA.neon, dark: THEMES_DATA.phosphor },
+  prism: { light: THEMES_DATA.prism, dark: THEMES_DATA.cobalt },
+  slate: { light: THEMES_DATA.slate, dark: THEMES_DATA.midnight },
+  pearl: { light: THEMES_DATA.pearl, dark: THEMES_DATA.flare },
+  sandstone: { light: THEMES_DATA.comfy, dark: THEMES_DATA.sandstone },
+  bauhaus: { light: THEMES_DATA.atelier, dark: THEMES_DATA.bauhaus },
+  monsoon: { light: THEMES_DATA.monsoon, dark: COMPLEMENTARY_THEMES_DATA.monsoonDark },
+  industrial: { light: COMPLEMENTARY_THEMES_DATA.industrialLight, dark: THEMES_DATA.industrial },
+  snow: { light: THEMES_DATA.snow, dark: COMPLEMENTARY_THEMES_DATA.snowDark },
+  eclipse: { light: COMPLEMENTARY_THEMES_DATA.eclipseLight, dark: THEMES_DATA.eclipse },
+  chalk: { light: THEMES_DATA.chalk, dark: COMPLEMENTARY_THEMES_DATA.chalkDark },
+  temporal: { light: COMPLEMENTARY_THEMES_DATA.temporalLight, dark: THEMES_DATA.temporal },
+  riso: { light: THEMES_DATA.riso, dark: COMPLEMENTARY_THEMES_DATA.risoDark },
+  cyber: { light: COMPLEMENTARY_THEMES_DATA.cyberLight, dark: THEMES_DATA.cyber },
+  split: { light: THEMES_DATA.split, dark: COMPLEMENTARY_THEMES_DATA.splitDark },
+  aurora: { light: COMPLEMENTARY_THEMES_DATA.auroraLight, dark: THEMES_DATA.aurora },
+  graphite: { light: THEMES_DATA.graphite, dark: COMPLEMENTARY_THEMES_DATA.graphiteDark },
+  dracula: { light: COMPLEMENTARY_THEMES_DATA.draculaLight, dark: THEMES_DATA.dracula },
+  mint: { light: THEMES_DATA.mint, dark: COMPLEMENTARY_THEMES_DATA.mintDark },
+  abyss: { light: COMPLEMENTARY_THEMES_DATA.abyssLight, dark: THEMES_DATA.abyss },
 };
