@@ -152,6 +152,26 @@
         "default": "./dist/modules/days-track.cjs"
       }
     },
+    "./modules/months-wheel": {
+      "import": {
+        "types": "./dist/modules/months-wheel.d.ts",
+        "default": "./dist/modules/months-wheel.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/months-wheel.d.cts",
+        "default": "./dist/modules/months-wheel.cjs"
+      }
+    },
+    "./modules/years-wheel": {
+      "import": {
+        "types": "./dist/modules/years-wheel.d.ts",
+        "default": "./dist/modules/years-wheel.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/years-wheel.d.cts",
+        "default": "./dist/modules/years-wheel.cjs"
+      }
+    },
     "./modules/years-grid": {
       "import": {
         "types": "./dist/modules/years-grid.d.ts",

@@ -140,12 +140,22 @@ const brand = createTheme({
 | `CalendarInfo`          | Selection metrics, relative hints, empty text, home / clear |
 | `CalendarManualInput`   | Typed dates, keyboard-first editing, per-date remove        |
 | `CalendarPresets`       | Shortcuts like Today, Last 7 days, custom ranges            |
-| `CalendarTimeWheel`      | Inline hour/minute/second selection                         |
 | `CalendarMonthsGrid`    | Month-only picking or fast month jumps                      |
 | `CalendarYearsGrid`     | Year-only picking or fast year jumps                        |
 | `CalendarDaysTrack`     | Scrollable day track for compact/mobile layouts             |
 | `CalendarMonthsTrack`   | Scrollable month track                                      |
 | `CalendarYearsTrack`    | Scrollable year track                                       |
+| `CalendarTimeWheel`     | Drum-style hour/minute/second picker (range bound aware)    |
+| `CalendarMonthsWheel`   | Drum-style month picker (range bound aware)                 |
+| `CalendarYearsWheel`    | Drum-style year picker (range bound aware)                  |
+
+### Module groups
+
+- **Grids** — `Days`, `MonthsGrid`, `YearsGrid`. Tabular picking.
+- **Tracks** — `DaysTrack`, `MonthsTrack`, `YearsTrack`. Horizontal scrollable strips (compact / mobile).
+- **Wheels** — `TimeWheel`, `MonthsWheel`, `YearsWheel`. iOS-style drum pickers with physics, optional `bound` for range, optional `showReset` for "current".
+- **Inputs** — `ManualInput`. Typed dates with mask + format.
+- **Helpers** — `Nav`, `Info`, `SelectedDates`, `Presets`.
 
 ---
 
