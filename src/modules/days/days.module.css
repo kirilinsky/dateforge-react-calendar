@@ -121,6 +121,21 @@
     font-size: var(--cal-text-day);
     font-weight: var(--cal-day-weight, inherit);
 
+    /* When the grid hosts custom-rendered day content (CalendarDays renderDay),
+       use a taller default aspect-ratio so multi-line content (weather +
+       price + dots) fits. Aspect-ratio is "preferred" — if user content is
+       larger than the computed size, the cell still auto-grows via min-content.
+       Override per-instance with `--cal-day-custom-ratio`. */
+    .dayGridContainer[data-day-content="custom"] & {
+      aspect-ratio: var(--cal-day-custom-ratio, 1 / 1.2);
+      display: flex;
+    }
+
+    .dayGridContainer[data-day-content="custom"] & > * {
+      flex: 1;
+      min-width: 0;
+    }
+
     &[data-selected] {
       font-weight: var(--cal-selected-day-weight, inherit);
     }
