@@ -96,18 +96,18 @@
 .itemText {
   position: relative;
   z-index: 2;
-  color: var(--c-c);
+  color: color-mix(
+    in srgb,
+    var(--active-cell-color, var(--c-at, var(--c-a))) var(--track-item-active, 0%),
+    var(--c-c)
+  );
   pointer-events: none;
-  transition: color 0.14s ease 0.04s;
+  transition: color 0.08s linear;
 }
 
 .active {
   font-weight: var(--cal-weight-semibold);
   cursor: default;
-}
-
-.active .itemText {
-  color: var(--active-cell-color, var(--c-at, var(--c-a)));
 }
 
 @media (prefers-reduced-motion: reduce) {

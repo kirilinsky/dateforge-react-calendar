@@ -84,7 +84,7 @@
   transform-origin: center;
   will-change: transform, opacity;
   transition:
-    color 0.14s ease 0.04s,
+    color 0.08s linear,
     opacity calc(var(--cal-transition, 0.2s) * 0.55) linear,
     transform var(--cal-transition, 0.2s) cubic-bezier(0.2, 0.8, 0.2, 1);
 }
