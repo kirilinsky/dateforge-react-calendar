@@ -204,6 +204,10 @@
       --cal-press-down-duration: 0.01ms;
       --cal-press-scale: 1;
     }
+
+    :global(::view-transition-group(*)) {
+      animation: none;
+    }
   }
 
 }

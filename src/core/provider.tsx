@@ -8,7 +8,11 @@ import {
   useRef,
   useState,
 } from "react";
-import { type CalendarConfig, ConfigContext } from "@/context/config-context";
+import {
+  type CalendarConfig,
+  type CalendarMotionNames,
+  ConfigContext,
+} from "@/context/config-context";
 import { NavigationContext } from "@/context/navigation-context";
 import {
   SelectionActionsContext,
@@ -31,11 +35,13 @@ import {
 import type {
   CalendarActionLabels,
   CalendarMode,
+  CalendarMotion,
   CalendarProps,
   CalendarValue,
   DateRange,
 } from "@/types/calendar";
 import { isSameDay } from "@/utils/date-core";
+import { runViewTransition } from "@/utils/view-transition";
 
 const isDateRange = (v: unknown): v is import("@/types/calendar").DateRange =>
   v !== null &&
@@ -43,6 +49,11 @@ const isDateRange = (v: unknown): v is import("@/types/calendar").DateRange =>
   !Array.isArray(v) &&
   !(v instanceof Date) &&
   "from" in (v as object);
+
+const DEFAULT_MOTION_NAMES: CalendarMotionNames = {
+  days: "cal-days",
+  popup: "cal-popup",
+};
 
 function serializeDate(d: Date | null | undefined): number {
   return d ? d.getTime() : 0;
@@ -79,11 +90,15 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   readOnly = false,
   timeStep,
   actionLabels = {},
+  motion = "none",
+  motionNames = DEFAULT_MOTION_NAMES,
 }: CalendarProps<M> & {
   children: ReactNode;
   toggleTheme?: () => void;
   activeTheme?: "light" | "dark" | "auto";
   actionLabels?: CalendarActionLabels;
+  motion?: CalendarMotion;
+  motionNames?: CalendarMotionNames;
 }) {
   const range = mode === "range";
   const multiselect: number | boolean | undefined =
@@ -349,9 +364,16 @@ export function CalendarProvider<M extends CalendarMode = "single">({
     [readOnly, selectConfig, commitSelection],
   );
 
-  const navigateTo = useCallback((d: Date) => {
-    dispatch({ type: "NAVIGATE", date: d });
-  }, []);
+  const transitionEnabled = motion === "view-transition";
+
+  const navigateTo = useCallback(
+    (d: Date) => {
+      runViewTransition(transitionEnabled, () => {
+        dispatch({ type: "NAVIGATE", date: d });
+      });
+    },
+    [transitionEnabled],
+  );
 
   useEffect(() => {
     validateMinMax(minDate, maxDate);
@@ -367,17 +389,35 @@ export function CalendarProvider<M extends CalendarMode = "single">({
     null,
   );
 
-  const setShowTimePopup = useCallback((v: boolean) => {
-    setOpenPopup(v ? "time" : null);
-  }, []);
+  const setOpenPopupWithTransition = useCallback(
+    (next: "time" | "month" | "year" | null) => {
+      runViewTransition(transitionEnabled, () => {
+        setOpenPopup(next);
+      });
+    },
+    [transitionEnabled],
+  );
 
-  const setShowMonthPopup = useCallback((v: boolean) => {
-    setOpenPopup(v ? "month" : null);
-  }, []);
+  const setShowTimePopup = useCallback(
+    (v: boolean) => {
+      setOpenPopupWithTransition(v ? "time" : null);
+    },
+    [setOpenPopupWithTransition],
+  );
 
-  const setShowYearPopup = useCallback((v: boolean) => {
-    setOpenPopup(v ? "year" : null);
-  }, []);
+  const setShowMonthPopup = useCallback(
+    (v: boolean) => {
+      setOpenPopupWithTransition(v ? "month" : null);
+    },
+    [setOpenPopupWithTransition],
+  );
+
+  const setShowYearPopup = useCallback(
+    (v: boolean) => {
+      setOpenPopupWithTransition(v ? "year" : null);
+    },
+    [setOpenPopupWithTransition],
+  );
 
   const selectedDate = range
     ? state.rangeStart
@@ -409,6 +449,8 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       readOnly,
       timeStep,
       actionLabels,
+      motion,
+      motionNames,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -428,6 +470,8 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       timeStep?.minute,
       timeStep?.second,
       actionLabels,
+      motion,
+      motionNames,
     ],
   );
 

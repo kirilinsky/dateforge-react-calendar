@@ -114,6 +114,8 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
     readOnly,
     multiselect,
     actionLabels,
+    motion,
+    motionNames,
   } = useConfig();
   const resolvedWeekLabel = resolveWeekLabel(weekLabel, actionLabels.weekLabel);
 
@@ -445,6 +447,10 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
         key={animationKey}
         data-today-dot={todayDot || undefined}
         data-day-content={renderDay ? "custom" : undefined}
+        style={{
+          viewTransitionName:
+            motion === "view-transition" ? motionNames.days : undefined,
+        }}
         className={[
           styles.dayGridContainer,
           direction !== "none" ? styles[direction] : "",

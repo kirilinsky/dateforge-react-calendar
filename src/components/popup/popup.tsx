@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useConfig } from "@/context/config-context";
 import { useUI } from "@/context/ui-context";
 import { useFocusTrap } from "@/hooks/use-focus-trap";
 import { Check } from "@/Icons";
@@ -25,6 +26,7 @@ export const Popup = ({
   confirmLabel = "Confirm",
   theme,
 }: PopupProps) => {
+  const { motion, motionNames } = useConfig();
   const { popupAnchorEl, setPopupAnchorEl, containerRef, activeTheme } =
     useUI();
   const themeScope = resolveThemeScope(theme, activeTheme);
@@ -86,6 +88,12 @@ export const Popup = ({
     onClose();
   }
 
+  const popupStyle: CSSProperties = {
+    ...panelStyle,
+    viewTransitionName:
+      motion === "view-transition" ? motionNames.popup : undefined,
+  };
+
   const content = (
     <div
       ref={backdropRef}
@@ -101,7 +109,7 @@ export const Popup = ({
         role="dialog"
         aria-modal="true"
         aria-label={label}
-        style={panelStyle}
+        style={popupStyle}
         onClick={(e) => e.stopPropagation()}
       >
         {children}

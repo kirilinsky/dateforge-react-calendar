@@ -32,6 +32,11 @@ describe("useConfig — defaults", () => {
     expect(result.current.readOnly).toBe(false);
   });
 
+  it("motion defaults to none", () => {
+    const { result } = renderHook(() => useConfig(), { wrapper: wrap() });
+    expect(result.current.motion).toBe("none");
+  });
+
   it("range defaults to false (mode=single)", () => {
     const { result } = renderHook(() => useConfig(), { wrapper: wrap() });
     expect(result.current.range).toBe(false);
@@ -65,6 +70,13 @@ describe("useConfig — prop overrides", () => {
       wrapper: wrap({ readOnly: true }),
     });
     expect(result.current.readOnly).toBe(true);
+  });
+
+  it("motion propagates", () => {
+    const { result } = renderHook(() => useConfig(), {
+      wrapper: wrap({ motion: "view-transition" }),
+    });
+    expect(result.current.motion).toBe("view-transition");
   });
 
   it("mode=range → range=true", () => {

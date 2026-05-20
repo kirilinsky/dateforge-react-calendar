@@ -23,6 +23,8 @@ export type DateRange = {
 
 export type CalendarMode = "single" | "multiple" | "range";
 
+export type CalendarMotion = "none" | "view-transition";
+
 export type CalendarValue<M extends CalendarMode> = M extends "range"
   ? DateRange
   : M extends "multiple"
@@ -153,6 +155,11 @@ export interface CalendarProps<M extends CalendarMode = "single"> {
    * @example import { compact } from "@dateforge/react-calendar/appearances/compact"; <Calendar appearance={compact} />
    */
   appearance?: CalendarAppearance;
+  /**
+   * Opt-in browser View Transitions for calendar navigation and popups.
+   * Defaults to `"none"` so host app page transitions are not affected.
+   */
+  motion?: CalendarMotion;
   gradient?: boolean;
   disabled?: DisabledConfig;
   /**

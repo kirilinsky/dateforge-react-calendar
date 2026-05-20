@@ -24,6 +24,7 @@ export type {
 } from "./types/appearances";
 export type {
   CalendarMode,
+  CalendarMotion,
   CalendarProps,
   CalendarValue,
   DateRange,

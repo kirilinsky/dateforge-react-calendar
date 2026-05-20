@@ -34,3 +34,8 @@ Override per-instance when mounting multiple calendars side by side.
 
 Collapse the styling contract to `cal-base`, `cal-themes`, `cal-appearances`,
 `cal-modules`, and `cal-user`; old internal layer names are removed.
+
+**`Calendar` — `motion` prop**
+
+Opt into browser View Transitions with `motion="view-transition"` for calendar
+navigation and popup open/close. Default remains `"none"`.

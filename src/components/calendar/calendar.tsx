@@ -1,5 +1,5 @@
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import "@/styles/layers.css";
 import "@/styles/tokens.css";
 import { validateTheme, validateThemeModeFlags } from "@/core/dev-warn";
@@ -30,6 +30,7 @@ export function Calendar<M extends CalendarMode = "single">({
   hour12 = false,
   locale = "en",
   gradient = false,
+  motion = "none",
   mode,
   maxDates,
   cols,
@@ -38,7 +39,15 @@ export function Calendar<M extends CalendarMode = "single">({
   "data-testid": testId = "dateforge-calendar",
   ...restProps
 }: CalendarProps<M>) {
+  const reactId = useId();
   const [isToggled, setIsToggled] = useState(false);
+  const motionNames = useMemo(() => {
+    const id = reactId.replace(/[^a-zA-Z0-9_-]/g, "");
+    return {
+      days: `cal-${id}-days`,
+      popup: `cal-${id}-popup`,
+    };
+  }, [reactId]);
 
   // Resolved system theme — known only after mount via matchMedia. Before mount
   // we render `data-theme="auto"` so CSS handles the light/dark choice via
@@ -115,6 +124,8 @@ export function Calendar<M extends CalendarMode = "single">({
       readOnly={readOnly}
       toggleTheme={toggleTheme}
       activeTheme={activeTheme}
+      motion={motion}
+      motionNames={motionNames}
       actionLabels={restProps as CalendarActionLabels}
       {...(restProps as import("@/types/calendar").CalendarProps<CalendarMode>)}
     >
