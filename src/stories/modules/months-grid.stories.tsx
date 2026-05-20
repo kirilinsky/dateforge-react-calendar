@@ -8,6 +8,7 @@ import {
   resolveStoryGradient,
   resolveStoryLocale,
   resolveStoryTheme,
+  resolveStoryThemeMode,
 } from "../_helpers/resolve-globals";
 
 type MonthsGridArgs = {
@@ -39,6 +40,7 @@ const meta: Meta<MonthsGridArgs> = {
         onChange={setDate}
         locale={args.locale ?? resolveStoryLocale(ctx.globals.locale)}
         theme={resolveStoryTheme(ctx.globals.theme)}
+        {...resolveStoryThemeMode(ctx.globals.themeMode)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         gradient={resolveStoryGradient(ctx.globals.gradient)}
       >
@@ -74,6 +76,7 @@ export const WithDisabledRange: Story = {
         maxDate={new Date(2016, 8, 30)}
         locale={args.locale ?? resolveStoryLocale(ctx.globals.locale)}
         theme={resolveStoryTheme(ctx.globals.theme)}
+        {...resolveStoryThemeMode(ctx.globals.themeMode)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         gradient={resolveStoryGradient(ctx.globals.gradient)}
       >
@@ -100,6 +103,7 @@ export const HideOutOfRange: Story = {
         maxDate={new Date(2016, 8, 30)}
         locale={args.locale ?? resolveStoryLocale(ctx.globals.locale)}
         theme={resolveStoryTheme(ctx.globals.theme)}
+        {...resolveStoryThemeMode(ctx.globals.themeMode)}
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         gradient={resolveStoryGradient(ctx.globals.gradient)}
       >
@@ -138,6 +142,7 @@ export const StandaloneMonthPicker: Story = {
           maxDate={new Date(2016, 8, 30)}
           locale={args.locale ?? resolveStoryLocale(ctx.globals.locale)}
           theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
           appearance={resolveStoryAppearance(ctx.globals.appearance)}
           gradient={resolveStoryGradient(ctx.globals.gradient)}
         >

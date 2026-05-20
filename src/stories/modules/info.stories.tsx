@@ -13,6 +13,7 @@ import {
   resolveStoryGradient,
   resolveStoryLocale,
   resolveStoryTheme,
+  resolveStoryThemeMode,
 } from "../_helpers/resolve-globals";
 
 type CalendarInfoArgs = {
@@ -43,6 +44,7 @@ const getCalendarProps = (
   gradient: resolveStoryGradient(ctx.globals.gradient),
   locale: resolveStoryLocale(ctx.globals.locale),
   theme: resolveStoryTheme(ctx.globals.theme),
+  ...resolveStoryThemeMode(ctx.globals.themeMode),
   timeZone: args.timeZone || undefined,
 });
 
