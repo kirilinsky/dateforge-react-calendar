@@ -9,12 +9,14 @@ const RUBBER_DAMP = 0.75; // boundary damping
 const SETTLE_PX = 0.4; // close enough to consider settled
 
 interface UseTrackOptions {
-  count: number;
+  count?: number;
   initialIndex: number;
   pixelsPerItem?: number;
+  axis?: "x" | "y";
   circular?: boolean;
   minIndex?: number;
   maxIndex?: number;
+  disabled?: boolean;
   onChange: (index: number) => void;
   ref?: React.RefObject<HTMLDivElement | null>;
 }
@@ -27,6 +29,7 @@ interface UseTrackReturn {
   onPointerMove: () => void;
   onPointerUp: () => void;
   onPointerCancel: () => void;
+  isInteracting: boolean;
 }
 
 const clamp = (v: number, lo: number, hi: number) =>
@@ -36,30 +39,37 @@ export function useTrack({
   count,
   initialIndex,
   pixelsPerItem = 52,
+  axis = "x",
   circular = false,
   minIndex,
   maxIndex,
+  disabled = false,
   onChange,
   ref: externalRef,
 }: UseTrackOptions): UseTrackReturn {
   const internalRef = useRef<HTMLDivElement>(null);
   const ref = externalRef ?? internalRef;
   const [position, setPosition] = useState(initialIndex);
+  const [isInteracting, setIsInteracting] = useState(false);
 
   const opts = useRef({
     count,
     pixelsPerItem,
+    axis,
     circular,
     minIndex,
     maxIndex,
+    disabled,
     onChange,
   });
   opts.current = {
     count,
     pixelsPerItem,
+    axis,
     circular,
     minIndex,
     maxIndex,
+    disabled,
     onChange,
   };
 
@@ -82,17 +92,19 @@ export function useTrack({
       minIndex: mn,
       maxIndex: mx,
     } = opts.current;
-    const lo = mn ?? 0;
-    const hi = mx ?? c - 1;
+    const lo = mn ?? (c === undefined ? -Infinity : 0);
+    const hi = mx ?? (c === undefined ? Infinity : c - 1);
     const bounded = mn !== undefined || mx !== undefined;
-    const isCircular = circ && !bounded;
+    const isCircular = circ && !bounded && c !== undefined;
     return { lo, hi, isCircular, c, ppi };
   };
 
   const resolveIdx = (offset: number) => {
     const { lo, hi, isCircular, c, ppi } = getBounds();
     const raw = Math.round(offset / ppi);
-    return isCircular ? ((raw % c) + c) % c : clamp(raw, lo, hi);
+    return isCircular && c !== undefined
+      ? ((raw % c) + c) % c
+      : clamp(raw, lo, hi);
   };
 
   const notifyIfChanged = (offset: number) => {
@@ -105,7 +117,7 @@ export function useTrack({
   };
 
   const isOffsetSnapped = () => {
-    const { isCircular, c, ppi } = getBounds();
+    const { isCircular, c = 0, ppi } = getBounds();
     const target = resolveIdx(p.current.offset) * ppi;
     const diff = Math.abs(target - p.current.offset);
     if (!isCircular) return diff < SETTLE_PX;
@@ -127,7 +139,7 @@ export function useTrack({
 
   const animate = () => {
     if (!p.current.isDragging) {
-      const { lo, hi, isCircular, c, ppi } = getBounds();
+      const { lo, hi, isCircular, c = 0, ppi } = getBounds();
 
       if (p.current.syncTarget !== null) {
         const range = c * ppi;
@@ -231,7 +243,7 @@ export function useTrack({
   useEffect(() => {
     if (prevInit.current === initialIndex) return;
     prevInit.current = initialIndex;
-    const { lo, hi, isCircular, c, ppi } = getBounds();
+    const { lo, hi, isCircular, c = 0, ppi } = getBounds();
     const idx = isCircular
       ? ((initialIndex % c) + c) % c
       : clamp(initialIndex, lo, hi);
@@ -265,9 +277,10 @@ export function useTrack({
     handlers.current = {
       move: (e: PointerEvent) => {
         if (!p.current.isDragging) return;
-        const { lo, hi, isCircular, c, ppi } = getBounds();
-        const delta = p.current.lastX - e.clientX;
-        p.current.lastX = e.clientX;
+        const { lo, hi, isCircular, c = 0, ppi } = getBounds();
+        const coordinate = opts.current.axis === "y" ? e.clientY : e.clientX;
+        const delta = p.current.lastX - coordinate;
+        p.current.lastX = coordinate;
 
         p.current.offset += delta;
         p.current.velocity = delta;
@@ -290,6 +303,7 @@ export function useTrack({
         const h = handlers.current;
         if (!h) return;
         p.current.isDragging = false;
+        setIsInteracting(false);
         window.removeEventListener("pointermove", h.move);
         window.removeEventListener("pointerup", h.up);
         window.removeEventListener("pointercancel", h.up);
@@ -316,6 +330,7 @@ export function useTrack({
   }, []);
 
   const onPointerDown = (e: React.PointerEvent) => {
+    if (opts.current.disabled) return;
     const h = handlers.current!;
     // Detach defensively in case a previous gesture left listeners attached.
     window.removeEventListener("pointermove", h.move);
@@ -324,8 +339,9 @@ export function useTrack({
 
     p.current.isDragging = true;
     p.current.fromGesture = true;
-    p.current.lastX = e.clientX;
+    p.current.lastX = opts.current.axis === "y" ? e.clientY : e.clientX;
     p.current.velocity = 0;
+    setIsInteracting(true);
 
     window.addEventListener("pointermove", h.move);
     window.addEventListener("pointerup", h.up);
@@ -342,7 +358,8 @@ export function useTrack({
   };
 
   const scrollTo = (targetIndex: number) => {
-    const { lo, hi, isCircular, c, ppi } = getBounds();
+    if (opts.current.disabled) return;
+    const { lo, hi, isCircular, c = 0, ppi } = getBounds();
     const idx = isCircular
       ? ((targetIndex % c) + c) % c
       : clamp(targetIndex, lo, hi);
@@ -355,10 +372,13 @@ export function useTrack({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    let wheelTimer = 0;
     const handler = (e: WheelEvent) => {
+      if (opts.current.disabled) return;
       // Pick the dominant axis. Mouse wheels only emit deltaY; trackpads emit
       // both. Either way, hijack scroll while the cursor is over the track.
-      const useY = Math.abs(e.deltaY) > Math.abs(e.deltaX);
+      const useY =
+        opts.current.axis === "y" || Math.abs(e.deltaY) > Math.abs(e.deltaX);
       const raw = useY ? e.deltaY : e.deltaX;
       if (raw === 0) return;
       e.preventDefault();
@@ -366,7 +386,10 @@ export function useTrack({
       const lineToPx = e.deltaMode === 1 ? 20 : e.deltaMode === 2 ? 300 : 1;
       const delta = raw * lineToPx;
 
-      const { lo, hi, isCircular, c, ppi } = getBounds();
+      const { lo, hi, isCircular, c = 0, ppi } = getBounds();
+      setIsInteracting(true);
+      window.clearTimeout(wheelTimer);
+      wheelTimer = window.setTimeout(() => setIsInteracting(false), 120);
 
       // Direct offset push — feels like real scroll. Velocity carries small
       // residual for inertia after the wheel stops.
@@ -389,7 +412,10 @@ export function useTrack({
       startLoop();
     };
     el.addEventListener("wheel", handler, { passive: false });
-    return () => el.removeEventListener("wheel", handler);
+    return () => {
+      window.clearTimeout(wheelTimer);
+      el.removeEventListener("wheel", handler);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -401,5 +427,6 @@ export function useTrack({
     onPointerMove,
     onPointerUp,
     onPointerCancel: onPointerUp,
+    isInteracting,
   };
 }

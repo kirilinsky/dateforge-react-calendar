@@ -23,3 +23,27 @@ export function useItemWidth(
 
   return itemWidth;
 }
+
+export function useItemHeight(
+  ref: React.RefObject<HTMLElement | null>,
+  initialHeight: number,
+  selector = "[data-item]",
+): number {
+  const [itemHeight, setItemHeight] = useState(initialHeight);
+
+  useEffect(() => {
+    if (typeof ResizeObserver === "undefined") return;
+    const container = ref.current;
+    if (!container) return;
+    const measure = () => {
+      const el = container.querySelector(selector) as HTMLElement | null;
+      if (el) setItemHeight(el.offsetHeight);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(container);
+    return () => ro.disconnect();
+  }, [ref, selector]);
+
+  return itemHeight;
+}
