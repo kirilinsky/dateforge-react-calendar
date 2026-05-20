@@ -57,8 +57,8 @@
     flex-shrink: 0;
     min-width: 0;
     max-width: 100%;
-    padding: 0 0.7em !important;
-    font-size: var(--cal-text-md) !important;
+    padding: 0 0.7em;
+    font-size: var(--cal-text-md);
     font-weight: var(--cal-weight-regular);
     white-space: nowrap;
     overflow: hidden;
@@ -90,7 +90,7 @@
     justify-content: flex-start;
     border-radius: var(--cal-radius, 0.5em);
     overflow: hidden;
-    padding: 0 !important;
+    padding: 0;
   }
 
   .chipMain {
@@ -189,8 +189,8 @@
 
   .clearBtn {
     height: var(--cal-size-chip, 2.3em);
-    padding: 0 0.6em !important;
-    font-size: var(--cal-text-base) !important;
+    padding: 0 0.6em;
+    font-size: var(--cal-text-base);
     color: var(--c-m, var(--c-c));
     flex-shrink: 0;
   }
