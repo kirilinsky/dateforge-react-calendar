@@ -46,7 +46,7 @@
     font-size: var(--cal-text-xs);
     color: var(--c-m, var(--c-c));
     font-weight: var(--cal-weight-semibold);
-    padding: 0.5em 0.25em !important;
+    padding: 0.5em 0.25em;
   }
 
   .dayItem[data-today] {
@@ -69,7 +69,7 @@
 
   .dayGridContainer[data-today-dot] .dayItem[data-today] {
     box-sizing: border-box;
-    padding-block-end: var(--today-dot-reserved-space) !important;
+    padding-block-end: var(--today-dot-reserved-space);
   }
 
   .dayGridContainer[data-today-dot] .dayItem[data-today]::after {
@@ -102,7 +102,7 @@
   }
 
   .dayItem[data-bold-weekend][data-weekend]:not([aria-selected="true"]) {
-    color: var(--c-we) !important;
+    color: var(--c-we);
   }
 
   .dayItemEmpty {
@@ -113,7 +113,7 @@
   .dayItem {
     width: 100%;
     min-width: 0;
-    height: auto !important;
+    height: auto;
     aspect-ratio: var(--cal-day-ratio, 1 / 0.85);
     padding: 0;
     position: relative;
@@ -148,7 +148,7 @@
 
     &[data-other-month]:disabled,
     &[data-other-month][aria-disabled="true"] {
-      color: var(--c-dt, var(--c-c)) !important;
+      color: var(--c-dt, var(--c-c));
     }
   }
 
@@ -158,64 +158,64 @@
     box-shadow: var(
       --active-cell-stroke,
       var(--active-shadow, 0 0.2em 0.6em var(--c-x))
-    ) !important;
+    );
   }
 
   .dayItem[data-selected][data-connect-right]:not(
       [data-connect-left]
     ):not([data-range-mode]) {
-    border-radius: var(--cal-radius, 0.5em) 0 0 var(--cal-radius, 0.5em) !important;
-    box-shadow: calc(var(--day-gap) / 2) 0 0 0 var(--c-h) !important;
+    border-radius: var(--cal-radius, 0.5em) 0 0 var(--cal-radius, 0.5em);
+    box-shadow: calc(var(--day-gap) / 2) 0 0 0 var(--c-h);
   }
 
   .dayItem[data-selected][data-connect-left]:not(
       [data-connect-right]
     ):not([data-range-mode]) {
-    border-radius: 0 var(--cal-radius, 0.5em) var(--cal-radius, 0.5em) 0 !important;
-    box-shadow: calc(-1 * var(--day-gap) / 2) 0 0 0 var(--c-h) !important;
+    border-radius: 0 var(--cal-radius, 0.5em) var(--cal-radius, 0.5em) 0;
+    box-shadow: calc(-1 * var(--day-gap) / 2) 0 0 0 var(--c-h);
   }
 
   .dayItem[data-selected][data-connect-left][data-connect-right]:not(
       [data-range-mode]
     ) {
-    border-radius: 0 !important;
+    border-radius: 0;
     box-shadow: calc(var(--day-gap) / 2) 0 0 0 var(--c-h),
-      calc(-1 * var(--day-gap) / 2) 0 0 0 var(--c-h) !important;
+      calc(-1 * var(--day-gap) / 2) 0 0 0 var(--c-h);
   }
 
   .dayItem[data-range-start]:not([data-range-end]),
   .dayItem[data-preview-start][data-selected] {
-    border-radius: var(--cal-radius, 0.5em) 0 0 var(--cal-radius, 0.5em) !important;
+    border-radius: var(--cal-radius, 0.5em) 0 0 var(--cal-radius, 0.5em);
   }
 
   .dayItem[data-range-end]:not([data-range-start]),
   .dayItem[data-preview-end][data-selected] {
-    border-radius: 0 var(--cal-radius, 0.5em) var(--cal-radius, 0.5em) 0 !important;
+    border-radius: 0 var(--cal-radius, 0.5em) var(--cal-radius, 0.5em) 0;
   }
 
   .dayItem[data-range-start][data-range-bridge-right],
   .dayItem[data-in-range][data-range-bridge-right]:not(
       [data-range-bridge-left]
     ) {
-    box-shadow: calc(var(--day-gap) / 2) 0 0 0 var(--rng-bg) !important;
+    box-shadow: calc(var(--day-gap) / 2) 0 0 0 var(--rng-bg);
   }
 
   .dayItem[data-range-end][data-range-bridge-left],
   .dayItem[data-in-range][data-range-bridge-left]:not(
       [data-range-bridge-right]
     ) {
-    box-shadow: calc(-1 * var(--day-gap) / 2) 0 0 0 var(--rng-bg) !important;
+    box-shadow: calc(-1 * var(--day-gap) / 2) 0 0 0 var(--rng-bg);
   }
 
   .dayItem[data-in-range][data-range-bridge-left][data-range-bridge-right] {
     box-shadow: calc(var(--day-gap) / 2) 0 0 0 var(--rng-bg),
-      calc(-1 * var(--day-gap) / 2) 0 0 0 var(--rng-bg) !important;
+      calc(-1 * var(--day-gap) / 2) 0 0 0 var(--rng-bg);
   }
 
   .dayItem[data-in-range]:not([data-disabled]) {
-    background: var(--rng-bg) !important;
-    color: var(--c-c) !important;
-    border-radius: 0 !important;
+    background: var(--rng-bg);
+    color: var(--c-c);
+    border-radius: 0;
   }
 
   .dayItem:is([data-in-range], [data-preview-mid])[data-disabled] {
@@ -317,8 +317,8 @@
   }
 
   .dayItem[data-max-reached]:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--c-e) 12%, transparent) !important;
-    color: var(--c-e) !important;
+    background: color-mix(in srgb, var(--c-e) 12%, transparent);
+    color: var(--c-e);
     cursor: not-allowed;
   }
 }
