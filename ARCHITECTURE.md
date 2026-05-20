@@ -233,6 +233,7 @@ Three module families share physics + naming conventions, so they are easy to sw
 | Grids  | `Days`, `MonthsGrid`, `YearsGrid`                    | Tabular layout. Best for desktop / wide compositions. `Days` is interactive (commits selection); month / year grids are navigational by default and expose `onMonthSelect` / `onYearSelect` for standalone pickers.                                  |
 | Tracks | `DaysTrack`, `MonthsTrack`, `YearsTrack`             | Single-axis scrollable strip with momentum + circular loop. Compact / mobile. Hybrid: navigational by default, interactive with `bound="from"\|"to"` in range mode.                                                                                  |
 | Wheels | `TimeWheel`, `MonthsWheel`, `YearsWheel`             | iOS-style drum picker via shared `StepDrum` physics (drag, momentum, keyboard ↑/↓/Home/End). All three share the same prop surface (`bound?`, `showBoundDate?`, `showReset?`, `resetLabel?`, `showLabel?`, `on{Time/Month/Year}Select`).              |
+| Information | `Info`, `SelectedDates`, `Lunar`                | Display-focused modules that render derived state. `Info` shows selection summary / relative hints; `SelectedDates` shows chips; `Lunar` shows moon phases. Each may include small interactive escape hatches (clear, per-chip remove) but the primary role is display. Lunar helpers exported separately so consumers don't pull moon math when only the component is needed. |
 
 **Wheels deep dive:**
 

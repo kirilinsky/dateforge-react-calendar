@@ -152,6 +152,16 @@
         "default": "./dist/modules/days-track.cjs"
       }
     },
+    "./modules/lunar": {
+      "import": {
+        "types": "./dist/modules/lunar.d.ts",
+        "default": "./dist/modules/lunar.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/lunar.d.cts",
+        "default": "./dist/modules/lunar.cjs"
+      }
+    },
     "./modules/months-wheel": {
       "import": {
         "types": "./dist/modules/months-wheel.d.ts",

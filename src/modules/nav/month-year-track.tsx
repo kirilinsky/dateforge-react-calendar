@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Popup } from "@/components/popup/popup";
-import { useItemHeight } from "@/hooks/use-item-width";
+import { useItemSize } from "@/hooks/use-item-size";
 import { useTrack } from "@/hooks/use-track";
 import type { CalendarTheme } from "@/types/themes";
 import {
@@ -71,7 +71,7 @@ function SelectDrum({
   maxIndex?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const itemHeight = useItemHeight(ref, 28);
+  const itemHeight = useItemSize(ref, "height", 28);
 
   const {
     position,
