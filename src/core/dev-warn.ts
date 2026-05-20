@@ -103,7 +103,7 @@ export function validateTheme(theme: unknown): void {
   if (VALID_THEME_STRINGS.has(theme)) return;
   warnOnce(
     `theme:invalid-string:${theme}`,
-    `theme="${theme}" is not a supported string value. Only "auto" | "light" | "dark" are accepted as strings; named palettes like "slate" must be imported as objects: import { ${theme} } from "@dateforge/react-calendar/themes/${theme}".`,
+    `theme="${theme}" is not a supported string value. Use <Calendar light /> / <Calendar dark /> for default modes, or import a theme family object: import { ${theme} } from "@dateforge/react-calendar/themes/${theme}".`,
   );
 }
 

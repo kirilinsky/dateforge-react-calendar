@@ -518,7 +518,7 @@ Used by:
 ### Test coverage
 
 - `src/__tests__/integration/ssr.test.tsx` — runs `renderToString` on representative compositions, asserts the markup is valid (correct ARIA roles, no `NaN` / `undefined` text leaking into the DOM).
-- `src/__tests__/integration/hydration.test.tsx` — runs the SSR HTML through `hydrateRoot` and asserts no React hydration warnings (`console.error` content scanned for "did not match" / "Hydration"). Covers Calendar + Days, Nav with `showNowTime`, `theme="auto"`, `timeZone="auto"`, and TimeGrid.
+- `src/__tests__/integration/hydration.test.tsx` — runs the SSR HTML through `hydrateRoot` and asserts no React hydration warnings (`console.error` content scanned for "did not match" / "Hydration"). Covers Calendar + Days, Nav with `showNowTime`, default auto theme mode, `timeZone="auto"`, and TimeGrid.
 
 ### Known SSR caveats
 
@@ -627,7 +627,7 @@ The package ships individual modules and themes as separate entry points:
 ```ts
 import { Calendar } from "@dateforge/react-calendar";
 import { CalendarDays } from "@dateforge/react-calendar/modules/days";
-import { midnight } from "@dateforge/react-calendar/themes/midnight";
+import { nebula } from "@dateforge/react-calendar/themes/nebula";
 import { compact } from "@dateforge/react-calendar/appearances/compact";
 ```
 

@@ -15,7 +15,7 @@ const useIsoLayoutEffect =
  * mismatch warning.
  *
  * The getter runs in a layout effect — the resolved value is applied
- * synchronously before the browser paints, so consumers like `theme="auto"`
+ * synchronously before the browser paints, so consumers like the default auto theme
  * do not flash the fallback (light) before resolving (dark).
  * Re-running requires remounting the consumer — by design.
  */

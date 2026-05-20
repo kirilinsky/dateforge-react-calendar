@@ -74,14 +74,58 @@ describe("createTheme", () => {
   });
 
   it("fills missing tokens from base light/dark defaults", () => {
-    const family = createTheme({
-      light: {},
-      dark: {},
-    });
+    const family = createTheme({});
 
     expect(family.light.vars["--c-b"]).toBe("#ffffff");
     expect(family.light.vars["--c-c"]).toBe("#1a1a1c");
     expect(family.dark.vars["--c-b"]).toBe("#1a1a1c");
     expect(family.dark.vars["--c-c"]).toBe("#f0f0f0");
+  });
+
+  it("creates both variants from seed-only tokens", () => {
+    const family = createTheme({
+      highlight: "#14b8a6",
+      range: "#0ea5e9",
+      weekend: "#be123c",
+    });
+
+    expect(family.light.vars["--c-h"]).toBe("#14b8a6");
+    expect(family.dark.vars["--c-h"]).toBe("#14b8a6");
+    expect(family.light.vars["--c-r"]).toBe("#0ea5e9");
+    expect(family.dark.vars["--c-r"]).toBe("#0ea5e9");
+    expect(family.light.vars["--c-we"]).toBe("#be123c");
+    expect(family.dark.vars["--c-we"]).toBe("#be123c");
+  });
+
+  it("derives readable active text, today dot, and shadow from highlight seeds", () => {
+    const family = createTheme({
+      highlight: "#14b8a6",
+    });
+
+    expect(family.light.vars["--c-at"]).toBe("#111111");
+    expect(family.dark.vars["--c-at"]).toBe("#111111");
+    expect(family.light.vars["--c-t-d"]).toBe("#111111");
+    expect(family.dark.vars["--c-t-d"]).toBe("#111111");
+    expect(family.light.vars["--c-x"]).toBe("#14b8a628");
+    expect(family.dark.vars["--c-x"]).toBe("#14b8a628");
+  });
+
+  it("lets explicit active text, today dot, and shadow override seed derivation", () => {
+    const family = createTheme({
+      highlight: "#14b8a6",
+      activeText: "#ffffff",
+      todayDot: "#fefefe",
+      shadow: "#00000020",
+      dark: {
+        activeText: "#eeeeee",
+      },
+    });
+
+    expect(family.light.vars["--c-at"]).toBe("#ffffff");
+    expect(family.dark.vars["--c-at"]).toBe("#eeeeee");
+    expect(family.light.vars["--c-t-d"]).toBe("#fefefe");
+    expect(family.dark.vars["--c-t-d"]).toBe("#fefefe");
+    expect(family.light.vars["--c-x"]).toBe("#00000020");
+    expect(family.dark.vars["--c-x"]).toBe("#00000020");
   });
 });

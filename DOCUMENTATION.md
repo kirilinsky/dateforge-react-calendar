@@ -105,8 +105,8 @@ Three subpaths, each tree-shakeable:
 | `@dateforge/react-calendar`                 | `Calendar`, `createTheme`, `createDisabled`, `createAppearance`, all public types              | Always — the root provider lives here.                                        |
 | `@dateforge/react-calendar/modules`         | All `Calendar*` module components (Days, Nav, Presets, TimeGrid, …)                            | When pulling in the visible UI pieces.                                        |
 | `@dateforge/react-calendar/context`         | Context hooks: `useConfig`, `useNavigation`, `useSelection`, `useSelectionActions`, `useUI`, … | When building custom modules that need to read or dispatch calendar state.    |
-| `@dateforge/react-calendar/themes`          | All theme objects re-exported together                                                         | Quick prototyping; pulls every theme into the bundle.                         |
-| `@dateforge/react-calendar/themes/<name>`   | A single theme (e.g. `…/themes/midnight`)                                                      | Production — only the themes you actually use end up in the bundle.           |
+| `@dateforge/react-calendar/themes`          | All theme families re-exported together                                                        | Quick prototyping; pulls every theme family into the bundle.                  |
+| `@dateforge/react-calendar/themes/<name>`   | A single theme family (e.g. `…/themes/nebula`)                                                 | Production — only the theme families you actually use end up in the bundle.   |
 | `@dateforge/react-calendar/appearances`     | All appearance objects together                                                                | Same trade-off as themes — prefer the per-name subpath for production builds. |
 | `@dateforge/react-calendar/appearances/<n>` | A single appearance (`loft`, `compact`, `square`, `soft`, `bubble`, `airy`)                    | Production.                                                                   |
 
@@ -145,7 +145,9 @@ import { CalendarNav, CalendarDays } from "@dateforge/react-calendar/modules";
 | `homeLabel`       | `string`                                              | `"Go to current month"` | Global aria-label for home/current-month buttons. Module-level `homeLabel` props override it                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | `hour12`          | `boolean`                                             | `false`    | Use 12-hour time format instead of 24-hour                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `timeStep`        | `{ hour?: number; minute?: number; second?: number }` | `{1,1,1}`  | Granularity (step) for time drums. Affects both inline `CalendarTimeGrid` and `CalendarNav` time popup. Example: `timeStep={{ minute: 5 }}` snaps minutes to 0/5/10/.../55. Step values divide the unit range; `aria-valuemax`, keyboard `±step`, and scroll snap follow the step. Default `1` (no snapping)                                                                                                                                                                                                                                                   |
-| `theme`           | `CalendarTheme`                                       | `"auto"`   | Base value (`"auto"` / `"light"` / `"dark"`), a pre-built theme object from `@dateforge/react-calendar/themes[/name]`, or a `CustomTheme` from `createTheme()`. Named string themes (e.g. `"midnight"`) are not supported — import the object instead.                                                                                                                                                                                                                                                                                                         |
+| `theme`           | `CalendarTheme`                                       | `"auto"`   | Base mode string (`"auto"` / `"light"` / `"dark"`) or a theme family from `@dateforge/react-calendar/themes[/name]` or `createTheme()`. Named string themes (e.g. `"nebula"`) are not supported — import the family object instead.                                                                                                                                                                                                                                                                                                                               |
+| `light`           | `boolean`                                             | `false`    | Start in light mode. Works with the default palette and imported/custom theme families.                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `dark`            | `boolean`                                             | `false`    | Start in dark mode. If both `light` and `dark` are passed, dark wins and a dev warning is emitted.                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | `appearance`      | `CalendarAppearance`                                  | —          | Pre-built appearance object from `@dateforge/react-calendar/appearances[/name]`, or a `CustomAppearance` from `createAppearance()`. Omit the prop entirely for the default appearance.                                                                                                                                                                                                                                                                                                                                                                         |
 | `gradient`        | `boolean`                                             | `false`    | Enable gradient backgrounds on selected cells                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | `width`           | `string \| number`                                    | `"100%"`   | Container width                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
@@ -446,7 +448,7 @@ export default function Page() {
 
 What you can rely on regardless of framework:
 
-- `theme="auto"` and `timeZone="auto"` (the defaults) detect the user's preferences after hydration. The first server render uses neutral defaults (`light` theme, no timezone) so the markup is deterministic.
+- The default theme mode and `timeZone="auto"` detect the user's preferences after hydration. The first server render uses neutral defaults (`light` theme, no timezone) so the markup is deterministic.
 - The live clock (`<CalendarNav showNowTime />`) renders an empty time slot on the server and starts ticking after hydration.
 - `highlightToday` is intentionally inactive on the server render — the highlight appears on the client once `today` is resolved in the user's timezone. This avoids the classic "server highlights yesterday because it's UTC, client expected today" bug.
 
@@ -529,7 +531,7 @@ A consolidated checklist of non-obvious cases the library handles, with pointers
 | `defaultViewDate = "garbage"` (non-Date)                                    | Treated as omitted; dev warn                                                                                                                                    | Dev warnings                        |
 | Repeated `<CalendarDays offset={n} />` (multi-month layout)                 | All instances share `viewDate`, `selectedDates`, `hoverDate` — diverge only by `offset`. Cost scales linearly                                                   | Performance model                   |
 | Mode change at runtime (e.g. `single` → `range`)                            | Selection is **not** migrated. Each mode reads its own shape from internal state. Pass a compatible `value` together with the new `mode` for a clean transition | Controlled and uncontrolled         |
-| `theme="midnight"` (string, not object)                                     | Falls back to system theme; dev warn                                                                                                                            | Dev warnings                        |
+| `theme="nebula"` (string, not object)                                       | Falls back to system theme; dev warn                                                                                                                            | Dev warnings                        |
 | `<CalendarPresets>` with a `getValue` that throws                           | Preset dropped; rest still render; dev warn                                                                                                                     | Presets → Defensive handling        |
 | `<CalendarPresets>` with two entries sharing the same `id`                  | First wins; duplicates dropped; dev warn                                                                                                                        | Presets → Defensive handling        |
 | `<CalendarYearsGrid yearsPerPage={999} />`                                  | Clamped to 40; dev warn                                                                                                                                         | CalendarYearsGrid → Props           |
@@ -757,7 +759,7 @@ Navigation header with configurable controls.
 | `homeLabel`       | `string`           | global / `"Go to current month"` | aria-label for the `home` button. Overrides `<Calendar homeLabel>`                                                                                                                                                         |
 | `clear`           | `boolean`          | `false` | Show a button that clears the current selection                                                                                                                                                                |
 | `clearLabel`      | `string`           | global / `"Clear"` | aria-label for the `clear` button. Overrides `<Calendar clearLabel>`                                                                                                                                                       |
-| `themeToggle`     | `boolean`          | `false` | Show a light/dark theme toggle button. Has no effect when a custom theme (`createTheme()` or pre-built palette) is passed to `<Calendar theme={...} />`                                                        |
+| `themeToggle`     | `boolean`          | `false` | Show a light/dark theme toggle button. Works with the default palette and with imported/custom theme families.                                                                                                      |
 | `offset`          | `number`           | `0`     | Month offset relative to `viewDate`. Use to render two synced nav headers in `cols={2}` layouts (`<CalendarNav offset={1} />`)                                                                                 |
 | `col`             | `number \| string` | —       | CSS grid `grid-column` value                                                                                                                                                                                   |
 | `bound`           | `"from" \| "to"`   | —       | In range mode binds the nav to a range boundary. Header reflects that bound's date; arrows / popups / `home` / `clear` write to that bound only. Falls back to opposite bound when own bound is null           |
@@ -1249,13 +1251,13 @@ In multiselect mode the active item follows the date in `selectedDates[]` whose 
 
 ## Design space
 
-12 composable modules, ~80 public props (≈60 boolean), 40 built-in themes, 6 appearances, plus `createTheme`/`createAppearance` for custom tokens.
+12 composable modules, ~80 public props (≈60 boolean), 28 built-in theme families, 7 appearances, plus `createTheme`/`createAppearance` for custom tokens.
 
 | Layer | Count |
 |---|---|
 | Module prop combinations (full calendar) | ~10^10 |
-| × built-in themes | × 40 |
-| × appearances | × 6 |
+| × built-in theme families | × 28 |
+| × appearances | × 7 |
 | **= built-in configurations** | **~2.0 trillion** |
 | + `createTheme` / `createAppearance` | ∞ |
 
@@ -1269,47 +1271,53 @@ Every configuration is type-safe, tree-shakeable, and SSR-compatible.
 
 Three ways to apply a theme.
 
-**Option 1 — pre-built theme object** (one of the 40 built-in palettes):
+**Option 1 — pre-built theme family** (one of the 28 built-in families):
 
 ```ts
-// barrel — all themes, bundler tree-shakes to just the one you import
-import { midnight } from "@dateforge/react-calendar/themes";
+// barrel — all families, bundler tree-shakes to just the one you import
+import { nebula } from "@dateforge/react-calendar/themes";
 
-// per-theme — single file, zero overhead from other themes
-import { midnight } from "@dateforge/react-calendar/themes/midnight";
+// per-theme — single file, zero overhead from other theme families
+import { nebula } from "@dateforge/react-calendar/themes/nebula";
 
-<Calendar theme={midnight} />;
+<Calendar theme={nebula} />;
+<Calendar theme={nebula} dark />;
 ```
 
-Each theme is a self-contained `CustomTheme` object. The consuming bundler includes only the file you import. Theme vars are applied as inline CSS custom properties on the calendar container — no extra CSS file needed.
+Each exported theme is a `ThemeFamily`: one logical palette with `light` and `dark` variants. The consuming bundler includes only the file you import. Theme vars are applied as inline CSS custom properties on the calendar container — no extra CSS file needed.
 
-**What ships in the core bundle.** The two base themes (`"light"` and `"dark"`) and the `"auto"` resolver are built into `<Calendar>` itself — no import, no extra bytes per theme, just pass the string. Default value is `"auto"`: server-render-safe, then resolves on mount via `prefers-color-scheme` and reacts in real time when the system toggle changes. Pick `"light"` or `"dark"` when you want to lock the color scheme and ignore the OS preference. For any **named palette** (`midnight`, `crimson`, `cobalt`, …) you must `import` the theme object — that is the line in cost vs. ergonomics: zero-cost defaults, opt-in palettes.
+**What ships in the core bundle.** The default light/dark palette and the `"auto"` resolver are built into `<Calendar>` itself. Omit `theme` for system-aware auto mode. Pass `light` or `dark` when you want a specific initial mode. For any named palette (`nebula`, `dracula`, `riso`, …), import the theme family object.
 
-**Option 2 — base theme** (`"auto"` / `"light"` / `"dark"`):
+**Option 2 — default palette**:
 
 ```ts
-<Calendar theme="auto" />   // follows system preference (default)
-<Calendar theme="light" />
-<Calendar theme="dark" />
+<Calendar />       // follows system preference (default)
+<Calendar light /> // default palette, light initial mode
+<Calendar dark />  // default palette, dark initial mode
 ```
 
-`"auto"` tracks `prefers-color-scheme` and switches in real time. These are the only string values supported — named palette strings like `"midnight"` are not valid. In development a `console.warn` is emitted; in production the value is ignored. Always import the theme object instead.
+The default auto mode tracks `prefers-color-scheme` and switches in real time. Named palette strings like `"nebula"` are not valid. In development a `console.warn` is emitted; in production the value is ignored. Always import the theme family object instead.
 
-**Option 3 — fully custom theme** via `createTheme()`:
+**Option 3 — custom theme family** via `createTheme()`:
 
 ```ts
 import { createTheme } from "@dateforge/react-calendar";
 
 const myTheme = createTheme({
   highlight: "#6366f1",
-  backdrop: "#0f172a",
-  text: "#f1f5f9",
+  range: "#22c55e",
+  weekend: "#ef4444",
+  dark: {
+    backdrop: "#0f172a",
+    text: "#f1f5f9",
+  },
 });
 
 <Calendar theme={myTheme} />;
+<Calendar theme={myTheme} light />;
 ```
 
-`createTheme` accepts a partial token map — only the tokens you provide are applied; the rest fall back to the base palette CSS variables.
+`createTheme` returns a `ThemeFamily`. Root tokens apply to both modes; `light` and `dark` override only their own variant. Missing tokens are filled from the default light/dark palettes.
 
 ### Appearances
 
@@ -1347,7 +1355,7 @@ const myAppearance = createAppearance({ radius: "0", spacing: "0.4em" });
 <Calendar appearance={myAppearance} />;
 ```
 
-### `createTheme(tokens)`
+### `createTheme(theme)`
 
 | Token          | CSS variable | Role                                                                                                                                      |
 | -------------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1660,29 +1668,25 @@ type StartOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 ### Built-in themes
 
-40 named palettes, each exported as a tree-shakeable `CustomTheme` object.
+28 named theme families, each exported as a tree-shakeable `ThemeFamily` object.
 
-**Light:** `tide`, `graphite` `amethyst` `mint` `comfy` `neon` `rosa` `snow` `solar` `latte` `slate` `scarlet` `prism` `meadow` `monsoon` `pearl` `chalk` `split` `riso`
+Each family has a light and dark variant: `noir`, `espresso`, `meadow`, `fjord`, `velvet`, `crimson`, `solar`, `nebula`, `neon`, `prism`, `slate`, `pearl`, `sandstone`, `bauhaus`, `monsoon`, `industrial`, `snow`, `eclipse`, `chalk`, `temporal`, `riso`, `cyber`, `split`, `aurora`, `graphite`, `dracula`, `mint`, `abyss`.
 
-**Dark:** `fjord`, `industrial` `midnight` `sandstone` `phosphor` `dracula` `cyber` `temporal` `crimson` `forest` `nebula` `aurora` `espresso` `ember` `flare` `abyss` `cobalt` `velvet` `eclipse`
-
-**Neutral:** `mono` `noir`
-
-**Base (no palette):** `"light"` `"dark"` `"auto"` — passed as strings, no import needed.
+**Base (no imported palette):** omit `theme` for auto mode, or pass `light` / `dark` flags for an explicit initial mode.
 
 ```ts
-// barrel — your bundler only includes midnight
-import { midnight } from "@dateforge/react-calendar/themes";
-<Calendar theme={midnight} />
+// barrel — your bundler only includes nebula
+import { nebula } from "@dateforge/react-calendar/themes";
+<Calendar theme={nebula} />
 
-// per-file — zero dependency on other themes
-import { midnight } from "@dateforge/react-calendar/themes/midnight";
-<Calendar theme={midnight} />
+// per-file — zero dependency on other theme families
+import { nebula } from "@dateforge/react-calendar/themes/nebula";
+<Calendar theme={nebula} dark />
 
-// base strings — no import
-<Calendar theme="auto" />   // default, follows system preference
-<Calendar theme="dark" />
-<Calendar theme="light" />
+// default palette — no import
+<Calendar />       // default, follows system preference
+<Calendar dark />
+<Calendar light />
 ```
 
 ### Built-in appearances

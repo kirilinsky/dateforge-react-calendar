@@ -41,14 +41,6 @@ const themeFamilyEntries = [
   ["abyss", themes.abyss],
 ] satisfies readonly (readonly [string, ThemeFamily])[];
 
-const lightThemeEntries = themeFamilyEntries.map(
-  ([name, theme]) => [name, theme.light] as const,
-);
-
-const darkThemeEntries = themeFamilyEntries.map(
-  ([name, theme]) => [name, theme.dark] as const,
-);
-
 const appearanceEntries = Object.entries(appearances) as [
   string,
   CalendarAppearance,
@@ -63,10 +55,11 @@ export default meta;
 type Story = StoryObj;
 
 const Cell: React.FC<{
-  theme: CalendarTheme;
+  theme?: CalendarTheme;
   appearance?: CalendarAppearance;
   label: string;
-}> = ({ theme, appearance, label }) => {
+  mode?: "light" | "dark";
+}> = ({ theme, appearance, label, mode }) => {
   const [date, setDate] = useState<Date | null>(FIXED_DATE);
   return (
     <div
@@ -87,6 +80,8 @@ const Cell: React.FC<{
         onChange={setDate}
         theme={theme}
         appearance={appearance}
+        light={mode === "light"}
+        dark={mode === "dark"}
       >
         <CalendarNav showMonthPicker compactYears />
         <CalendarDays />
@@ -95,27 +90,55 @@ const Cell: React.FC<{
   );
 };
 
-const renderThemesOverview = (
-  themeEntries: readonly (readonly [string, CalendarTheme])[],
-) => (
-  <div style={{ display: "flex", flexWrap: "wrap", gap: 24 }}>
-    {themeEntries.map(([name, theme]) => (
-      <Cell key={name} theme={theme} label={name} />
+const FamilyPair: React.FC<{
+  name: string;
+  theme: ThemeFamily;
+}> = ({ name, theme }) => (
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      gap: 8,
+      minWidth: 0,
+    }}
+  >
+    <span
+      style={{
+        fontFamily: "monospace",
+        fontSize: 13,
+        fontWeight: 700,
+        color: "inherit",
+      }}
+    >
+      {name}
+    </span>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
+      <Cell theme={theme} mode="light" label="light" />
+      <Cell theme={theme} mode="dark" label="dark" />
+    </div>
+  </div>
+);
+
+const renderThemeFamiliesOverview = () => (
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit, minmax(626px, 1fr))",
+      gap: 28,
+      alignItems: "start",
+    }}
+  >
+    {themeFamilyEntries.map(([name, theme]) => (
+      <FamilyPair key={name} name={name} theme={theme} />
     ))}
   </div>
 );
 
-export const LightThemesOverview: Story = {
+export const ThemeFamiliesOverview: Story = {
   parameters: { storyWidth: "auto" },
-  render: () => renderThemesOverview(lightThemeEntries),
+  render: renderThemeFamiliesOverview,
 };
-LightThemesOverview.storyName = "Light themes (default appearance)";
-
-export const DarkThemesOverview: Story = {
-  parameters: { storyWidth: "auto" },
-  render: () => renderThemesOverview(darkThemeEntries),
-};
-DarkThemesOverview.storyName = "Dark themes (default appearance)";
+ThemeFamiliesOverview.storyName = "Theme families (light + dark)";
 
 export const AppearancesOverview: Story = {
   parameters: { storyWidth: "auto" },
@@ -127,14 +150,7 @@ export const AppearancesOverview: Story = {
             name === "default"
               ? undefined
               : appearanceEntries.find(([n]) => n === name)?.[1];
-          return (
-            <Cell
-              key={name}
-              theme="auto"
-              appearance={appearance}
-              label={name}
-            />
-          );
+          return <Cell key={name} appearance={appearance} label={name} />;
         },
       )}
     </div>

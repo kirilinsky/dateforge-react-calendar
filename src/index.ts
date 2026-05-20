@@ -41,7 +41,6 @@ export type {
 export type {
   BuiltInTheme,
   CalendarTheme,
-  CustomTheme,
   ThemeFamily,
   ThemeMode,
   ThemeTokens,
