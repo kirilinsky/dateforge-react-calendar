@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import { useRef } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useScrollAccumulator } from "@/hooks/use-scroll-accumulator";
@@ -39,6 +39,17 @@ function fireTouchEnd(el: Element) {
   el.dispatchEvent(
     new TouchEvent("touchend", { bubbles: true, cancelable: true }),
   );
+}
+
+function pointerEvent(type: string, clientY: number) {
+  const event = new Event(type, {
+    bubbles: true,
+    cancelable: true,
+  }) as PointerEvent;
+  Object.defineProperty(event, "button", { value: 0 });
+  Object.defineProperty(event, "clientY", { value: clientY });
+  Object.defineProperty(event, "pointerType", { value: "mouse" });
+  return event;
 }
 
 describe("useScrollAccumulator", () => {
@@ -152,12 +163,59 @@ describe("useScrollAccumulator", () => {
       const ref = useRef<HTMLDivElement>(el);
       useScrollAccumulator(ref, onStep, { touchThreshold: 28 });
     });
-    fireTouchStart(el, 100);
-    fireTouchMove(el, 85); // 15px — below threshold
-    fireTouchEnd(el);
-    fireTouchStart(el, 100);
-    fireTouchMove(el, 87); // 13px after reset — still below
+    act(() => {
+      fireTouchStart(el, 100);
+      fireTouchMove(el, 92); // 8px — below release commit threshold
+      fireTouchEnd(el);
+      fireTouchStart(el, 100);
+      fireTouchMove(el, 93); // 7px after reset — still below
+    });
     expect(onStep).not.toHaveBeenCalled();
+    document.body.removeChild(el);
+  });
+
+  it("pointer drag exposes fractional offset below threshold", () => {
+    const onStep = vi.fn();
+    const { result } = renderHook(() => {
+      const ref = useRef<HTMLDivElement>(el);
+      return useScrollAccumulator(ref, onStep, { dragThreshold: 24 });
+    });
+
+    act(() => {
+      el.dispatchEvent(pointerEvent("pointerdown", 100));
+      window.dispatchEvent(pointerEvent("pointermove", 88));
+    });
+
+    expect(onStep).not.toHaveBeenCalled();
+    expect(result.current.isDragging).toBe(true);
+    expect(result.current.dragOffset).toBeCloseTo(0.5);
+
+    act(() => {
+      window.dispatchEvent(pointerEvent("pointerup", 88));
+    });
+
+    expect(result.current.isDragging).toBe(false);
+    expect(result.current.dragOffset).toBe(0);
+    document.body.removeChild(el);
+  });
+
+  it("pointer drag steps and keeps remainder as fractional offset", () => {
+    const onStep = vi.fn();
+    const { result } = renderHook(() => {
+      const ref = useRef<HTMLDivElement>(el);
+      return useScrollAccumulator(ref, onStep, { dragThreshold: 24 });
+    });
+
+    act(() => {
+      el.dispatchEvent(pointerEvent("pointerdown", 100));
+      window.dispatchEvent(pointerEvent("pointermove", 70));
+    });
+
+    expect(onStep).toHaveBeenCalledWith(1);
+    expect(result.current.dragOffset).toBeCloseTo(0.25);
+    act(() => {
+      window.dispatchEvent(pointerEvent("pointerup", 70));
+    });
     document.body.removeChild(el);
   });
 
@@ -173,6 +231,7 @@ describe("useScrollAccumulator", () => {
     expect(removeSpy).toHaveBeenCalledWith("touchstart", expect.any(Function));
     expect(removeSpy).toHaveBeenCalledWith("touchmove", expect.any(Function));
     expect(removeSpy).toHaveBeenCalledWith("touchend", expect.any(Function));
+    expect(removeSpy).toHaveBeenCalledWith("pointerdown", expect.any(Function));
     document.body.removeChild(el);
   });
 });

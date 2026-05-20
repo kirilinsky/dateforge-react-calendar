@@ -8,6 +8,13 @@ import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { resolveThemeScope } from "@/utils/resolve-theme-scope";
 import styles from "./virtual-track.module.css";
 
+type TrackItemStyle = React.CSSProperties & {
+  "--track-item-opacity": number;
+  "--track-item-scale": number;
+  "--track-item-y": string;
+  "--track-item-tilt": string;
+};
+
 interface VirtualTrackRenderArgs {
   idx: number;
   raw: number;
@@ -48,6 +55,21 @@ interface VirtualTrackProps {
 
 const cx = (...parts: Array<string | undefined>) =>
   parts.filter(Boolean).join(" ");
+
+const getTrackItemStyle = (signedDistance: number): TrackItemStyle => {
+  const distance = Math.abs(signedDistance);
+  const opacity = Math.max(0.22, 1 - distance * 0.2);
+  const scale = Math.max(0.68, 1 - distance * 0.075);
+  const y = Math.min(distance * 0.1, 0.24);
+  const tilt = Math.max(-18, Math.min(18, signedDistance * -7));
+
+  return {
+    "--track-item-opacity": opacity,
+    "--track-item-scale": scale,
+    "--track-item-y": `${y}em`,
+    "--track-item-tilt": `${tilt}deg`,
+  };
+};
 
 export const VirtualTrack: React.FC<VirtualTrackProps> = ({
   count,
@@ -167,10 +189,8 @@ export const VirtualTrack: React.FC<VirtualTrackProps> = ({
           } else {
             idx = Math.max(0, Math.min(count - 1, raw));
           }
-          const dist = Math.abs(raw - position);
-          const isActive = dist < 0.5;
-          const opacity = Math.max(0.2, 1 - dist * 0.18);
-          const scale = Math.max(0.6, 1 - dist * 0.08);
+          const signedDistance = raw - position;
+          const isActive = Math.abs(signedDistance) < 0.5;
 
           return (
             <div
@@ -182,7 +202,7 @@ export const VirtualTrack: React.FC<VirtualTrackProps> = ({
                 isActive ? styles.active : undefined,
                 isActive ? activeClassName : undefined,
               )}
-              style={{ opacity, transform: `scale(${scale})` }}
+              style={getTrackItemStyle(signedDistance)}
               aria-hidden={!isActive}
               onClick={!isActive ? () => scrollTo(round + o) : undefined}
             >

@@ -12,6 +12,41 @@ import styles from "./month-year-track.module.css";
 
 const OFFSETS = Array.from({ length: 7 }, (_, i) => i - 3);
 
+type DrumItemStyle = React.CSSProperties & {
+  "--drum-item-active": string;
+  "--drum-item-opacity": number;
+  "--drum-item-scale": number;
+  "--drum-item-shift": string;
+  "--drum-item-y": string;
+  "--drum-item-z": string;
+  "--drum-item-tilt": string;
+};
+
+const getDrumItemStyle = (
+  offset: number,
+  dragOffset: number,
+  disabled: boolean,
+): DrumItemStyle => {
+  const signedOffset = offset - dragOffset;
+  const distance = Math.abs(signedOffset);
+  const activeMix = Math.max(0, Math.min(1, 1 - distance * 1.35));
+  const opacity = Math.max(0.18, 1 - distance * 0.28);
+  const scale = Math.max(0.8, 1.06 - distance * 0.075);
+  const y = signedOffset * 0.045;
+  const z = 0.5 - distance * 0.2;
+  const tilt = Math.max(-30, Math.min(30, signedOffset * -12));
+
+  return {
+    "--drum-item-active": `${Math.round(activeMix * 100)}%`,
+    "--drum-item-opacity": disabled ? opacity * 0.4 : opacity,
+    "--drum-item-scale": scale,
+    "--drum-item-shift": `${dragOffset * -100}%`,
+    "--drum-item-y": `${y}em`,
+    "--drum-item-z": `${z}em`,
+    "--drum-item-tilt": `${tilt}deg`,
+  };
+};
+
 function SelectDrum({
   val,
   getLabel,
@@ -31,7 +66,9 @@ function SelectDrum({
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
-  useScrollAccumulator(ref, onStep);
+  const { dragOffset, isDragging } = useScrollAccumulator(ref, onStep, {
+    dragThreshold: 24,
+  });
 
   return (
     <div
@@ -42,6 +79,7 @@ function SelectDrum({
       aria-label={label}
       aria-valuenow={val}
       aria-valuetext={getLabel(val)}
+      data-dragging={isDragging || undefined}
       onKeyDown={(e) => {
         if (e.key === "ArrowUp") {
           e.preventDefault();
@@ -56,20 +94,13 @@ function SelectDrum({
       <div className={styles.highlight} />
       {OFFSETS.map((o) => {
         const isActive = o === 0;
-        const dist = Math.abs(o);
-        const opacity =
-          dist === 0 ? 1 : dist === 1 ? 0.6 : dist === 2 ? 0.35 : 0.15;
         const dispVal = getOffsetVal(val, o);
         const disabled = isDisabled(dispVal);
         return (
           <div
             key={o}
             className={`${styles.item} ${isActive ? styles.active : ""} ${disabled ? styles.disabled : ""}`}
-            style={
-              !isActive
-                ? { opacity: disabled ? opacity * 0.4 : opacity }
-                : undefined
-            }
+            style={getDrumItemStyle(o, dragOffset, disabled)}
             aria-hidden={!isActive}
             onClick={isActive || disabled ? undefined : () => onJump(dispVal)}
           >

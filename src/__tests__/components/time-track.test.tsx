@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { fireEvent, render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { TimeTrack } from "@/components/time-track/time-track";
@@ -163,5 +163,27 @@ describe("TimeTrack AM/PM switch", () => {
     expect(getByRole("switch").getAttribute("aria-label")).toMatch(
       /after noon/,
     );
+  });
+});
+
+describe("TimeTrack drum drag", () => {
+  it("changes the focused drum when dragged past a row threshold", () => {
+    const onChange = vi.fn();
+    const { getByRole } = render(
+      <TimeTrack date={at(9, 30, 15)} onChange={onChange} />,
+    );
+
+    const hours = getByRole("spinbutton", { name: "Hours" });
+    fireEvent.pointerDown(hours, {
+      button: 0,
+      clientY: 100,
+      pointerType: "mouse",
+    });
+    fireEvent.pointerMove(window, { clientY: 70, pointerType: "mouse" });
+
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect((onChange.mock.calls[0][0] as Date).getHours()).toBe(10);
+
+    fireEvent.pointerUp(window, { clientY: 70, pointerType: "mouse" });
   });
 });

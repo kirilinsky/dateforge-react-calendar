@@ -6,6 +6,40 @@ import styles from "./step-drum.module.css";
 
 const OFFSETS = Array.from({ length: 7 }, (_, i) => i - 3);
 
+type DrumItemStyle = React.CSSProperties & {
+  "--drum-item-active": string;
+  "--drum-item-opacity": number;
+  "--drum-item-scale": number;
+  "--drum-item-shift": string;
+  "--drum-item-y": string;
+  "--drum-item-z": string;
+  "--drum-item-tilt": string;
+};
+
+const getDrumItemStyle = (
+  offset: number,
+  dragOffset: number,
+): DrumItemStyle => {
+  const signedOffset = offset - dragOffset;
+  const distance = Math.abs(signedOffset);
+  const activeMix = Math.max(0, Math.min(1, 1 - distance * 1.35));
+  const opacity = Math.max(0.18, 1 - distance * 0.28);
+  const scale = Math.max(0.8, 1.06 - distance * 0.075);
+  const y = signedOffset * 0.045;
+  const z = 0.5 - distance * 0.2;
+  const tilt = Math.max(-30, Math.min(30, signedOffset * -12));
+
+  return {
+    "--drum-item-active": `${Math.round(activeMix * 100)}%`,
+    "--drum-item-opacity": opacity,
+    "--drum-item-scale": scale,
+    "--drum-item-shift": `${dragOffset * -100}%`,
+    "--drum-item-y": `${y}em`,
+    "--drum-item-z": `${z}em`,
+    "--drum-item-tilt": `${tilt}deg`,
+  };
+};
+
 interface StepDrumProps {
   value: number;
   max: number;
@@ -43,7 +77,11 @@ export const StepDrum: React.FC<StepDrumProps> = ({
     onChange(getDrumValue(index, delta, count) * safeStep);
   };
 
-  useScrollAccumulator(ref, moveByIdx, { requireHover: true });
+  const { dragOffset, isDragging } = useScrollAccumulator(ref, moveByIdx, {
+    disabled: readOnly,
+    dragThreshold: 24,
+    requireHover: true,
+  });
 
   return (
     <div
@@ -57,6 +95,7 @@ export const StepDrum: React.FC<StepDrumProps> = ({
       aria-valuemax={valueMax}
       aria-valuetext={getValueText(aligned)}
       aria-disabled={readOnly || undefined}
+      data-dragging={isDragging || undefined}
       onKeyDown={(e) => {
         if (e.key === "ArrowUp") {
           e.preventDefault();
@@ -76,16 +115,13 @@ export const StepDrum: React.FC<StepDrumProps> = ({
       <div className={styles.highlight} aria-hidden />
       {OFFSETS.map((o) => {
         const isActive = o === 0;
-        const dist = Math.abs(o);
-        const opacity =
-          dist === 0 ? 1 : dist === 1 ? 0.6 : dist === 2 ? 0.35 : 0.15;
         const idx = getDrumValue(index, o, count);
         const v = idx * safeStep;
         return (
           <div
             key={o}
             className={`${styles.item} ${isActive ? styles.active : ""}`}
-            style={!isActive ? { opacity } : undefined}
+            style={getDrumItemStyle(o, dragOffset)}
             aria-hidden={!isActive}
             onClick={isActive ? undefined : () => moveByIdx(o)}
           >
