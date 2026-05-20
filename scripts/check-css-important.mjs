@@ -7,8 +7,6 @@ const SRC_DIR = join(ROOT, "src");
 const IMPORTANT_ALLOWLIST = {
   "src/global/global.module.css": 5,
   "src/modules/days/days.module.css": 34,
-  "src/modules/info/info.module.css": 5,
-  "src/modules/nav/nav.module.css": 5,
   "src/modules/selected-dates/selected-dates.module.css": 5,
 };
 
