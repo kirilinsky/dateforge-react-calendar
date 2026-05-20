@@ -8,6 +8,7 @@ import {
   useSelectionValue,
 } from "@/context/selection-context";
 import { useBoundDateView } from "@/hooks/use-bound-date-view";
+import type { CalendarTheme } from "@/types/themes";
 import {
   DEFAULT_MONTH_TRACK_LABEL,
   resolveActionLabel,
@@ -22,6 +23,7 @@ export interface CalendarMonthsTrackProps {
   showYearLabel?: boolean;
   bound?: "from" | "to";
   col?: number | string;
+  theme?: CalendarTheme;
   monthTrackLabel?: string;
   /**
    * Fires after the user lands on a month via the track. Receives the
@@ -36,6 +38,7 @@ export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({
   showYearLabel = false,
   bound,
   col,
+  theme,
   monthTrackLabel,
   onMonthSelect,
 }) => {
@@ -124,6 +127,7 @@ export const CalendarMonthsTrack: React.FC<CalendarMonthsTrackProps> = ({
       getAriaValueMax={() => maxIdx + 1}
       getAriaValueText={(i) => fmt.format(new Date(year, i, 1))}
       col={col}
+      theme={theme}
       onChange={handleChange}
       renderItem={({ idx, isActive }) =>
         isActive && showYearLabel ? (

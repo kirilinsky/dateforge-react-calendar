@@ -7,9 +7,11 @@ import {
   useSelectionActions,
   useSelectionValue,
 } from "@/context/selection-context";
+import { useUI } from "@/context/ui-context";
 import shared from "@/global/global.module.css";
 import { useToday } from "@/hooks/use-today";
 import { Home } from "@/Icons";
+import type { CalendarTheme } from "@/types/themes";
 import {
   DEFAULT_CLEAR_LABEL,
   DEFAULT_HOME_LABEL,
@@ -17,6 +19,7 @@ import {
 } from "@/utils/action-labels";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { type AlignValue, alignToJustify } from "@/utils/layout-utils";
+import { resolveThemeScope } from "@/utils/resolve-theme-scope";
 import styles from "./info.module.css";
 import {
   type CalendarInfoRangeStyle,
@@ -72,6 +75,7 @@ export interface CalendarInfoProps {
   showHome?: boolean;
   showRelative?: boolean;
   showSummary?: boolean;
+  theme?: CalendarTheme;
 }
 
 export const CalendarInfo: React.FC<CalendarInfoProps> = ({
@@ -88,6 +92,7 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
   showHome = false,
   showRelative = false,
   showSummary = true,
+  theme,
 }) => {
   const [innerHeight, setInnerHeight] = useState<number | null>(null);
   const innerRef = useRef<HTMLDivElement>(null);
@@ -108,6 +113,8 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
     DEFAULT_HOME_LABEL,
   );
   const { viewDate, navigateTo } = useNavigation();
+  const { activeTheme } = useUI();
+  const themeScope = resolveThemeScope(theme, activeTheme);
   const today = useToday();
   const { selectedDate, selectedDates, rangeStart, rangeEnd } =
     useSelectionValue();
@@ -322,7 +329,8 @@ export const CalendarInfo: React.FC<CalendarInfoProps> = ({
         .filter(Boolean)
         .join(" ")}
       data-area="calendar-info"
-      style={getGridSlotStyle(col)}
+      data-theme={themeScope.dataTheme}
+      style={{ ...getGridSlotStyle(col), ...themeScope.style }}
     >
       <div ref={innerRef} className={styles.inner} style={innerStyle}>
         <div

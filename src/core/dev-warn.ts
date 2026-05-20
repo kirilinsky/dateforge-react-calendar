@@ -103,7 +103,16 @@ export function validateTheme(theme: unknown): void {
   if (VALID_THEME_STRINGS.has(theme)) return;
   warnOnce(
     `theme:invalid-string:${theme}`,
-    `theme="${theme}" is not a supported string value. Only "auto" | "light" | "dark" are accepted as strings; named palettes like "midnight" must be imported as objects: import { ${theme} } from "@dateforge/react-calendar/themes/${theme}".`,
+    `theme="${theme}" is not a supported string value. Only "auto" | "light" | "dark" are accepted as strings; named palettes like "slate" must be imported as objects: import { ${theme} } from "@dateforge/react-calendar/themes/${theme}".`,
+  );
+}
+
+export function validateThemeModeFlags(light?: boolean, dark?: boolean): void {
+  if (!isDev()) return;
+  if (!light || !dark) return;
+  warnOnce(
+    "theme-mode:ambiguous",
+    `<Calendar light dark /> received both mode flags. Using dark as the initial mode.`,
   );
 }
 

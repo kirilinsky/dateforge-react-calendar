@@ -7,8 +7,10 @@ import {
   useSelectionActions,
   useSelectionValue,
 } from "@/context/selection-context";
+import { useUI } from "@/context/ui-context";
 import shared from "@/global/global.module.css";
 import { Check, Clear } from "@/Icons";
+import type { CalendarTheme } from "@/types/themes";
 import {
   DEFAULT_APPLY_LABEL,
   DEFAULT_CLEAR_LABEL,
@@ -18,6 +20,7 @@ import {
 import { checkIsDateDisabled } from "@/utils/date-core";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { type AlignValue, alignToJustify } from "@/utils/layout-utils";
+import { resolveThemeScope } from "@/utils/resolve-theme-scope";
 import { DateSlot } from "./date-slot";
 import styles from "./manual-input.module.css";
 import { MaskedDateInput } from "./masked-date-input";
@@ -30,6 +33,7 @@ export interface CalendarManualInputProps {
   col?: number | string;
   label?: React.ReactNode;
   removeLabel?: string;
+  theme?: CalendarTheme;
 }
 
 export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
@@ -40,6 +44,7 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
   col,
   label,
   removeLabel,
+  theme,
 }) => {
   const {
     range,
@@ -66,6 +71,8 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
     DEFAULT_REMOVE_LABEL,
   );
   const { viewDate: date } = useNavigation();
+  const { activeTheme } = useUI();
+  const themeScope = resolveThemeScope(theme, activeTheme);
   const { rangeStart, rangeEnd, selectedDates } = useSelectionValue();
   const { onChangeDate, onRangeSet, onDatesSet } = useSelectionActions();
 
@@ -93,7 +100,10 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
   const hasValue = range ? !!rangeStart : !!selectedDates.length;
 
   const gridSlot = getGridSlotStyle(col);
-  const containerStyle: React.CSSProperties = { ...gridSlot };
+  const containerStyle: React.CSSProperties = {
+    ...gridSlot,
+    ...themeScope.style,
+  };
   const contentStyle: React.CSSProperties = {
     justifyContent: alignToJustify[align],
   };
@@ -149,6 +159,7 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
       <div
         className={`${styles.container} ${styles.containerMulti}`}
         data-area="manual-input"
+        data-theme={themeScope.dataTheme}
         style={containerStyle}
       >
         <div className={styles.datesArea} style={contentStyle}>
@@ -231,6 +242,7 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
       <div
         className={styles.container}
         data-area="manual-input"
+        data-theme={themeScope.dataTheme}
         style={containerStyle}
       >
         <div className={styles.contentArea} style={contentStyle}>
@@ -268,6 +280,7 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
     <div
       className={styles.container}
       data-area="manual-input"
+      data-theme={themeScope.dataTheme}
       style={containerStyle}
     >
       <div className={styles.contentArea} style={contentStyle}>

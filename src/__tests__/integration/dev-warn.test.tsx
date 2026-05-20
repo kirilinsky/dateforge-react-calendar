@@ -120,6 +120,16 @@ describe("dev-warn — theme", () => {
     expect(warnSpy).not.toHaveBeenCalled();
   });
 
+  it("warns when light and dark flags are both passed", () => {
+    render(
+      <Calendar light dark>
+        <CalendarDays />
+      </Calendar>,
+    );
+    expect(warnSpy).toHaveBeenCalled();
+    expect(lastMsg()).toContain("light dark");
+  });
+
   it("falls back to system theme on invalid string (data-theme not 'midnight')", () => {
     const { container } = render(
       <Calendar theme={"midnight" as never}>

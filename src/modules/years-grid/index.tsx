@@ -4,11 +4,13 @@ import "@/styles/layers.css";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import { useSelectionValue } from "@/context/selection-context";
+import { useUI } from "@/context/ui-context";
 import { warnOnce } from "@/core/dev-warn";
 import shared from "@/global/global.module.css";
 import { useRovingTileFocus } from "@/hooks/use-roving-tile-focus";
 import { ChevronLeft, ChevronRight } from "@/Icons";
 import type { DisabledConfig } from "@/types/calendar";
+import type { CalendarTheme } from "@/types/themes";
 import {
   DEFAULT_NEXT_YEARS_LABEL,
   DEFAULT_PREVIOUS_YEARS_LABEL,
@@ -19,6 +21,7 @@ import {
 } from "@/utils/action-labels";
 import { setYear } from "@/utils/date-utils";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
+import { resolveThemeScope } from "@/utils/resolve-theme-scope";
 import { MAX_CALENDAR_YEAR, MIN_CALENDAR_YEAR } from "@/utils/year-range";
 import styles from "./years-grid.module.css";
 
@@ -29,6 +32,7 @@ export interface CalendarYearsGridProps {
   disableOutOfRange?: boolean;
   hideOutOfRange?: boolean;
   col?: number | string;
+  theme?: CalendarTheme;
   nextYearsLabel?: string;
   previousYearsLabel?: string;
   yearGridLabel?: string;
@@ -84,6 +88,7 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
   disableOutOfRange = true,
   hideOutOfRange = false,
   col,
+  theme,
   nextYearsLabel,
   previousYearsLabel,
   yearGridLabel,
@@ -103,6 +108,8 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
     );
   }
   const { minDate, maxDate, disabled, actionLabels } = useConfig();
+  const { activeTheme } = useUI();
+  const themeScope = resolveThemeScope(theme, activeTheme);
   const resolvedYearGridLabel = resolveActionLabel(
     yearGridLabel,
     actionLabels.yearGridLabel,
@@ -242,12 +249,13 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
       data-area="years-grid"
       className={styles.root}
       role="group"
+      data-theme={themeScope.dataTheme}
       aria-label={formatActionLabel(
         formatActionLabel(resolvedYearGridLabel, "from", pageStartYear),
         "to",
         pageEndYear,
       )}
-      style={getGridSlotStyle(col)}
+      style={{ ...getGridSlotStyle(col), ...themeScope.style }}
     >
       {showControls && (
         <div

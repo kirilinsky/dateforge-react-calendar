@@ -5,58 +5,49 @@ import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
 import { CalendarNav } from "@/modules/nav";
 import type { CalendarAppearance } from "@/types/appearances";
-import type { CalendarTheme } from "@/types/themes";
+import type { CalendarTheme, ThemeFamily } from "@/types/themes";
 import * as appearances from "../../../appearances/index";
 import * as themes from "../../../themes/index";
 import { FIXED_DATE } from "../_constants";
 
-const lightThemeEntries = [
-  ["graphite", themes.graphite],
-  ["amethyst", themes.amethyst],
-  ["mint", themes.mint],
-  ["tide", themes.tide],
-  ["comfy", themes.comfy],
-  ["neon", themes.neon],
-  ["rosa", themes.rosa],
-  ["snow", themes.snow],
-  ["solar", themes.solar],
-  ["latte", themes.latte],
-  ["slate", themes.slate],
-  ["scarlet", themes.scarlet],
-  ["prism", themes.prism],
-  ["meadow", themes.meadow],
-  ["monsoon", themes.monsoon],
-  ["pearl", themes.pearl],
-  ["chalk", themes.chalk],
-  ["split", themes.split],
-  ["riso", themes.riso],
-  ["mono", themes.mono],
-  ["atelier", themes.atelier],
-] satisfies readonly (readonly [string, CalendarTheme])[];
-
-const darkThemeEntries = [
-  ["industrial", themes.industrial],
-  ["midnight", themes.midnight],
-  ["sandstone", themes.sandstone],
-  ["phosphor", themes.phosphor],
-  ["dracula", themes.dracula],
-  ["cyber", themes.cyber],
-  ["temporal", themes.temporal],
-  ["crimson", themes.crimson],
-  ["forest", themes.forest],
-  ["nebula", themes.nebula],
-  ["aurora", themes.aurora],
+const themeFamilyEntries = [
+  ["noir", themes.noir],
   ["espresso", themes.espresso],
-  ["ember", themes.ember],
-  ["flare", themes.flare],
-  ["abyss", themes.abyss],
-  ["cobalt", themes.cobalt],
+  ["meadow", themes.meadow],
   ["fjord", themes.fjord],
   ["velvet", themes.velvet],
-  ["eclipse", themes.eclipse],
-  ["noir", themes.noir],
+  ["crimson", themes.crimson],
+  ["solar", themes.solar],
+  ["nebula", themes.nebula],
+  ["neon", themes.neon],
+  ["prism", themes.prism],
+  ["slate", themes.slate],
+  ["pearl", themes.pearl],
+  ["sandstone", themes.sandstone],
   ["bauhaus", themes.bauhaus],
-] satisfies readonly (readonly [string, CalendarTheme])[];
+  ["monsoon", themes.monsoon],
+  ["industrial", themes.industrial],
+  ["snow", themes.snow],
+  ["eclipse", themes.eclipse],
+  ["chalk", themes.chalk],
+  ["temporal", themes.temporal],
+  ["riso", themes.riso],
+  ["cyber", themes.cyber],
+  ["split", themes.split],
+  ["aurora", themes.aurora],
+  ["graphite", themes.graphite],
+  ["dracula", themes.dracula],
+  ["mint", themes.mint],
+  ["abyss", themes.abyss],
+] satisfies readonly (readonly [string, ThemeFamily])[];
+
+const lightThemeEntries = themeFamilyEntries.map(
+  ([name, theme]) => [name, theme.light] as const,
+);
+
+const darkThemeEntries = themeFamilyEntries.map(
+  ([name, theme]) => [name, theme.dark] as const,
+);
 
 const appearanceEntries = Object.entries(appearances) as [
   string,

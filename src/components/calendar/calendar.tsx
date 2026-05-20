@@ -2,7 +2,7 @@ import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import "@/styles/layers.css";
 import "@/styles/tokens.css";
-import { validateTheme } from "@/core/dev-warn";
+import { validateTheme, validateThemeModeFlags } from "@/core/dev-warn";
 import { CalendarLayout } from "@/core/layout";
 import { CalendarProvider } from "@/core/provider";
 import {
@@ -14,10 +14,7 @@ import type {
   CalendarMode,
   CalendarProps,
 } from "@/types/calendar";
-import { CUSTOM_THEME_BRAND, type CustomTheme } from "@/types/themes";
-
-const isCustomTheme = (t: unknown): t is CustomTheme =>
-  typeof t === "object" && t !== null && CUSTOM_THEME_BRAND in (t as object);
+import { isCustomTheme, isThemeFamily } from "@/utils/resolve-theme-scope";
 
 const isCustomAppearance = (a: unknown): a is CustomAppearance =>
   typeof a === "object" &&
@@ -27,6 +24,8 @@ const isCustomAppearance = (a: unknown): a is CustomAppearance =>
 export function Calendar<M extends CalendarMode = "single">({
   width = "100%",
   theme: themeProp,
+  light = false,
+  dark = false,
   appearance: appearanceProp,
   hour12 = false,
   locale = "en",
@@ -74,17 +73,20 @@ export function Calendar<M extends CalendarMode = "single">({
     return () => mq.removeEventListener("change", handler);
   }, []);
 
+  const customThemeFamily = isThemeFamily(themeProp) ? themeProp : undefined;
   const customTheme = isCustomTheme(themeProp) ? themeProp : undefined;
-  const rawThemeKey = customTheme
-    ? undefined
-    : (themeProp as string | undefined);
-  const themeKey =
+  const rawThemeKey =
+    customTheme || customThemeFamily
+      ? undefined
+      : (themeProp as string | undefined);
+  const themeKeyFromProp =
     rawThemeKey === "auto" ||
     rawThemeKey === "light" ||
     rawThemeKey === "dark" ||
     rawThemeKey === undefined
       ? rawThemeKey
       : undefined;
+  const themeKey = dark ? "dark" : light ? "light" : themeKeyFromProp;
   const isAutoTheme = !themeKey || themeKey === "auto";
   // baseTheme used only when systemTheme is resolved (post-mount) or theme is
   // explicit. Pre-mount auto skips this branch via activeTheme === "auto".
@@ -95,24 +97,31 @@ export function Calendar<M extends CalendarMode = "single">({
   useEffect(() => {
     setIsToggled(false);
     validateTheme(themeProp);
-  }, [themeProp]);
+    validateThemeModeFlags(light, dark);
+  }, [themeProp, light, dark]);
 
   const isBaseDark = baseTheme === "dark";
-  const activeTheme: "light" | "dark" | "auto" = customTheme
-    ? baseTheme
-    : isAutoTheme && systemTheme === null && !isToggled
-      ? "auto"
-      : isToggled
-        ? isBaseDark
-          ? "light"
-          : "dark"
-        : baseTheme;
+  const toggledTheme: "light" | "dark" = isBaseDark ? "light" : "dark";
+  const resolvedTheme: "light" | "dark" = isToggled ? toggledTheme : baseTheme;
+  const activeTheme: "light" | "dark" | "auto" = customThemeFamily
+    ? resolvedTheme
+    : customTheme
+      ? resolvedTheme
+      : isAutoTheme && systemTheme === null && !isToggled
+        ? "auto"
+        : resolvedTheme;
   const toggleTheme = () => setIsToggled((v) => !v);
 
   const customAppearance = isCustomAppearance(appearanceProp)
     ? appearanceProp
     : undefined;
-  const customThemeVars = customTheme?.vars as React.CSSProperties | undefined;
+  const resolvedCustomTheme =
+    customThemeFamily && activeTheme !== "auto"
+      ? customThemeFamily[activeTheme]
+      : customTheme;
+  const customThemeVars = resolvedCustomTheme?.vars as
+    | React.CSSProperties
+    | undefined;
   const customAppearanceVars = customAppearance?.vars as
     | React.CSSProperties
     | undefined;

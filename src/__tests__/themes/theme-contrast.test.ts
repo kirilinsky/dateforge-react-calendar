@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { THEMES_DATA, type ThemeTokens } from "../../../themes/themes";
+import {
+  THEME_FAMILIES_DATA,
+  THEME_VARIANTS_DATA,
+  type ThemeTokens,
+} from "../../../themes/themes";
 
 const MIN_NORMAL_TEXT_CONTRAST = 4.5;
 const WEEKEND_BACKGROUNDS = ["backdrop", "tone"] as const;
@@ -48,7 +52,7 @@ function contrastRatio(foreground: string, background: string): number {
 
 describe("built-in theme contrast tokens", () => {
   it.each(
-    Object.entries(THEMES_DATA),
+    Object.entries(THEME_VARIANTS_DATA),
   )("%s muted and disabled text pass normal text contrast", (_name, theme) => {
     const foregrounds = ["mutedText", "disabledText"] as const;
     const backgrounds = ["backdrop", "tone"] as const;
@@ -64,7 +68,7 @@ describe("built-in theme contrast tokens", () => {
   });
 
   it.each(
-    Object.entries(THEMES_DATA),
+    Object.entries(THEME_VARIANTS_DATA),
   )("%s active text passes normal text contrast", (_name, theme) => {
     expect(
       contrastRatio(theme.activeText, theme.highlight),
@@ -73,7 +77,7 @@ describe("built-in theme contrast tokens", () => {
   });
 
   it.each(
-    Object.entries(THEMES_DATA),
+    Object.entries(THEME_VARIANTS_DATA),
   )("%s today dot passes normal text contrast", (_name, theme) => {
     expect(
       contrastRatio(theme.todayDot, theme.highlight),
@@ -82,7 +86,7 @@ describe("built-in theme contrast tokens", () => {
   });
 
   it.each(
-    Object.entries(THEMES_DATA),
+    Object.entries(THEME_VARIANTS_DATA),
   )("%s weekend text passes normal text contrast", (_name, theme) => {
     for (const background of WEEKEND_BACKGROUNDS) {
       expect(
@@ -93,7 +97,7 @@ describe("built-in theme contrast tokens", () => {
   });
 
   it.each(
-    Object.entries(THEMES_DATA).filter(([, theme]) => theme.outOfMonth),
+    Object.entries(THEME_VARIANTS_DATA).filter(([, theme]) => theme.outOfMonth),
   )("%s out-of-month text passes normal text contrast", (_name, theme) => {
     for (const background of WEEKEND_BACKGROUNDS) {
       expect(
@@ -115,7 +119,7 @@ describe("built-in theme contrast tokens", () => {
   });
 
   it("covers every built-in theme with the new a11y tokens", () => {
-    for (const theme of Object.values(THEMES_DATA) as ThemeTokens[]) {
+    for (const theme of Object.values(THEME_VARIANTS_DATA) as ThemeTokens[]) {
       expect(theme.activeText).toMatch(/^#[0-9a-f]{6}$/i);
       expect(theme.todayDot).toMatch(/^#[0-9a-f]{6}$/i);
       expect(theme.mutedText).toMatch(/^#[0-9a-f]{6}$/i);
@@ -124,6 +128,20 @@ describe("built-in theme contrast tokens", () => {
       if (theme.outOfMonth) {
         expect(theme.outOfMonth).toMatch(/^#[0-9a-f]{6}$/i);
       }
+    }
+  });
+
+  it("defines both mode variants for every built-in theme family", () => {
+    expect(Object.keys(THEME_FAMILIES_DATA).length).toBeGreaterThan(0);
+    for (const [name, family] of Object.entries(THEME_FAMILIES_DATA)) {
+      expect(family.light, `${name}.light`).toBeTruthy();
+      expect(family.dark, `${name}.dark`).toBeTruthy();
+      expect(family.light.backdrop, `${name}.light.backdrop`).toMatch(
+        /^#[0-9a-f]{6}$/i,
+      );
+      expect(family.dark.backdrop, `${name}.dark.backdrop`).toMatch(
+        /^#[0-9a-f]{6}$/i,
+      );
     }
   });
 });

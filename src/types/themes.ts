@@ -1,4 +1,4 @@
-import type { ThemeTokens } from "../../themes/themes";
+import type { ThemeTokens } from "./theme-tokens";
 
 export type { ThemeTokens };
 
@@ -9,6 +9,14 @@ export type CustomTheme = {
   readonly vars: Record<string, string>;
 };
 
+export type ThemeMode = "light" | "dark";
+
+export type ThemeFamily = {
+  readonly kind: "family";
+  readonly light: CustomTheme;
+  readonly dark: CustomTheme;
+};
+
 export type BuiltInTheme = "auto" | "light" | "dark";
 
-export type CalendarTheme = BuiltInTheme | CustomTheme;
+export type CalendarTheme = BuiltInTheme | CustomTheme | ThemeFamily;

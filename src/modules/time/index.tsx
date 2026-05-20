@@ -10,8 +10,10 @@ import {
   useSelectionActions,
   useSelectionValue,
 } from "@/context/selection-context";
+import { useUI } from "@/context/ui-context";
 import { useToday } from "@/hooks/use-today";
 import { Clock } from "@/Icons";
+import type { CalendarTheme } from "@/types/themes";
 import {
   DEFAULT_HOURS_LABEL,
   DEFAULT_MINUTES_LABEL,
@@ -24,6 +26,7 @@ import {
 } from "@/utils/action-labels";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { getDateTimeFormat } from "@/utils/intl-cache";
+import { resolveThemeScope } from "@/utils/resolve-theme-scope";
 import styles from "./time.module.css";
 
 export interface CalendarTimeGridProps {
@@ -33,6 +36,7 @@ export interface CalendarTimeGridProps {
    */
   bound?: "from" | "to";
   col?: number | string;
+  theme?: CalendarTheme;
   hoursLabel?: string;
   minutesLabel?: string;
   resetTimeLabel?: string;
@@ -79,6 +83,7 @@ export interface CalendarTimeGridProps {
 export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
   bound,
   col,
+  theme,
   hoursLabel,
   minutesLabel,
   resetTimeLabel,
@@ -125,6 +130,8 @@ export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
     DEFAULT_TIME_PICKER_LABEL,
   );
   const { viewDate: date } = useNavigation();
+  const { activeTheme } = useUI();
+  const themeScope = resolveThemeScope(theme, activeTheme);
   const { rangeStart, rangeEnd } = useSelectionValue();
   const { onChangeTime, onRangeBoundSet } = useSelectionActions();
   const today = useToday();
@@ -186,7 +193,8 @@ export const CalendarTimeGrid: React.FC<CalendarTimeGridProps> = ({
     <div
       data-area="time"
       className={styles.timeContainer}
-      style={getGridSlotStyle(col)}
+      data-theme={themeScope.dataTheme}
+      style={{ ...getGridSlotStyle(col), ...themeScope.style }}
     >
       {headerText && (
         <div className={styles.boundedDate} data-bound={bound}>

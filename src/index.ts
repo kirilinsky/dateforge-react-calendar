@@ -42,6 +42,8 @@ export type {
   BuiltInTheme,
   CalendarTheme,
   CustomTheme,
+  ThemeFamily,
+  ThemeMode,
   ThemeTokens,
 } from "./types/themes";
 export { createAppearance } from "./utils/create-appearance";
