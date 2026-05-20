@@ -151,7 +151,6 @@ export const WithThemeToggle: Story = {
       <Calendar
         value={date}
         onChange={setDate}
-        theme="auto"
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}

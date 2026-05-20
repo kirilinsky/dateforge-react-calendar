@@ -37,7 +37,7 @@
   }
 
   /* CSS-native auto: when no JS-resolved theme is set, follow the OS
-     preference. This kills the white flash on first paint with theme="auto" +
+     preference. This kills the white flash on first paint with the default auto theme +
      dark system — CSS picks dark before any JS runs. */
   @media (prefers-color-scheme: dark) {
     :global([data-theme="auto"]) {

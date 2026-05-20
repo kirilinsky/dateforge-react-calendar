@@ -24,7 +24,7 @@ Modular React calendar/datepicker lib. Zero runtime deps. SSR-safe. Composable m
 - I.pkg — `@dateforge/react-calendar` (main entry: `Calendar`, `createTheme`, `createDisabled`, `createAppearance`, types)
 - I.ctx — `@dateforge/react-calendar/context` (all context hooks: `useConfig`, `useNavigation`, `useSelection`, `useSelectionActions`, `useSelectionHover`, `useSelectionValue`, `useUI`)
 - I.modules — `@dateforge/react-calendar/modules` (all module components)
-- I.themes — `@dateforge/react-calendar/themes` + `themes/<name>` (34 themes)
+- I.themes — `@dateforge/react-calendar/themes` + `themes/<name>` (28 theme families)
 - I.appearances — `@dateforge/react-calendar/appearances` + `appearances/<name>` (6 appearances)
 - I.api — `CalendarProps<M>`, `CalendarValue<M>`, `CalendarMode`, `DateRange`, `DisabledConfig`, `DisabledRule`, `ThemeTokens`
 - I.ci — GitHub Actions: typecheck, lint, build, exports, size, test, SSR, Chromatic, CodeQL, Scorecard
@@ -46,7 +46,7 @@ Modular React calendar/datepicker lib. Zero runtime deps. SSR-safe. Composable m
 - V9. Generated theme/appearance files are not hand-edited — source is `themes/themes.ts` + `scripts/generate-*.ts`.
 - V10. `SelectionHoverContext` is separate from `SelectionStateContext` to prevent re-renders on hover.
 - V11. Popup state (`time|month|year|null`) lives in `UIContext`, not reducer.
-- V12. `theme="auto"` resolves via `matchMedia` after mount — CSS handles server render via `prefers-color-scheme`, no white flash.
+- V12. The default theme mode resolves via `matchMedia` after mount — CSS handles server render via `prefers-color-scheme`, no white flash.
 - V13. Module order in JSX = visual order in CSS grid. No implicit ordering.
 - V14. No runtime dep added to `dependencies` — only `devDependencies` or `peerDependencies`.
 - V15. `tsc --noEmit` passes before every publish (`npm run verify`).

@@ -14,7 +14,7 @@ import type {
   CalendarMode,
   CalendarProps,
 } from "@/types/calendar";
-import { isCustomTheme, isThemeFamily } from "@/utils/resolve-theme-scope";
+import { isThemeFamily } from "@/utils/resolve-theme-scope";
 
 const isCustomAppearance = (a: unknown): a is CustomAppearance =>
   typeof a === "object" &&
@@ -74,11 +74,9 @@ export function Calendar<M extends CalendarMode = "single">({
   }, []);
 
   const customThemeFamily = isThemeFamily(themeProp) ? themeProp : undefined;
-  const customTheme = isCustomTheme(themeProp) ? themeProp : undefined;
-  const rawThemeKey =
-    customTheme || customThemeFamily
-      ? undefined
-      : (themeProp as string | undefined);
+  const rawThemeKey = customThemeFamily
+    ? undefined
+    : (themeProp as string | undefined);
   const themeKeyFromProp =
     rawThemeKey === "auto" ||
     rawThemeKey === "light" ||
@@ -105,21 +103,19 @@ export function Calendar<M extends CalendarMode = "single">({
   const resolvedTheme: "light" | "dark" = isToggled ? toggledTheme : baseTheme;
   const activeTheme: "light" | "dark" | "auto" = customThemeFamily
     ? resolvedTheme
-    : customTheme
-      ? resolvedTheme
-      : isAutoTheme && systemTheme === null && !isToggled
-        ? "auto"
-        : resolvedTheme;
+    : isAutoTheme && systemTheme === null && !isToggled
+      ? "auto"
+      : resolvedTheme;
   const toggleTheme = () => setIsToggled((v) => !v);
 
   const customAppearance = isCustomAppearance(appearanceProp)
     ? appearanceProp
     : undefined;
-  const resolvedCustomTheme =
+  const resolvedThemeVariant =
     customThemeFamily && activeTheme !== "auto"
       ? customThemeFamily[activeTheme]
-      : customTheme;
-  const customThemeVars = resolvedCustomTheme?.vars as
+      : undefined;
+  const themeVariantVars = resolvedThemeVariant?.vars as
     | React.CSSProperties
     | undefined;
   const customAppearanceVars = customAppearance?.vars as
@@ -145,7 +141,7 @@ export function Calendar<M extends CalendarMode = "single">({
         ref={wrapperRef}
         data-theme={activeTheme}
         data-readonly={readOnly || undefined}
-        style={{ containerType: "inline-size", width, ...customThemeVars }}
+        style={{ containerType: "inline-size", width, ...themeVariantVars }}
       >
         <CalendarLayout
           customAppearanceVars={customAppearanceVars}

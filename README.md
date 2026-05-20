@@ -109,6 +109,27 @@ Most date pickers ask you to accept their shape. DateForge lets you forge yours.
 
 Remove a line, remove a feature. Add a module, add a workflow. That is the core idea.
 
+## Themes
+
+Themes are light/dark families. Omit `theme` for the default auto palette, pass `light` or `dark` for an explicit initial mode, or import a family:
+
+```tsx
+import { Calendar, createTheme } from "@dateforge/react-calendar";
+import { nebula } from "@dateforge/react-calendar/themes/nebula";
+
+<Calendar theme={nebula} dark />;
+
+const brand = createTheme({
+  highlight: "#2563eb",
+  range: "#22c55e",
+  weekend: "#ef4444",
+  light: { backdrop: "#f8fafc" },
+  dark: { backdrop: "#0f172a", text: "#f8fafc" },
+});
+
+<Calendar theme={brand} />;
+```
+
 ## Modules
 
 | Module                  | Use it for                                                  |

@@ -10,7 +10,7 @@ For state/composition/contracts see [`ARCHITECTURE.md`](./ARCHITECTURE.md). For 
 
 Styling splits along two **independent** dimensions. Any theme combines freely with any appearance.
 
-- **Theme** = palette (colors). CSS custom properties on the wrapper. Applied via `data-theme` attribute. String values: `"auto" | "light" | "dark"`. Anything else must be a `CustomTheme` object — either a named theme imported from `@dateforge/react-calendar/themes/<name>`, or `createTheme()` output. Named theme **names are export names, not accepted string values** — passing the string `"midnight"` is invalid and emits a dev warning.
+- **Theme** = palette family (colors). CSS custom properties on the wrapper. Applied via `data-theme` plus inline token vars. The default palette supports auto/light/dark without imports; named palettes are `ThemeFamily` objects imported from `@dateforge/react-calendar/themes/<name>` or returned by `createTheme()`. Theme names are export names, not accepted string values — passing the string `"nebula"` is invalid and emits a dev warning.
 - **Appearance** = structure (radii, sizing, density, border styles, motion duration). Applied via `data-appearance` attribute. Custom via `createAppearance()`.
 
 The combinatorial product (themes × appearances) is the primary target for visual regression testing (Chromatic).
@@ -83,15 +83,15 @@ Source: `appearances/index.ts`.
 
 ---
 
-## Themes (42)
+## Themes (28 families)
 
 Generated via `scripts/generate-theme.ts` → `themes/<name>.ts`. Do **not** hand-edit generated files; re-run `npm run build`.
 
-**Light / bright:** `tide`, `graphite`, `mint`, `snow`, `solar`, `slate`, `neon`, `prism`, `meadow`, `latte`, `split`, `riso`, `monsoon`, `pearl`, `chalk`, `comfy`, `mono`, `atelier`.
+Each public theme is a family with a light and dark variant:
 
-**Dark / vibrant:** `fjord`, `industrial`, `crimson`, `amethyst`, `cyber`, `espresso`, `ember`, `phosphor`, `midnight`, `sandstone`, `rosa`, `dracula`, `nebula`, `aurora`, `forest`, `scarlet`, `temporal`, `flare`, `abyss`, `cobalt`, `velvet`, `eclipse`, `noir`, `bauhaus`.
+`noir`, `espresso`, `meadow`, `fjord`, `velvet`, `crimson`, `solar`, `nebula`, `neon`, `prism`, `slate`, `pearl`, `sandstone`, `bauhaus`, `monsoon`, `industrial`, `snow`, `eclipse`, `chalk`, `temporal`, `riso`, `cyber`, `split`, `aurora`, `graphite`, `dracula`, `mint`, `abyss`.
 
-Range covers muted pastels (`latte`, `comfy`), neon/cyber (`phosphor`, `neon`, `abyss`), earth tones (`sandstone`, `forest`).
+Families preserve the old palette coverage by pairing previous light/dark themes or creating complementary variants where no obvious pair existed. Range covers neutral (`noir`, `slate`, `pearl`), neon/cyber (`neon`, `cyber`, `abyss`), earth tones (`sandstone`, `meadow`), print-inspired (`riso`, `bauhaus`), and vivid editorial palettes (`velvet`, `nebula`, `crimson`).
 
 ---
 
@@ -127,7 +127,7 @@ Source: `src/core/layout.module.css`.
 
 ### Data attributes (root)
 
-- `data-theme="light|dark|auto"` — theme selector. CSS handles `auto` via `prefers-color-scheme` (avoids flash).
+- `data-theme="light|dark|auto"` — active mode selector. CSS handles `auto` via `prefers-color-scheme` for the default palette; imported/custom families apply their resolved variant vars inline.
 - `data-appearance="<name>"` — appearance selector.
 - `data-readonly` — read-only mode marker.
 - `data-area="days|selected-dates|time"` — functional region markers.
@@ -291,7 +291,7 @@ CSS wins the race vs JS. Client-side resolution via `useClientValue(matchMedia, 
 
 ## File references
 
-- `themes/themes.ts` — 40 themes, 15 tokens each
+- `themes/themes.ts` — source variants plus 28 public theme families, 15 color tokens each
 - `appearances/index.ts` — 6 appearances
 - `src/core/layout.module.css` — typography, container query, color defaults
 - `src/hooks/use-client-value.ts` — SSR-safe deferred values
