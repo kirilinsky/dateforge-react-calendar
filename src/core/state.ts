@@ -4,6 +4,7 @@ import {
   hasDisabledInRange,
   isSameDay,
 } from "@/utils/date-utils";
+import { warnOnce } from "./dev-warn";
 
 interface CalendarState {
   viewDate: Date;
@@ -253,7 +254,26 @@ export function calendarReducer(
       );
 
       if (config.range) {
-        if (state.rangeStart && isSameDay(state.rangeStart, state.viewDate)) {
+        const startMatch =
+          !!state.rangeStart && isSameDay(state.rangeStart, state.viewDate);
+        const endMatch =
+          !!state.rangeEnd && isSameDay(state.rangeEnd, state.viewDate);
+
+        // Ambiguous: both bounds share the same calendar day as viewDate.
+        // Without explicit `bound` we'd silently edit `rangeStart` (the
+        // earlier branch), making `rangeEnd` unreachable via this path.
+        // No-op + dev warning instead — consumers must route through
+        // `onRangeBoundSet(bound, …)` (e.g. via `<CalendarTimeWheel
+        // bound="from"|"to">`).
+        if (startMatch && endMatch) {
+          warnOnce(
+            "change-time:ambiguous-range-bound",
+            "CHANGE_TIME in range mode is ambiguous when rangeStart and rangeEnd share the calendar day matching viewDate. " +
+              'Use an explicit bound via `<CalendarTimeWheel bound="from"|"to">` or `onRangeBoundSet(bound, date)` to edit a specific boundary.',
+          );
+          return state;
+        }
+        if (startMatch) {
           const range = validateRange(date, state.rangeEnd, config);
           if (!range) return state;
           return {
@@ -263,7 +283,7 @@ export function calendarReducer(
             notifySeq: state.notifySeq + 1,
           };
         }
-        if (state.rangeEnd && isSameDay(state.rangeEnd, state.viewDate)) {
+        if (endMatch) {
           const range = validateRange(state.rangeStart, date, config);
           if (!range) return state;
           return {

@@ -4,9 +4,11 @@ import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
 import { CalendarDaysTrack } from "@/modules/days-track";
 import { CalendarInfo } from "@/modules/info";
+import { CalendarLunar } from "@/modules/lunar";
 import { CalendarManualInput } from "@/modules/manual-input";
 import { CalendarMonthsGrid } from "@/modules/months-grid";
 import { CalendarMonthsTrack } from "@/modules/months-track";
+import { CalendarMonthsWheel } from "@/modules/months-wheel";
 import { CalendarNav } from "@/modules/nav";
 import { CalendarPresets } from "@/modules/presets";
 import { basicPresets } from "@/modules/presets/presets-pack";
@@ -203,6 +205,54 @@ export const RelativeDeadline: Story = {
 };
 RelativeDeadline.storyName =
   "Single / Relative deadline (Intl.RelativeTimeFormat)";
+
+export const MonthsWheelPicker: Story = {
+  parameters: { storyWidth: 820 },
+  render: (_args, ctx) => {
+    const [date, setDate] = useState<Date | null>(FIXED_DATE);
+    return (
+      <Calendar
+        mode="single"
+        value={date}
+        onChange={setDate}
+        cols={3}
+        theme={resolveStoryTheme(ctx.globals.theme)}
+        {...resolveStoryThemeMode(ctx.globals.themeMode)}
+        appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
+      >
+        <CalendarNav yearLabel themeToggle clear />
+        <CalendarMonthsWheel col={1} showLabel showReset />
+        <CalendarDays col={2} />
+      </Calendar>
+    );
+  },
+};
+MonthsWheelPicker.storyName = "Single / Nav + MonthsWheel + Days  ";
+
+export const LunarPhaseStrip: Story = {
+  render: (_args, ctx) => {
+    const [date, setDate] = useState<Date | null>(FIXED_DATE);
+    return (
+      <Calendar
+        mode="single"
+        value={date}
+        onChange={setDate}
+        theme={resolveStoryTheme(ctx.globals.theme)}
+        {...resolveStoryThemeMode(ctx.globals.themeMode)}
+        appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
+      >
+        <CalendarNav showMonthPicker compactYears />
+        <CalendarDays />
+        <CalendarLunar />
+      </Calendar>
+    );
+  },
+};
+LunarPhaseStrip.storyName = "Single / Lunar phase strip under grid";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Multiple — N dates

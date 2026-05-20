@@ -114,7 +114,24 @@ describe("CHANGE_TIME respects min/max/disabled", () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it("range mode: valid time change on endpoint commits", () => {
+  it("range mode: valid time change on endpoint commits (explicit bound)", () => {
+    const onChange = vi.fn();
+    const value = {
+      from: new Date(2024, 5, 15, 10, 0, 0),
+      to: new Date(2024, 5, 15, 18, 0, 0),
+    };
+    const { container } = render(
+      <Calendar mode="range" value={value} onChange={onChange}>
+        <CalendarTimeWheel bound="from" />
+      </Calendar>,
+    );
+    const hour = drumByLabel(container, "Hours");
+    hour.focus();
+    fireEvent.keyDown(hour, { key: "ArrowDown" });
+    expect(onChange).toHaveBeenCalled();
+  });
+
+  it("range mode: same-day bounds + no explicit bound = no-op (A-2 fix)", () => {
     const onChange = vi.fn();
     const value = {
       from: new Date(2024, 5, 15, 10, 0, 0),
@@ -128,6 +145,9 @@ describe("CHANGE_TIME respects min/max/disabled", () => {
     const hour = drumByLabel(container, "Hours");
     hour.focus();
     fireEvent.keyDown(hour, { key: "ArrowDown" });
-    expect(onChange).toHaveBeenCalled();
+    // Ambiguous: both bounds match viewDate's calendar day. Without
+    // explicit `bound`, CHANGE_TIME used to silently edit rangeStart and
+    // make rangeEnd unreachable. Now it's a no-op + dev warning.
+    expect(onChange).not.toHaveBeenCalled();
   });
 });
