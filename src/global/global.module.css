@@ -53,14 +53,13 @@
 
   .selectedItem {
     background: color-mix(in srgb, var(--c-h) 12%, var(--c-b));
-    box-shadow:
-      inset 0 0 0 1px color-mix(in srgb, var(--c-h) 48%, transparent),
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c-h) 48%, transparent),
       inset 0 1px 0 color-mix(in srgb, var(--c-b) 54%, transparent);
   }
 
   .adaptiveTile {
-    --hover-shadow:
-      inset 0 1px 0 color-mix(in srgb, var(--c-b) 54%, transparent),
+    --hover-shadow: inset 0 1px 0
+        color-mix(in srgb, var(--c-b) 54%, transparent),
       inset 0 -1px 0 color-mix(in srgb, var(--c-x) 11%, transparent),
       inset 0 0 0 1px color-mix(in srgb, var(--c-x) 7%, transparent);
 
@@ -83,12 +82,10 @@
     overflow-wrap: break-word;
     hyphens: auto;
     background: color-mix(in srgb, var(--c-b) 22%, transparent);
-    box-shadow:
-      inset 0 1px 0 color-mix(in srgb, var(--c-b) 48%, transparent),
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--c-b) 48%, transparent),
       inset 0 -1px 0 color-mix(in srgb, var(--c-x) 9%, transparent),
       inset 0 0 0 1px color-mix(in srgb, var(--c-x) 5%, transparent);
-    transition:
-      background var(--cal-transition, 0.2s) ease,
+    transition: background var(--cal-transition, 0.2s) ease,
       color var(--cal-transition, 0.2s) ease;
   }
 
@@ -98,6 +95,22 @@
   .activeItem {
     background: var(--active-cell-bg, var(--c-h));
     color: var(--active-cell-color, var(--c-at, var(--c-a)));
-    box-shadow: var(--active-cell-stroke, var(--active-shadow, 0 0.2em 0.6em var(--c-x)));
+    box-shadow: var(
+      --active-cell-stroke,
+      var(--active-shadow, 0 0.2em 0.6em var(--c-x))
+    );
+    transition: transform var(--cal-press-up-duration, 0.18s)
+        var(--cal-press-up-easing, cubic-bezier(0.34, 1.4, 0.64, 1)),
+      background var(--cal-paint-transition, var(--cal-transition, 0.2s))
+        var(--cal-paint-easing, linear),
+      color var(--cal-paint-transition, var(--cal-transition, 0.2s))
+        var(--cal-paint-easing, linear),
+      box-shadow var(--cal-paint-transition, var(--cal-transition, 0.2s))
+        var(--cal-paint-easing, linear);
+  }
+
+  .activeItem:active:not([disabled]):not([aria-disabled="true"]) {
+    transform: scale(var(--cal-press-scale, 0.95));
+    transition-duration: var(--cal-press-down-duration, 0.08s);
   }
 }

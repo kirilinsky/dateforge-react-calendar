@@ -193,4 +193,17 @@
     }
   }
 
+  /* Honor OS reduced-motion preference. Token-based transitions resolve to
+     near-zero; press feedback flattens to no scale. Keyframe animations with
+     hardcoded durations are neutralized per-module. */
+  @media (prefers-reduced-motion: reduce) {
+    .calendarContainer {
+      --cal-transition: 0.01ms;
+      --cal-paint-transition: 0.01ms;
+      --cal-press-up-duration: 0.01ms;
+      --cal-press-down-duration: 0.01ms;
+      --cal-press-scale: 1;
+    }
+  }
+
 }
