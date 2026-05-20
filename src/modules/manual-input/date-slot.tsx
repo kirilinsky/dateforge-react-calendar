@@ -2,7 +2,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { Check, Clear } from "@/Icons";
 import { isSameDay } from "@/utils/date-core";
-import { dateToMask } from "@/utils/date-mask";
+import { DEFAULT_DATE_FORMAT, dateToMask } from "@/utils/date-mask";
 import styles from "./manual-input.module.css";
 import { MaskedDateInput } from "./masked-date-input";
 
@@ -19,6 +19,7 @@ interface DateSlotProps {
   isEditing?: boolean;
   onEditStart?: () => void;
   readOnly?: boolean;
+  format?: string;
 }
 
 export const DateSlot: React.FC<DateSlotProps> = ({
@@ -30,10 +31,11 @@ export const DateSlot: React.FC<DateSlotProps> = ({
   onSave,
   onClear,
   onRemove,
-  placeholder = "DD.MM.YYYY",
+  placeholder,
   isEditing,
   onEditStart,
   readOnly,
+  format = DEFAULT_DATE_FORMAT,
 }) => {
   const [editing, setEditing] = useState(() => !date);
   const [inputInitialDate, setInputInitialDate] = useState<Date | null>(null);
@@ -127,7 +129,7 @@ export const DateSlot: React.FC<DateSlotProps> = ({
           onClick={enterEditMode}
           disabled={readOnly}
         >
-          {dateToMask(date)}
+          {dateToMask(date, format)}
         </button>
         {onRemove && (
           <button
@@ -178,6 +180,7 @@ export const DateSlot: React.FC<DateSlotProps> = ({
         onEnter={handleSave}
         placeholder={placeholder}
         readOnly={readOnly}
+        format={format}
       />
       {hasText && (
         <button

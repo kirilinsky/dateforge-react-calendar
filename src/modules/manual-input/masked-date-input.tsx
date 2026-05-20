@@ -2,6 +2,7 @@ import type React from "react";
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import {
   applyMask,
+  DEFAULT_DATE_FORMAT,
   dateToMask,
   maskToDate,
   validatePartialMask,
@@ -19,6 +20,7 @@ interface MaskedDateInputProps {
   classNameInvalid?: string;
   placeholder?: string;
   readOnly?: boolean;
+  format?: string;
 }
 
 const countDigits = (s: string) => (s.match(/\d/g) ?? []).length;
@@ -46,20 +48,22 @@ export const MaskedDateInput: React.FC<MaskedDateInputProps> = ({
   isDateAllowed,
   className,
   classNameInvalid,
-  placeholder = "DD.MM.YYYY",
+  placeholder,
   readOnly,
+  format = DEFAULT_DATE_FORMAT,
 }) => {
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const pendingCursor = useRef<number | null>(null);
-  const [text, setText] = useState(() => dateToMask(value));
+  const [text, setText] = useState(() => dateToMask(value, format));
   const [invalid, setInvalid] = useState(false);
+  const resolvedPlaceholder = placeholder ?? format;
 
   useEffect(() => {
-    setText(dateToMask(value));
+    setText(dateToMask(value, format));
     setInvalid(false);
     onValidityChange?.(false);
-  }, [value]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [value, format]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Restore caret to the digit-equivalent position after each render.
   // The controlled re-render otherwise snaps it to the end of the input,
@@ -76,12 +80,12 @@ export const MaskedDateInput: React.FC<MaskedDateInputProps> = ({
     const sel = e.target.selectionStart ?? raw.length;
     pendingCursor.current = countDigits(raw.slice(0, sel));
 
-    const masked = applyMask(raw);
+    const masked = applyMask(raw, format);
     setText(masked);
     onHasText?.(masked.length > 0);
 
-    let nextInvalid = validatePartialMask(masked);
-    const date = maskToDate(masked);
+    let nextInvalid = validatePartialMask(masked, format);
+    const date = maskToDate(masked, format);
 
     if (date) {
       onTyped?.(date);
@@ -123,18 +127,19 @@ export const MaskedDateInput: React.FC<MaskedDateInputProps> = ({
       e.key === "Backspace" &&
       sel === selEnd &&
       sel > 0 &&
-      text[sel - 1] === "."
+      text[sel - 1] !== undefined &&
+      !/\d/.test(text[sel - 1])
     ) {
       e.preventDefault();
       const before = text.slice(0, sel - 2);
       const after = text.slice(sel);
       const merged = before + after;
       pendingCursor.current = countDigits(before);
-      const masked = applyMask(merged);
+      const masked = applyMask(merged, format);
       setText(masked);
       onHasText?.(masked.length > 0);
-      let nextInvalid = validatePartialMask(masked);
-      const date = maskToDate(masked);
+      let nextInvalid = validatePartialMask(masked, format);
+      const date = maskToDate(masked, format);
       if (date && isDateAllowed(date)) {
         nextInvalid = false;
         onChange(date);
@@ -158,7 +163,7 @@ export const MaskedDateInput: React.FC<MaskedDateInputProps> = ({
         .filter(Boolean)
         .join(" ")}
       value={text}
-      placeholder={placeholder}
+      placeholder={resolvedPlaceholder}
       onChange={handleChange}
       onKeyDown={handleKeyDown}
       readOnly={readOnly}

@@ -108,3 +108,56 @@ describe("validatePartialMask", () => {
   it("full impossible date → invalid", () =>
     expect(validatePartialMask("31.02.2024")).toBe(true));
 });
+
+// ─── format prop ──────────────────────────────────────────────────────────────
+
+describe("format — MM/DD/YYYY", () => {
+  const F = "MM/DD/YYYY";
+  it("dateToMask emits MM/DD/YYYY", () =>
+    expect(dateToMask(new Date(2024, 5, 15), F)).toBe("06/15/2024"));
+  it("applyMask reshapes to slash format", () =>
+    expect(applyMask("06152024", F)).toBe("06/15/2024"));
+  it("applyMask partial 4 digits → MM/DD", () =>
+    expect(applyMask("0615", F)).toBe("06/15"));
+  it("maskToDate parses MM/DD/YYYY", () => {
+    const d = maskToDate("06/15/2024", F);
+    expect(d).not.toBeNull();
+    expect(d!.getMonth()).toBe(5);
+    expect(d!.getDate()).toBe(15);
+    expect(d!.getFullYear()).toBe(2024);
+  });
+  it("rejects month 13 in MM/DD/YYYY", () =>
+    expect(maskToDate("13/15/2024", F)).toBeNull());
+  it("validatePartialMask catches month 13 first segment", () =>
+    expect(validatePartialMask("13", F)).toBe(true));
+});
+
+describe("format — YYYY-MM-DD", () => {
+  const F = "YYYY-MM-DD";
+  it("dateToMask emits ISO-like", () =>
+    expect(dateToMask(new Date(2024, 5, 15), F)).toBe("2024-06-15"));
+  it("applyMask reshapes to YYYY-MM-DD", () =>
+    expect(applyMask("20240615", F)).toBe("2024-06-15"));
+  it("applyMask partial 4 digits → YYYY only", () =>
+    expect(applyMask("2024", F)).toBe("2024"));
+  it("applyMask partial 6 digits → YYYY-MM", () =>
+    expect(applyMask("202406", F)).toBe("2024-06"));
+  it("maskToDate parses YYYY-MM-DD", () => {
+    const d = maskToDate("2024-06-15", F);
+    expect(d).not.toBeNull();
+    expect(d!.getFullYear()).toBe(2024);
+    expect(d!.getMonth()).toBe(5);
+    expect(d!.getDate()).toBe(15);
+  });
+  it("validatePartialMask catches month 13 after 6 digits", () =>
+    expect(validatePartialMask("2024-13", F)).toBe(true));
+});
+
+describe("format — invalid format string falls back to default", () => {
+  it("missing token → default DD.MM.YYYY", () =>
+    expect(dateToMask(new Date(2024, 5, 15), "XX/YY")).toBe("15.06.2024"));
+  it("extra token → default", () =>
+    expect(dateToMask(new Date(2024, 5, 15), "DD.MM.YYYY.DD")).toBe(
+      "15.06.2024",
+    ));
+});

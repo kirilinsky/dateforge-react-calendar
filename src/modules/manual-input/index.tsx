@@ -34,6 +34,13 @@ export interface CalendarManualInputProps {
   label?: React.ReactNode;
   removeLabel?: string;
   theme?: CalendarTheme;
+  /**
+   * Date input format. Token string with `DD`, `MM`, `YYYY` and any single-char
+   * separator(s). Examples: `"DD.MM.YYYY"` (default), `"MM/DD/YYYY"`,
+   * `"YYYY-MM-DD"`, `"DD-MM-YYYY"`. Invalid format strings fall back to the
+   * default. The format string also serves as the placeholder.
+   */
+  format?: string;
 }
 
 export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
@@ -45,6 +52,7 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
   label,
   removeLabel,
   theme,
+  format,
 }) => {
   const {
     range,
@@ -184,6 +192,7 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
                 onValidityChange={setAddWrapperInvalid}
                 onEnter={handleAddSave}
                 readOnly={readOnly}
+                format={format}
               />
               {addHasText && (
                 <button
@@ -229,6 +238,7 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
               isEditing={editingKey === d.getTime()}
               onEditStart={() => setEditingKey(d.getTime())}
               readOnly={readOnly}
+              format={format}
             />
           ))}
         </div>
@@ -255,8 +265,8 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
             removeLabel={resolvedRemoveLabel}
             onSave={(d) => onRangeSet(withTime(d), rangeEnd)}
             onClear={() => onRangeSet(null, rangeEnd)}
-            placeholder="DD.MM.YYYY"
             readOnly={readOnly}
+            format={format}
           />
           <span className={styles.sep}>—</span>
           <DateSlot
@@ -267,8 +277,8 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
             removeLabel={resolvedRemoveLabel}
             onSave={(d) => onRangeSet(rangeStart, withTime(d))}
             onClear={() => onRangeSet(rangeStart, null)}
-            placeholder="DD.MM.YYYY"
             readOnly={readOnly}
+            format={format}
           />
         </div>
         {clearBtn}
@@ -294,6 +304,7 @@ export const CalendarManualInput: React.FC<CalendarManualInputProps> = ({
           onSave={(d) => onChangeDate(withTime(d))}
           onClear={() => onChangeDate(null)}
           readOnly={readOnly}
+          format={format}
         />
       </div>
       {clearBtn}

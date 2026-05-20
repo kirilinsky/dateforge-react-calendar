@@ -6,17 +6,26 @@ import * as themes from "../themes/index";
 import "../dist/style.css";
 
 const STORY_BG = { light: "#ffffff", dark: "#1a1a1c" } as const;
+const STORY_FG = { light: "#1a1a1c", dark: "#f0f0f0" } as const;
 
 function useStoryBackground(mode: string) {
   useLayoutEffect(() => {
-    const bg = mode === "dark" ? STORY_BG.dark : STORY_BG.light;
-    const prevBody = document.body.style.background;
-    const prevHtml = document.documentElement.style.background;
+    const isDark = mode === "dark";
+    const bg = isDark ? STORY_BG.dark : STORY_BG.light;
+    const fg = isDark ? STORY_FG.dark : STORY_FG.light;
+    const prevBg = document.body.style.background;
+    const prevColor = document.body.style.color;
+    const prevHtmlBg = document.documentElement.style.background;
+    const prevScheme = document.documentElement.style.colorScheme;
     document.body.style.background = bg;
+    document.body.style.color = fg;
     document.documentElement.style.background = bg;
+    document.documentElement.style.colorScheme = isDark ? "dark" : "light";
     return () => {
-      document.body.style.background = prevBody;
-      document.documentElement.style.background = prevHtml;
+      document.body.style.background = prevBg;
+      document.body.style.color = prevColor;
+      document.documentElement.style.background = prevHtmlBg;
+      document.documentElement.style.colorScheme = prevScheme;
     };
   }, [mode]);
 }
