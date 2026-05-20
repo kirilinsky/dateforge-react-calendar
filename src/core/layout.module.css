@@ -1,4 +1,4 @@
-@layer themes {
+@layer cal-themes {
   :global([data-theme="light"]),
   :global([data-theme="auto"]) {
     --c-a: #ffffff;

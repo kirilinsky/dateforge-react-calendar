@@ -1,4 +1,4 @@
-Reduced motion# Design
+# Design
 
 Visual & UX design system for `@dateforge/react-calendar`. Covers tokens, themes, appearances, motion, interaction patterns, and accessibility.
 
@@ -20,10 +20,19 @@ The combinatorial product (themes × appearances) is the primary target for visu
 User styles override library defaults predictably:
 
 ```
-@layer cal-base, cal-components, cal-modules, themes, appearances, user;
+@layer cal-base, cal-themes, cal-appearances, cal-modules, cal-user;
 ```
 
-User layer wins over `themes` and `appearances`; both win over base/component/module layers.
+Layer order is part of the public v2 styling contract:
+
+- `cal-base` — reset, typed token declarations, token defaults, shell layout, shared primitives
+- `cal-themes` — built-in/custom theme color variables
+- `cal-appearances` — appearance sizing, radius, density, and motion variables
+- `cal-modules` — module-owned layout and state styling
+- `cal-user` — optional user override layer
+
+Unlayered app CSS still wins over all library layers. Prefer tokens and stable
+`data-*` state attributes before reaching for `cal-user`.
 
 ---
 

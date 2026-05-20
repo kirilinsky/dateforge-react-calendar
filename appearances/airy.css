@@ -1,4 +1,4 @@
-@layer appearances {
+@layer cal-appearances {
   [data-appearance="airy"] {
     --cal-radius: 0.4em;
     --cal-container-radius: 0.6em;

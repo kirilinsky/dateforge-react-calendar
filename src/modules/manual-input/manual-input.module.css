@@ -1,4 +1,4 @@
-@layer cal-module {
+@layer cal-modules {
   .inputWrapper:hover {
     border-color: var(--c-s);
     box-shadow: var(--cal-shadow-sm, 0 0.1em 0.3em var(--c-x));

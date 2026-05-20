@@ -222,6 +222,7 @@
     "lint": "biome lint .",
     "format": "biome format --write .",
     "check": "biome check .",
+    "check:css": "node scripts/check-css-important.mjs",
     "check:fix": "biome check --write .",
     "check:exports": "publint && attw --pack . --profile node16",
     "size": "size-limit",
@@ -234,7 +235,7 @@
     "test:coverage": "vitest run --coverage",
     "test:ssr": "vitest run src/__tests__/integration/ssr.test.tsx",
     "test:storybook": "vitest run --project=storybook --passWithNoTests",
-    "verify": "npm run typecheck && npm run check && npm run knip && npm run build && npm run check:exports && npm run size && npm run test",
+    "verify": "npm run typecheck && npm run check && npm run check:css && npm run knip && npm run build && npm run check:exports && npm run size && npm run test",
     "storybook": "storybook dev -p 6006 --no-open",
     "build-storybook": "storybook build",
     "chromatic": "node --env-file=.env.local node_modules/.bin/chromatic"

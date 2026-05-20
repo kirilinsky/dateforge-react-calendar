@@ -1,4 +1,4 @@
-@layer appearances {
+@layer cal-appearances {
   [data-appearance="soft"] {
     --cal-radius: 0.75em;
     --cal-border: 1px;

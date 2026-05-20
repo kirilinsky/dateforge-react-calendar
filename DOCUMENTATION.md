@@ -6,6 +6,7 @@
 - [`onChange` value shapes](#onchange-value-shapes)
 - [Which modules do I need?](#which-modules-do-i-need)
 - [Import strategy](#import-strategy)
+- [Styling override contract](#styling-override-contract)
 - [Calendar (Main Component)](#calendar)
 - [Edge cases](#edge-cases)
 - [Recommended compositions](#recommended-compositions)
@@ -111,6 +112,19 @@ Three subpaths, each tree-shakeable:
 | `@dateforge/react-calendar/appearances/<n>` | A single appearance (`loft`, `compact`, `square`, `soft`, `bubble`, `airy`)                    | Production.                                                                   |
 
 Each module is its own bundle, so importing `CalendarPresets` does not pull `CalendarTimeGrid` or any other unused module. The `modules` aggregate subpath is still tree-shakeable under ESM — bundlers drop unused named exports.
+
+## Styling override contract
+
+No global CSS import is needed. Library styles are layered in this order:
+
+```css
+@layer cal-base, cal-themes, cal-appearances, cal-modules, cal-user;
+```
+
+Prefer `createTheme()`, `createAppearance()`, and stable `data-*` state
+attributes for customization. Use `@layer cal-user { ... }` only when you need
+a predictable CSS escape hatch. Unlayered app CSS still wins over all library
+layers.
 
 ---
 

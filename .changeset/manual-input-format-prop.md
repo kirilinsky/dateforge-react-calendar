@@ -29,3 +29,8 @@ preserved when `renderDay` is omitted. New public exports: `DayState`,
 
 Optional `data-testid` on the root wrapper. Defaults to `"dateforge-calendar"`.
 Override per-instance when mounting multiple calendars side by side.
+
+**CSS layers**
+
+Collapse the styling contract to `cal-base`, `cal-themes`, `cal-appearances`,
+`cal-modules`, and `cal-user`; old internal layer names are removed.
