@@ -8,7 +8,7 @@ import type {
 } from "@/types/themes";
 import { CUSTOM_THEME_BRAND } from "@/types/themes";
 
-export const isThemeVariant = (theme: unknown): theme is ThemeVariant =>
+const isThemeVariant = (theme: unknown): theme is ThemeVariant =>
   typeof theme === "object" &&
   theme !== null &&
   CUSTOM_THEME_BRAND in (theme as object);

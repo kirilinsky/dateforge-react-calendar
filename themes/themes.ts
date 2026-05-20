@@ -1,8 +1,6 @@
 import type { ThemeTokens } from "../src/types/theme-tokens";
-import { TOKEN_TO_VAR } from "../src/types/theme-tokens";
 
 export type { ThemeTokens };
-export { TOKEN_TO_VAR };
 
 export type ThemeFamilyTokens = {
   light: ThemeTokens;
@@ -12,7 +10,7 @@ export type ThemeFamilyTokens = {
 const W = "#ffffff";
 const RE = "#c62828";
 
-export const THEMES_DATA: Record<string, ThemeTokens> = {
+const THEMES_DATA: Record<string, ThemeTokens> = {
   industrial: { accent: W,         activeText: "#111111", todayDot: "#111111", backdrop: "#111111", highlight: "#e85d00", tone: "#1c1c1c",  text: "#d4d4d4", stroke: "#2a2a2a", shadow: "#e85d0030", disabled: "#505050", mutedText: "#868686", disabledText: "#8c8c8c", weekend: "#ff7043", range: "#f1c40f", error: "#ef4444", outOfMonth: "#8c8c8c" },
   graphite:   { accent: W,         activeText: "#111111", todayDot: "#111111", backdrop: "#f7f8f9", highlight: "#f1a01d", tone: "#eeeff1",  text: "#1a1a1a", stroke: "#e2e4e8", shadow: "#f1a01d1e", disabled: "#9aa0aa", mutedText: "#6a6b6b", disabledText: "#656566", weekend: RE,        range: "#4a90d9", error: "#dc2626", outOfMonth: "#656566" },
   crimson:    { accent: "#161111", activeText: "#0d0909", todayDot: "#0d0909", backdrop: "#0d0909", highlight: "#f92f2f", tone: "#3a1616",  text: W,         stroke: "#2b1a1a", shadow: "#f92f2f2c", disabled: "#5a3535", mutedText: "#8b8989", disabledText: "#929090", weekend: "#ff6b6b", range: "#ff9800", error: "#fbbf24", outOfMonth: "#929090" },
@@ -154,7 +152,7 @@ const lightCompanion = (source: ThemeTokens): ThemeTokens => {
   };
 };
 
-export const COMPLEMENTARY_THEMES_DATA: Record<string, ThemeTokens> = {
+const COMPLEMENTARY_THEMES_DATA: Record<string, ThemeTokens> = {
   monsoonDark: darkCompanion(THEMES_DATA.monsoon),
   industrialLight: lightCompanion(THEMES_DATA.industrial),
   snowDark: darkCompanion(THEMES_DATA.snow),
