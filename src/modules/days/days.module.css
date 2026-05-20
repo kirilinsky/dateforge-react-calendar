@@ -219,43 +219,43 @@
   }
 
   .dayItem:is([data-in-range], [data-preview-mid])[data-disabled] {
-    background: color-mix(in srgb, var(--c-we) 32%, var(--rng-bg)) !important;
-    color: var(--c-c) !important;
-    border-radius: 0 !important;
+    background: color-mix(in srgb, var(--c-we) 32%, var(--rng-bg));
+    color: var(--c-c);
+    border-radius: 0;
   }
 
   .dayItem[data-preview-start]:not([data-selected]) {
-    background: var(--rng-prev) !important;
-    border-radius: var(--cal-radius, 0.5em) 0 0 var(--cal-radius, 0.5em) !important;
+    background: var(--rng-prev);
+    border-radius: var(--cal-radius, 0.5em) 0 0 var(--cal-radius, 0.5em);
   }
 
   .dayItem[data-preview-end]:not([data-selected]) {
-    background: var(--rng-prev) !important;
-    border-radius: 0 var(--cal-radius, 0.5em) var(--cal-radius, 0.5em) 0 !important;
+    background: var(--rng-prev);
+    border-radius: 0 var(--cal-radius, 0.5em) var(--cal-radius, 0.5em) 0;
   }
 
   .dayItem[data-preview-mid]:not([data-disabled]) {
-    background: var(--rng-prev) !important;
-    border-radius: 0 !important;
+    background: var(--rng-prev);
+    border-radius: 0;
   }
 
   .dayItem[data-preview-bridge-right]:not(
       [data-preview-bridge-left]
     ):not([data-disabled]) {
-    box-shadow: calc(var(--day-gap) / 2) 0 0 0 var(--rng-prev) !important;
+    box-shadow: calc(var(--day-gap) / 2) 0 0 0 var(--rng-prev);
   }
 
   .dayItem[data-preview-bridge-left]:not(
       [data-preview-bridge-right]
     ):not([data-disabled]) {
-    box-shadow: calc(-1 * var(--day-gap) / 2) 0 0 0 var(--rng-prev) !important;
+    box-shadow: calc(-1 * var(--day-gap) / 2) 0 0 0 var(--rng-prev);
   }
 
   .dayItem[data-preview-bridge-left][data-preview-bridge-right]:not(
       [data-disabled]
     ) {
     box-shadow: calc(var(--day-gap) / 2) 0 0 0 var(--rng-prev),
-      calc(-1 * var(--day-gap) / 2) 0 0 0 var(--rng-prev) !important;
+      calc(-1 * var(--day-gap) / 2) 0 0 0 var(--rng-prev);
   }
 
   @container cal-days (max-width: 14em) {

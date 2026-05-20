@@ -6,7 +6,6 @@ const SRC_DIR = join(ROOT, "src");
 
 const IMPORTANT_ALLOWLIST = {
   "src/global/global.module.css": 5,
-  "src/modules/days/days.module.css": 12,
 };
 
 function collectCssModules(dir) {
