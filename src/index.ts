@@ -7,6 +7,11 @@ export type {
   CalendarInfoRangeValue,
   CalendarInfoValue,
 } from "./modules/info/index";
+export type {
+  LunarPhaseIndex,
+  LunarPhaseKey,
+} from "./modules/lunar/helpers";
+export type { CalendarLunarProps } from "./modules/lunar/index";
 export type { CalendarManualInputProps } from "./modules/manual-input/index";
 export type { CalendarMonthsGridProps } from "./modules/months-grid/index";
 export type { CalendarMonthsTrackProps } from "./modules/months-track/index";

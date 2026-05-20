@@ -148,6 +148,7 @@ const brand = createTheme({
 | `CalendarTimeWheel`     | Drum-style hour/minute/second picker (range bound aware)    |
 | `CalendarMonthsWheel`   | Drum-style month picker (range bound aware)                 |
 | `CalendarYearsWheel`    | Drum-style year picker (range bound aware)                  |
+| `CalendarLunar`         | Information-only lunar phase strip around the selected date |
 
 ### Module groups
 
@@ -155,7 +156,8 @@ const brand = createTheme({
 - **Tracks** — `DaysTrack`, `MonthsTrack`, `YearsTrack`. Horizontal scrollable strips (compact / mobile).
 - **Wheels** — `TimeWheel`, `MonthsWheel`, `YearsWheel`. iOS-style drum pickers with physics, optional `bound` for range, optional `showReset` for "current".
 - **Inputs** — `ManualInput`. Typed dates with mask + format.
-- **Helpers** — `Nav`, `Info`, `SelectedDates`, `Presets`.
+- **Helpers** — `Nav`, `Presets`.
+- **Information** — `Info`, `SelectedDates`, `Lunar`. Read-only / display-focused; minor interactive bits (clear, per-chip remove) are escape hatches, not the primary purpose.
 
 ---
 

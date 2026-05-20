@@ -16,8 +16,6 @@
   - [CalendarMonthsGrid](#calendarmonthsgrid)
   - [CalendarYearsGrid](#calendaryearsgrid)
   - [CalendarPresets](#calendarpresets)
-  - [CalendarSelectedDates](#calendarselecteddates)
-  - [CalendarInfo](#calendarinfo)
   - [CalendarManualInput](#calendarmanualinput)
 - [Tracks (scrollable strips)](#tracks-scrollable-strips)
   - [CalendarDaysTrack](#calendardaystrack)
@@ -27,6 +25,10 @@
   - [CalendarTimeWheel](#calendartimewheel)
   - [CalendarMonthsWheel](#calendarmonthswheel)
   - [CalendarYearsWheel](#calendaryearswheel)
+- [Information modules](#information-modules)
+  - [CalendarSelectedDates](#calendarselecteddates)
+  - [CalendarInfo](#calendarinfo)
+  - [CalendarLunar](#calendarlunar)
 - [Utility Functions](#utility-functions)
 - [Types](#types)
 - [Design space](#design-space)
@@ -1429,6 +1431,59 @@ Single drum picker for year. **Hybrid** with the same navigational / bound logic
 | `CalendarYearsWheel`    | `range`                 | `"from"`/`"to"` | `onRangeBoundSet` (mutates boundary's year)  |
 
 All three wheels share `StepDrum` physics: drag with momentum, ArrowUp/ArrowDown step, Home / End jump to start / end of the local range. Touch + mouse + keyboard parity is handled by the underlying `useTrack` hook (same one Tracks use).
+
+---
+
+## Information modules
+
+Read-only display modules. They never call selection actions and never fire `onChange`. They subscribe to selection / view state and render derived data.
+
+### CalendarLunar
+
+Horizontal strip of N days centered on the selection. Each cell shows the day number, a moon-phase glyph (8-phase bucketing), and a short phase label.
+
+```tsx
+<CalendarLunar days={7} />
+```
+
+Astronomical math: synodic month = 29.530588853 d, reference new moon = 2000-01-06 18:14 UTC. Helpers live in `@dateforge/react-calendar/modules/lunar` exports (`getLunarFraction`, `getLunarPhaseKey`, `getLunarIllumination`, `buildLunarWindow`) — they are tree-shaken away when only the component is consumed.
+
+### Props
+
+| Prop              | Type                                                | Default          | Description                                                                                                                                                                                                                                                       |
+| ----------------- | --------------------------------------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `days`            | `number`                                            | `7`              | Width of the strip. Anchor sits at the middle slot (or one-left for an even count).                                                                                                                                                                              |
+| `col`             | `number \| string`                                  | —                | CSS grid `grid-column` value                                                                                                                                                                                                                                     |
+| `theme`           | `CalendarTheme`                                     | —                | Local module theme                                                                                                                                                                                                                                                |
+| `lunarLabel`     | `string`                                            | `"Lunar phases"` | aria-label for the strip wrapper. English fallback — Intl has no lunar vocabulary, pass an explicit string for full localization.                                                                                                                                |
+| `phaseLabels`    | `false \| Partial<Record<LunarPhaseKey, string>>` | NASA-style abbrev | Visible per-cell phase label. Defaults: `NEW`, `WAX CRES`, `FIRST QTR`, `WAX GIB`, `FULL`, `WAN GIB`, `LAST QTR`, `WAN CRES`. Pass `false` to hide labels entirely (icons only). Pass a partial map to localize individual phases.                                |
+| `phaseAriaLabels`| `Partial<Record<LunarPhaseKey, string>>`           | English long names | Per-cell `aria-label` phase fragment. Override per locale.                                                                                                                                                                                                       |
+
+### Phase key contract
+
+`LunarPhaseKey` is a stable string union: `"new" | "waxing-crescent" | "first-quarter" | "waxing-gibbous" | "full" | "waning-gibbous" | "last-quarter" | "waning-crescent"`. Use it to build typed `phaseLabels` / `phaseAriaLabels` maps without depending on display strings.
+
+### Anchor resolution
+
+```
+selectedDates[0]  →  rangeEnd  →  rangeStart  →  viewDate
+```
+
+Whichever is set first wins. Anchor cell carries `aria-current="date"` and `data-anchor="true"` for styling hooks.
+
+### Accessibility
+
+- Strip wrapper: `role="group"`, `aria-label={lunarLabel}`.
+- Each cell: nested `role="group"` with `aria-label="{localized date}, {phase}"` (date via `Intl.DateTimeFormat` honoring the calendar's `locale` and `timeZone`).
+- Anchor cell: `aria-current="date"`.
+- All visuals (day number, glyph, label) are `aria-hidden` — the cell-level label carries the full announcement.
+
+### CSS hooks (read-only)
+
+- `data-area="lunar"` on the wrapper.
+- `data-phase="{LunarPhaseKey}"` on each cell.
+- `data-anchor="true"` on the anchor cell.
+- Container query `cal-lunar` collapses visible labels under `18em`.
 
 ---
 

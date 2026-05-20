@@ -3,6 +3,7 @@ import "@/styles/layers.css";
 export { CalendarDays } from "./days";
 export { CalendarDaysTrack } from "./days-track";
 export { CalendarInfo } from "./info";
+export { CalendarLunar } from "./lunar";
 export { CalendarManualInput } from "./manual-input";
 export { CalendarMonthsGrid } from "./months-grid";
 export { CalendarMonthsTrack } from "./months-track";

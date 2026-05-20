@@ -1,6 +1,6 @@
 import type React from "react";
 import { useRef } from "react";
-import { useItemHeight } from "@/hooks/use-item-width";
+import { useItemSize } from "@/hooks/use-item-size";
 import { useTrack } from "@/hooks/use-track";
 import { getDrumValue, padTime } from "@/utils/time-utils";
 import styles from "./step-drum.module.css";
@@ -64,7 +64,7 @@ export const StepDrum: React.FC<StepDrumProps> = ({
   className,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
-  const itemHeight = useItemHeight(ref, 28);
+  const itemHeight = useItemSize(ref, "height", 28);
 
   const safeStep = step > 0 ? step : 1;
   const count = Math.max(1, Math.floor(max / safeStep));

@@ -1,7 +1,7 @@
 import type React from "react";
 import { useRef } from "react";
 import { useUI } from "@/context/ui-context";
-import { useItemWidth } from "@/hooks/use-item-width";
+import { useItemSize } from "@/hooks/use-item-size";
 import { useTrack } from "@/hooks/use-track";
 import type { CalendarTheme } from "@/types/themes";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
@@ -101,7 +101,7 @@ export const VirtualTrack: React.FC<VirtualTrackProps> = ({
   renderOverlay,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const itemWidth = useItemWidth(containerRef, initialItemWidth);
+  const itemWidth = useItemSize(containerRef, "width", initialItemWidth);
   const { activeTheme } = useUI();
   const themeScope = resolveThemeScope(theme, activeTheme);
 

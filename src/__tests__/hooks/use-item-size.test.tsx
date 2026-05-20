@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { useRef } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { useItemWidth } from "@/hooks/use-item-width";
+import { useItemSize } from "@/hooks/use-item-size";
 
 type ROCallback = (entries: ResizeObserverEntry[]) => void;
 let roCallback: ROCallback | null = null;
@@ -42,14 +42,14 @@ function makeContainer(itemWidth?: number) {
   return container;
 }
 
-describe("useItemWidth", () => {
+describe("useItemSize", () => {
   it("returns initialWidth before ResizeObserver fires", () => {
     const container = makeContainer();
     const { result } = renderHook(() => {
       const ref = useRef<HTMLDivElement>(
         container as unknown as HTMLDivElement,
       );
-      return useItemWidth(ref, 44);
+      return useItemSize(ref, "width", 44);
     });
     expect(result.current).toBe(44);
     document.body.removeChild(container);
@@ -61,7 +61,7 @@ describe("useItemWidth", () => {
       const ref = useRef<HTMLDivElement>(
         container as unknown as HTMLDivElement,
       );
-      return useItemWidth(ref, 44);
+      return useItemSize(ref, "width", 44);
     });
 
     act(() => {
@@ -78,7 +78,7 @@ describe("useItemWidth", () => {
       const ref = useRef<HTMLDivElement>(
         container as unknown as HTMLDivElement,
       );
-      return useItemWidth(ref, 52);
+      return useItemSize(ref, "width", 52);
     });
 
     act(() => {
@@ -96,7 +96,7 @@ describe("useItemWidth", () => {
       const ref = useRef<HTMLDivElement>(
         container as unknown as HTMLDivElement,
       );
-      return useItemWidth(ref, 44);
+      return useItemSize(ref, "width", 44);
     });
     expect(result.current).toBe(44);
     document.body.removeChild(container);
@@ -117,7 +117,7 @@ describe("useItemWidth", () => {
       const ref = useRef<HTMLDivElement>(
         container as unknown as HTMLDivElement,
       );
-      return useItemWidth(ref, 44, "[data-custom]");
+      return useItemSize(ref, "width", 44, "[data-custom]");
     });
 
     act(() => {
@@ -134,7 +134,7 @@ describe("useItemWidth", () => {
       const ref = useRef<HTMLDivElement>(
         container as unknown as HTMLDivElement,
       );
-      return useItemWidth(ref, 44);
+      return useItemSize(ref, "width", 44);
     });
     const instance = MockResizeObserver.mock.results[0]?.value;
     unmount();
