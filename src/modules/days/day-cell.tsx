@@ -1,6 +1,19 @@
-import React, { useMemo } from "react";
+import React, { type ReactNode, useMemo } from "react";
 import { getDayCellClassName } from "./day-cell-class-name";
 import styles from "./days.module.css";
+
+export interface DayState {
+  isSelected: boolean;
+  isToday: boolean;
+  isDisabled: boolean;
+  isWeekend: boolean;
+  isInRange: boolean;
+  isRangeStart: boolean;
+  isRangeEnd: boolean;
+  isOtherMonth: boolean;
+}
+
+export type RenderDay = (date: Date, state: DayState) => ReactNode;
 
 interface BuildCellLabelArgs {
   fullDate: Date;
@@ -59,6 +72,7 @@ export interface DayCellProps {
   onSelect: (date: Date, isDisabled: boolean) => void;
   onMouseEnter: (date: Date) => void;
   onKeyDown: (e: React.KeyboardEvent, date: Date) => void;
+  renderDay?: RenderDay;
 }
 
 export const DayCell = React.memo(function DayCell({
@@ -91,6 +105,7 @@ export const DayCell = React.memo(function DayCell({
   onSelect,
   onMouseEnter,
   onKeyDown,
+  renderDay,
 }: DayCellProps) {
   const fullDate = useMemo(() => new Date(dateTime), [dateTime]);
 
@@ -170,7 +185,20 @@ export const DayCell = React.memo(function DayCell({
         data-max-reached={isMaxReachedTarget || undefined}
         className={className}
       >
-        <span className={styles.dayLabel}>{day}</span>
+        {renderDay ? (
+          renderDay(fullDate, {
+            isSelected,
+            isToday,
+            isDisabled,
+            isWeekend,
+            isInRange,
+            isRangeStart,
+            isRangeEnd,
+            isOtherMonth,
+          })
+        ) : (
+          <span className={styles.dayLabel}>{day}</span>
+        )}
       </button>
     </div>
   );

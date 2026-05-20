@@ -35,6 +35,7 @@ export function Calendar<M extends CalendarMode = "single">({
   cols,
   children,
   readOnly = false,
+  "data-testid": testId = "dateforge-calendar",
   ...restProps
 }: CalendarProps<M>) {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -141,6 +142,7 @@ export function Calendar<M extends CalendarMode = "single">({
         ref={wrapperRef}
         data-theme={activeTheme}
         data-readonly={readOnly || undefined}
+        data-testid={testId}
         style={{ containerType: "inline-size", width, ...themeVariantVars }}
       >
         <CalendarLayout
