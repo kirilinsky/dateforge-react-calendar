@@ -16,7 +16,6 @@ const makeWrapper = () => {
           containerRef: { current: null },
           toggleTheme: () => {},
           activeTheme: "light",
-          containerWidth: 0,
           showTimePopup,
           setShowTimePopup,
           showMonthPopup,

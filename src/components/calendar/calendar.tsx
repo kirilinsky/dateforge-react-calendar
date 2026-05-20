@@ -1,5 +1,5 @@
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import "@/styles/layers.css";
 import "@/styles/tokens.css";
 import { validateTheme, validateThemeModeFlags } from "@/core/dev-warn";
@@ -38,25 +38,6 @@ export function Calendar<M extends CalendarMode = "single">({
   "data-testid": testId = "dateforge-calendar",
   ...restProps
 }: CalendarProps<M>) {
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const [containerWidth, setContainerWidth] = useState<number>(() => {
-    if (typeof width === "number") return width;
-    if (typeof width === "string" && width.endsWith("px"))
-      return parseFloat(width);
-    return 800;
-  });
-
-  useEffect(() => {
-    if (typeof ResizeObserver === "undefined") return;
-    const el = wrapperRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver(([entry]) => {
-      setContainerWidth(entry.contentRect.width);
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
   const [isToggled, setIsToggled] = useState(false);
 
   // Resolved system theme — known only after mount via matchMedia. Before mount
@@ -132,14 +113,12 @@ export function Calendar<M extends CalendarMode = "single">({
       mode={mode}
       maxDates={maxDates}
       readOnly={readOnly}
-      containerWidth={containerWidth}
       toggleTheme={toggleTheme}
       activeTheme={activeTheme}
       actionLabels={restProps as CalendarActionLabels}
       {...(restProps as import("@/types/calendar").CalendarProps<CalendarMode>)}
     >
       <div
-        ref={wrapperRef}
         data-theme={activeTheme}
         data-readonly={readOnly || undefined}
         data-testid={testId}

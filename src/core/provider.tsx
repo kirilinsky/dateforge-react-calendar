@@ -69,7 +69,6 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   onChange,
   minRangeDays,
   maxRangeDays,
-  containerWidth = 0,
   locale,
   hour12,
   gradient,
@@ -82,7 +81,6 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   actionLabels = {},
 }: CalendarProps<M> & {
   children: ReactNode;
-  containerWidth?: number;
   toggleTheme?: () => void;
   activeTheme?: "light" | "dark" | "auto";
   actionLabels?: CalendarActionLabels;
@@ -482,7 +480,6 @@ export function CalendarProvider<M extends CalendarMode = "single">({
     () => ({
       toggleTheme: toggleTheme ?? (() => {}),
       activeTheme,
-      containerWidth,
       containerRef,
       showTimePopup: openPopup === "time",
       setShowTimePopup,
@@ -501,7 +498,6 @@ export function CalendarProvider<M extends CalendarMode = "single">({
     [
       toggleTheme,
       activeTheme,
-      containerWidth,
       openPopup,
       daysTrackActive,
       popupAnchorEl,
