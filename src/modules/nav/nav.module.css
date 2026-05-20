@@ -160,9 +160,6 @@
     line-height: var(--cal-leading-tight);
   }
 
-  /* TODO(a11y): wrap drum / pulse animations in `@media (prefers-reduced-motion: no-preference)`
-     so users with reduced-motion preference get static text. Same for month-slide and chip
-     fade animations elsewhere. Tracked in ARCHITECTURE.md → Accessibility. */
   .drumCurr,
   .drumPrev {
     position: absolute;
@@ -192,7 +189,11 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .drumCurr, .drumPrev { animation: none; }
+    .drumCurr,
+    .drumPrev,
+    .nowTimeDot {
+      animation: none;
+    }
   }
 
   @keyframes nowPulse {
