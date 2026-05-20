@@ -1,8 +1,25 @@
 import type { Preview } from "@storybook/react-vite";
+import { useLayoutEffect } from "react";
 import * as appearances from "../appearances/index";
 import { STORY_LOCALES } from "../src/stories/_helpers/resolve-globals";
 import * as themes from "../themes/index";
 import "../dist/style.css";
+
+const STORY_BG = { light: "#ffffff", dark: "#1a1a1c" } as const;
+
+function useStoryBackground(mode: string) {
+  useLayoutEffect(() => {
+    const bg = mode === "dark" ? STORY_BG.dark : STORY_BG.light;
+    const prevBody = document.body.style.background;
+    const prevHtml = document.documentElement.style.background;
+    document.body.style.background = bg;
+    document.documentElement.style.background = bg;
+    return () => {
+      document.body.style.background = prevBody;
+      document.documentElement.style.background = prevHtml;
+    };
+  }, [mode]);
+}
 
 const themeNames = ["default", ...Object.keys(themes)];
 const appearanceNames = ["default", ...Object.keys(appearances)];
@@ -31,7 +48,10 @@ const preview: Preview = {
       toolbar: {
         title: "Mode",
         icon: "circlehollow",
-        items: toToolbarItems("mode", ["light", "dark"]),
+        items: [
+          { value: "light", title: "mode: light", icon: "sun" },
+          { value: "dark", title: "mode: dark", icon: "moon" },
+        ],
         dynamicTitle: true,
       },
     },
@@ -68,6 +88,8 @@ const preview: Preview = {
   },
   decorators: [
     (Story, ctx) => {
+      const themeMode = (ctx.globals.themeMode as string) ?? "light";
+      useStoryBackground(themeMode);
       const viewportActive = Boolean(
         (ctx.globals.viewport as { value?: string } | undefined)?.value,
       );
