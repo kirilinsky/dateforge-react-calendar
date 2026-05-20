@@ -10,6 +10,7 @@ export type {
 export type { CalendarManualInputProps } from "./modules/manual-input/index";
 export type { CalendarMonthsGridProps } from "./modules/months-grid/index";
 export type { CalendarMonthsTrackProps } from "./modules/months-track/index";
+export type { CalendarMonthsWheelProps } from "./modules/months-wheel/index";
 export type { CalendarNavProps } from "./modules/nav/index";
 export type { CalendarPresetsProps } from "./modules/presets/index";
 export { basicPresets } from "./modules/presets/presets-pack";
@@ -17,6 +18,7 @@ export type { CalendarSelectedDatesProps } from "./modules/selected-dates/index"
 export type { CalendarTimeWheelProps } from "./modules/time/index";
 export type { CalendarYearsGridProps } from "./modules/years-grid/index";
 export type { CalendarYearsTrackProps } from "./modules/years-track/index";
+export type { CalendarYearsWheelProps } from "./modules/years-wheel/index";
 export type {
   AppearanceTokens,
   CalendarAppearance,

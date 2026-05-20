@@ -46,6 +46,8 @@ export interface CalendarActionLabels {
   monthGridLabel?: string;
   monthPickerLabel?: string;
   monthTrackLabel?: string;
+  monthsLabel?: string;
+  yearsLabel?: string;
   nextMonthLabel?: string;
   nextYearLabel?: string;
   nextYearsLabel?: string;
@@ -57,6 +59,8 @@ export interface CalendarActionLabels {
   removeRangeStartLabel?: string;
   removeSelectedDateLabel?: string;
   resetTimeLabel?: string;
+  resetMonthLabel?: string;
+  resetYearLabel?: string;
   saveSelectedDateLabel?: string;
   secondsLabel?: string;
   selectMonthLabel?: string;
@@ -102,6 +106,8 @@ export interface CalendarProps<M extends CalendarMode = "single"> {
   monthGridLabel?: string;
   monthPickerLabel?: string;
   monthTrackLabel?: string;
+  monthsLabel?: string;
+  yearsLabel?: string;
   nextMonthLabel?: string;
   nextYearLabel?: string;
   nextYearsLabel?: string;
@@ -113,6 +119,8 @@ export interface CalendarProps<M extends CalendarMode = "single"> {
   removeRangeStartLabel?: string;
   removeSelectedDateLabel?: string;
   resetTimeLabel?: string;
+  resetMonthLabel?: string;
+  resetYearLabel?: string;
   saveSelectedDateLabel?: string;
   secondsLabel?: string;
   selectMonthLabel?: string;

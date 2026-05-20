@@ -145,7 +145,9 @@ Their job is to let the user _navigate_ through the calendar — to find the dat
 | `<CalendarYearsGrid>`   | `onYearSelect`  | navigated `viewDate` (same month/day, picked year)       |
 | `<CalendarMonthsTrack>` | `onMonthSelect` | navigated date (clamped to bound in range mode)          |
 | `<CalendarYearsTrack>`  | `onYearSelect`  | navigated date (clamped to bound in range mode)          |
-| `<CalendarTimeWheel>`    | `onTimeSelect`  | Date built from `viewDate` with new time set             |
+| `<CalendarTimeWheel>`   | `onTimeSelect`  | Date built from `viewDate` with new time set             |
+| `<CalendarMonthsWheel>` | `onMonthSelect` | navigated date with new month (or bound's month)         |
+| `<CalendarYearsWheel>`  | `onYearSelect`  | navigated date with new year (or bound's year)           |
 
 Use them when you want a month-only / year-only / time-only picker UX without committing to the full date-selection pipeline. The contract is unchanged — these callbacks fire alongside `navigateTo` (or alongside an accepted `onChangeTime` for `TimeWheel`); they do **not** trigger calendar-level `onChange`. Rejected no-op time changes (`disabled` / `minDate` / `maxDate` / invalid range constraints / `readOnly`) do not fire `onTimeSelect`.
 
@@ -156,7 +158,7 @@ Use them when you want a month-only / year-only / time-only picker UX without co
 | Module                  | Role                                                                     | Notes                                                  |
 | ----------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------ |
 | `<CalendarDays>`        | The day grid. Click → select day.                                        | Most common interactive module.                        |
-| `<CalendarTimeWheel>`    | Hour/minute drums (and seconds). Change → updates time on selected date. | Interactive at finer granularity than days.            |
+| `<CalendarTimeWheel>`   | Hour/minute drums (and seconds). Change → updates time on selected date. | Interactive at finer granularity than days. Member of the **Wheels** group. |
 | `<CalendarManualInput>` | Masked text input(s) for typing dates directly.                          | Interactive via keyboard.                              |
 | `<CalendarPresets>`     | Preset shortcuts (Today, Last 7 days, This month).                       | Interactive — applies a whole range/date in one click. |
 
@@ -192,6 +194,8 @@ Use them when you want a month-only / year-only / time-only picker UX without co
 | `<CalendarDaysTrack>`   | range mode without `bound`                                                                                           | `mode="single"` (item click commits date); `mode="range"` with `bound` (item click sets that boundary); `mode="multiple"` via auto save/remove button                           |
 | `<CalendarMonthsTrack>` | single / multiple / range without `bound`                                                                            | `mode="range"` with `bound="from"\|"to"` (click sets that boundary's month)                                                                                                     |
 | `<CalendarYearsTrack>`  | single / multiple / range without `bound`                                                                            | `mode="range"` with `bound="from"\|"to"` (click sets that boundary's year)                                                                                                      |
+| `<CalendarMonthsWheel>` | single / multiple / range without `bound` — drum dispatches `navigateTo`                                             | `mode="range"` with `bound="from"\|"to"` — drum dispatches `onRangeBoundSet(bound, …)` mutating that boundary's month                                                            |
+| `<CalendarYearsWheel>`  | single / multiple / range without `bound` — drum dispatches `navigateTo`                                             | `mode="range"` with `bound="from"\|"to"` — drum dispatches `onRangeBoundSet(bound, …)` mutating that boundary's year                                                             |
 
 **Common contract:**
 
@@ -219,6 +223,24 @@ Why intentional:
 - Range-bound mode (`bound="from"|"to"`) uses `clampBoundDate` against the current ref — also single-axis.
 
 Compose Tracks for multi-axis navigation: pair `MonthsTrack` with `YearsTrack`, or use `CalendarNav` for orthogonal moves.
+
+### Module groups (visual families)
+
+Three module families share physics + naming conventions, so they are easy to swap:
+
+| Group  | Modules                                              | Pattern                                                                                                                                                                                                                                              |
+| ------ | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Grids  | `Days`, `MonthsGrid`, `YearsGrid`                    | Tabular layout. Best for desktop / wide compositions. `Days` is interactive (commits selection); month / year grids are navigational by default and expose `onMonthSelect` / `onYearSelect` for standalone pickers.                                  |
+| Tracks | `DaysTrack`, `MonthsTrack`, `YearsTrack`             | Single-axis scrollable strip with momentum + circular loop. Compact / mobile. Hybrid: navigational by default, interactive with `bound="from"\|"to"` in range mode.                                                                                  |
+| Wheels | `TimeWheel`, `MonthsWheel`, `YearsWheel`             | iOS-style drum picker via shared `StepDrum` physics (drag, momentum, keyboard ↑/↓/Home/End). All three share the same prop surface (`bound?`, `showBoundDate?`, `showReset?`, `resetLabel?`, `showLabel?`, `on{Time/Month/Year}Select`).              |
+
+**Wheels deep dive:**
+
+- `TimeWheel` — interactive only. Multiple drums (hour / minute / optional seconds / optional AM-PM). Changes commit via `onChangeTime` or `onRangeBoundSet(bound, …)` in bound mode.
+- `MonthsWheel` / `YearsWheel` — hybrid. Without `bound`: drum dispatches `navigateTo` (navigational, view-only). With `bound`: dispatches `onRangeBoundSet(bound, …)` mutating that boundary's month / year while preserving the other date fields.
+- `showReset` (all three): renders a button below the drum. Click resets the active date (or bound date) to the current time / month / year via `useToday()`.
+- `showBoundDate` (all three, default `true`): renders a localized date chip above the drum when `bound` is set, so the user sees which boundary is being edited.
+- `bound` is range-only — has no effect outside `mode="range"`.
 
 ### Special case — `<CalendarPresets>`
 
@@ -280,6 +302,11 @@ The single source of truth for which user actions change view, mutate selection,
 | `<CalendarMonthsTrack>` item · single / multiple / range no-bound | yes                 | no                | no               | works                            |
 | `<CalendarMonthsTrack>` item · `mode="range"` + `bound`           | preview             | yes               | yes              | bound write blocked              |
 | `<CalendarYearsTrack>` item · single / multiple / range no-bound  | yes                 | no                | no               | works                            |
+| `<CalendarMonthsWheel>` drum · single / multiple / range no-bound | yes (month)         | no                | no               | drum disabled                    |
+| `<CalendarMonthsWheel>` drum · `mode="range"` + `bound`           | preview             | yes               | yes              | bound write blocked              |
+| `<CalendarYearsWheel>` drum · single / multiple / range no-bound  | yes (year)          | no                | no               | drum disabled                    |
+| `<CalendarYearsWheel>` drum · `mode="range"` + `bound`            | preview             | yes               | yes              | bound write blocked              |
+| `<CalendarTimeWheel>` / `Months/YearsWheel` reset button          | yes (current)       | maybe ¹           | maybe ¹          | button hidden                    |
 | `<CalendarYearsTrack>` item · `mode="range"` + `bound`            | preview             | yes               | yes              | bound write blocked              |
 
 ¹ See "Time editing semantics" — `single` mode without selection auto-creates one (time-only picker case); `multiple` / `range` without a matching boundary leave time pending and do not fire `onChange`.

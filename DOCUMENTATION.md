@@ -13,16 +13,20 @@
 - [CalendarDays](#calendardays)
 - [Modules](#modules)
   - [CalendarNav](#calendarnav)
-  - [CalendarMonthsGrid](#CalendarMonthsGrid)
+  - [CalendarMonthsGrid](#calendarmonthsgrid)
   - [CalendarYearsGrid](#calendaryearsgrid)
-  - [CalendarTimeWheel](#calendartimegrid)
   - [CalendarPresets](#calendarpresets)
   - [CalendarSelectedDates](#calendarselecteddates)
   - [CalendarInfo](#calendarinfo)
   - [CalendarManualInput](#calendarmanualinput)
+- [Tracks (scrollable strips)](#tracks-scrollable-strips)
   - [CalendarDaysTrack](#calendardaystrack)
   - [CalendarMonthsTrack](#calendarmonthstrack)
   - [CalendarYearsTrack](#calendaryearstrack)
+- [Wheels (drum pickers)](#wheels-drum-pickers)
+  - [CalendarTimeWheel](#calendartimewheel)
+  - [CalendarMonthsWheel](#calendarmonthswheel)
+  - [CalendarYearsWheel](#calendaryearswheel)
 - [Utility Functions](#utility-functions)
 - [Types](#types)
 - [Design space](#design-space)
@@ -1229,6 +1233,10 @@ Per-keystroke commit is intentionally avoided — it would fire `onChange` for e
 
 ---
 
+## Tracks (scrollable strips)
+
+Horizontal momentum-scrollable strips for compact / mobile layouts. All three share the same `useTrack` physics (drag, inertia, circular loop) and naming convention. Hybrid behavior — navigational by default, interactive when paired with `bound="from" | "to"` in range mode.
+
 ### CalendarDaysTrack
 
 A horizontal scrollable strip of day numbers for the current month.
@@ -1325,6 +1333,102 @@ A horizontal scrollable strip of years.
 | `multiple` | —               | preview only      | toggles in/out of selection (Check ↔ Clear icon) |
 
 In multiselect mode the active item follows the date in `selectedDates[]` whose day matches the current `viewDate`. Without a match the track centers on `viewDate` without active highlight.
+
+---
+
+## Wheels (drum pickers)
+
+iOS-style drum pickers using the shared `StepDrum` physics (drag, momentum, keyboard ↑/↓/Home/End). All three wheel modules share the same prop surface — `bound?`, `showBoundDate?`, `showReset?`, `resetLabel?`, `showLabel?`, and an `on{Time/Month/Year}Select` callback. Pair with `<Calendar cols={n}>` for side-by-side `from` / `to` layouts.
+
+### CalendarTimeWheel
+
+Hour / minute (optional seconds, optional AM-PM) drum picker. Interactive: commits via `onChangeTime` or `onRangeBoundSet(bound, …)` when `bound` is set in range mode.
+
+```tsx
+<CalendarTimeWheel seconds bound="from" showReset />
+```
+
+### Props
+
+| Prop              | Type                                  | Default | Description                                                                                                                                                                                                                                                                  |
+| ----------------- | ------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bound`           | `"from" \| "to"`                      | —       | Range mode only — edit time on a specific boundary instead of relying on the current `viewDate` to match `rangeStart` / `rangeEnd`.                                                                                                                                          |
+| `col`             | `number \| string`                    | —       | CSS grid `grid-column` value                                                                                                                                                                                                                                                 |
+| `theme`           | `CalendarTheme`                       | —       | Local module theme                                                                                                                                                                                                                                                            |
+| `seconds`         | `boolean`                             | `false` | Render the seconds drum                                                                                                                                                                                                                                                       |
+| `labels`          | `"short" \| "long"`                   | —       | Drum headers. `"short"` = `HH/MM/SS`; `"long"` = localized field names (`hour`/`minute`/`second`) via `Intl.DisplayNames`                                                                                                                                                       |
+| `showBoundDate`   | `boolean`                             | `true`  | Render a localized date header above the drums when `bound` is set                                                                                                                                                                                                            |
+| `showReset`       | `boolean`                             | `false` | Render a reset button below the drums. Click resets active date / bound date to the current time                                                                                                                                                                              |
+| `resetLabel`      | `React.ReactNode`                     | —       | Override reset button content. Default: clock icon + localized "now"                                                                                                                                                                                                          |
+| `hoursLabel`      | `string`                              | `"Hours"`     | aria-label for the hours drum                                                                                                                                                                                                                                            |
+| `minutesLabel`    | `string`                              | `"Minutes"`   | aria-label for the minutes drum                                                                                                                                                                                                                                          |
+| `secondsLabel`    | `string`                              | `"Seconds"`   | aria-label for the seconds drum                                                                                                                                                                                                                                          |
+| `timePeriodLabel` | `string`                              | —       | aria-label for AM/PM toggle. Supports `{period}` substitution                                                                                                                                                                                                                  |
+| `timePickerLabel` | `string`                              | `"Time picker"` | aria-label for the group wrapper                                                                                                                                                                                                                                       |
+| `resetTimeLabel`  | `string`                              | `"Reset to {time}"` | aria-label for the reset button. `{time}` substituted by localized "now"                                                                                                                                                                                          |
+| `onTimeSelect`    | `(date: Date) => void`                | —       | Fires when any drum changes. Receives the new full datetime                                                                                                                                                                                                                  |
+
+### CalendarMonthsWheel
+
+Single drum picker for month. **Hybrid:** without `bound` dispatches `navigateTo` (navigational); with `bound` dispatches `onRangeBoundSet(bound, …)` mutating that boundary's month while preserving the other fields of the date.
+
+```tsx
+<CalendarMonthsWheel bound="from" showBoundDate showReset />
+```
+
+### Props
+
+| Prop                | Type                   | Default | Description                                                                                                                                                  |
+| ------------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `bound`             | `"from" \| "to"`       | —       | Range mode only — edit month on a specific boundary. Without `bound` the drum behaves as a global view-date navigator.                                       |
+| `col`               | `number \| string`     | —       | CSS grid `grid-column` value                                                                                                                                 |
+| `theme`             | `CalendarTheme`        | —       | Local module theme                                                                                                                                           |
+| `showLabel`         | `boolean`              | `false` | Render a localized header above the drum (via `Intl.DisplayNames`, e.g. `month` / `месяц` / `月`)                                                            |
+| `shortMonths`       | `boolean`              | `false` | Render short month names in the drum (`Jan`, `Фев`). `aria-valuetext` stays long-form for screen readers.                                                    |
+| `showBoundDate`     | `boolean`              | `true`  | Render a localized date header above the drum when `bound` is set                                                                                            |
+| `showReset`         | `boolean`              | `false` | Render a reset button. Click resets active date / bound date to the current month                                                                            |
+| `resetLabel`        | `React.ReactNode`      | —       | Override reset button content. Default: home icon + localized current month name                                                                             |
+| `monthsLabel`       | `string`               | —       | aria-label for the drum. Falls back to localized noun (`Intl.DisplayNames` with `dateTimeField` → `month`)                                                    |
+| `monthPickerLabel`  | `string`               | `"Month picker"` | aria-label for the group wrapper                                                                                                                    |
+| `resetMonthLabel`   | `string`               | `"Reset to {month}"` | aria-label for the reset button. `{month}` substituted by localized current month                                                              |
+| `onMonthSelect`     | `(date: Date) => void` | —       | Fires on drum change. Receives navigated date (or clamped bound date in range mode)                                                                          |
+
+### CalendarYearsWheel
+
+Single drum picker for year. **Hybrid** with the same navigational / bound logic as `MonthsWheel`. Drum range is bounded by `minDate.getFullYear()` / `maxDate.getFullYear()` when set, otherwise virtual range `[1900, 2100]`.
+
+```tsx
+<CalendarYearsWheel bound="to" showReset />
+```
+
+### Props
+
+| Prop               | Type                   | Default | Description                                                                                                              |
+| ------------------ | ---------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `bound`            | `"from" \| "to"`       | —       | Range mode only — edit year on a specific boundary.                                                                      |
+| `col`              | `number \| string`     | —       | CSS grid `grid-column` value                                                                                             |
+| `theme`            | `CalendarTheme`        | —       | Local module theme                                                                                                       |
+| `showLabel`        | `boolean`              | `false` | Render a localized header above the drum (`year` / `год` / `年`)                                                         |
+| `showBoundDate`    | `boolean`              | `true`  | Render a localized date header above the drum when `bound` is set                                                        |
+| `showReset`        | `boolean`              | `false` | Render a reset button. Click resets active date / bound date to the current year                                         |
+| `resetLabel`       | `React.ReactNode`      | —       | Override reset button content. Default: home icon + current year                                                         |
+| `yearsLabel`       | `string`               | —       | aria-label for the drum. Falls back to localized noun (`Intl.DisplayNames` `dateTimeField` → `year`)                      |
+| `yearPickerLabel`  | `string`               | `"Year picker"` | aria-label for the group wrapper                                                                                |
+| `resetYearLabel`   | `string`               | `"Reset to {year}"` | aria-label for the reset button. `{year}` substituted by the current year                                    |
+| `onYearSelect`     | `(date: Date) => void` | —       | Fires on drum change. Receives navigated date (or clamped bound date in range mode)                                      |
+
+### Wheel behavior matrix
+
+| Module                  | mode                    | `bound`         | Drum does                              |
+| ----------------------- | ----------------------- | --------------- | -------------------------------------- |
+| `CalendarTimeWheel`     | any                     | —               | `onChangeTime` (commits time on selected date) |
+| `CalendarTimeWheel`     | `range`                 | `"from"`/`"to"` | `onRangeBoundSet` (commits time on the boundary date) |
+| `CalendarMonthsWheel`   | single / multiple / range no-bound | — | `navigateTo` (view-only)                |
+| `CalendarMonthsWheel`   | `range`                 | `"from"`/`"to"` | `onRangeBoundSet` (mutates boundary's month) |
+| `CalendarYearsWheel`    | single / multiple / range no-bound | — | `navigateTo` (view-only)                |
+| `CalendarYearsWheel`    | `range`                 | `"from"`/`"to"` | `onRangeBoundSet` (mutates boundary's year)  |
+
+All three wheels share `StepDrum` physics: drag with momentum, ArrowUp/ArrowDown step, Home / End jump to start / end of the local range. Touch + mouse + keyboard parity is handled by the underlying `useTrack` hook (same one Tracks use).
 
 ---
 

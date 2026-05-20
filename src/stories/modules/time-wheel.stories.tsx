@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarTimeWheel } from "@/modules/time";
 import { FIXED_DATE } from "../_constants";
+import { debugStyle } from "../_helpers/debug";
 import {
   resolveStoryAppearance,
   resolveStoryGradient,
@@ -167,3 +168,65 @@ StandaloneTimePicker.parameters = {
   // snapshot catches mid-flight frames and diffs randomly.
   chromatic: { delay: 800, pauseAnimationAtEnd: true },
 };
+
+export const ShowReset: Story = {
+  render: (_args, ctx) => {
+    const [date, setDate] = useState<Date | null>(
+      new Date(2024, 5, 15, 9, 30, 0),
+    );
+    return (
+      <Calendar
+        value={date}
+        onChange={setDate}
+        theme={resolveStoryTheme(ctx.globals.theme)}
+        {...resolveStoryThemeMode(ctx.globals.themeMode)}
+        appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
+        locale={resolveStoryLocale(ctx.globals.locale)}
+      >
+        <CalendarTimeWheel showReset />
+      </Calendar>
+    );
+  },
+};
+ShowReset.storyName = "showReset — reset to current time";
+
+export const BoundFromTo: Story = {
+  render: (_args, ctx) => {
+    const [range, setRange] = useState<{
+      from: Date | null;
+      to: Date | null;
+    }>({
+      from: new Date(2024, 5, 15, 9, 30, 0),
+      to: new Date(2024, 5, 20, 18, 45, 0),
+    });
+    const fmt = (d: Date | null) =>
+      d
+        ? d.toLocaleString("en-GB", { dateStyle: "short", timeStyle: "medium" })
+        : "null";
+    return (
+      <>
+        <p style={debugStyle}>
+          from: <strong>{fmt(range.from)}</strong> | to:{" "}
+          <strong>{fmt(range.to)}</strong>
+        </p>
+        <Calendar
+          mode="range"
+          cols={2}
+          value={range}
+          onChange={setRange}
+          theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
+          appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          gradient={resolveStoryGradient(ctx.globals.gradient)}
+          locale={resolveStoryLocale(ctx.globals.locale)}
+        >
+          <CalendarTimeWheel bound="from" col={1} />
+          <CalendarTimeWheel bound="to" col={1} />
+        </Calendar>
+      </>
+    );
+  },
+  parameters: { storyWidth: 520 },
+};
+BoundFromTo.storyName = "Bound — from + to side by side";
