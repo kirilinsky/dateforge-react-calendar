@@ -1,5 +1,14 @@
 import { createContext, useContext } from "react";
-import type { CalendarActionLabels, DisabledConfig } from "@/types/calendar";
+import type {
+  CalendarActionLabels,
+  CalendarMotion,
+  DisabledConfig,
+} from "@/types/calendar";
+
+export interface CalendarMotionNames {
+  days: string;
+  popup: string;
+}
 
 export interface CalendarConfig {
   locale: string;
@@ -16,6 +25,8 @@ export interface CalendarConfig {
   readOnly: boolean;
   timeStep?: { hour?: number; minute?: number; second?: number };
   actionLabels: CalendarActionLabels;
+  motion: CalendarMotion;
+  motionNames: CalendarMotionNames;
 }
 
 export const ConfigContext = createContext<CalendarConfig | undefined>(

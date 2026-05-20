@@ -77,7 +77,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   opacity: var(--drum-item-opacity, 1);
-  transform: translateY(var(--drum-item-y, 0em))
+  transform: translateY(calc(var(--drum-item-shift, 0%) + var(--drum-item-y, 0em)))
     translateZ(var(--drum-item-z, 0))
     rotateX(var(--drum-item-tilt, 0deg))
     scale(var(--drum-item-scale, 1));

@@ -17,6 +17,7 @@ type DrumItemStyle = React.CSSProperties & {
   "--drum-item-active": string;
   "--drum-item-opacity": number;
   "--drum-item-scale": number;
+  "--drum-item-shift": string;
   "--drum-item-y": string;
   "--drum-item-z": string;
   "--drum-item-tilt": string;
@@ -24,6 +25,7 @@ type DrumItemStyle = React.CSSProperties & {
 
 const getDrumItemStyle = (
   signedOffset: number,
+  wheelOffset: number,
   disabled: boolean,
 ): DrumItemStyle => {
   const distance = Math.abs(signedOffset);
@@ -38,6 +40,7 @@ const getDrumItemStyle = (
     "--drum-item-active": `${Math.round(activeMix * 100)}%`,
     "--drum-item-opacity": disabled ? opacity * 0.4 : opacity,
     "--drum-item-scale": scale,
+    "--drum-item-shift": `${wheelOffset * -100}%`,
     "--drum-item-y": `${y}em`,
     "--drum-item-z": `${z}em`,
     "--drum-item-tilt": `${tilt}deg`,
@@ -92,6 +95,7 @@ function SelectDrum({
     ref,
   });
   const round = Math.round(position);
+  const wheelOffset = position - round;
   const activeValue = getOffsetVal(0, round);
 
   return (
@@ -130,7 +134,7 @@ function SelectDrum({
           <div
             key={o}
             className={`${styles.item} ${isActive ? styles.active : ""} ${disabled ? styles.disabled : ""}`}
-            style={getDrumItemStyle(signedDistance, disabled)}
+            style={getDrumItemStyle(signedDistance, wheelOffset, disabled)}
             aria-hidden={!isActive}
             onClick={isActive || disabled ? undefined : () => scrollTo(raw)}
           >
