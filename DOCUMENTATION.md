@@ -709,6 +709,51 @@ Renders the month grid — weekday headers, week numbers (optional), and the day
 | `swipe`             | `boolean`                       | `true`    | Enable swipe gestures to navigate between months                                                                                                                                                                                                                                                                                 |
 | `syncViewOnSelect`  | `boolean`                       | `offset === 0` | When a day is clicked, also move the calendar's `viewDate` to that day's month. Defaults to `true` for the primary grid (`offset === 0`) and `false` for any offset grid — so clicking a day in a side month of a multi-month layout no longer steals the primary view. Set explicitly to override. Works in both controlled and uncontrolled mode (the controlled-value round-trip is suppressed for the click that requested keepView). |
 | `col`               | `number \| string`              | —         | CSS grid `grid-column` value for layout positioning                                                                                                                                                                                                                                                                              |
+| `renderDay`         | `(date: Date, state: DayState) => ReactNode` | —  | Custom renderer for the day cell's inner content. Replaces the default day-number label only — the button shell, `data-*` state attributes, keyboard handlers, and a11y stay owned by the library. See "[renderDay — custom day content](#renderday--custom-day-content)" below for the `DayState` shape and sizing notes.       |
+
+### `renderDay` — custom day content
+
+`renderDay` lets you replace what is painted inside each day button. The library still owns the button itself (click handling, focus, `aria-label`, `aria-disabled`, the `data-*` state attributes, range styling), so a custom renderer cannot break a11y or selection logic. Only the inner label is replaced.
+
+```tsx
+import { CalendarDays, type DayState } from "@dateforge/react-calendar/modules/days";
+
+<CalendarDays
+  renderDay={(date, state) => (
+    <span>
+      <strong>{date.getDate()}</strong>
+      {state.isWeekend && !state.isOtherMonth && <span aria-hidden>★</span>}
+    </span>
+  )}
+/>;
+```
+
+`DayState` shape:
+
+| Field          | Type      | Meaning                                                          |
+| -------------- | --------- | ---------------------------------------------------------------- |
+| `isSelected`   | `boolean` | Cell is currently selected                                        |
+| `isToday`      | `boolean` | Cell is today AND `highlightToday` is on                          |
+| `isDisabled`   | `boolean` | Cell is outside `minDate`/`maxDate` or matches a disabled rule    |
+| `isWeekend`    | `boolean` | Cell is Saturday/Sunday AND `highlightWeekends` is on             |
+| `isInRange`    | `boolean` | In `mode="range"`, cell falls between range start and end         |
+| `isRangeStart` | `boolean` | In `mode="range"`, cell is the start of the range                 |
+| `isRangeEnd`   | `boolean` | In `mode="range"`, cell is the end of the range                   |
+| `isOtherMonth` | `boolean` | Cell belongs to the previous or next month (grid bleed)           |
+
+**Aspect-ratio override.** When `renderDay` is set, the day grid is marked with `data-day-content="custom"` and the appearance-driven `--cal-day-ratio` token is **intentionally ignored** for day cells. Without this, appearances like `compact` (`1 / 0.7`) or `airy` (`1 / 0.55`) crop multi-line custom content (weather + price + dots etc.). Instead, the library applies `aspect-ratio: var(--cal-day-custom-ratio, 1 / 1.2)`, so cells render slightly taller than wide. Aspect-ratio is "preferred" — if the rendered content is larger than the computed size, the cell still auto-grows via `min-content`. Override per-instance:
+
+```css
+[data-area="days"] [data-day-content="custom"] {
+  --cal-day-custom-ratio: 1 / 1.5;
+}
+```
+
+The appearance token (`--cal-day-ratio`) still applies to the default rendering (when `renderDay` is omitted) — only the custom-content path uses `--cal-day-custom-ratio`.
+
+**Returning falsy values is safe.** `null`, `undefined`, `false`, and `true` render to nothing — the button is just empty. Strings, numbers, arrays, fragments, and arbitrary React trees are all accepted.
+
+**`React.memo` and stability.** `DayCell` is memoized. If you want to avoid unnecessary re-renders, keep the `renderDay` reference stable across renders (`useCallback`).
 
 ### `hideOutOfRange` accessibility
 
