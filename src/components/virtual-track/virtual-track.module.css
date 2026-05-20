@@ -8,6 +8,7 @@
   touch-action: pan-y;
   z-index: 3;
   isolation: isolate;
+  perspective: 28em;
   &::before,
   &::after {
     content: "";
@@ -65,6 +66,7 @@
   align-items: center;
   z-index: 1;
   will-change: transform;
+  transform-style: preserve-3d;
 }
 
 .item {
@@ -80,7 +82,15 @@
   font-weight: var(--cal-weight-regular);
   cursor: pointer;
   user-select: none;
-  transition: opacity 0.05s linear;
+  opacity: var(--track-item-opacity, 1);
+  transform: translateY(var(--track-item-y, 0))
+    rotateY(var(--track-item-tilt, 0deg))
+    scale(var(--track-item-scale, 1));
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+  transition:
+    opacity calc(var(--cal-transition, 0.2s) * 0.5) linear,
+    transform var(--cal-transition, 0.2s) cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .itemText {
@@ -98,6 +108,14 @@
 
 .active .itemText {
   color: var(--active-cell-color, var(--c-at, var(--c-a)));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 }
