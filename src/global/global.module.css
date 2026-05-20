@@ -80,7 +80,7 @@
     padding: var(--adaptive-tile-padding, 0.55em 0.75em) !important;
     border: none;
     border-radius: calc(var(--cal-radius, 0.5em) * 0.85);
-    font-size: var(--cal-text-sm) !important;
+    font-size: var(--adaptive-tile-font-size, var(--cal-text-sm)) !important;
     line-height: var(--cal-leading-normal);
     white-space: normal;
     text-align: center;

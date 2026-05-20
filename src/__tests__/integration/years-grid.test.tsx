@@ -165,7 +165,7 @@ describe("CalendarYearsGrid", () => {
     expect(btn?.getAttribute("aria-disabled")).toBe("true");
   });
 
-  it("hideOutOfRange hides limited years from the grid", () => {
+  it("hideOutOfRange trims edge limited years from the grid", () => {
     const { container } = render(
       <Calendar
         value={new Date(2024, 5, 15)}
@@ -175,10 +175,13 @@ describe("CalendarYearsGrid", () => {
         <CalendarYearsGrid yearsPerPage={10} hideOutOfRange />
       </Calendar>,
     );
-    const limited = yearButtons(container).filter(
-      (b) => b.getAttribute("aria-hidden") === "true",
-    );
-    expect(limited.length).toBeGreaterThan(0);
+    expect(yearButton(container, 2024)).toBeTruthy();
+    expect(yearButton(container, 2025)).toBeTruthy();
+    expect(yearButton(container, 2026)).toBeUndefined();
+    expect(yearTiles(container).map((tile) => tile.textContent)).toEqual([
+      "2024",
+      "2025",
+    ]);
   });
 
   it("hideOutOfRange puts the initial tab stop on the first visible year", () => {
@@ -191,11 +194,33 @@ describe("CalendarYearsGrid", () => {
         <CalendarYearsGrid yearsPerPage={10} startYear={2020} hideOutOfRange />
       </Calendar>,
     );
-    const hiddenCurrent = yearButton(container, 2024)!;
     const firstVisible = yearButton(container, 2025)!;
-    expect(hiddenCurrent.getAttribute("aria-hidden")).toBe("true");
-    expect(hiddenCurrent.tabIndex).toBe(-1);
+    expect(yearButton(container, 2024)).toBeUndefined();
     expect(firstVisible.tabIndex).toBe(0);
+  });
+
+  it("hideOutOfRange keeps internal limited years as empty slots", () => {
+    const disabled = createDisabled({
+      ranges: [{ from: new Date(2025, 0, 1), to: new Date(2025, 11, 31) }],
+    });
+    const { container } = render(
+      <Calendar
+        value={new Date(2024, 5, 15)}
+        minDate={new Date(2024, 0, 1)}
+        maxDate={new Date(2026, 11, 31)}
+        disabled={disabled}
+      >
+        <CalendarYearsGrid yearsPerPage={10} startYear={2024} hideOutOfRange />
+      </Calendar>,
+    );
+    const hiddenMiddle = yearButton(container, 2025)!;
+    expect(yearTiles(container).map((tile) => tile.textContent)).toEqual([
+      "2024",
+      "2025",
+      "2026",
+    ]);
+    expect(hiddenMiddle.getAttribute("aria-hidden")).toBe("true");
+    expect(hiddenMiddle).toHaveStyle({ visibility: "hidden" });
   });
 
   it("invalid yearsPerPage clamps and emits dev warning", () => {
