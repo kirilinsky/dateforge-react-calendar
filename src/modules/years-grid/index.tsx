@@ -1,5 +1,5 @@
 import type React from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import "@/styles/layers.css";
 import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
@@ -168,27 +168,38 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
     );
   }
 
-  const initialPage = hasCustomStartYear
-    ? 0
-    : Math.floor((currentYear - firstListYear) / pageSize);
-  const [page, setPage] = useState(initialPage);
-  const [direction, setDirection] = useState<"left" | "right" | "none">("none");
-
-  useEffect(() => {
-    if (hasCustomStartYear) return;
-    const targetPage = Math.floor((currentYear - firstListYear) / pageSize);
-    setPage((prevPage) => {
-      if (targetPage === prevPage) return prevPage;
-      setDirection(targetPage > prevPage ? "right" : "left");
-      return targetPage;
-    });
-  }, [currentYear, firstListYear, hasCustomStartYear, pageSize]);
-
   const listEndYear = Math.max(firstListYear, maxAllowedYear);
   const totalPages = Math.max(
     1,
     Math.ceil((listEndYear - firstListYear + 1) / pageSize),
   );
+  const getPageForYear = useCallback(
+    (year: number) =>
+      Math.min(
+        totalPages - 1,
+        Math.max(0, Math.floor((year - firstListYear) / pageSize)),
+      ),
+    [firstListYear, pageSize, totalPages],
+  );
+  const initialPage = hasCustomStartYear ? 0 : getPageForYear(currentYear);
+  const [page, setPage] = useState(initialPage);
+  const [direction, setDirection] = useState<"left" | "right" | "none">("none");
+
+  useEffect(() => {
+    if (hasCustomStartYear) return;
+    const targetPage = getPageForYear(currentYear);
+    setPage((prevPage) => {
+      if (targetPage === prevPage) return prevPage;
+      setDirection(targetPage > prevPage ? "right" : "left");
+      return targetPage;
+    });
+  }, [
+    currentYear,
+    firstListYear,
+    getPageForYear,
+    hasCustomStartYear,
+    pageSize,
+  ]);
 
   const navigate = (delta: number) => {
     const nextPage = Math.min(totalPages - 1, Math.max(0, page + delta));
@@ -199,7 +210,7 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
 
   const years = useMemo(() => {
     const start = firstListYear + page * pageSize;
-    return Array.from({ length: pageSize }, (_, i) => {
+    const pageYears = Array.from({ length: pageSize }, (_, i) => {
       const year = start + i;
       const outOfRange = year < minAllowedYear || year > maxAllowedYear;
       const fullyDisabled =
@@ -209,6 +220,14 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
     }).filter(
       ({ year }) => year >= MIN_CALENDAR_YEAR && year <= MAX_CALENDAR_YEAR,
     );
+
+    if (!hideOutOfRange) return pageYears;
+
+    const firstVisibleIndex = pageYears.findIndex(({ limited }) => !limited);
+    if (firstVisibleIndex < 0) return [];
+
+    const lastVisibleIndex = pageYears.findLastIndex(({ limited }) => !limited);
+    return pageYears.slice(firstVisibleIndex, lastVisibleIndex + 1);
   }, [
     firstListYear,
     minAllowedYear,
@@ -219,6 +238,7 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
     minDate,
     maxDate,
     disableOutOfRange,
+    hideOutOfRange,
   ]);
 
   const handleClick = (year: number) => {

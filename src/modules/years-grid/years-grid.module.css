@@ -23,6 +23,7 @@
   .grid {
     --adaptive-tile-min-height: 3.15em;
     --adaptive-tile-padding: 0.35em 0.55em;
+    --adaptive-tile-font-size: var(--cal-text-base);
     container-type: inline-size;
     container-name: cal-years-grid;
     display: grid;
@@ -55,7 +56,6 @@
   .item {
     max-width: none;
     min-height: var(--adaptive-tile-min-height, 2.8em);
-    font-size: var(--cal-text-base) !important;
     font-weight: var(--cal-weight-medium);
     white-space: nowrap;
     text-wrap: nowrap;

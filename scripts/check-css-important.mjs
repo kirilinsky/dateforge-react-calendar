@@ -10,7 +10,6 @@ const IMPORTANT_ALLOWLIST = {
   "src/modules/info/info.module.css": 5,
   "src/modules/nav/nav.module.css": 5,
   "src/modules/selected-dates/selected-dates.module.css": 5,
-  "src/modules/years-grid/years-grid.module.css": 1,
 };
 
 function collectCssModules(dir) {
