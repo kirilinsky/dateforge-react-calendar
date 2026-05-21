@@ -226,7 +226,7 @@ Compose Tracks for multi-axis navigation: pair `MonthsTrack` with `YearsTrack`, 
 
 ### Module groups (visual families)
 
-Three module families share physics + naming conventions, so they are easy to swap:
+Four module families share physics + naming conventions, so they are easy to swap:
 
 | Group  | Modules                                              | Pattern                                                                                                                                                                                                                                              |
 | ------ | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -350,7 +350,7 @@ The wrapper exposes four contexts to modules. Each has a clear responsibility:
 | `ConfigContext`                                                       | locale, timezone, mode, min/maxDate, disabled, hour12, timeStep, minRangeDays, maxRangeDays, readOnly                              | (none — config is fixed per render)                                                                                                         |
 | `NavigationContext`                                                   | viewDate                                                                                                                           | `navigateTo(date)`                                                                                                                          |
 | `SelectionContext` (split into `State`, `Actions`, `Hover` providers) | selectedDate, selectedDates, rangeStart, rangeEnd, hoverDate                                                                       | `onChangeDate`, `onRangeSet`, `onDatesSet`, `onRangeBoundSet`, `onChangeTime`, `setHoverDate`                                               |
-| `UIContext`                                                           | containerRef, containerWidth, `showTimePopup` / `showMonthPopup` / `showYearPopup`, daysTrackActive, popupAnchorEl, navShowSeconds | `toggleTheme`, `setShowTimePopup` / `setShowMonthPopup` / `setShowYearPopup`, `setDaysTrackActive`, `setPopupAnchorEl`, `setNavShowSeconds` |
+| `UIContext`                                                           | containerRef, `activeTheme`, `showTimePopup` / `showMonthPopup` / `showYearPopup`, daysTrackActive, popupAnchorEl, navShowSeconds | `toggleTheme`, `setShowTimePopup` / `setShowMonthPopup` / `setShowYearPopup`, `setDaysTrackActive`, `setPopupAnchorEl`, `setNavShowSeconds` |
 
 **Popup state ownership.** Popup open/close (`showTimePopup`, `showMonthPopup`, `showYearPopup`) is **pure UI state** and lives in a `useState` inside `CalendarProvider`, exposed via `UIContext`. It is intentionally **not** part of the reducer — popup transitions never need to be atomic with selection changes, and keeping the reducer focused on selection / view data avoids the "one giant store" anti-pattern. Only one popup can be open at a time.
 
@@ -552,7 +552,6 @@ Used by:
 
 - The `Calendar` initial seed for `viewDate` falls back to `new Date()` when neither `value`, `defaultValue`, nor `defaultViewDate` is provided. In sub-second SSR-to-hydrate flows this is identical between server and client; near a midnight boundary it can briefly show a different month on first paint. **Mitigation:** pass `defaultViewDate` for strict deterministic SSR.
 - Animations (drum flip, month slide) start on mount; SSR HTML contains the static "settled" frame.
-- `prefers-reduced-motion` is not yet honored (see Accessibility → Known limitations).
 
 ---
 

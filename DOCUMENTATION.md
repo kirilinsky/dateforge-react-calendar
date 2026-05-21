@@ -1489,7 +1489,7 @@ Whichever is set first wins. Anchor cell carries `aria-current="date"` and `data
 
 ## Design space
 
-12 composable modules, ~80 public props (≈60 boolean), 28 built-in theme families, 7 appearances, plus `createTheme`/`createAppearance` for custom tokens.
+15 composable modules, ~80 public props (≈60 boolean), 28 built-in theme families, 7 appearances, plus `createTheme`/`createAppearance` for custom tokens.
 
 | Layer | Count |
 |---|---|
@@ -1595,25 +1595,27 @@ const myAppearance = createAppearance({ radius: "0", spacing: "0.4em" });
 
 ### `createTheme(theme)`
 
-| Token          | CSS variable | Role                                                                                                                                      |
-| -------------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `highlight`    | `--c-h`      | **Primary accent.** Background of the selected day cell, active buttons, nav accents. The most impactful token.                           |
-| `activeText`   | `--c-at`     | Readable text/icon color on top of `highlight`. Built-in themes keep it at 4.5:1+ against `highlight`.                                    |
-| `todayDot`     | `--c-t-d`    | Fallback dot color for selected today. Built-in themes choose a contrasting ink that matches the theme's active surface.                   |
-| `accent`       | `--c-a`      | Inverted/accent surface color for secondary month labels and decorative active outlines.                                                  |
-| `backdrop`     | `--c-b`      | Main calendar background.                                                                                                                 |
-| `tone`         | `--c-t`      | Secondary / muted background for rows, tracks, and hover states.                                                                          |
-| `text`         | `--c-c`      | Default text color for all labels and numbers.                                                                                            |
-| `stroke`       | `--c-s`      | Border and separator color between cells and sections.                                                                                    |
-| `shadow`       | `--c-x`      | Drop-shadow color. Should include alpha (e.g. `"#6366f130"`).                                                                             |
-| `disabled`     | `--c-d`      | Decorative disabled surface color. Kept for non-text affordances; do not rely on it for readable disabled text.                           |
-| `mutedText`    | `--c-m`      | Secondary readable foreground: outside-month dates, week numbers, placeholders, separators.                                               |
-| `disabledText` | `--c-dt`     | Readable disabled / unavailable foreground. Built-in themes keep it at 4.5:1+ against `backdrop` and `tone`.                              |
-| `weekend`      | `--c-we`     | Weekend text accent for weekend day labels and bold weekend day numbers. Built-in themes keep it at 4.5:1+ against `backdrop` and `tone`. |
-| `range`        | `--c-r`      | Background tint for days that fall inside a selected date range.                                                                          |
-| `error`        | `--c-e`      | Error / destructive signal.                                                                                                               |
+Accepts a partial subset of theme tokens and returns a `ThemeFamily` with
+`light` and `dark` variants. Root-level tokens apply to both modes; the `light`
+and `dark` sub-objects override only their own variant. Missing tokens fall
+back to the default palette.
 
-`activeText`, `mutedText`, `disabledText`, and `weekend` are intentionally contrast-aware text tokens, while `accent` and `disabled` can stay more expressive as surface/decorative colors.
+```ts
+const brand = createTheme({
+  highlight: "#2563eb",
+  range: "#22c55e",
+  weekend: "#ef4444",
+  light: { backdrop: "#f8fafc" },
+  dark: { backdrop: "#0f172a", text: "#f8fafc" },
+});
+```
+
+**Token keys.** 15 required + 1 optional (`outOfMonth`). For the authoritative
+catalog — token key → CSS variable → design role — see
+[DESIGN.md → Design tokens → Color tokens](./DESIGN.md#color-tokens---c-).
+`activeText`, `mutedText`, `disabledText`, and `weekend` are intentionally
+contrast-aware text tokens; `accent` and `disabled` can stay more expressive
+as decorative surfaces.
 
 ---
 
