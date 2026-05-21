@@ -15,24 +15,50 @@ Styling splits along two **independent** dimensions. Any theme combines freely w
 
 The combinatorial product (themes × appearances) is the primary target for visual regression testing (Chromatic).
 
-### CSS layering
+### CSS layering — the v2 onion
 
-User styles override library defaults predictably:
+Library styles are wrapped in nested CSS layers, like an onion: each outer
+layer can refine — but never accidentally override — the inner ones. The
+declared order is part of the public v2 styling contract:
 
 ```
 @layer cal-base, cal-themes, cal-appearances, cal-modules, cal-user;
 ```
 
-Layer order is part of the public v2 styling contract:
+```
+   ┌─────────────────────────────────── cal-user ───────────────────────────────────┐
+   │  ┌──────────────────────────── cal-modules ─────────────────────────────────┐  │
+   │  │  ┌──────────────────────── cal-appearances ───────────────────────────┐  │  │
+   │  │  │  ┌──────────────────── cal-themes ────────────────────────────┐    │  │  │
+   │  │  │  │  ┌─────────────── cal-base ───────────────────────────┐    │    │  │  │
+   │  │  │  │  │  reset · token declarations · shell · primitives    │    │    │  │  │
+   │  │  │  │  └────────────────────────────────────────────────────┘    │    │  │  │
+   │  │  │  │  color tokens (`--c-*`) per family, light + dark variants  │    │  │  │
+   │  │  │  └─────────────────────────────────────────────────────────────┘    │  │  │
+   │  │  │  shape/spacing/motion tokens (`--cal-*`) per appearance              │  │  │
+   │  │  └─────────────────────────────────────────────────────────────────────┘  │  │
+   │  │  module layout · selection/hover state · interactive affordances          │  │
+   │  └─────────────────────────────────────────────────────────────────────────────┘  │
+   │  optional consumer overrides (`@layer cal-user { … }`)                          │
+   └─────────────────────────────────────────────────────────────────────────────────┘
+```
 
-- `cal-base` — reset, typed token declarations, token defaults, shell layout, shared primitives
-- `cal-themes` — built-in/custom theme color variables
-- `cal-appearances` — appearance sizing, radius, density, and motion variables
-- `cal-modules` — module-owned layout and state styling
-- `cal-user` — optional user override layer
+Read inside-out:
+
+- `cal-base` — core. Reset, typed token declarations, defaults, shell layout,
+  shared primitives (popup, drum, virtual-track, time-track).
+- `cal-themes` — palette skin. Color tokens (`--c-*`) per theme family, with
+  `light` / `dark` variants resolved at the wrapper.
+- `cal-appearances` — shape skin. Sizing, radius, density, motion tokens
+  (`--cal-*`) per appearance.
+- `cal-modules` — module-owned styling. Reads tokens from inner layers, owns
+  layout and selection/hover state.
+- `cal-user` — optional consumer override layer. The supported escape hatch.
 
 Unlayered app CSS still wins over all library layers. Prefer tokens and stable
-`data-*` state attributes before reaching for `cal-user`.
+`data-*` state attributes before reaching for `cal-user`. Inside `src/**/*.module.css`
+the library uses **zero `!important`** — specificity is achieved through
+cascade ordering. Consumers should mirror that discipline inside `cal-user`.
 
 ---
 
@@ -40,25 +66,33 @@ Unlayered app CSS still wins over all library layers. Prefer tokens and stable
 
 ### Color tokens (`--c-*`)
 
-Source: `themes/themes.ts`. 15 tokens per theme.
+Source: `themes/themes.ts` (and `src/types/theme-tokens.ts` for the
+key→CSS-var map). 16 tokens per theme — 15 required, `outOfMonth` optional.
+This is the authoritative catalog; `DOCUMENTATION.md → createTheme(theme)` is
+the API view that links here.
 
-| Token     | Role                                        |
-| --------- | ------------------------------------------- |
-| `--c-a`   | accent — primary action                     |
-| `--c-at`  | activeText — text on active/pressed         |
-| `--c-t-d` | todayDot — dot under selected today         |
-| `--c-b`   | backdrop — dialog/overlay background        |
-| `--c-h`   | highlight — hover/focus indicator, selected |
-| `--c-t`   | tone — calendar grid background subtone     |
-| `--c-c`   | text — primary text                         |
-| `--c-s`   | stroke — border, divider, outline           |
-| `--c-x`   | shadow — shadow tint (alpha-blended)        |
-| `--c-d`   | disabled — disabled control background      |
-| `--c-m`   | mutedText — secondary/hint text             |
-| `--c-dt`  | disabledText                                |
-| `--c-we`  | weekend — weekend cell highlight            |
-| `--c-r`   | range — range selection background          |
-| `--c-e`   | error — invalid state                       |
+| Token key      | CSS var   | Role                                                              |
+| -------------- | --------- | ----------------------------------------------------------------- |
+| `accent`       | `--c-a`   | inverted surface for secondary labels and decorative outlines     |
+| `activeText`   | `--c-at`  | text/icon on top of `highlight` (4.5:1+ against highlight)        |
+| `todayDot`     | `--c-t-d` | fallback dot color for selected today                             |
+| `backdrop`     | `--c-b`   | main calendar background                                          |
+| `highlight`    | `--c-h`   | primary accent — selected cell, active buttons, nav accents       |
+| `tone`         | `--c-t`   | secondary/muted background for rows, tracks, hover                |
+| `text`         | `--c-c`   | default text for labels and numbers                               |
+| `stroke`       | `--c-s`   | border / divider                                                  |
+| `shadow`       | `--c-x`   | drop-shadow tint (alpha-blended, e.g. `#6366f130`)                |
+| `disabled`     | `--c-d`   | decorative disabled surface (non-text)                            |
+| `mutedText`    | `--c-m`   | secondary readable foreground — outside-month, week numbers       |
+| `disabledText` | `--c-dt`  | readable disabled foreground (4.5:1+ against backdrop and tone)   |
+| `weekend`      | `--c-we`  | weekend text accent (4.5:1+ against backdrop and tone)            |
+| `range`        | `--c-r`   | background tint for in-range days                                 |
+| `error`        | `--c-e`   | error / destructive signal                                        |
+| `outOfMonth`*  | `--c-oom` | dedicated foreground for outside-month cells; falls back to `mutedText` when omitted |
+
+\* Optional. When omitted, `mutedText` is reused. Built-in 28 families all
+define it explicitly to keep the outside-month tone tunable without weakening
+the muted body text.
 
 ### Typography tokens
 
@@ -363,8 +397,9 @@ CSS wins the race vs JS. Client-side resolution via `useClientValue(matchMedia, 
 
 ## File references
 
-- `themes/themes.ts` — source variants plus 28 public theme families, 15 color tokens each
-- `appearances/index.ts` — 6 appearances
+- `themes/themes.ts` — source variants plus 28 public theme families, 16 color tokens each (15 required + optional `outOfMonth`)
+- `src/types/theme-tokens.ts` — `ThemeTokens` type + `TOKEN_TO_VAR` map (token key → CSS var)
+- `appearances/index.ts` — 7 appearances
 - `src/core/layout.module.css` — typography, container query, color defaults
 - `src/hooks/use-client-value.ts` — SSR-safe deferred values
 - `src/hooks/use-calendar-keyboard.ts` — keyboard nav
