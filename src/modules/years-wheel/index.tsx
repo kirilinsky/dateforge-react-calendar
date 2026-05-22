@@ -17,6 +17,7 @@ import {
   formatActionLabel,
   resolveActionLabel,
 } from "@/utils/action-labels";
+import { clampBoundDate, computeBoundLimits } from "@/utils/clamp-bound-date";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { getDateTimeFormat } from "@/utils/intl-cache";
 import { resolveThemeScope } from "@/utils/resolve-theme-scope";
@@ -156,22 +157,49 @@ export const CalendarYearsWheel: React.FC<CalendarYearsWheelProps> = ({
     : null;
 
   const handleChange = (next: Date) => {
-    if (readOnly) return;
+    if (readOnly) return false;
     if (isBound) {
-      if (!boundDate) return;
-      if (onRangeBoundSet(bound!, next)) {
-        onYearSelect?.(next);
+      if (!boundDate) return false;
+      const clamped = clampBoundDate(next, bound!, rangeStart, rangeEnd);
+      if (clamped.getTime() !== next.getTime()) return false;
+      if (onRangeBoundSet(bound!, clamped)) {
+        onYearSelect?.(clamped);
+        return true;
       }
-      return;
+      return false;
     }
     navigateTo(next);
     onYearSelect?.(next);
+    return true;
   };
 
-  const handleDrumChange = (nextOffset: number) => {
+  const { yearMin, yearMax } = isBound
+    ? computeBoundLimits({
+        bound: bound!,
+        rangeStart,
+        rangeEnd,
+        refYear: displayDate.getFullYear(),
+        refMonth: displayDate.getMonth(),
+        refDay: displayDate.getDate(),
+        daysInRefMonth: new Date(
+          displayDate.getFullYear(),
+          displayDate.getMonth() + 1,
+          0,
+        ).getDate(),
+      })
+    : { yearMin: -Infinity, yearMax: Infinity };
+  // Convert year → offset (StepDrum value = year - minYear)
+  const minYearValue = Number.isFinite(yearMin)
+    ? Math.max(0, yearMin - minYear)
+    : undefined;
+  const maxYearValue = Number.isFinite(yearMax)
+    ? Math.min(span - 1, yearMax - minYear)
+    : undefined;
+
+  const handleDrumChange = (nextOffset: number): boolean | undefined => {
     const draft = new Date(displayDate);
     draft.setFullYear(minYear + nextOffset);
-    handleChange(draft);
+    return handleChange(draft);
   };
 
   const handleReset = () => {
@@ -209,7 +237,11 @@ export const CalendarYearsWheel: React.FC<CalendarYearsWheelProps> = ({
               value={value}
               max={span}
               step={1}
+              circular={!isBound}
+              minValue={minYearValue}
+              maxValue={maxYearValue}
               label={resolvedYearsLabel}
+              getAriaValue={(v) => minYear + v}
               getValueText={getValueText}
               format={format}
               readOnly={readOnly || (isBound && !boundDate)}

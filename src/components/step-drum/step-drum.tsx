@@ -43,9 +43,14 @@ const getDrumItemStyle = (
 interface StepDrumProps {
   value: number;
   max: number;
+  minValue?: number;
+  maxValue?: number;
   step?: number;
-  onChange: (next: number) => void;
+  circular?: boolean;
+  snapKey?: unknown;
+  onChange: (next: number) => boolean | undefined;
   label: string;
+  getAriaValue?: (v: number) => number;
   getValueText: (v: number) => string;
   format?: (v: number) => string;
   readOnly?: boolean;
@@ -55,9 +60,14 @@ interface StepDrumProps {
 export const StepDrum: React.FC<StepDrumProps> = ({
   value,
   max,
+  minValue,
+  maxValue,
   step = 1,
+  circular = true,
+  snapKey,
   onChange,
   label,
+  getAriaValue = (v) => v,
   getValueText,
   format = padTime,
   readOnly,
@@ -65,17 +75,43 @@ export const StepDrum: React.FC<StepDrumProps> = ({
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const itemHeight = useItemSize(ref, "height", 28);
+  const pixelsPerItem = Math.max(itemHeight, 28);
 
   const safeStep = step > 0 ? step : 1;
   const count = Math.max(1, Math.floor(max / safeStep));
   const rawIndex = Math.floor(value / safeStep);
-  const index = getDrumValue(rawIndex, 0, count);
+  const baseMinIndex =
+    minValue === undefined ? undefined : Math.ceil(minValue / safeStep);
+  const baseMaxIndex =
+    maxValue === undefined ? undefined : Math.floor(maxValue / safeStep);
+  const hasBounds = baseMinIndex !== undefined || baseMaxIndex !== undefined;
+  const isFiniteWheel = hasBounds || !circular;
+  const clampIndex = (idx: number, lo = 0, hi = count - 1) =>
+    Math.min(Math.max(idx, lo), hi);
+  const normalizedMinIndex =
+    baseMinIndex === undefined ? 0 : clampIndex(baseMinIndex);
+  const normalizedMaxIndex =
+    baseMaxIndex === undefined ? count - 1 : clampIndex(baseMaxIndex);
+  const noValidRange = normalizedMinIndex > normalizedMaxIndex;
+  const fallbackIndex = clampIndex(rawIndex);
+  const minIndex = noValidRange ? fallbackIndex : normalizedMinIndex;
+  const maxIndex = noValidRange ? fallbackIndex : normalizedMaxIndex;
+  const resolveIndex = (idx: number) =>
+    isFiniteWheel
+      ? clampIndex(idx, minIndex, maxIndex)
+      : getDrumValue(idx, 0, count);
+  const index = resolveIndex(rawIndex);
   const aligned = index * safeStep;
-  const valueMax = (count - 1) * safeStep;
+  const valueMin = minIndex * safeStep;
+  const valueMax = maxIndex * safeStep;
 
   const moveByIdx = (delta: number) => {
     if (readOnly) return;
-    onChange(getDrumValue(index, delta, count) * safeStep);
+    const nextIndex = resolveIndex(index + delta);
+    if (nextIndex === index) return;
+    if (onChange(nextIndex * safeStep) !== false) {
+      scrollTo(nextIndex);
+    }
   };
 
   const {
@@ -88,16 +124,24 @@ export const StepDrum: React.FC<StepDrumProps> = ({
     isInteracting,
   } = useTrack({
     axis: "y",
-    circular: true,
+    circular,
     count,
     disabled: readOnly,
     initialIndex: index,
+    maxIndex: isFiniteWheel ? maxIndex : undefined,
+    minIndex: isFiniteWheel ? minIndex : undefined,
     onChange: (next) => onChange(next * safeStep),
-    pixelsPerItem: itemHeight,
+    pixelsPerItem,
     ref,
+    rubberBand: !isFiniteWheel,
+    snapKey,
+    sticky: true,
   });
-  const round = Math.round(position);
-  const wheelOffset = position - round;
+  const renderPosition = isFiniteWheel
+    ? clampIndex(position, minIndex, maxIndex)
+    : position;
+  const round = Math.round(renderPosition);
+  const wheelOffset = renderPosition - round;
 
   return (
     <div
@@ -106,9 +150,9 @@ export const StepDrum: React.FC<StepDrumProps> = ({
       role="spinbutton"
       tabIndex={0}
       aria-label={label}
-      aria-valuenow={aligned}
-      aria-valuemin={0}
-      aria-valuemax={valueMax}
+      aria-valuenow={getAriaValue(aligned)}
+      aria-valuemin={getAriaValue(valueMin)}
+      aria-valuemax={getAriaValue(valueMax)}
       aria-valuetext={getValueText(aligned)}
       aria-disabled={readOnly || undefined}
       data-dragging={isInteracting || undefined}
@@ -135,19 +179,22 @@ export const StepDrum: React.FC<StepDrumProps> = ({
       <div className={styles.highlight} aria-hidden />
       {OFFSETS.map((o) => {
         const raw = round + o;
-        const signedDistance = raw - position;
+        const signedDistance = raw - renderPosition;
         const isActive = Math.abs(signedDistance) < 0.5;
-        const idx = getDrumValue(raw, 0, count);
+        const isOutOfRange =
+          isFiniteWheel && (raw < minIndex || raw > maxIndex);
+        const idx = isFiniteWheel ? raw : getDrumValue(raw, 0, count);
         const v = idx * safeStep;
         return (
           <div
             key={o}
+            data-item
             className={`${styles.item} ${isActive ? styles.active : ""}`}
             style={getDrumItemStyle(signedDistance, wheelOffset)}
-            aria-hidden={!isActive}
-            onClick={isActive ? undefined : () => scrollTo(raw)}
+            aria-hidden={!isActive || isOutOfRange}
+            onClick={isActive || isOutOfRange ? undefined : () => scrollTo(raw)}
           >
-            {format(v)}
+            {isOutOfRange ? " " : format(v)}
           </div>
         );
       })}

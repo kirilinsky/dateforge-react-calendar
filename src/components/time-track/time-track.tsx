@@ -11,6 +11,12 @@ interface TimeStep {
 
 export type TimeLabelStyle = "short" | "long";
 
+export interface BoundTimeLimit {
+  hours?: number;
+  minutes?: number;
+  seconds?: number;
+}
+
 interface TimeTrackProps {
   date: Date;
   hour12?: boolean;
@@ -18,13 +24,20 @@ interface TimeTrackProps {
   showSeconds?: boolean;
   readOnly?: boolean;
   step?: TimeStep;
+  circular?: boolean;
+  snapKey?: unknown;
   labels?: TimeLabelStyle;
   hoursLabel?: string;
   minutesLabel?: string;
   secondsLabel?: string;
   timePeriodLabel?: string;
   timePickerLabel?: string;
-  onChange: (date: Date) => void;
+  /** Per-drum lower bound for bound="to" (24h values). Cross-drum: minutes
+   *  constraint only applies when hours == boundMin.hours. */
+  boundMin?: BoundTimeLimit;
+  /** Per-drum upper bound for bound="from" (24h values). */
+  boundMax?: BoundTimeLimit;
+  onChange: (date: Date) => boolean | undefined;
 }
 
 const SHORT_LABELS = { hour: "HH", minute: "MM", second: "SS" } as const;
@@ -62,12 +75,16 @@ export const TimeTrack = ({
   showSeconds = false,
   readOnly = false,
   step,
+  circular = true,
+  snapKey,
   labels,
   hoursLabel = "Hours",
   minutesLabel = "Minutes",
   secondsLabel = "Seconds",
   timePeriodLabel = "Time period, currently {period}",
   timePickerLabel = "Time picker",
+  boundMin,
+  boundMax,
   onChange,
 }: TimeTrackProps) => {
   const resolveLabel = (field: "hour" | "minute" | "second") => {
@@ -93,12 +110,47 @@ export const TimeTrack = ({
   const minuteStep = Math.max(1, step?.minute ?? 1);
   const secondStep = Math.max(1, step?.second ?? 1);
 
-  const emit = (h: number, m: number, s: number, p: "AM" | "PM") => {
+  const emit = (
+    h: number,
+    m: number,
+    s: number,
+    p: "AM" | "PM",
+  ): boolean | undefined => {
     if (readOnly) return;
     const next = new Date(date);
     next.setHours(hour12 ? (p === "AM" ? h % 12 : (h % 12) + 12) : h, m, s, 0);
-    onChange(next);
+    return onChange(next);
   };
+
+  // Per-drum bounds (24h only — hour12 AM/PM split makes min/max per-drum complex).
+  // Cross-drum: minute min/max only applies when the current hour equals the
+  // bound hour, otherwise the whole hour direction is clear.
+  const minHour = !hour12 ? boundMin?.hours : undefined;
+  const maxHour = !hour12 ? boundMax?.hours : undefined;
+  const minMinute =
+    !hour12 && boundMin?.hours !== undefined && raw === boundMin.hours
+      ? boundMin.minutes
+      : undefined;
+  const maxMinute =
+    !hour12 && boundMax?.hours !== undefined && raw === boundMax.hours
+      ? boundMax.minutes
+      : undefined;
+  const minSecond =
+    !hour12 &&
+    boundMin?.hours !== undefined &&
+    raw === boundMin.hours &&
+    boundMin.minutes !== undefined &&
+    minutes === boundMin.minutes
+      ? boundMin.seconds
+      : undefined;
+  const maxSecond =
+    !hour12 &&
+    boundMax?.hours !== undefined &&
+    raw === boundMax.hours &&
+    boundMax.minutes !== undefined &&
+    minutes === boundMax.minutes
+      ? boundMax.seconds
+      : undefined;
 
   return (
     <div className={styles.root} role="group" aria-label={timePickerLabel}>
@@ -138,7 +190,11 @@ export const TimeTrack = ({
             value={hour12 ? hours - 1 : hours}
             max={hourMax}
             step={hourStep}
+            circular={circular}
+            snapKey={snapKey}
             label={hoursLabel}
+            minValue={minHour}
+            maxValue={maxHour}
             getValueText={hour12 ? (v) => hourText(v + 1) : hourText}
             format={hour12 ? (v) => padTime(v + 1) : undefined}
             readOnly={readOnly}
@@ -159,7 +215,11 @@ export const TimeTrack = ({
             value={minutes}
             max={60}
             step={minuteStep}
+            circular={circular}
+            snapKey={snapKey}
             label={minutesLabel}
+            minValue={minMinute}
+            maxValue={maxMinute}
             getValueText={minuteText}
             readOnly={readOnly}
             onChange={(m) => emit(hours, m, seconds, period)}
@@ -181,7 +241,11 @@ export const TimeTrack = ({
                 value={seconds}
                 max={60}
                 step={secondStep}
+                circular={circular}
+                snapKey={snapKey}
                 label={secondsLabel}
+                minValue={minSecond}
+                maxValue={maxSecond}
                 getValueText={secondText}
                 readOnly={readOnly}
                 onChange={(s) => emit(hours, minutes, s, period)}

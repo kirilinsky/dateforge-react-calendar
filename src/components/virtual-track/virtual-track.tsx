@@ -123,7 +123,10 @@ export const VirtualTrack: React.FC<VirtualTrackProps> = ({
     minIndex,
     maxIndex,
     ref: containerRef,
-    onChange,
+    onChange: (idx) => {
+      onChange(idx);
+      return undefined;
+    },
   });
 
   const containerWidth = ref.current?.offsetWidth ?? 0;

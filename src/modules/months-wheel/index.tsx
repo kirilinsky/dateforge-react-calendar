@@ -17,6 +17,7 @@ import {
   formatActionLabel,
   resolveActionLabel,
 } from "@/utils/action-labels";
+import { clampBoundDate, computeBoundLimits } from "@/utils/clamp-bound-date";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { getDateTimeFormat } from "@/utils/intl-cache";
 import { resolveThemeScope } from "@/utils/resolve-theme-scope";
@@ -161,22 +162,52 @@ export const CalendarMonthsWheel: React.FC<CalendarMonthsWheelProps> = ({
     : null;
 
   const handleChange = (next: Date) => {
-    if (readOnly) return;
+    if (readOnly) return false;
     if (isBound) {
-      if (!boundDate) return;
-      if (onRangeBoundSet(bound!, next)) {
-        onMonthSelect?.(next);
+      if (!boundDate) return false;
+      const clamped = clampBoundDate(next, bound!, rangeStart, rangeEnd);
+      if (clamped.getTime() !== next.getTime()) return false;
+      if (onRangeBoundSet(bound!, clamped)) {
+        onMonthSelect?.(clamped);
+        return true;
       }
-      return;
+      return false;
     }
     navigateTo(next);
     onMonthSelect?.(next);
+    return true;
   };
 
-  const handleDrumChange = (nextMonth: number) => {
+  // Physical drum bounds derived from bound constraints so the drum hits a wall
+  // instead of snapping back after rejection.
+  const { monthMin, monthMax } = isBound
+    ? computeBoundLimits({
+        bound: bound!,
+        rangeStart,
+        rangeEnd,
+        refYear: displayDate.getFullYear(),
+        refMonth: displayDate.getMonth(),
+        refDay: displayDate.getDate(),
+        daysInRefMonth: new Date(
+          displayDate.getFullYear(),
+          displayDate.getMonth() + 1,
+          0,
+        ).getDate(),
+      })
+    : { monthMin: -Infinity, monthMax: Infinity };
+  const minMonthValue =
+    Number.isFinite(monthMin) && monthMin < 12
+      ? Math.max(0, monthMin)
+      : undefined;
+  const maxMonthValue =
+    Number.isFinite(monthMax) && monthMax >= 0
+      ? Math.min(11, monthMax)
+      : undefined;
+
+  const handleDrumChange = (nextMonth: number): boolean | undefined => {
     const draft = new Date(displayDate);
     draft.setMonth(nextMonth);
-    handleChange(draft);
+    return handleChange(draft);
   };
 
   const handleReset = () => {
@@ -214,6 +245,9 @@ export const CalendarMonthsWheel: React.FC<CalendarMonthsWheelProps> = ({
               value={month}
               max={12}
               step={1}
+              circular={!isBound}
+              minValue={minMonthValue}
+              maxValue={maxMonthValue}
               label={resolvedMonthsLabel}
               getValueText={getValueText}
               format={format}

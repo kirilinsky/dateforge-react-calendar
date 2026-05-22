@@ -1,6 +1,7 @@
 import type React from "react";
 import "@/styles/layers.css";
 import {
+  type BoundTimeLimit,
   type TimeLabelStyle,
   TimeTrack,
 } from "@/components/time-track/time-track";
@@ -24,6 +25,7 @@ import {
   formatActionLabel,
   resolveActionLabel,
 } from "@/utils/action-labels";
+import { clampBoundDate } from "@/utils/clamp-bound-date";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { getDateTimeFormat } from "@/utils/intl-cache";
 import { resolveThemeScope } from "@/utils/resolve-theme-scope";
@@ -163,18 +165,50 @@ export const CalendarTimeWheel: React.FC<CalendarTimeWheelProps> = ({
       ))
     : null;
 
-  const handleChange = (next: Date) => {
+  // Per-drum physical bounds for 24h mode. Cross-drum: minute/second limits
+  // only apply when the current hour (or hour+minute) matches the bound.
+  const isSameDayAs = (ref: Date | null) =>
+    ref !== null &&
+    boundDate !== null &&
+    boundDate.getFullYear() === ref.getFullYear() &&
+    boundDate.getMonth() === ref.getMonth() &&
+    boundDate.getDate() === ref.getDate();
+
+  const boundMin: BoundTimeLimit | undefined =
+    isBound && bound === "to" && rangeStart && isSameDayAs(rangeStart)
+      ? {
+          hours: rangeStart.getHours(),
+          minutes: rangeStart.getMinutes(),
+          seconds: rangeStart.getSeconds(),
+        }
+      : undefined;
+
+  const boundMax: BoundTimeLimit | undefined =
+    isBound && bound === "from" && rangeEnd && isSameDayAs(rangeEnd)
+      ? {
+          hours: rangeEnd.getHours(),
+          minutes: rangeEnd.getMinutes(),
+          seconds: rangeEnd.getSeconds(),
+        }
+      : undefined;
+
+  const handleChange = (next: Date): boolean | undefined => {
     if (isBound) {
-      if (!boundDate) return;
-      if (onRangeBoundSet(bound!, next)) {
-        onTimeSelect?.(next);
+      if (!boundDate) return false;
+      const clamped = clampBoundDate(next, bound!, rangeStart, rangeEnd);
+      if (clamped.getTime() !== next.getTime()) return false;
+      if (onRangeBoundSet(bound!, clamped)) {
+        onTimeSelect?.(clamped);
+        return true;
       }
-      return;
+      return false;
     }
 
     if (onChangeTime(next)) {
       onTimeSelect?.(next);
+      return true;
     }
+    return false;
   };
 
   const handleReset = () => {
@@ -208,12 +242,15 @@ export const CalendarTimeWheel: React.FC<CalendarTimeWheelProps> = ({
         showSeconds={seconds}
         readOnly={readOnly || (isBound && !boundDate)}
         step={timeStep}
+        circular={!isBound}
         labels={labels}
         hoursLabel={resolvedHoursLabel}
         minutesLabel={resolvedMinutesLabel}
         secondsLabel={resolvedSecondsLabel}
         timePeriodLabel={resolvedTimePeriodLabel}
         timePickerLabel={resolvedTimePickerLabel}
+        boundMin={boundMin}
+        boundMax={boundMax}
         onChange={handleChange}
       />
       {resetContent && (

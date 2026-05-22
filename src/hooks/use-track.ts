@@ -1,30 +1,46 @@
 import { useEffect, useRef, useState } from "react";
 
-const FRICTION = 0.95; // inertia decay — high = long glide
-const SNAP_THRESHOLD = 3.5; // px/frame — catch earlier for visible overshoot
-const SPRING_K = 0.08; // spring stiffness
-const SPRING_DAMP = 0.82; // underdamped (< critical) → bouncy overshoot
-const RUBBER_K = 0.12; // boundary spring stiffness
-const RUBBER_DAMP = 0.75; // boundary damping
-const SETTLE_PX = 0.4; // close enough to consider settled
+const FRICTION = 0.86;
+const SNAP_THRESHOLD = 8;
+const SPRING_K = 0.18;
+const SPRING_DAMP = 0.62;
+const RUBBER_K = 0.12;
+const RUBBER_DAMP = 0.5;
+const SETTLE_PX = 0.4;
+const WHEEL_DELTA_SCALE = 0.42;
+const WHEEL_INERTIA_SCALE = 0.18;
+const RELEASE_INERTIA_SCALE = 0.35;
+const MAX_FRAME_VELOCITY = 18;
+
+// Sticky physics for StepDrum — less inertia, harder snap, can't skip items.
+const STICKY_FRICTION = 0.76;
+const STICKY_SNAP_THRESHOLD = 14;
+const STICKY_SPRING_K = 0.28;
+const STICKY_SPRING_DAMP = 0.72;
+const STICKY_WHEEL_INERTIA_SCALE = 0.08;
+const STICKY_RELEASE_INERTIA_SCALE = 0.12;
+const STICKY_MAX_FRAME_VELOCITY = 12;
 
 interface UseTrackOptions {
   count?: number;
   initialIndex: number;
+  snapKey?: unknown;
   pixelsPerItem?: number;
   axis?: "x" | "y";
   circular?: boolean;
   minIndex?: number;
   maxIndex?: number;
+  rubberBand?: boolean;
   disabled?: boolean;
-  onChange: (index: number) => void;
+  sticky?: boolean;
+  onChange: (index: number) => boolean | undefined;
   ref?: React.RefObject<HTMLDivElement | null>;
 }
 
 interface UseTrackReturn {
   ref: React.RefObject<HTMLDivElement | null>;
   position: number; // float index (offset / pixelsPerItem)
-  scrollTo: (targetIndex: number) => void;
+  scrollTo: (targetIndex: number, options?: { animate?: boolean }) => void;
   onPointerDown: (e: React.PointerEvent) => void;
   onPointerMove: () => void;
   onPointerUp: () => void;
@@ -38,12 +54,15 @@ const clamp = (v: number, lo: number, hi: number) =>
 export function useTrack({
   count,
   initialIndex,
+  snapKey,
   pixelsPerItem = 52,
   axis = "x",
   circular = false,
   minIndex,
   maxIndex,
+  rubberBand = true,
   disabled = false,
+  sticky = false,
   onChange,
   ref: externalRef,
 }: UseTrackOptions): UseTrackReturn {
@@ -59,7 +78,9 @@ export function useTrack({
     circular,
     minIndex,
     maxIndex,
+    rubberBand,
     disabled,
+    sticky,
     onChange,
   });
   opts.current = {
@@ -69,7 +90,9 @@ export function useTrack({
     circular,
     minIndex,
     maxIndex,
+    rubberBand,
     disabled,
+    sticky,
     onChange,
   };
 
@@ -91,12 +114,13 @@ export function useTrack({
       circular: circ,
       minIndex: mn,
       maxIndex: mx,
+      rubberBand: rb,
     } = opts.current;
     const lo = mn ?? (c === undefined ? -Infinity : 0);
     const hi = mx ?? (c === undefined ? Infinity : c - 1);
     const bounded = mn !== undefined || mx !== undefined;
     const isCircular = circ && !bounded && c !== undefined;
-    return { lo, hi, isCircular, c, ppi };
+    return { lo, hi, isCircular, c, ppi, rubberBand: rb };
   };
 
   const resolveIdx = (offset: number) => {
@@ -110,9 +134,19 @@ export function useTrack({
   const notifyIfChanged = (offset: number) => {
     const idx = resolveIdx(offset);
     if (p.current.snapped !== idx) {
+      const prev = p.current.snapped;
       p.current.snapped = idx;
       if (p.current.fromGesture) navigator.vibrate?.(8);
-      opts.current.onChange(idx);
+      const accepted = opts.current.onChange(idx) !== false;
+      if (!accepted) {
+        // Hard stop: no syncTarget animation, instant return to last valid pos.
+        const { ppi } = getBounds();
+        p.current.snapped = prev;
+        p.current.offset = prev * ppi;
+        p.current.velocity = 0;
+        p.current.syncTarget = null;
+        setPosition(prev);
+      }
     }
   };
 
@@ -137,9 +171,34 @@ export function useTrack({
     rafId.current = null;
   };
 
+  const normalizeIndex = (index: number) => {
+    const { lo, hi, isCircular, c = 0 } = getBounds();
+    return isCircular && c > 0 ? ((index % c) + c) % c : clamp(index, lo, hi);
+  };
+
+  const snapToIndex = (targetIndex: number) => {
+    const { ppi } = getBounds();
+    const idx = normalizeIndex(targetIndex);
+    stopLoop();
+    p.current.offset = idx * ppi;
+    p.current.velocity = 0;
+    p.current.syncTarget = null;
+    p.current.snapped = idx;
+    p.current.fromGesture = false;
+    setPosition(idx);
+  };
+
   const animate = () => {
     if (!p.current.isDragging) {
-      const { lo, hi, isCircular, c = 0, ppi } = getBounds();
+      const { lo, hi, isCircular, c = 0, ppi, rubberBand: rb } = getBounds();
+
+      // Per-frame physics constants — sticky mode for drums, fluid for tracks.
+      const s = opts.current.sticky;
+      const friction = s ? STICKY_FRICTION : FRICTION;
+      const snapThreshold = s ? STICKY_SNAP_THRESHOLD : SNAP_THRESHOLD;
+      const springK = s ? STICKY_SPRING_K : SPRING_K;
+      const springDamp = s ? STICKY_SPRING_DAMP : SPRING_DAMP;
+      const maxFrameVel = s ? STICKY_MAX_FRAME_VELOCITY : MAX_FRAME_VELOCITY;
 
       if (p.current.syncTarget !== null) {
         const range = c * ppi;
@@ -173,22 +232,32 @@ export function useTrack({
       const minOffset = lo * ppi;
       const maxOffset = hi * ppi;
 
-      p.current.velocity *= FRICTION;
+      p.current.velocity = clamp(
+        p.current.velocity * friction,
+        -maxFrameVel,
+        maxFrameVel,
+      );
       p.current.offset += p.current.velocity;
 
       if (!isCircular) {
-        if (p.current.offset < minOffset) {
+        if (!rb) {
+          const clampedOffset = clamp(p.current.offset, minOffset, maxOffset);
+          if (clampedOffset !== p.current.offset) {
+            p.current.offset = clampedOffset;
+            p.current.velocity = 0;
+          }
+        } else if (p.current.offset < minOffset) {
           p.current.velocity += (minOffset - p.current.offset) * RUBBER_K;
           p.current.velocity *= RUBBER_DAMP;
         } else if (p.current.offset > maxOffset) {
           p.current.velocity += (maxOffset - p.current.offset) * RUBBER_K;
           p.current.velocity *= RUBBER_DAMP;
-        } else if (Math.abs(p.current.velocity) < SNAP_THRESHOLD) {
+        } else if (Math.abs(p.current.velocity) < snapThreshold) {
           const idx = clamp(Math.round(p.current.offset / ppi), lo, hi);
           const target = idx * ppi;
           const diff = target - p.current.offset;
-          p.current.velocity += diff * SPRING_K;
-          p.current.velocity *= SPRING_DAMP;
+          p.current.velocity += diff * springK;
+          p.current.velocity *= springDamp;
           if (
             Math.abs(diff) < SETTLE_PX &&
             Math.abs(p.current.velocity) < SETTLE_PX
@@ -201,15 +270,15 @@ export function useTrack({
         const range = c * ppi;
         p.current.offset = ((p.current.offset % range) + range) % range;
 
-        if (Math.abs(p.current.velocity) < SNAP_THRESHOLD) {
+        if (Math.abs(p.current.velocity) < snapThreshold) {
           const rawIdx = p.current.offset / ppi;
           const idx = ((Math.round(rawIdx) % c) + c) % c;
           const target = idx * ppi;
           let diff = target - p.current.offset;
           if (diff > range / 2) diff -= range;
           if (diff < -range / 2) diff += range;
-          p.current.velocity += diff * SPRING_K;
-          p.current.velocity *= SPRING_DAMP;
+          p.current.velocity += diff * springK;
+          p.current.velocity *= springDamp;
           if (
             Math.abs(diff) < SETTLE_PX &&
             Math.abs(p.current.velocity) < SETTLE_PX
@@ -240,9 +309,25 @@ export function useTrack({
   }, []);
 
   const prevInit = useRef(initialIndex);
+  const prevSnapKey = useRef(snapKey);
+  const pendingInstantSync = useRef(false);
   useEffect(() => {
-    if (prevInit.current === initialIndex) return;
+    const snapChanged = prevSnapKey.current !== snapKey;
+    const initChanged = prevInit.current !== initialIndex;
     prevInit.current = initialIndex;
+    prevSnapKey.current = snapKey;
+
+    if (!initChanged) {
+      if (snapChanged) pendingInstantSync.current = true;
+      return;
+    }
+
+    if (snapChanged || pendingInstantSync.current) {
+      pendingInstantSync.current = false;
+      snapToIndex(initialIndex);
+      return;
+    }
+
     const { lo, hi, isCircular, c = 0, ppi } = getBounds();
     const idx = isCircular
       ? ((initialIndex % c) + c) % c
@@ -252,7 +337,7 @@ export function useTrack({
     p.current.fromGesture = false;
     startLoop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialIndex]);
+  }, [initialIndex, snapKey]);
 
   const prevPpi = useRef(pixelsPerItem);
   useEffect(() => {
@@ -277,7 +362,7 @@ export function useTrack({
     handlers.current = {
       move: (e: PointerEvent) => {
         if (!p.current.isDragging) return;
-        const { lo, hi, isCircular, c = 0, ppi } = getBounds();
+        const { lo, hi, isCircular, c = 0, ppi, rubberBand: rb } = getBounds();
         const coordinate = opts.current.axis === "y" ? e.clientY : e.clientX;
         const delta = p.current.lastX - coordinate;
         p.current.lastX = coordinate;
@@ -288,9 +373,15 @@ export function useTrack({
         if (!isCircular) {
           p.current.offset = clamp(
             p.current.offset,
-            lo * ppi - ppi,
-            hi * ppi + ppi,
+            lo * ppi - (rb ? ppi : 0),
+            hi * ppi + (rb ? ppi : 0),
           );
+          if (
+            !rb &&
+            (p.current.offset === lo * ppi || p.current.offset === hi * ppi)
+          ) {
+            p.current.velocity = 0;
+          }
         } else {
           const range = c * ppi;
           p.current.offset = ((p.current.offset % range) + range) % range;
@@ -307,6 +398,10 @@ export function useTrack({
         window.removeEventListener("pointermove", h.move);
         window.removeEventListener("pointerup", h.up);
         window.removeEventListener("pointercancel", h.up);
+        const releaseScale = opts.current.sticky
+          ? STICKY_RELEASE_INERTIA_SCALE
+          : RELEASE_INERTIA_SCALE;
+        p.current.velocity *= releaseScale;
         startLoop();
       },
     };
@@ -357,8 +452,12 @@ export function useTrack({
     // No-op: handled at window level.
   };
 
-  const scrollTo = (targetIndex: number) => {
+  const scrollTo = (targetIndex: number, options?: { animate?: boolean }) => {
     if (opts.current.disabled) return;
+    if (options?.animate === false) {
+      snapToIndex(targetIndex);
+      return;
+    }
     const { lo, hi, isCircular, c = 0, ppi } = getBounds();
     const idx = isCircular
       ? ((targetIndex % c) + c) % c
@@ -384,24 +483,31 @@ export function useTrack({
       e.preventDefault();
 
       const lineToPx = e.deltaMode === 1 ? 20 : e.deltaMode === 2 ? 300 : 1;
-      const delta = raw * lineToPx;
+      const delta = raw * lineToPx * WHEEL_DELTA_SCALE;
 
-      const { lo, hi, isCircular, c = 0, ppi } = getBounds();
+      const { lo, hi, isCircular, c = 0, ppi, rubberBand: rb } = getBounds();
       setIsInteracting(true);
       window.clearTimeout(wheelTimer);
       wheelTimer = window.setTimeout(() => setIsInteracting(false), 120);
 
-      // Direct offset push — feels like real scroll. Velocity carries small
-      // residual for inertia after the wheel stops.
       p.current.offset += delta;
-      p.current.velocity = delta * 0.6;
+      const inertiaScale = opts.current.sticky
+        ? STICKY_WHEEL_INERTIA_SCALE
+        : WHEEL_INERTIA_SCALE;
+      p.current.velocity = delta * inertiaScale;
 
       if (!isCircular) {
         p.current.offset = clamp(
           p.current.offset,
-          lo * ppi - ppi,
-          hi * ppi + ppi,
+          lo * ppi - (rb ? ppi : 0),
+          hi * ppi + (rb ? ppi : 0),
         );
+        if (
+          !rb &&
+          (p.current.offset === lo * ppi || p.current.offset === hi * ppi)
+        ) {
+          p.current.velocity = 0;
+        }
       } else {
         const range = c * ppi;
         p.current.offset = ((p.current.offset % range) + range) % range;
@@ -409,7 +515,7 @@ export function useTrack({
 
       notifyIfChanged(p.current.offset);
       setPosition(p.current.offset / ppi);
-      startLoop();
+      if (shouldKeepAnimating()) startLoop();
     };
     el.addEventListener("wheel", handler, { passive: false });
     return () => {

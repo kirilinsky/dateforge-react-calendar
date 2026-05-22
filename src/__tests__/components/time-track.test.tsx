@@ -8,7 +8,7 @@ const at = (h: number, m = 0, s = 0) => new Date(2024, 5, 15, h, m, s);
 describe("TimeTrack labels", () => {
   it("renders no drum labels by default", () => {
     const { container } = render(
-      <TimeTrack date={at(9)} onChange={() => {}} />,
+      <TimeTrack date={at(9)} onChange={() => undefined} />,
     );
     expect(container.textContent).not.toMatch(/HH|MM|SS/);
     expect(container.textContent).not.toMatch(/hour|minute|second/i);
@@ -16,7 +16,7 @@ describe("TimeTrack labels", () => {
 
   it('labels="short" renders HH and MM (no seconds by default)', () => {
     const { container } = render(
-      <TimeTrack date={at(9)} labels="short" onChange={() => {}} />,
+      <TimeTrack date={at(9)} labels="short" onChange={() => undefined} />,
     );
     expect(container.textContent).toMatch(/HH/);
     expect(container.textContent).toMatch(/MM/);
@@ -25,14 +25,24 @@ describe("TimeTrack labels", () => {
 
   it('labels="short" + showSeconds renders SS', () => {
     const { container } = render(
-      <TimeTrack date={at(9)} labels="short" showSeconds onChange={() => {}} />,
+      <TimeTrack
+        date={at(9)}
+        labels="short"
+        showSeconds
+        onChange={() => undefined}
+      />,
     );
     expect(container.textContent).toMatch(/SS/);
   });
 
   it('labels="long" renders localized field names (EN)', () => {
     const { container } = render(
-      <TimeTrack date={at(9)} labels="long" locale="en" onChange={() => {}} />,
+      <TimeTrack
+        date={at(9)}
+        labels="long"
+        locale="en"
+        onChange={() => undefined}
+      />,
     );
     // EN "hour" / "minute" via Intl.DisplayNames dateTimeField
     expect(container.textContent?.toLowerCase()).toMatch(/hour/);
@@ -41,10 +51,20 @@ describe("TimeTrack labels", () => {
 
   it('labels="long" picks a different word per locale', () => {
     const { container: en } = render(
-      <TimeTrack date={at(9)} labels="long" locale="en" onChange={() => {}} />,
+      <TimeTrack
+        date={at(9)}
+        labels="long"
+        locale="en"
+        onChange={() => undefined}
+      />,
     );
     const { container: ru } = render(
-      <TimeTrack date={at(9)} labels="long" locale="ru" onChange={() => {}} />,
+      <TimeTrack
+        date={at(9)}
+        labels="long"
+        locale="ru"
+        onChange={() => undefined}
+      />,
     );
     const enText = en.textContent?.toLowerCase() ?? "";
     const ruText = ru.textContent?.toLowerCase() ?? "";
@@ -61,14 +81,14 @@ describe("TimeTrack labels", () => {
 describe("TimeTrack AM/PM switch", () => {
   it("does not render switch when hour12 is false", () => {
     const { queryByRole } = render(
-      <TimeTrack date={at(9)} onChange={() => {}} />,
+      <TimeTrack date={at(9)} onChange={() => undefined} />,
     );
     expect(queryByRole("switch")).toBeNull();
   });
 
   it("renders a role=switch with aria-checked=false for AM", () => {
     const { getByRole } = render(
-      <TimeTrack date={at(9)} hour12 onChange={() => {}} />,
+      <TimeTrack date={at(9)} hour12 onChange={() => undefined} />,
     );
     const sw = getByRole("switch");
     expect(sw.getAttribute("aria-checked")).toBe("false");
@@ -77,7 +97,7 @@ describe("TimeTrack AM/PM switch", () => {
 
   it("renders aria-checked=true for PM", () => {
     const { getByRole } = render(
-      <TimeTrack date={at(15)} hour12 onChange={() => {}} />,
+      <TimeTrack date={at(15)} hour12 onChange={() => undefined} />,
     );
     const sw = getByRole("switch");
     expect(sw.getAttribute("aria-checked")).toBe("true");
@@ -86,7 +106,7 @@ describe("TimeTrack AM/PM switch", () => {
 
   it("shows both AM and PM labels", () => {
     const { getByRole } = render(
-      <TimeTrack date={at(9)} hour12 onChange={() => {}} />,
+      <TimeTrack date={at(9)} hour12 onChange={() => undefined} />,
     );
     const sw = getByRole("switch");
     expect(sw.textContent).toMatch(/AM/);
@@ -154,12 +174,12 @@ describe("TimeTrack AM/PM switch", () => {
 
   it("has an accessible name describing current period", () => {
     const { getByRole, rerender } = render(
-      <TimeTrack date={at(9)} hour12 onChange={() => {}} />,
+      <TimeTrack date={at(9)} hour12 onChange={() => undefined} />,
     );
     expect(getByRole("switch").getAttribute("aria-label")).toMatch(
       /before noon/,
     );
-    rerender(<TimeTrack date={at(15)} hour12 onChange={() => {}} />);
+    rerender(<TimeTrack date={at(15)} hour12 onChange={() => undefined} />);
     expect(getByRole("switch").getAttribute("aria-label")).toMatch(
       /after noon/,
     );
