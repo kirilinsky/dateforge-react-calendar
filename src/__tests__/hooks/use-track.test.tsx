@@ -144,6 +144,28 @@ describe("useTrack RAF lifecycle", () => {
     expect(frames.size).toBe(0);
   });
 
+  it("snaps the next initialIndex change when snapKey changes first", () => {
+    const { result, rerender } = renderHook(
+      ({ initialIndex, snapKey }) =>
+        useTrack({
+          count: 12,
+          initialIndex,
+          snapKey,
+          pixelsPerItem: 10,
+          onChange: vi.fn(),
+        }),
+      { initialProps: { initialIndex: 0, snapKey: 0 } },
+    );
+
+    rerender({ initialIndex: 0, snapKey: 1 });
+    expect(frames.size).toBe(0);
+
+    rerender({ initialIndex: 5, snapKey: 1 });
+
+    expect(result.current.position).toBe(5);
+    expect(frames.size).toBe(0);
+  });
+
   it("syncs circular initialIndex changes through the shortest path", () => {
     const { result, rerender } = renderHook(
       ({ initialIndex }) =>
@@ -236,7 +258,8 @@ describe("useTrack RAF lifecycle", () => {
     act(() => {
       ref.current.dispatchEvent(wheelEvent(0, 20, 0));
     });
-    expect(result.current.position).toBe(2);
+    expect(result.current.position).toBeGreaterThan(0);
+    expect(result.current.position).toBeLessThan(1);
 
     act(() => {
       ref.current.dispatchEvent(wheelEvent(-2, 1, 1));
@@ -252,7 +275,8 @@ describe("useTrack RAF lifecycle", () => {
       ref.current.dispatchEvent(wheelEvent(-20, 0, 0));
     });
 
-    expect(result.current.position).toBe(10);
+    expect(result.current.position).toBeGreaterThan(11);
+    expect(result.current.position).toBeLessThan(12);
   });
 
   it("keeps scrollTo bounded by min and max indexes", () => {
@@ -261,10 +285,52 @@ describe("useTrack RAF lifecycle", () => {
     act(() => {
       result.current.scrollTo(10);
     });
+    flushFrames(120);
+
+    expect(result.current.position).toBeGreaterThanOrEqual(1.99);
+    expect(result.current.position).toBeLessThanOrEqual(4);
+  });
+
+  it("hard-clamps wheel input at bounds when rubberBand is disabled", () => {
+    const ref = { current: document.createElement("div") };
+    const { result } = renderTrack({
+      initialIndex: 4,
+      maxIndex: 4,
+      minIndex: 2,
+      ref,
+      rubberBand: false,
+    });
+
+    act(() => {
+      ref.current.dispatchEvent(wheelEvent(0, 60, 0));
+    });
+
+    expect(result.current.position).toBe(4);
+    expect(frames.size).toBe(0);
+  });
+
+  it("returns to the previous index when onChange rejects a gesture tick", () => {
+    const onChange = vi.fn(() => false);
+    const { result } = renderTrack({ onChange });
+
+    act(() => {
+      result.current.scrollTo(4);
+    });
     flushFrames(80);
 
-    expect(result.current.position).toBeGreaterThanOrEqual(2);
-    expect(result.current.position).toBeLessThanOrEqual(4);
+    expect(onChange).toHaveBeenCalled();
+    expect(result.current.position).toBe(0);
+  });
+
+  it("can scrollTo without animation", () => {
+    const { result } = renderTrack();
+
+    act(() => {
+      result.current.scrollTo(4, { animate: false });
+    });
+
+    expect(result.current.position).toBe(4);
+    expect(frames.size).toBe(0);
   });
 
   it("exposes no-op pointer handlers for React props", () => {

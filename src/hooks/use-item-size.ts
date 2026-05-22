@@ -22,7 +22,8 @@ export function useItemSize(
     const prop = axis === "width" ? "offsetWidth" : "offsetHeight";
     const measure = () => {
       const el = container.querySelector(selector) as HTMLElement | null;
-      if (el) setSize(el[prop]);
+      const next = el?.[prop] ?? 0;
+      if (next > 0) setSize(next);
     };
     measure();
     const ro = new ResizeObserver(measure);

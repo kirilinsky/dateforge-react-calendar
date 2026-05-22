@@ -90,6 +90,7 @@ function SelectDrum({
     minIndex,
     onChange: (next) => {
       if (!isDisabled(next)) onJump(next);
+      return undefined;
     },
     pixelsPerItem: itemHeight,
     ref,

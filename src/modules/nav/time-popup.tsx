@@ -41,9 +41,10 @@ export const TimePopup = ({
   const [current, setCurrent] = useState(date);
   const currentRef = useRef(current);
 
-  const handleChange = (newDate: Date) => {
+  const handleChange = (newDate: Date): undefined => {
     currentRef.current = newDate;
     setCurrent(newDate);
+    return undefined;
   };
 
   return (
