@@ -211,6 +211,8 @@ export function CalendarProvider<M extends CalendarMode = "single">({
     [deriveValue],
   );
 
+  const pendingKeepViewRef = useRef(false);
+
   const externalKey = serializeValue(
     externalValue as DateRange | Date[] | Date | null | undefined,
   );
@@ -288,11 +290,6 @@ export function CalendarProvider<M extends CalendarMode = "single">({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [externalKey]);
-
-  // One-shot flag set by handleChangeDate when the caller passed keepView.
-  // Consumed by the SYNC_EXTERNAL effect that fires after the parent updates
-  // `value`, so the external sync doesn't re-snap viewDate to the selection.
-  const pendingKeepViewRef = useRef(false);
 
   const lastNotifySeqRef = useRef(0);
   useEffect(() => {
@@ -535,8 +532,16 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       popupAnchorEl,
       setPopupAnchorEl,
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [toggleTheme, activeTheme, openPopup, daysTrackActive, popupAnchorEl],
+    [
+      toggleTheme,
+      activeTheme,
+      openPopup,
+      daysTrackActive,
+      popupAnchorEl,
+      setShowTimePopup,
+      setShowMonthPopup,
+      setShowYearPopup,
+    ],
   );
 
   return (
