@@ -4,8 +4,8 @@ import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
-import { CalendarNav } from "@/modules/nav";
 import { CalendarTimeWheel } from "@/modules/time";
+import { TestToolbar } from "../helpers/test-toolbar";
 
 const D = new Date(2024, 5, 15);
 
@@ -57,10 +57,10 @@ describe("Hydration — no mismatch warnings", () => {
     await teardown(root, errorSpy);
   });
 
-  it("Nav with showNowTime hydrates cleanly", async () => {
+  it("Toolbar with live clock hydrates cleanly", async () => {
     const { errorSpy, root } = await setup(
       <Calendar value={D}>
-        <CalendarNav showNowTime />
+        <TestToolbar showNowTime />
       </Calendar>,
     );
     expect(hydrationWarnings(errorSpy)).toEqual([]);

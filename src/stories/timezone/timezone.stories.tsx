@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
 import { validateTimeZone } from "@/core/dev-warn";
 import { CalendarDays } from "@/modules/days";
-import { CalendarNav } from "@/modules/nav";
 import { FIXED_DATE } from "../_constants";
 import { debugStyle } from "../_helpers/debug";
 import {
@@ -13,6 +12,7 @@ import {
   resolveStoryTheme,
   resolveStoryThemeMode,
 } from "../_helpers/resolve-globals";
+import { StoryToolbar } from "../_helpers/story-toolbar";
 
 // Probe shows the timeZone that Calendar resolves: explicit IANA (validated),
 // fixed offset, or auto-detect via Intl. Lives outside Calendar — replicates
@@ -64,7 +64,7 @@ export const AutoDetect: Story = {
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
-          <CalendarNav showMonthPicker compactYears />
+          <StoryToolbar showMonthPicker compactYears />
           <CalendarDays />
         </Calendar>
       </>
@@ -89,7 +89,7 @@ export const ExplicitParis: Story = {
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
-          <CalendarNav showMonthPicker compactYears />
+          <StoryToolbar showMonthPicker compactYears />
           <CalendarDays />
         </Calendar>
       </>
@@ -114,7 +114,7 @@ export const ExplicitNewYork: Story = {
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
-          <CalendarNav showMonthPicker compactYears />
+          <StoryToolbar showMonthPicker compactYears />
           <CalendarDays />
         </Calendar>
       </>
@@ -139,7 +139,7 @@ export const FixedOffset: Story = {
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
-          <CalendarNav showMonthPicker compactYears />
+          <StoryToolbar showMonthPicker compactYears />
           <CalendarDays />
         </Calendar>
       </>
@@ -172,7 +172,7 @@ export const OffByOneFix: Story = {
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
-          <CalendarNav showMonthPicker compactYears />
+          <StoryToolbar showMonthPicker compactYears />
           <CalendarDays />
         </Calendar>
       </>
@@ -201,7 +201,7 @@ export const InvalidTimezone: Story = {
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
-          <CalendarNav showMonthPicker compactYears />
+          <StoryToolbar showMonthPicker compactYears />
           <CalendarDays />
         </Calendar>
       </>

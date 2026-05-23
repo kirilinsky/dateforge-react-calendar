@@ -2,7 +2,7 @@ import { fireEvent, render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
-import { CalendarNav } from "@/modules/nav";
+import { TestToolbar } from "../helpers/test-toolbar";
 
 const openTimePopup = async (container: HTMLElement) => {
   const btn = container.querySelector(
@@ -20,7 +20,7 @@ describe("TimePopup confirm/close handlers", () => {
         value={new Date(2024, 5, 15, 10, 0, 0)}
         onChange={onChange}
       >
-        <CalendarNav showTime />
+        <TestToolbar showTime />
       </Calendar>,
     );
     await openTimePopup(container);
@@ -47,7 +47,7 @@ describe("TimePopup confirm/close handlers", () => {
         value={new Date(2024, 5, 15, 10, 0, 0)}
         onChange={onChange}
       >
-        <CalendarNav showTime />
+        <TestToolbar showTime />
       </Calendar>,
     );
     await openTimePopup(container);
@@ -73,7 +73,7 @@ describe("TimePopup confirm/close handlers", () => {
         onChange={onChange}
         timeStep={{ minute: 15 }}
       >
-        <CalendarNav showTime />
+        <TestToolbar showTime />
       </Calendar>,
     );
     await openTimePopup(container);

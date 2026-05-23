@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
 import { CalendarLunar } from "@/modules/lunar";
-import { CalendarNav } from "@/modules/nav";
 import { FIXED_DATE } from "../_constants";
 import {
   resolveStoryAppearance,
@@ -12,6 +11,7 @@ import {
   resolveStoryTheme,
   resolveStoryThemeMode,
 } from "../_helpers/resolve-globals";
+import { StoryToolbar } from "../_helpers/story-toolbar";
 
 type LunarArgs = {
   showLabels?: boolean;
@@ -37,7 +37,7 @@ const meta: Meta<LunarArgs> = {
         gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
-        <CalendarNav />
+        <StoryToolbar />
         <CalendarDays />
         <CalendarLunar phaseLabels={args.showLabels ? undefined : false} />
       </Calendar>
@@ -69,7 +69,7 @@ export const LocalizedLabels: Story = {
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         gradient={resolveStoryGradient(ctx.globals.gradient)}
       >
-        <CalendarNav />
+        <StoryToolbar />
         <CalendarDays />
         <CalendarLunar
           lunarLabel="Фазы луны"

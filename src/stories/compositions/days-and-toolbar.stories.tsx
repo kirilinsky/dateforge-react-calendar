@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarSelectedDates } from "@/modules";
 import { CalendarDays } from "@/modules/days";
-import { CalendarNav } from "@/modules/nav";
 import { FIXED_DATE } from "../_constants";
 import {
   resolveStoryAppearance,
@@ -12,9 +11,10 @@ import {
   resolveStoryTheme,
   resolveStoryThemeMode,
 } from "../_helpers/resolve-globals";
+import { StoryToolbar } from "../_helpers/story-toolbar";
 
 const meta: Meta = {
-  title: "Compositions/Days + Nav + Selected",
+  title: "Compositions/Days + Toolbar + Selected",
 };
 
 export default meta;
@@ -32,7 +32,7 @@ export const Default: StoryObj = {
         gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
-        <CalendarNav showTime showMonthPicker compactYears />
+        <StoryToolbar showTime showMonthPicker compactYears />
         <CalendarDays />
         <CalendarSelectedDates showTime />
       </Calendar>

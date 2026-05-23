@@ -1,14 +1,14 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
-import { CalendarNav } from "@/modules/nav";
 import { createTheme } from "@/utils/create-theme";
+import { TestToolbar } from "../helpers/test-toolbar";
 
 describe("Calendar theme families", () => {
   it("uses light and dark flags as the initial mode for the default theme", () => {
     const { container: darkContainer } = render(
       <Calendar dark>
-        <CalendarNav />
+        <TestToolbar />
       </Calendar>,
     );
     expect(
@@ -17,7 +17,7 @@ describe("Calendar theme families", () => {
 
     const { container: lightContainer } = render(
       <Calendar light>
-        <CalendarNav />
+        <TestToolbar />
       </Calendar>,
     );
     expect(
@@ -25,7 +25,7 @@ describe("Calendar theme families", () => {
     ).toBe("light");
   });
 
-  it("resolves the active family variant and lets the Nav theme toggle switch variants", () => {
+  it("resolves the active family variant and lets the Toolbar theme toggle switch variants", () => {
     const theme = createTheme({
       light: { highlight: "#111111" },
       dark: { highlight: "#eeeeee" },
@@ -33,7 +33,7 @@ describe("Calendar theme families", () => {
 
     const { container } = render(
       <Calendar theme={theme}>
-        <CalendarNav themeToggle />
+        <TestToolbar themeToggle />
       </Calendar>,
     );
 
@@ -55,7 +55,7 @@ describe("Calendar theme families", () => {
 
     const { container } = render(
       <Calendar theme={theme} dark>
-        <CalendarNav themeToggle />
+        <TestToolbar themeToggle />
       </Calendar>,
     );
 

@@ -3,7 +3,7 @@ import { Profiler } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
-import { CalendarNav } from "@/modules/nav";
+import { TestToolbar } from "../helpers/test-toolbar";
 
 const D = new Date(2024, 5, 15);
 
@@ -22,27 +22,27 @@ const findDayButton = (container: HTMLElement, day: number): HTMLElement => {
 };
 
 describe("perf — module re-render boundaries", () => {
-  it("hover preview in range mode does not re-render Nav subtree", () => {
-    const navRenders: number[] = [];
-    const onNavRender = () => navRenders.push(performance.now());
+  it("hover preview in range mode does not re-render Toolbar subtree", () => {
+    const toolbarRenders: number[] = [];
+    const onToolbarRender = () => toolbarRenders.push(performance.now());
 
     const { container } = render(
       <Calendar mode="range" defaultViewDate={D}>
-        <Profiler id="nav" onRender={onNavRender}>
-          <CalendarNav />
+        <Profiler id="toolbar" onRender={onToolbarRender}>
+          <TestToolbar />
         </Profiler>
         <CalendarDays />
       </Calendar>,
     );
 
     fireEvent.click(findDayButton(container, 5));
-    const before = navRenders.length;
+    const before = toolbarRenders.length;
 
     for (const day of [10, 11, 12, 13, 14]) {
       fireEvent.mouseEnter(findDayButton(container, day));
     }
 
-    expect(navRenders.length).toBe(before);
+    expect(toolbarRenders.length).toBe(before);
   });
 });
 
@@ -60,7 +60,7 @@ describe("perf — showNowTime isolation", () => {
 
     render(
       <Calendar value={D}>
-        <CalendarNav showNowTime />
+        <TestToolbar showNowTime />
         <Profiler id="days" onRender={onDaysRender}>
           <CalendarDays />
         </Profiler>

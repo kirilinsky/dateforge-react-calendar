@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
-import { CalendarNav } from "@/modules/nav";
+import { TestToolbar } from "../helpers/test-toolbar";
 
 type StartViewTransition = (update: () => void) => {
   finished: Promise<void>;
@@ -44,7 +44,7 @@ describe("Calendar View Transitions", () => {
 
     const { getByLabelText } = render(
       <Calendar defaultViewDate={new Date(2024, 5, 15)}>
-        <CalendarNav showMonthPicker />
+        <TestToolbar showMonthPicker />
       </Calendar>,
     );
 
@@ -61,7 +61,7 @@ describe("Calendar View Transitions", () => {
         defaultViewDate={new Date(2024, 5, 15)}
         motion="view-transition"
       >
-        <CalendarNav showMonthPicker />
+        <TestToolbar showMonthPicker />
         <CalendarDays />
       </Calendar>,
     );
@@ -79,7 +79,7 @@ describe("Calendar View Transitions", () => {
         defaultViewDate={new Date(2024, 5, 15)}
         motion="view-transition"
       >
-        <CalendarNav showMonthPicker />
+        <TestToolbar showMonthPicker />
       </Calendar>,
     );
 

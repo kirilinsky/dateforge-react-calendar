@@ -2,14 +2,14 @@ import { fireEvent, render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
-import { CalendarNav } from "@/modules/nav";
+import { TestToolbar } from "../helpers/test-toolbar";
 
-describe("Nav MonthPopup confirm path", () => {
+describe("Toolbar MonthPopup confirm path", () => {
   it("changing the month via drum and confirming navigates viewDate", async () => {
     const onChange = vi.fn();
     const { container, getByLabelText } = render(
       <Calendar mode="single" value={new Date(2024, 5, 15)} onChange={onChange}>
-        <CalendarNav showMonthPicker />
+        <TestToolbar showMonthPicker />
       </Calendar>,
     );
     await userEvent.click(getByLabelText(/Change month/));
@@ -30,11 +30,11 @@ describe("Nav MonthPopup confirm path", () => {
   });
 });
 
-describe("Nav YearPopup confirm path", () => {
+describe("Toolbar YearPopup confirm path", () => {
   it("changing the year via drum and confirming navigates viewDate", async () => {
     const { container, getByLabelText } = render(
       <Calendar mode="single" value={new Date(2024, 5, 15)}>
-        <CalendarNav showYearPicker />
+        <TestToolbar showYearPicker />
       </Calendar>,
     );
     await userEvent.click(getByLabelText(/Change year/));
@@ -57,7 +57,7 @@ describe("Nav YearPopup confirm path", () => {
         minDate={new Date(2020, 0, 1)}
         maxDate={new Date(2024, 11, 31)}
       >
-        <CalendarNav showYearPicker />
+        <TestToolbar showYearPicker />
       </Calendar>,
     );
     await userEvent.click(getByLabelText(/Change year/));

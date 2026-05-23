@@ -2,7 +2,7 @@ import { fireEvent, render, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
-import { CalendarNav } from "@/modules/nav";
+import { TestToolbar } from "../helpers/test-toolbar";
 
 const VIEW_DATE = new Date(2024, 5, 15); // June 15 2024
 
@@ -12,14 +12,14 @@ const getGrid = (container: HTMLElement): HTMLElement =>
 const tabbableCellsIn = (grid: HTMLElement): HTMLElement[] =>
   Array.from(grid.querySelectorAll('button[tabindex="0"]')) as HTMLElement[];
 
-describe("CalendarDays — Tab reachability after Nav navigation", () => {
-  // Regression: when viewDate moves out from under focusedDate (e.g. Nav
+describe("CalendarDays — Tab reachability after toolbar navigation", () => {
+  // Regression: when viewDate moves out from under focusedDate (e.g. toolbar
   // prev/next click), focusedDate must follow so the grid keeps exactly one
-  // tabbable cell. Otherwise Tab from Nav skips the grid entirely.
+  // tabbable cell. Otherwise Tab from toolbar skips the grid entirely.
   it("after clicking Next month, the visible grid has exactly one tabbable cell", () => {
     const { container, getByLabelText } = render(
       <Calendar mode="single" defaultViewDate={VIEW_DATE}>
-        <CalendarNav showMonthPicker />
+        <TestToolbar showMonthPicker />
         <CalendarDays />
       </Calendar>,
     );
@@ -44,7 +44,7 @@ describe("CalendarDays — Tab reachability after Nav navigation", () => {
   it("after clicking Previous month, the visible grid has exactly one tabbable cell", () => {
     const { container, getByLabelText } = render(
       <Calendar mode="single" defaultViewDate={VIEW_DATE}>
-        <CalendarNav showMonthPicker />
+        <TestToolbar showMonthPicker />
         <CalendarDays />
       </Calendar>,
     );
@@ -62,7 +62,7 @@ describe("CalendarDays — Tab reachability after Nav navigation", () => {
   it("with no selection, jumping multiple months keeps the grid tabbable", () => {
     const { container, getByLabelText } = render(
       <Calendar mode="single" defaultViewDate={VIEW_DATE}>
-        <CalendarNav showMonthPicker />
+        <TestToolbar showMonthPicker />
         <CalendarDays />
       </Calendar>,
     );

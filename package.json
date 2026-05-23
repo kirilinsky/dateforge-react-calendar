@@ -52,14 +52,144 @@
         "default": "./dist/modules/days.cjs"
       }
     },
-    "./modules/nav": {
+    "./modules/toolbar": {
       "import": {
-        "types": "./dist/modules/nav.d.ts",
-        "default": "./dist/modules/nav.mjs"
+        "types": "./dist/modules/toolbar.d.ts",
+        "default": "./dist/modules/toolbar.mjs"
       },
       "require": {
-        "types": "./dist/modules/nav.d.cts",
-        "default": "./dist/modules/nav.cjs"
+        "types": "./dist/modules/toolbar.d.cts",
+        "default": "./dist/modules/toolbar.cjs"
+      }
+    },
+    "./modules/toolbar/clear": {
+      "import": {
+        "types": "./dist/modules/toolbar/clear.d.ts",
+        "default": "./dist/modules/toolbar/clear.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/toolbar/clear.d.cts",
+        "default": "./dist/modules/toolbar/clear.cjs"
+      }
+    },
+    "./modules/toolbar/clock": {
+      "import": {
+        "types": "./dist/modules/toolbar/clock.d.ts",
+        "default": "./dist/modules/toolbar/clock.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/toolbar/clock.d.cts",
+        "default": "./dist/modules/toolbar/clock.cjs"
+      }
+    },
+    "./modules/toolbar/day-label": {
+      "import": {
+        "types": "./dist/modules/toolbar/day-label.d.ts",
+        "default": "./dist/modules/toolbar/day-label.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/toolbar/day-label.d.cts",
+        "default": "./dist/modules/toolbar/day-label.cjs"
+      }
+    },
+    "./modules/toolbar/home": {
+      "import": {
+        "types": "./dist/modules/toolbar/home.d.ts",
+        "default": "./dist/modules/toolbar/home.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/toolbar/home.d.cts",
+        "default": "./dist/modules/toolbar/home.cjs"
+      }
+    },
+    "./modules/toolbar/label": {
+      "import": {
+        "types": "./dist/modules/toolbar/label.d.ts",
+        "default": "./dist/modules/toolbar/label.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/toolbar/label.d.cts",
+        "default": "./dist/modules/toolbar/label.cjs"
+      }
+    },
+    "./modules/toolbar/month-label": {
+      "import": {
+        "types": "./dist/modules/toolbar/month-label.d.ts",
+        "default": "./dist/modules/toolbar/month-label.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/toolbar/month-label.d.cts",
+        "default": "./dist/modules/toolbar/month-label.cjs"
+      }
+    },
+    "./modules/toolbar/month-trigger": {
+      "import": {
+        "types": "./dist/modules/toolbar/month-trigger.d.ts",
+        "default": "./dist/modules/toolbar/month-trigger.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/toolbar/month-trigger.d.cts",
+        "default": "./dist/modules/toolbar/month-trigger.cjs"
+      }
+    },
+    "./modules/toolbar/next": {
+      "import": {
+        "types": "./dist/modules/toolbar/next.d.ts",
+        "default": "./dist/modules/toolbar/next.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/toolbar/next.d.cts",
+        "default": "./dist/modules/toolbar/next.cjs"
+      }
+    },
+    "./modules/toolbar/prev": {
+      "import": {
+        "types": "./dist/modules/toolbar/prev.d.ts",
+        "default": "./dist/modules/toolbar/prev.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/toolbar/prev.d.cts",
+        "default": "./dist/modules/toolbar/prev.cjs"
+      }
+    },
+    "./modules/toolbar/theme-toggle": {
+      "import": {
+        "types": "./dist/modules/toolbar/theme-toggle.d.ts",
+        "default": "./dist/modules/toolbar/theme-toggle.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/toolbar/theme-toggle.d.cts",
+        "default": "./dist/modules/toolbar/theme-toggle.cjs"
+      }
+    },
+    "./modules/toolbar/time": {
+      "import": {
+        "types": "./dist/modules/toolbar/time.d.ts",
+        "default": "./dist/modules/toolbar/time.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/toolbar/time.d.cts",
+        "default": "./dist/modules/toolbar/time.cjs"
+      }
+    },
+    "./modules/toolbar/year-label": {
+      "import": {
+        "types": "./dist/modules/toolbar/year-label.d.ts",
+        "default": "./dist/modules/toolbar/year-label.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/toolbar/year-label.d.cts",
+        "default": "./dist/modules/toolbar/year-label.cjs"
+      }
+    },
+    "./modules/toolbar/year-trigger": {
+      "import": {
+        "types": "./dist/modules/toolbar/year-trigger.d.ts",
+        "default": "./dist/modules/toolbar/year-trigger.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/toolbar/year-trigger.d.cts",
+        "default": "./dist/modules/toolbar/year-trigger.cjs"
       }
     },
     "./modules/months-grid": {

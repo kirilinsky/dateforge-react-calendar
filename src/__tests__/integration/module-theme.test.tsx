@@ -7,13 +7,13 @@ import { CalendarInfo } from "@/modules/info";
 import { CalendarManualInput } from "@/modules/manual-input";
 import { CalendarMonthsGrid } from "@/modules/months-grid";
 import { CalendarMonthsTrack } from "@/modules/months-track";
-import { CalendarNav } from "@/modules/nav";
 import { CalendarPresets } from "@/modules/presets";
 import { CalendarSelectedDates } from "@/modules/selected-dates";
 import { CalendarTimeWheel } from "@/modules/time";
 import { CalendarYearsGrid } from "@/modules/years-grid";
 import { CalendarYearsTrack } from "@/modules/years-track";
 import { createTheme } from "@/utils/create-theme";
+import { TestToolbar } from "../helpers/test-toolbar";
 
 const D = new Date(2024, 5, 15);
 
@@ -58,7 +58,7 @@ describe("module-local themes", () => {
 
     const { container } = render(
       <Calendar value={D} theme={rootTheme}>
-        <CalendarNav themeToggle />
+        <TestToolbar themeToggle />
         <CalendarInfo theme={infoTheme} />
       </Calendar>,
     );
@@ -98,7 +98,7 @@ describe("module-local themes", () => {
   it("supports built-in string themes on module roots", () => {
     const { container } = render(
       <Calendar value={[D]} mode="multiple">
-        <CalendarNav label="Calendar controls" theme="dark" />
+        <TestToolbar label="Calendar controls" theme="dark" />
         <CalendarDays theme="dark" />
         <CalendarDaysTrack theme="dark" />
         <CalendarManualInput theme="light" />
@@ -116,7 +116,7 @@ describe("module-local themes", () => {
     );
 
     for (const area of [
-      "header",
+      "toolbar",
       "days",
       "days-track",
       "months",

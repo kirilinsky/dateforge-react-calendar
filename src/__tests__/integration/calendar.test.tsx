@@ -345,7 +345,7 @@ describe("Calendar — controlled value is single source of truth", () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it("controlled range bound: clicking nav arrow on bound nav routes through onChange only", async () => {
+  it("controlled range bound: committing a bound toolbar action routes through onChange only", async () => {
     const onChange = vi.fn();
     const { container } = render(
       <Calendar
@@ -353,7 +353,7 @@ describe("Calendar — controlled value is single source of truth", () => {
         value={{ from: new Date(2024, 5, 15), to: new Date(2024, 7, 20) }}
         onChange={onChange}
       >
-        {/* nav with bound writes via onRangeBoundSet → commitSelection */}
+        {/* toolbar with bound writes via onRangeBoundSet → commitSelection */}
       </Calendar>,
     );
     expect(container).toBeTruthy();

@@ -10,12 +10,12 @@ import { CalendarDaysTrack } from "@/modules/days-track";
 import { CalendarManualInput } from "@/modules/manual-input";
 import { CalendarMonthsGrid } from "@/modules/months-grid";
 import { CalendarMonthsTrack } from "@/modules/months-track";
-import { CalendarNav } from "@/modules/nav";
 import { CalendarPresets } from "@/modules/presets";
 import { CalendarSelectedDates } from "@/modules/selected-dates";
 import { CalendarTimeWheel } from "@/modules/time";
 import { CalendarYearsGrid } from "@/modules/years-grid";
 import { CalendarYearsTrack } from "@/modules/years-track";
+import { TestToolbar } from "../helpers/test-toolbar";
 
 const D = new Date(2024, 5, 15);
 
@@ -30,19 +30,19 @@ describe("SSR — renderToString", () => {
     expect(html).toContain("aria-label");
   });
 
-  it("renders Nav with showTime / clear / themeToggle without crashing", () => {
+  it("renders Toolbar with showTime / clear / themeToggle without crashing", () => {
     const html = renderToString(
       <Calendar value={D}>
-        <CalendarNav showTime clear themeToggle />
+        <TestToolbar showTime clear themeToggle />
       </Calendar>,
     );
     expect(html).toContain("toolbar");
   });
 
-  it("renders Nav with showNowTime without throwing (live clock is empty pre-hydration)", () => {
+  it("renders Toolbar with showNowTime without throwing (live clock is empty pre-hydration)", () => {
     const html = renderToString(
       <Calendar value={D}>
-        <CalendarNav showNowTime />
+        <TestToolbar showNowTime />
       </Calendar>,
     );
     // The live time slot exists but its inner text is empty until client mounts.

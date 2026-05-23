@@ -1,0 +1,8 @@
+@layer cal-modules {
+  .group {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    gap: 0.25em;
+  }
+}

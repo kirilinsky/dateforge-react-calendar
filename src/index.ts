@@ -16,7 +16,6 @@ export type { CalendarManualInputProps } from "./modules/manual-input/index";
 export type { CalendarMonthsGridProps } from "./modules/months-grid/index";
 export type { CalendarMonthsTrackProps } from "./modules/months-track/index";
 export type { CalendarMonthsWheelProps } from "./modules/months-wheel/index";
-export type { CalendarNavProps } from "./modules/nav/index";
 export type { CalendarPresetsProps } from "./modules/presets/index";
 export { basicPresets } from "./modules/presets/presets-pack";
 export type { CalendarSelectedDatesProps } from "./modules/selected-dates/index";

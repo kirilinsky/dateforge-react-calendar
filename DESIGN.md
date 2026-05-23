@@ -77,7 +77,7 @@ the API view that links here.
 | `activeText`   | `--c-at`  | text/icon on top of `highlight` (4.5:1+ against highlight)        |
 | `todayDot`     | `--c-t-d` | fallback dot color for selected today                             |
 | `backdrop`     | `--c-b`   | main calendar background                                          |
-| `highlight`    | `--c-h`   | primary accent — selected cell, active buttons, nav accents       |
+| `highlight`    | `--c-h`   | primary accent — selected cell, active buttons, toolbar accents   |
 | `tone`         | `--c-t`   | secondary/muted background for rows, tracks, hover                |
 | `text`         | `--c-c`   | default text for labels and numbers                               |
 | `stroke`       | `--c-s`   | border / divider                                                  |
@@ -99,7 +99,7 @@ the muted body text.
 Source: `src/core/layout.module.css`.
 
 - `--cal-font-size`: `clamp(11px, 2.7cqw, 18px)` — container-relative base
-- `--cal-text-2xs … --cal-text-lg`: semantic scale (0.6em–0.95em). `xl`/`2xl` were retired in favor of `--cal-nav-meta-font-size` / `--cal-nav-font-size` since they were nav-only.
+- `--cal-text-2xs … --cal-text-lg`: semantic scale (0.6em–0.95em). `xl`/`2xl` were retired in favor of `--cal-nav-meta-font-size` / `--cal-nav-font-size` since they are toolbar/header-specific.
 - `--cal-text-day`: `clamp(0.72em, …, 1.15em)` — adaptive day-cell sizing
 - `--cal-weight-{regular,medium,semibold,bold}`: 400–700
 - `--cal-leading-{tight,normal,relaxed}`: 1 → 1.6
@@ -119,10 +119,10 @@ Source: `appearances/index.ts`.
 | `--cal-days-padding`       | day-cell padding                                                  |
 | `--cal-track-height`       | scrollable track height                                           |
 | `--cal-day-ratio`          | day-cell aspect ratio                                             |
-| `--cal-nav-padding`        | padding of `CalendarNav` container (was `--header-padding`)       |
-| `--cal-nav-min-height`     | minimum height of `CalendarNav` (was `--header-min-height`)       |
-| `--cal-nav-font-size`      | nav container root font-size; cascades to all nav children via em |
-| `--cal-nav-meta-font-size` | font-size of `.currentYear` children (year/month text in nav)     |
+| `--cal-nav-padding`        | padding of toolbar containers (was `--header-padding`) |
+| `--cal-nav-min-height`     | minimum height of toolbar containers (was `--header-min-height`) |
+| `--cal-nav-font-size`      | toolbar root font-size; cascades to toolbar children via em       |
+| `--cal-nav-meta-font-size` | font-size of year/month label and trigger text                    |
 
 ---
 
@@ -145,7 +145,7 @@ Families preserve the old palette coverage by pairing previous light/dark themes
 | `compact`  | Dense, minimal padding, tight                 | radius 0.3em, spacing 0.35em, transition 0.15s, day-ratio 1/0.7          |
 | `square`   | Sharp corners, tight, minimal shadows         | radius 0, spacing 0.5em, transition 0.12s                                |
 | `soft`     | Subtle rounding, balanced, gentle shadows     | radius 0.75em, spacing 0.7em, transition 0.25s                           |
-| `bubble`   | Rounded, spacious, prominent shadows          | radius 1.5em, spacing 0.7em, transition 0.28s, nav-min-height 4em        |
+| `bubble`   | Rounded, spacious, prominent shadows          | radius 1.5em, spacing 0.7em, transition 0.28s, toolbar min-height 4em    |
 | `loft`     | Large, relaxed                                | radius 1em, spacing 1em, transition 0.35s, day-padding 1.8em             |
 | `airy`     | light weights, generous spacing               | radius 0.4em, border 1px, spacing 1em, weights 300, no shadows           |
 | `press`    | Newspaper serif, sharp corners, wide tracking | radius 0.05em, serif font, letter-spacing 0.18em, no shadows, border 1px |
@@ -225,9 +225,9 @@ item transitions while the user is actively moving the control.
 ### Drum visual model
 
 Source: `src/components/step-drum/step-drum.tsx`,
-`src/modules/nav/month-year-track.tsx`.
+`src/modules/toolbar/_internal/month-year-track.tsx`.
 
-Time drums and Nav month/year drums are separate components, but share the same
+Time drums and Toolbar month/year popup drums are separate components, but share the same
 visual vocabulary:
 
 | CSS variable | Role |
@@ -255,7 +255,7 @@ without `document.startViewTransition` run the same state update directly.
 Global reduced motion is enforced through the shared transition tokens:
 `--cal-transition`, `--cal-paint-transition`, press durations, and press scale
 collapse inside `@media (prefers-reduced-motion: reduce)`. Keyframe-based
-module animations (day/year slides, nav pulse/drums, chip reveal) have local
+module animations (day/year slides, toolbar pulse/drums, chip reveal) have local
 reduced-motion overrides.
 
 Browser View Transitions are opt-in via `<Calendar motion="view-transition" />`
@@ -324,7 +324,7 @@ Tracks (`<CalendarDaysTrack>`, `<CalendarMonthsTrack>`, `<CalendarYearsTrack>`):
 | Hidden out-of-range cell (`hideOutOfRange`) | `presentation` | Not exposed to AT; preserves grid layout only                                          |
 | Empty week row (all cells hidden)           | `presentation` | Whole row dropped from AT                                                              |
 
-### Time picker (`<CalendarTimeWheel>` and `<TimeTrack>` inside Nav popup)
+### Time picker (`<CalendarTimeWheel>` and `<TimeTrack>` inside Toolbar popup)
 
 Each drum (hour / minute / second) is `role="spinbutton"` with `aria-label`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, `aria-valuetext`. AM/PM buttons use `aria-pressed`. Under `readOnly` the spinbutton gets `aria-disabled="true"` and all keyboard / scroll / click handlers no-op.
 

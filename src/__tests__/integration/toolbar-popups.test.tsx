@@ -1,50 +1,24 @@
 import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
-import { __resetWarnOnce } from "@/core/dev-warn";
-import { CalendarNav } from "@/modules/nav";
+import { TestToolbar } from "../helpers/test-toolbar";
 
-let warnSpy: ReturnType<typeof vi.spyOn>;
-
-beforeEach(() => {
-  __resetWarnOnce();
-  warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-});
-
-afterEach(() => {
-  warnSpy.mockRestore();
-});
-
-describe("Nav popups — open/close via UI state", () => {
-  it("marks how many picker selector groups are rendered", () => {
-    const { container, rerender } = render(
+describe("Toolbar popups — open/close via local toolbar state", () => {
+  it("renders toolbar shell for picker controls", () => {
+    const { container } = render(
       <Calendar value={new Date(2024, 5, 15)}>
-        <CalendarNav showMonthPicker />
+        <TestToolbar showMonthPicker showYearPicker />
       </Calendar>,
     );
-    expect(
-      container
-        .querySelector('[data-area="header"]')
-        ?.getAttribute("data-selector-count"),
-    ).toBe("1");
-
-    rerender(
-      <Calendar value={new Date(2024, 5, 15)}>
-        <CalendarNav showMonthPicker showYearPicker />
-      </Calendar>,
-    );
-    expect(
-      container
-        .querySelector('[data-area="header"]')
-        ?.getAttribute("data-selector-count"),
-    ).toBe("2");
+    expect(container.querySelector('[data-area="toolbar"]')).toBeTruthy();
+    expect(container.querySelectorAll("button").length).toBeGreaterThan(0);
   });
 
   it("clicking showTime button opens the time popup", async () => {
     const { container, queryByLabelText } = render(
       <Calendar value={new Date(2024, 5, 15)}>
-        <CalendarNav showTime />
+        <TestToolbar showTime />
       </Calendar>,
     );
     expect(queryByLabelText("Select time")).toBeNull();
@@ -59,7 +33,7 @@ describe("Nav popups — open/close via UI state", () => {
   it("clicking the month label (showMonthPicker) opens the month popup", async () => {
     const { container, queryByLabelText, getByLabelText } = render(
       <Calendar value={new Date(2024, 5, 15)}>
-        <CalendarNav showMonthPicker />
+        <TestToolbar showMonthPicker />
       </Calendar>,
     );
     expect(queryByLabelText("Select month")).toBeNull();
@@ -73,7 +47,7 @@ describe("Nav popups — open/close via UI state", () => {
   it("clicking the year label (showYearPicker) opens the year popup", async () => {
     const { container, getByLabelText, queryByLabelText } = render(
       <Calendar value={new Date(2024, 5, 15)}>
-        <CalendarNav showYearPicker />
+        <TestToolbar showYearPicker />
       </Calendar>,
     );
     expect(queryByLabelText("Select year")).toBeNull();
@@ -87,7 +61,7 @@ describe("Nav popups — open/close via UI state", () => {
   it("compactTime icon button opens the time popup", async () => {
     const { queryByLabelText, getByLabelText } = render(
       <Calendar value={new Date(2024, 5, 15)}>
-        <CalendarNav compactTime />
+        <TestToolbar compactTime />
       </Calendar>,
     );
     expect(queryByLabelText("Select time")).toBeNull();
@@ -96,10 +70,10 @@ describe("Nav popups — open/close via UI state", () => {
     expect(queryByLabelText("Select time")).not.toBeNull();
   });
 
-  it("compactTime does not render any nav UI other than the icon button", () => {
+  it("compact time renders only the icon button", () => {
     const { container, getByLabelText } = render(
       <Calendar value={new Date(2024, 5, 15)}>
-        <CalendarNav compactTime />
+        <TestToolbar compactTime />
       </Calendar>,
     );
     expect(getByLabelText(/Change time/)).toBeTruthy();
@@ -109,7 +83,7 @@ describe("Nav popups — open/close via UI state", () => {
   it("compactTime button shows current time in its aria-label", () => {
     const { getByLabelText } = render(
       <Calendar value={new Date(2024, 5, 15, 14, 30)}>
-        <CalendarNav compactTime />
+        <TestToolbar compactTime />
       </Calendar>,
     );
     const btn = getByLabelText(/Change time, currently/);
@@ -119,7 +93,7 @@ describe("Nav popups — open/close via UI state", () => {
   it("compactMonths button opens the same month popup", async () => {
     const { container, getByLabelText } = render(
       <Calendar value={new Date(2024, 5, 15)}>
-        <CalendarNav compactMonths />
+        <TestToolbar compactMonths />
       </Calendar>,
     );
     const btn = getByLabelText(/Change month/);
@@ -138,7 +112,7 @@ describe("Nav popups — open/close via UI state", () => {
           lastValue = v;
         }}
       >
-        <CalendarNav showTime />
+        <TestToolbar showTime />
       </Calendar>,
     );
     const btn = container.querySelector(
@@ -148,11 +122,11 @@ describe("Nav popups — open/close via UI state", () => {
     expect(lastValue).toBe("untouched");
   });
 
-  it("does not render a duplicate popup from an offset nav", async () => {
+  it("does not render a duplicate popup from an offset toolbar", async () => {
     const { container, getByLabelText } = render(
       <Calendar value={new Date(2024, 5, 15)} cols={4}>
-        <CalendarNav showMonthPicker yearLabel col={2} />
-        <CalendarNav monthLabel yearLabel offset={1} col={2} />
+        <TestToolbar showMonthPicker yearLabel col={2} />
+        <TestToolbar monthLabel yearLabel offset={1} col={2} />
       </Calendar>,
     );
 
@@ -161,38 +135,5 @@ describe("Nav popups — open/close via UI state", () => {
     expect(
       container.querySelectorAll('[role="dialog"][aria-label="Select month"]'),
     ).toHaveLength(1);
-  });
-});
-
-describe("Nav — ambiguous picker combinations", () => {
-  it("warns when showMonthPicker and compactMonths are both true", () => {
-    render(
-      <Calendar value={new Date(2024, 5, 15)}>
-        <CalendarNav showMonthPicker compactMonths />
-      </Calendar>,
-    );
-    expect(warnSpy).toHaveBeenCalled();
-    const msg = warnSpy.mock.calls.flat().join(" ");
-    expect(msg).toContain("month UI variants");
-  });
-
-  it("warns when showYearPicker and compactYears are both true", () => {
-    render(
-      <Calendar value={new Date(2024, 5, 15)}>
-        <CalendarNav showYearPicker compactYears />
-      </Calendar>,
-    );
-    expect(warnSpy).toHaveBeenCalled();
-    const msg = warnSpy.mock.calls.flat().join(" ");
-    expect(msg).toContain("year UI variants");
-  });
-
-  it("does not warn when only one of each pair is set", () => {
-    render(
-      <Calendar value={new Date(2024, 5, 15)}>
-        <CalendarNav showMonthPicker showYearPicker />
-      </Calendar>,
-    );
-    expect(warnSpy).not.toHaveBeenCalled();
   });
 });

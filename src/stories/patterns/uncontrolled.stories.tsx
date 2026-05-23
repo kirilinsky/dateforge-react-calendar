@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
-import { CalendarNav } from "@/modules/nav";
 import { FIXED_DATE } from "../_constants";
 import { debugStyle, fmtDate } from "../_helpers/debug";
 import {
@@ -12,6 +11,7 @@ import {
   resolveStoryTheme,
   resolveStoryThemeMode,
 } from "../_helpers/resolve-globals";
+import { StoryToolbar } from "../_helpers/story-toolbar";
 
 const meta: Meta = {
   title: "Patterns/Uncontrolled",
@@ -49,7 +49,7 @@ export const Uncontrolled: Story = {
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
-          <CalendarNav showMonthPicker compactYears />
+          <StoryToolbar showMonthPicker compactYears />
           <CalendarDays />
         </Calendar>
       </>

@@ -3,12 +3,12 @@ import { useState } from "react";
 import { expect } from "storybook/test";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
-import { CalendarNav } from "@/modules/nav";
 import type { CalendarAppearance } from "@/types/appearances";
 import type { CalendarTheme, ThemeFamily } from "@/types/themes";
 import * as appearances from "../../../appearances/index";
 import * as themes from "../../../themes/index";
 import { FIXED_DATE } from "../_constants";
+import { StoryToolbar } from "../_helpers/story-toolbar";
 
 const themeFamilyEntries = [
   ["noir", themes.noir],
@@ -83,7 +83,7 @@ const Cell: React.FC<{
         light={mode === "light"}
         dark={mode === "dark"}
       >
-        <CalendarNav showMonthPicker compactYears />
+        <StoryToolbar showMonthPicker compactYears />
         <CalendarDays />
       </Calendar>
     </div>
@@ -171,17 +171,17 @@ export const CssCheck: Story = {
         theme={themes.dracula}
         appearance={appearances.loft}
       >
-        <CalendarNav showMonthPicker />
+        <StoryToolbar showMonthPicker />
         <CalendarDays />
       </Calendar>
     );
   },
   play: async ({ canvasElement }) => {
-    const header = canvasElement.querySelector(
-      '[data-area="header"]',
+    const toolbar = canvasElement.querySelector(
+      '[data-area="toolbar"]',
     ) as HTMLElement | null;
-    await expect(header).not.toBeNull();
-    const style = getComputedStyle(header!);
+    await expect(toolbar).not.toBeNull();
+    const style = getComputedStyle(toolbar!);
     // Dracula highlight token must reach descendants of [data-theme].
     // Browser normalizes the hex `#ff5e5e` to its rgb() form on resolve.
     await expect(style.getPropertyValue("--c-h").trim()).toBe(
