@@ -30,14 +30,3 @@ export const Clock = () =>
   I(
     "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z",
   );
-
-export {
-  MoonFirstQuarter,
-  MoonFull,
-  MoonLastQuarter,
-  MoonNew,
-  MoonWaningCrescent,
-  MoonWaningGibbous,
-  MoonWaxingCrescent,
-  MoonWaxingGibbous,
-} from "./moon";
