@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { expect } from "storybook/test";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
@@ -83,9 +83,47 @@ const Cell: React.FC<{
         light={mode === "light"}
         dark={mode === "dark"}
       >
-        <StoryToolbar showMonthPicker compactYears />
+        <StoryToolbar />
         <CalendarDays />
       </Calendar>
+    </div>
+  );
+};
+
+type CellProps = React.ComponentProps<typeof Cell>;
+
+const LazyCell: React.FC<CellProps> = (props) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          obs.disconnect();
+        }
+      },
+      { rootMargin: "400px" },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return (
+    <div ref={ref} style={{ width: 305, minHeight: 350 }}>
+      {visible ? (
+        <Cell {...props} />
+      ) : (
+        <div
+          style={{
+            width: 305,
+            height: 350,
+            borderRadius: 10,
+            background: "rgba(128,128,128,0.08)",
+          }}
+        />
+      )}
     </div>
   );
 };
@@ -113,8 +151,8 @@ const FamilyPair: React.FC<{
       {name}
     </span>
     <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
-      <Cell theme={theme} mode="light" label="light" />
-      <Cell theme={theme} mode="dark" label="dark" />
+      <LazyCell theme={theme} mode="light" label="light" />
+      <LazyCell theme={theme} mode="dark" label="dark" />
     </div>
   </div>
 );
