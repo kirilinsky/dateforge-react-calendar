@@ -15,7 +15,7 @@ describe("CalendarLunar", () => {
         <CalendarLunar />
       </Calendar>,
     );
-    const strip = screen.getByRole("group", { name: "Lunar phases" });
+    const strip = screen.getByRole("list", { name: "Lunar phases" });
     expect(strip).toBeInTheDocument();
     const cells = strip.querySelectorAll("[data-phase]");
     expect(cells.length).toBe(WINDOW_LENGTH);
@@ -65,7 +65,7 @@ describe("CalendarLunar", () => {
     const cells = document.querySelectorAll("[data-phase]");
     const anchorCell = cells[ANCHOR_INDEX];
     expect(anchorCell.textContent).not.toContain("FULL");
-    expect(anchorCell.getAttribute("aria-label")).toMatch(FULL_PHRASE_LONG);
+    expect(anchorCell.textContent).toContain(FULL_PHRASE_LONG);
   });
 
   it("phaseLabels override per phase", () => {
@@ -86,9 +86,7 @@ describe("CalendarLunar", () => {
       </Calendar>,
     );
     const cells = document.querySelectorAll("[data-phase]");
-    expect(cells[ANCHOR_INDEX].getAttribute("aria-label")).toMatch(
-      /Полнолуние/,
-    );
+    expect(cells[ANCHOR_INDEX].textContent).toMatch(/Полнолуние/);
   });
 
   it("custom lunarLabel applies to the strip group", () => {
@@ -97,9 +95,7 @@ describe("CalendarLunar", () => {
         <CalendarLunar lunarLabel="Фазы луны" />
       </Calendar>,
     );
-    expect(
-      screen.getByRole("group", { name: "Фазы луны" }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "Фазы луны" })).toBeInTheDocument();
   });
 
   it("falls back to viewDate when nothing is selected", () => {
