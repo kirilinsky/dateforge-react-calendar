@@ -32,9 +32,9 @@
 
 **A modular calendar toolkit that starts tiny and grows with your product.**
 
-Monolithic pickers ship the grid, nav, time picker, presets, layout opinions, and weight. DateForge ships only what you use.
+Monolithic pickers ship the grid, toolbar, time picker, presets, layout opinions, and weight. DateForge ships only what you use.
 
-Start with two components. Add range selection, multi-select, time, presets, manual input, chips, tracks, custom layouts, themes, and tokens.
+Start with a toolbar and a grid. Add range selection, multi-select, time, presets, manual input, chips, tracks, custom layouts, themes, and tokens.
 
 DateForge is not one picker with a long prop list. It is a set of focused modules that share one calendar brain.
 
@@ -73,14 +73,26 @@ No global CSS import is required — styles are bundled into the modules and app
 ```tsx
 import { useState } from "react";
 import { Calendar } from "@dateforge/react-calendar";
-import { CalendarNav, CalendarDays } from "@dateforge/react-calendar/modules";
+import {
+  CalendarDays,
+  CalendarToolbar,
+  CalendarToolbarMonthTrigger,
+  CalendarToolbarNext,
+  CalendarToolbarPrev,
+  CalendarToolbarYearTrigger,
+} from "@dateforge/react-calendar/modules";
 
 export function Example() {
   const [date, setDate] = useState<Date | null>(null);
 
   return (
     <Calendar mode="single" value={date} onChange={setDate}>
-      <CalendarNav showMonthPicker compactYears />
+      <CalendarToolbar>
+        <CalendarToolbarPrev />
+        <CalendarToolbarMonthTrigger />
+        <CalendarToolbarYearTrigger compact />
+        <CalendarToolbarNext />
+      </CalendarToolbar>
       <CalendarDays />
     </Calendar>
   );
@@ -91,7 +103,7 @@ export function Example() {
 
 Most date pickers ask you to accept their shape. DateForge lets you forge yours.
 
-- **Ship less by default** — import `CalendarDays` and `CalendarNav`, then stop. No unused time picker, presets, or hidden panel.
+- **Ship less by default** — import `CalendarDays` and the toolbar pieces you need, then stop. No unused time picker, presets, or hidden panel.
 - **Compose real workflows** — add modules for range previews, multi-month layouts, inline time, shortcuts, manual input, summaries, or tracks.
 - **Keep one shared state model** — every module plugs into the same provider, so custom layouts feel native instead of stitched together.
 - **Style it like your system** — themes, appearances, gradients, CSS-grid placement, and tokens help it feel built-in.
@@ -100,7 +112,12 @@ Most date pickers ask you to accept their shape. DateForge lets you forge yours.
 
 ```tsx
 <Calendar mode="range" value={range} onChange={setRange}>
-  <CalendarNav showMonthPicker compactYears />
+  <CalendarToolbar>
+    <CalendarToolbarPrev />
+    <CalendarToolbarMonthTrigger />
+    <CalendarToolbarYearTrigger compact />
+    <CalendarToolbarNext />
+  </CalendarToolbar>
   <CalendarDays />
   <CalendarPresets presets={presets} />
   <CalendarSelectedDates />
@@ -134,7 +151,7 @@ const brand = createTheme({
 
 | Module                  | Use it for                                                  |
 | ----------------------- | ----------------------------------------------------------- |
-| `CalendarNav`           | Month/year navigation, popups, clear, optional time         |
+| `CalendarToolbar`       | Composable header row for navigation, labels, popups, time  |
 | `CalendarDays`          | Classic month grid for single, multiple, and range          |
 | `CalendarSelectedDates` | Selected-date chips, overflow, per-chip clear               |
 | `CalendarInfo`          | Selection metrics, relative hints, empty text, home / clear |
@@ -156,7 +173,7 @@ const brand = createTheme({
 - **Tracks** — `DaysTrack`, `MonthsTrack`, `YearsTrack`. Horizontal scrollable strips (compact / mobile).
 - **Wheels** — `TimeWheel`, `MonthsWheel`, `YearsWheel`. iOS-style drum pickers with physics, optional `bound` for range, optional `showReset` for "current".
 - **Inputs** — `ManualInput`. Typed dates with mask + format.
-- **Helpers** — `Nav`, `Presets`.
+- **Helpers** — `Toolbar`, `Presets`.
 - **Information** — `Info`, `SelectedDates`, `Lunar`. Read-only / display-focused; minor interactive bits (clear, per-chip remove) are escape hatches, not the primary purpose.
 
 ---

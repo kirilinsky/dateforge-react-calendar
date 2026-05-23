@@ -1,0 +1,15 @@
+@layer cal-modules {
+  .button {
+    width: var(--cal-size-chip, 2.3em);
+    height: var(--cal-size-chip, 2.3em);
+    flex: 0 0 auto;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    & svg {
+      width: 1.1em;
+      height: 1.1em;
+    }
+  }
+}

@@ -5,20 +5,20 @@ import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
 import { CalendarDaysTrack } from "@/modules/days-track";
 import { CalendarManualInput } from "@/modules/manual-input";
-import { CalendarNav } from "@/modules/nav";
 import { CalendarPresets } from "@/modules/presets";
 import { basicPresets } from "@/modules/presets/presets-pack";
 import { CalendarSelectedDates } from "@/modules/selected-dates";
 import { CalendarTimeWheel } from "@/modules/time";
+import { TestToolbar } from "../helpers/test-toolbar";
 
 const D = new Date(2024, 5, 15);
 
-describe("readOnly — Nav clear", () => {
+describe("readOnly — Toolbar clear", () => {
   it("clear button is disabled and does not fire onChange", async () => {
     const onChange = vi.fn();
     const { container } = render(
       <Calendar value={D} onChange={onChange} readOnly>
-        <CalendarNav clear />
+        <TestToolbar clear />
       </Calendar>,
     );
     const btn = within(container).getByLabelText("Clear");
@@ -30,7 +30,7 @@ describe("readOnly — Nav clear", () => {
   it("clear button is enabled when not readOnly", () => {
     const { container } = render(
       <Calendar value={D}>
-        <CalendarNav clear />
+        <TestToolbar clear />
       </Calendar>,
     );
     const btn = within(container).getByLabelText("Clear");

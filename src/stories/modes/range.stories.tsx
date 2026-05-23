@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useMemo, useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
-import { CalendarNav } from "@/modules/nav";
 import { createDisabled } from "@/utils/create-disabled";
 import { FIXED_DATE } from "../_constants";
 import { debugStyle, fmtRange } from "../_helpers/debug";
@@ -13,6 +12,7 @@ import {
   resolveStoryTheme,
   resolveStoryThemeMode,
 } from "../_helpers/resolve-globals";
+import { StoryToolbar } from "../_helpers/story-toolbar";
 
 type RangeValue = { from: Date | null; to: Date | null };
 
@@ -43,7 +43,7 @@ export const Default: Story = {
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
-          <CalendarNav showMonthPicker compactYears />
+          <StoryToolbar showMonthPicker compactYears />
           <CalendarDays />
         </Calendar>
       </>
@@ -79,7 +79,7 @@ export const WithMinRangeDays: Story = {
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
-          <CalendarNav showMonthPicker compactYears />
+          <StoryToolbar showMonthPicker compactYears />
           <CalendarDays />
         </Calendar>
       </>
@@ -116,7 +116,7 @@ export const WithMaxRangeDays: Story = {
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
-          <CalendarNav showMonthPicker compactYears />
+          <StoryToolbar showMonthPicker compactYears />
           <CalendarDays />
         </Calendar>
       </>
@@ -145,7 +145,7 @@ export const HoverPreview: Story = {
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
-          <CalendarNav showMonthPicker compactYears />
+          <StoryToolbar showMonthPicker compactYears />
           <CalendarDays />
         </Calendar>
       </>
@@ -193,7 +193,7 @@ export const DisabledInsideRange: Story = {
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
-          <CalendarNav showMonthPicker compactYears />
+          <StoryToolbar showMonthPicker compactYears />
           <CalendarDays />
         </Calendar>
       </>
@@ -222,8 +222,8 @@ export const TwoMonths: Story = {
           gradient={resolveStoryGradient(ctx.globals.gradient)}
           locale={resolveStoryLocale(ctx.globals.locale)}
         >
-          <CalendarNav showMonthPicker col={2} />
-          <CalendarNav monthLabel compactYears offset={1} col={2} />
+          <StoryToolbar showMonthPicker col={2} />
+          <StoryToolbar monthLabel compactYears offset={1} col={2} />
           <CalendarDays offset={0} col={2} />
           <CalendarDays offset={1} col={2} />
         </Calendar>
@@ -248,7 +248,7 @@ export const ReadOnly: Story = {
         gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
-        <CalendarNav showMonthPicker compactYears />
+        <StoryToolbar showMonthPicker compactYears />
         <CalendarDays />
       </Calendar>
     );

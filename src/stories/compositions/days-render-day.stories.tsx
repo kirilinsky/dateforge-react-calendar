@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays, type DayState } from "@/modules/days";
-import { CalendarNav } from "@/modules/nav";
 import { FIXED_DATE } from "../_constants";
 import {
   resolveStoryAppearance,
@@ -11,6 +10,7 @@ import {
   resolveStoryTheme,
   resolveStoryThemeMode,
 } from "../_helpers/resolve-globals";
+import { StoryToolbar } from "../_helpers/story-toolbar";
 
 const meta: Meta = {
   title: "Compositions/Days renderDay",
@@ -72,7 +72,7 @@ export const Weather: Story = {
         gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
-        <CalendarNav />
+        <StoryToolbar />
         <CalendarDays
           renderDay={(d, state) => {
             if (state.isOtherMonth) return renderOtherMonth(d, state);
@@ -115,7 +115,7 @@ export const Heatmap: Story = {
         gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
-        <CalendarNav />
+        <StoryToolbar />
         <CalendarDays
           renderDay={(d, state) => {
             if (state.isOtherMonth) return renderOtherMonth(d, state);
@@ -162,7 +162,7 @@ export const TicketPrices: Story = {
         gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
-        <CalendarNav />
+        <StoryToolbar />
         <CalendarDays
           renderDay={(d, state) => {
             if (state.isOtherMonth) return renderOtherMonth(d, state);
@@ -212,7 +212,7 @@ export const EventDots: Story = {
         gradient={resolveStoryGradient(ctx.globals.gradient)}
         locale={resolveStoryLocale(ctx.globals.locale)}
       >
-        <CalendarNav />
+        <StoryToolbar />
         <CalendarDays
           renderDay={(d, state) => {
             if (state.isOtherMonth) return renderOtherMonth(d, state);

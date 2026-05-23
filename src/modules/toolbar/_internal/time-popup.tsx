@@ -1,6 +1,9 @@
 import { useRef, useState } from "react";
 import { Popup } from "@/components/popup/popup";
-import { TimeTrack } from "@/components/time-track/time-track";
+import {
+  type TimeLabelStyle,
+  TimeTrack,
+} from "@/components/time-track/time-track";
 import { useConfig } from "@/context/config-context";
 import type { CalendarTheme } from "@/types/themes";
 
@@ -14,6 +17,7 @@ interface TimePopupProps {
   confirmLabel?: string;
   hoursLabel?: string;
   label?: string;
+  labels?: TimeLabelStyle;
   minutesLabel?: string;
   secondsLabel?: string;
   timePeriodLabel?: string;
@@ -31,6 +35,7 @@ export const TimePopup = ({
   confirmLabel,
   hoursLabel,
   label = "Select time",
+  labels,
   minutesLabel,
   secondsLabel,
   timePeriodLabel,
@@ -60,6 +65,7 @@ export const TimePopup = ({
         hour12={hour12}
         locale={locale}
         showSeconds={showSeconds}
+        labels={labels}
         readOnly={readOnly}
         step={timeStep}
         hoursLabel={hoursLabel}

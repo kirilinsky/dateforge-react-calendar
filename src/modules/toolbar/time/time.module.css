@@ -1,0 +1,27 @@
+@layer cal-modules {
+  .timeButton {
+    background: var(--active-cell-bg, var(--c-h));
+    color: var(--active-cell-color, var(--c-at, var(--c-a)));
+    box-shadow: var(--active-cell-stroke, none);
+    padding: 0 0.7em;
+    height: var(--cal-size-chip, 2.3em);
+    font-size: var(--cal-text-md);
+    font-weight: var(--cal-weight-semibold);
+    flex: 0 0 auto;
+    min-width: max-content;
+  }
+
+  .iconButton {
+    width: var(--cal-size-chip, 2.3em);
+    height: var(--cal-size-chip, 2.3em);
+    flex: 0 0 auto;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    & svg {
+      width: 1.1em;
+      height: 1.1em;
+    }
+  }
+}

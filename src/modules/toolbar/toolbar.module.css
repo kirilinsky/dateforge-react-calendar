@@ -1,0 +1,34 @@
+@layer cal-modules {
+  .toolbar {
+    container-type: inline-size;
+    container-name: cal-toolbar;
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.35em 0.45em;
+    font-size: var(--cal-nav-font-size);
+    padding: var(--cal-nav-padding, 0.45em 0.7em);
+    min-height: var(--cal-nav-min-height, 3.2em);
+    height: auto;
+    z-index: 3;
+    position: relative;
+    box-sizing: border-box;
+    overflow: visible;
+    transition:
+      background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      box-shadow var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
+    &:hover {
+      box-shadow: 0 0.1em 0.1em var(--c-x);
+    }
+  }
+
+  /* grid mode — activated when cols prop is set */
+  .toolbar[data-cols] {
+    display: grid;
+    align-items: center;
+    gap: 0.35em 0.45em;
+  }
+}

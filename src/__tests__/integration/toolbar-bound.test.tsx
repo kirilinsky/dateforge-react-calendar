@@ -2,11 +2,11 @@ import { fireEvent, render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
-import { CalendarNav } from "@/modules/nav";
+import { TestToolbar } from "../helpers/test-toolbar";
 
 const D = (y: number, m: number, d: number) => new Date(y, m, d);
 
-describe("CalendarNav — bound prop", () => {
+describe("TestToolbar — bound prop", () => {
   it("displays rangeStart year when bound=from", () => {
     const { getByLabelText } = render(
       <Calendar
@@ -14,7 +14,7 @@ describe("CalendarNav — bound prop", () => {
         value={{ from: D(2022, 3, 10), to: D(2024, 5, 15) }}
         defaultViewDate={D(2024, 5, 15)}
       >
-        <CalendarNav bound="from" yearLabel monthLabel />
+        <TestToolbar bound="from" yearLabel monthLabel />
       </Calendar>,
     );
     // currentYear button label rendered for yearLabel — use container text
@@ -28,7 +28,7 @@ describe("CalendarNav — bound prop", () => {
         value={{ from: D(2022, 3, 10), to: D(2024, 5, 15) }}
         defaultViewDate={D(2022, 3, 10)}
       >
-        <CalendarNav bound="to" yearLabel monthLabel />
+        <TestToolbar bound="to" yearLabel monthLabel />
       </Calendar>,
     );
     expect(getByLabelText("Calendar navigation").textContent).toContain("2024");
@@ -41,7 +41,7 @@ describe("CalendarNav — bound prop", () => {
         value={{ from: D(2022, 3, 10), to: null }}
         defaultViewDate={D(2030, 0, 1)}
       >
-        <CalendarNav bound="to" yearLabel />
+        <TestToolbar bound="to" yearLabel />
       </Calendar>,
     );
     // `to` empty → falls back to rangeStart (2022), not viewDate (2030)
@@ -57,7 +57,7 @@ describe("CalendarNav — bound prop", () => {
         onChange={onChange}
         defaultViewDate={D(2022, 3, 10)}
       >
-        <CalendarNav bound="from" clear yearLabel />
+        <TestToolbar bound="from" clear yearLabel />
       </Calendar>,
     );
     fireEvent.click(getByLabelText("Clear"));
@@ -75,7 +75,7 @@ describe("CalendarNav — bound prop", () => {
         value={{ from: null, to: D(2024, 5, 15) }}
         defaultViewDate={D(2024, 5, 15)}
       >
-        <CalendarNav bound="from" clear />
+        <TestToolbar bound="from" clear />
       </Calendar>,
     );
     const btn = getByLabelText("Clear") as HTMLButtonElement;
@@ -91,7 +91,7 @@ describe("CalendarNav — bound prop", () => {
         onChange={onChange}
         defaultViewDate={D(2024, 7, 20)}
       >
-        <CalendarNav bound="to" showMonthPicker />
+        <TestToolbar bound="to" showMonthPicker />
       </Calendar>,
     );
     const prev = container.querySelector(
@@ -112,7 +112,7 @@ describe("CalendarNav — bound prop", () => {
         onChange={onChange}
         defaultViewDate={D(2024, 5, 16)}
       >
-        <CalendarNav bound="to" showMonthPicker />
+        <TestToolbar bound="to" showMonthPicker />
       </Calendar>,
     );
     const prev = container.querySelector(

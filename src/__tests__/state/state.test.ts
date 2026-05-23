@@ -486,7 +486,7 @@ describe("HOVER", () => {
 });
 
 // Popup state lives in provider's useState now (see UIContext.showTimePopup
-// etc.). It is exercised by integration tests for Nav popups.
+// etc.). It is exercised by integration tests for Toolbar popups.
 
 // ─── CHANGE_TIME ─────────────────────────────────────────────────────────────
 

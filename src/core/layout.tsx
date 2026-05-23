@@ -89,7 +89,7 @@ export const CalendarLayout: React.FC<{
           <span className={styles.emptyStateTitle}>No modules</span>
           <span className={styles.emptyStateHint}>
             Add modules like <code>&lt;CalendarDays /&gt;</code> or{" "}
-            <code>&lt;CalendarNav /&gt;</code> as children of{" "}
+            <code>&lt;CalendarToolbar /&gt;</code> as children of{" "}
             <code>&lt;Calendar /&gt;</code>
           </span>
         </div>

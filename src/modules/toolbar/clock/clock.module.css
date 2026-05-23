@@ -1,0 +1,21 @@
+@layer cal-modules {
+  .clock {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    min-width: max-content;
+    height: var(--cal-size-chip, 2.3em);
+    padding: 0 0.55em;
+    color: var(--c-m, var(--c-c));
+    font-size: var(--cal-text-md);
+    font-weight: var(--cal-weight-medium);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dot {
+    width: 0.42em;
+    height: 0.42em;
+    border-radius: 999px;
+    background: var(--active-cell-bg, var(--c-h));
+  }
+}

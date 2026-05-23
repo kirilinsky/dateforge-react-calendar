@@ -12,7 +12,7 @@
 - [Recommended compositions](#recommended-compositions)
 - [CalendarDays](#calendardays)
 - [Modules](#modules)
-  - [CalendarNav](#calendarnav)
+  - [CalendarToolbar](#calendartoolbar)
   - [CalendarMonthsGrid](#calendarmonthsgrid)
   - [CalendarYearsGrid](#calendaryearsgrid)
   - [CalendarPresets](#calendarpresets)
@@ -50,14 +50,26 @@ Minimal single-date picker:
 ```tsx
 import { useState } from "react";
 import { Calendar } from "@dateforge/react-calendar";
-import { CalendarNav, CalendarDays } from "@dateforge/react-calendar/modules";
+import {
+  CalendarDays,
+  CalendarToolbar,
+  CalendarToolbarMonthTrigger,
+  CalendarToolbarNext,
+  CalendarToolbarPrev,
+  CalendarToolbarYearTrigger,
+} from "@dateforge/react-calendar/modules";
 
 export function DatePicker() {
   const [date, setDate] = useState<Date | null>(null);
 
   return (
     <Calendar mode="single" value={date} onChange={setDate}>
-      <CalendarNav showMonthPicker compactYears />
+      <CalendarToolbar>
+        <CalendarToolbarPrev />
+        <CalendarToolbarMonthTrigger />
+        <CalendarToolbarYearTrigger compact />
+        <CalendarToolbarNext />
+      </CalendarToolbar>
       <CalendarDays />
     </Calendar>
   );
@@ -90,9 +102,9 @@ Pick the modules per the UX you want. All compose under one `<Calendar>` provide
 
 | You want…                       | Modules                                                                                        |
 | ------------------------------- | ---------------------------------------------------------------------------------------------- |
-| Basic date picker               | `CalendarNav`, `CalendarDays`                                                                  |
-| Date range picker               | `CalendarNav`, `CalendarDays` (set `mode="range"` on `<Calendar>`)                             |
-| Date + time picker              | `CalendarNav` (with `showTime`) + `CalendarDays`, or inline `CalendarTimeWheel`                 |
+| Basic date picker               | `CalendarToolbar`, `CalendarToolbarPrev/Next`, month/year trigger or label modules, `CalendarDays` |
+| Date range picker               | `CalendarToolbar`, `CalendarDays` (set `mode="range"` on `<Calendar>`)                         |
+| Date + time picker              | `CalendarToolbarTime` inside `CalendarToolbar` + `CalendarDays`, or inline `CalendarTimeWheel`  |
 | Time-only picker                | `CalendarTimeWheel` (no `CalendarDays`)                                                         |
 | Manual typing / keyboard-first  | `CalendarManualInput` (alone or with `CalendarDays`)                                           |
 | Presets (Today, Last 7 days, …) | `CalendarPresets` (+ any picker modules)                                                       |
@@ -110,7 +122,7 @@ Three subpaths, each tree-shakeable:
 | Import from                                 | What's there                                                                                   | When to use                                                                   |
 | ------------------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | `@dateforge/react-calendar`                 | `Calendar`, `createTheme`, `createDisabled`, `createAppearance`, all public types              | Always — the root provider lives here.                                        |
-| `@dateforge/react-calendar/modules`         | All `Calendar*` module components (Days, Nav, Presets, TimeWheel, …)                            | When pulling in the visible UI pieces.                                        |
+| `@dateforge/react-calendar/modules`         | All `Calendar*` module components (Days, Toolbar, Presets, TimeWheel, …)                        | When pulling in the visible UI pieces.                                        |
 | `@dateforge/react-calendar/context`         | Context hooks: `useConfig`, `useNavigation`, `useSelection`, `useSelectionActions`, `useUI`, … | When building custom modules that need to read or dispatch calendar state.    |
 | `@dateforge/react-calendar/themes`          | All theme families re-exported together                                                        | Quick prototyping; pulls every theme family into the bundle.                  |
 | `@dateforge/react-calendar/themes/<name>`   | A single theme family (e.g. `…/themes/nebula`)                                                 | Production — only the theme families you actually use end up in the bundle.   |
@@ -140,10 +152,22 @@ The root component. All other components must be placed as its children.
 
 ```tsx
 import { Calendar } from "@dateforge/react-calendar";
-import { CalendarNav, CalendarDays } from "@dateforge/react-calendar/modules";
+import {
+  CalendarDays,
+  CalendarToolbar,
+  CalendarToolbarMonthLabel,
+  CalendarToolbarNext,
+  CalendarToolbarPrev,
+  CalendarToolbarYearLabel,
+} from "@dateforge/react-calendar/modules";
 
 <Calendar mode="single" onChange={(v) => console.log(v)}>
-  <CalendarNav />
+  <CalendarToolbar>
+    <CalendarToolbarPrev />
+    <CalendarToolbarMonthLabel />
+    <CalendarToolbarYearLabel />
+    <CalendarToolbarNext />
+  </CalendarToolbar>
   <CalendarDays />
 </Calendar>;
 ```
@@ -160,11 +184,11 @@ import { CalendarNav, CalendarDays } from "@dateforge/react-calendar/modules";
 | `cols`            | `number`                                              | —          | Number of columns in the internal CSS grid                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `locale`          | `string`                                              | `"en"`     | BCP 47 language tag used for all labels and formatting                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | `timeZone`        | `string \| "auto"`                                    | `"auto"`   | IANA timezone (`"Europe/Paris"`, `"UTC"`), fixed offset (`"UTC+2"`, `"UTC-5"`), or `"auto"`. When `"auto"` (or omitted) the library detects the user's timezone via `Intl.DateTimeFormat().resolvedOptions().timeZone` after mount. Invalid values fall back to auto-detect with a dev warning. Affects today detection, emitted date midnight, and formatting. **Important:** with an explicit `timeZone`, the `Date` passed to `onChange` is the absolute instant of midnight **in that zone** — see [Timezone](#timezone) for examples and storage guidance |
-| `readOnly`        | `boolean`                                             | `false`    | Disables all state-changing interactions (date/time selection). Navigation still works. Adds `data-readonly` on the root and `aria-disabled` on each interactive cell — the wrapper itself carries no ARIA state because plain `<div>` does not support `aria-readonly` per ARIA spec                                                                                                                                                                                                                                                                          |
+| `readOnly`        | `boolean`                                             | `false`    | Disables state-changing interactions (date/time selection). Non-committing navigation modules can still move the view; toolbar controls that can write bound state, clear selection, or open commit popups render disabled. Adds `data-readonly` on the root and `aria-disabled` on each interactive cell — the wrapper itself carries no ARIA state because plain `<div>` does not support `aria-readonly` per ARIA spec                                                                                                                                    |
 | `clearLabel`      | `string`                                              | `"Clear"`  | Global aria-label for clear buttons. Module-level `clearLabel` props override it                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `homeLabel`       | `string`                                              | `"Go to current month"` | Global aria-label for home/current-month buttons. Module-level `homeLabel` props override it                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | `hour12`          | `boolean`                                             | `false`    | Use 12-hour time format instead of 24-hour                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `timeStep`        | `{ hour?: number; minute?: number; second?: number }` | `{1,1,1}`  | Granularity (step) for time drums. Affects both inline `CalendarTimeWheel` and `CalendarNav` time popup. Example: `timeStep={{ minute: 5 }}` snaps minutes to 0/5/10/.../55. Step values divide the unit range; `aria-valuemax`, keyboard `±step`, and scroll snap follow the step. Default `1` (no snapping)                                                                                                                                                                                                                                                   |
+| `timeStep`        | `{ hour?: number; minute?: number; second?: number }` | `{1,1,1}`  | Granularity (step) for time drums. Affects both inline `CalendarTimeWheel` and the `CalendarToolbarTime` popup. Example: `timeStep={{ minute: 5 }}` snaps minutes to 0/5/10/.../55. Step values divide the unit range; `aria-valuemax`, keyboard `±step`, and scroll snap follow the step. Default `1` (no snapping)                                                                                                                                                                                                                                             |
 | `theme`           | `CalendarTheme`                                       | `"auto"`   | Base mode string (`"auto"` / `"light"` / `"dark"`) or a theme family from `@dateforge/react-calendar/themes[/name]` or `createTheme()`. Named string themes (e.g. `"nebula"`) are not supported — import the family object instead.                                                                                                                                                                                                                                                                                                                               |
 | `light`           | `boolean`                                             | `false`    | Start in light mode. Works with the default palette and imported/custom theme families.                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | `dark`            | `boolean`                                             | `false`    | Start in dark mode. If both `light` and `dark` are passed, dark wins and a dev warning is emitted.                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
@@ -205,10 +229,10 @@ All of these props can be passed to `<Calendar>`.
 | Prop | Default | Placeholders | Used for |
 | ---- | ------- | ------------ | -------- |
 | `applyLabel` | `"Apply"` | — | Manual input apply buttons |
-| `calendarNavigationLabel` | `"Calendar navigation"` | — | Nav toolbar when no visible `label` prop is provided |
-| `changeMonthLabel` | `"Change month, currently {month}"` | `{month}` | Nav month popup trigger |
-| `changeTimeLabel` | `"Change time, currently {time}"` | `{time}` | Nav time popup trigger |
-| `changeYearLabel` | `"Change year, currently {year}"` | `{year}` | Nav year popup trigger |
+| `calendarNavigationLabel` | `"Calendar navigation"` | — | Toolbar landmark label |
+| `changeMonthLabel` | `"Change month, currently {month}"` | `{month}` | Toolbar month popup trigger |
+| `changeTimeLabel` | `"Change time, currently {time}"` | `{time}` | Toolbar time popup trigger |
+| `changeYearLabel` | `"Change year, currently {year}"` | `{year}` | Toolbar year popup trigger |
 | `clearLabel` | `"Clear"` | — | Clear buttons |
 | `confirmLabel` | `"Confirm"` | — | Popup confirm buttons |
 | `dayTrackLabel` | `"Day"` | — | Days track spinbutton |
@@ -216,13 +240,13 @@ All of these props can be passed to `<Calendar>`.
 | `hoursLabel` | `"Hours"` | — | Time hour drum |
 | `minutesLabel` | `"Minutes"` | — | Time minute drum |
 | `monthGridLabel` | `"Select month, {year}"` | `{year}` | Months grid group |
-| `monthPickerLabel` | `"Month picker"` | — | Nav month picker group |
+| `monthPickerLabel` | `"Month picker"` | — | Month wheel group |
 | `monthTrackLabel` | `"Month"` | — | Month track / month popup drum |
-| `nextMonthLabel` | `"Next month"` | — | Nav next-month button |
-| `nextYearLabel` | `"Next year"` | — | Nav next-year button |
+| `nextMonthLabel` | `"Next month"` | — | Toolbar next-month button |
+| `nextYearLabel` | `"Next year"` | — | Toolbar next-year button |
 | `nextYearsLabel` | `"Next years"` | — | Years grid next-page button |
-| `previousMonthLabel` | `"Previous month"` | — | Nav previous-month button |
-| `previousYearLabel` | `"Previous year"` | — | Nav previous-year button |
+| `previousMonthLabel` | `"Previous month"` | — | Toolbar previous-month button |
+| `previousYearLabel` | `"Previous year"` | — | Toolbar previous-year button |
 | `previousYearsLabel` | `"Previous years"` | — | Years grid previous-page button |
 | `removeLabel` | `"Remove"` | — | Manual input per-chip remove button |
 | `removeRangeEndLabel` | `"Remove range end"` | — | Selected-dates range-end remove button |
@@ -243,7 +267,7 @@ All of these props can be passed to `<Calendar>`.
 | `weekLabel` | `"Week"` | — | Days grid week-number rows and row headers |
 | `yearGridLabel` | `"Select year, showing {from} to {to}"` | `{from}`, `{to}` | Years grid group |
 | `yearPageNavigationLabel` | `"Year page navigation"` | — | Years grid page controls group |
-| `yearPickerLabel` | `"Year picker"` | — | Nav year picker group |
+| `yearPickerLabel` | `"Year picker"` | — | Year wheel group |
 | `yearTrackLabel` | `"Year"` | — | Year track / year popup drum |
 
 #### Module override props
@@ -252,7 +276,7 @@ Module props use the same names and override the matching root prop only for tha
 
 | Module | Override props |
 | ------ | -------------- |
-| `CalendarNav` | `calendarNavigationLabel`, `changeMonthLabel`, `changeTimeLabel`, `changeYearLabel`, `clearLabel`, `confirmLabel`, `homeLabel`, `hoursLabel`, `minutesLabel`, `monthPickerLabel`, `monthTrackLabel`, `nextMonthLabel`, `nextYearLabel`, `previousMonthLabel`, `previousYearLabel`, `secondsLabel`, `selectMonthLabel`, `selectTimeLabel`, `selectYearLabel`, `themeSwitchToDarkLabel`, `themeSwitchToLightLabel`, `themeToggleLabel`, `timePeriodLabel`, `timePickerLabel`, `yearPickerLabel`, `yearTrackLabel` |
+| `CalendarToolbar` modules | `calendarNavigationLabel`, `changeMonthLabel`, `changeTimeLabel`, `changeYearLabel`, `clearLabel`, `confirmLabel`, `homeLabel`, `hoursLabel`, `minutesLabel`, `monthTrackLabel`, `nextMonthLabel`, `nextYearLabel`, `previousMonthLabel`, `previousYearLabel`, `secondsLabel`, `selectMonthLabel`, `selectTimeLabel`, `selectYearLabel`, `themeSwitchToDarkLabel`, `themeSwitchToLightLabel`, `themeToggleLabel`, `timePeriodLabel`, `timePickerLabel`, `yearTrackLabel` |
 | `CalendarDays` | `weekLabel` |
 | `CalendarInfo` | `clearLabel`, `homeLabel` |
 | `CalendarManualInput` | `applyLabel`, `clearLabel`, `removeLabel` |
@@ -266,13 +290,13 @@ Module props use the same names and override the matching root prop only for tha
 
 ### When does each action fire `onChange`?
 
-The complete cross-module matrix lives in `ARCHITECTURE.md → Module behavior matrix`. It tells you for every public action — Nav arrows, day click, preset click, drum scroll, manual input commit, etc. — whether it changes the view, mutates the selection, fires the consumer callback, and how it behaves under `readOnly`.
+The complete cross-module matrix lives in `ARCHITECTURE.md → Module behavior matrix`. It tells you for every public action — Toolbar arrows, day click, preset click, drum scroll, manual input commit, etc. — whether it changes the view, mutates the selection, fires the consumer callback, and how it behaves under `readOnly`.
 
 Quick high-level summary:
 
-- **Pure navigation** (Nav arrows / popups, MonthsGrid / YearsGrid clicks, Track scrolling without `bound`) never fires `onChange`.
+- **Pure navigation** (Toolbar arrows / popups, MonthsGrid / YearsGrid clicks, Track scrolling without `bound`) never fires `onChange`.
 - **Pure selection** (Days click, ManualInput Enter / apply, Presets click, SelectedDates clear) fires `onChange`.
-- **Mixed actions** (Nav `clear`, `showTime` confirm, Days click that crosses months, Track items in `bound` mode) change both view and selection — fire `onChange`.
+- **Mixed actions** (Toolbar `Clear`, `Time` confirm, Days click that crosses months, Track items in `bound` mode) change both view and selection — fire `onChange`.
 - **`readOnly`** disables every selection-affecting affordance; navigation stays enabled.
 
 ### Controlled and uncontrolled
@@ -339,7 +363,7 @@ That's it — `value` is `null` on the server (no day selected in SSR HTML), `to
 
 ### Time semantics — when does time editing fire `onChange`?
 
-`CalendarTimeWheel` and `CalendarNav.showTime` both edit time. They share the same rules. The principle is:
+`CalendarTimeWheel` and `CalendarToolbarTime` both edit time. They share the same rules. The principle is:
 
 > `viewDate` always carries the **current working time**. A selection's time is updated only when the selection corresponds to `viewDate`'s day. Otherwise the time stays "pending" — applied to the next date the user selects in `CalendarDays` (because Days commits a new date with `viewDate.hours / minutes / seconds`).
 
@@ -358,7 +382,7 @@ Per-mode behavior:
 | `range`    | `rangeEnd` day matches `viewDate`         | updates `rangeEnd`'s time                               | yes               |
 | `range`    | neither matches                           | pending                                                 | no                |
 
-¹ This makes `<Calendar mode="single"><CalendarNav showTime /><CalendarTimeWheel /></Calendar>` work as a **time-only picker**: scrolling time drums commits a date for today (or whatever `viewDate` defaults to). For `multiple` and `range` modes time-only pickers are not supported by design — the user must select a date first because there is no unambiguous boundary to attach time to.
+¹ This makes `<Calendar mode="single"><CalendarToolbarTime /><CalendarTimeWheel /></Calendar>` work as a **time-only picker**: scrolling time drums commits a date for today (or whatever `viewDate` defaults to). For `multiple` and `range` modes time-only pickers are not supported by design — the user must select a date first because there is no unambiguous boundary to attach time to.
 
 **Pending vs committed.** "Pending" means `viewDate.hours / minutes / seconds` are updated for display and for the next selection, but the existing committed selection is not mutated and `onChange` is not called. The next click in `CalendarDays` will pick up the pending time automatically.
 
@@ -404,7 +428,6 @@ For purely local single-user CRUD without SSR, the default `"auto"` is the right
 | `timeZone` not a valid IANA / `UTC±N`                                                                                   | Falls back to auto-detect                                                                                                                                 |
 | `theme` string outside `"auto" \| "light" \| "dark"`                                                                    | Falls back to system theme                                                                                                                                |
 | `<CalendarYearsGrid yearsPerPage>` outside 1..40 / non-integer                                                          | Clamped to 1..40                                                                                                                                          |
-| `<CalendarNav>` with both `showMonthPicker` + `compactMonths` (or year equivalents)                                     | Both UI variants render; warn                                                                                                                             |
 | `<CalendarPresets>` entry: not an object / missing `label` / duplicate `id` / throwing `getValue` / Invalid Date result | Entry skipped                                                                                                                                             |
 | `createDisabled()` bad input (non-object init, invalid Dates, malformed ranges, weekdays out of 0..6)                   | Bad pieces dropped, valid kept                                                                                                                            |
 
@@ -428,7 +451,7 @@ What you can do to keep things fast:
 
 - **Wide multi-month layouts** (12+ instances of `<CalendarDays>`) work, but cost scales linearly. Avoid heavy `disabled` configs (long `ranges` / `dates` arrays) when you can express the same constraint via `minDate` / `maxDate` instead.
 
-- **`<CalendarNav showNowTime />`** ticks every second; the tick is isolated to `Nav` so it does not re-render the day grid. Adding `seconds={true}` makes the animation more frequent but still local.
+- **`<CalendarToolbarClock seconds />`** ticks every second; the tick is isolated to the clock submodule so it does not re-render the day grid.
 
 - **Hover range preview** (in `mode="range"`) recomputes the day grid as the mouse moves over cells. `<CalendarDays>` cells outside the preview band are skipped via `React.memo`, so the cost stays bounded. If preview is not desired, omit hover-driven custom modules.
 
@@ -445,12 +468,24 @@ What you can do to keep things fast:
 "use client";
 
 import { Calendar } from "@dateforge/react-calendar";
-import { CalendarDays, CalendarNav } from "@dateforge/react-calendar/modules";
+import {
+  CalendarDays,
+  CalendarToolbar,
+  CalendarToolbarMonthLabel,
+  CalendarToolbarNext,
+  CalendarToolbarPrev,
+  CalendarToolbarYearLabel,
+} from "@dateforge/react-calendar/modules";
 
 export function Picker() {
   return (
     <Calendar mode="single" defaultValue={null}>
-      <CalendarNav />
+      <CalendarToolbar>
+        <CalendarToolbarPrev />
+        <CalendarToolbarMonthLabel />
+        <CalendarToolbarYearLabel />
+        <CalendarToolbarNext />
+      </CalendarToolbar>
       <CalendarDays />
     </Calendar>
   );
@@ -471,7 +506,7 @@ export default function Page() {
 What you can rely on regardless of framework:
 
 - The default theme mode and `timeZone="auto"` detect the user's preferences after hydration. The first server render uses neutral defaults (`light` theme, no timezone) so the markup is deterministic.
-- The live clock (`<CalendarNav showNowTime />`) renders an empty time slot on the server and starts ticking after hydration.
+- The live clock (`<CalendarToolbarClock />`) renders an empty time slot on the server and starts ticking after hydration.
 - `highlightToday` is intentionally inactive on the server render — the highlight appears on the client once `today` is resolved in the user's timezone. This avoids the classic "server highlights yesterday because it's UTC, client expected today" bug.
 
 For deterministic SSR snapshots (e.g. visual regression testing) pass `defaultViewDate` so the displayed month does not depend on either side's clock.
@@ -514,15 +549,16 @@ When `readOnly` is `true`:
 
 - Selecting a date in `CalendarDays`, `CalendarDaysTrack`, `CalendarPresets`, `CalendarManualInput`.
 - Setting a range boundary in `CalendarDaysTrack` / `CalendarMonthsTrack` / `CalendarYearsTrack` with `bound`.
-- Changing time in `CalendarTimeWheel` and the time popup of `CalendarNav`.
-- Clearing selection from `CalendarNav` (`clear`), `CalendarSelectedDates` (`allowClear`), `CalendarManualInput` (`allowClear`).
+- Changing time in `CalendarTimeWheel` and the time popup of `CalendarToolbarTime`.
+- Clearing selection from `CalendarToolbarClear`, `CalendarSelectedDates` (`allowClear`), `CalendarManualInput` (`allowClear`).
+- Toolbar navigation controls (`CalendarToolbarPrev/Next`, `CalendarToolbarHome`, month/year triggers), because a bound toolbar may write a range boundary.
 - Editing a date chip in `CalendarManualInput`.
 
 **Still works**
 
-- Navigating the view (`CalendarNav` arrows, month/year popups, all Track scrolling, `CalendarMonthsGrid`, `CalendarYearsGrid`).
-- Theme toggle (`CalendarNav.themeToggle`).
-- Opening the time popup in `CalendarNav` (drums inside are read-only).
+- Navigating the view from non-committing modules (`CalendarMonthsGrid`, `CalendarYearsGrid`, unbound Track scrolling, day-grid keyboard focus movement).
+- Theme toggle (`CalendarToolbarThemeToggle`).
+- Opening the time popup in `CalendarToolbarTime` (drums inside are read-only).
 - Clicking a chip in `CalendarSelectedDates` to navigate to that date.
 - Hover preview in range mode.
 
@@ -559,7 +595,6 @@ A consolidated checklist of non-obvious cases the library handles, with pointers
 | `<CalendarPresets>` with a `getValue` that throws                           | Preset dropped; rest still render; dev warn                                                                                                                     | Presets → Defensive handling        |
 | `<CalendarPresets>` with two entries sharing the same `id`                  | First wins; duplicates dropped; dev warn                                                                                                                        | Presets → Defensive handling        |
 | `<CalendarYearsGrid yearsPerPage={999} />`                                  | Clamped to 40; dev warn                                                                                                                                         | CalendarYearsGrid → Props           |
-| `<CalendarNav showMonthPicker compactMonths />` (both true)                 | Renders both UI variants; dev warn                                                                                                                              | CalendarNav → Behavior matrix       |
 | `hideOutOfRange` + arrow-key navigation crossing hidden cells               | Focus may not land (no button rendered). Pair with `blockNavigation`.                                                                                           | `hideOutOfRange` accessibility      |
 | SSR (Next.js / Remix) without `defaultViewDate`                             | Works; momentary first-paint mismatch possible near midnight UTC                                                                                                | SSR / hydration                     |
 
@@ -577,7 +612,12 @@ Copy-paste recipes. Each renders a complete, working calendar; pair with `useSta
 const [date, setDate] = useState<Date | null>(null);
 
 <Calendar mode="single" value={date} onChange={setDate}>
-  <CalendarNav showMonthPicker showYearPicker />
+  <CalendarToolbar>
+    <CalendarToolbarPrev />
+    <CalendarToolbarMonthTrigger />
+    <CalendarToolbarYearTrigger />
+    <CalendarToolbarNext />
+  </CalendarToolbar>
   <CalendarDays />
 </Calendar>;
 ```
@@ -586,7 +626,13 @@ const [date, setDate] = useState<Date | null>(null);
 
 ```tsx
 <Calendar mode="single" value={date} onChange={setDate}>
-  <CalendarNav showMonthPicker showYearPicker clear />
+  <CalendarToolbar>
+    <CalendarToolbarPrev />
+    <CalendarToolbarMonthTrigger />
+    <CalendarToolbarYearTrigger />
+    <CalendarToolbarNext />
+    <CalendarToolbarClear />
+  </CalendarToolbar>
   <CalendarDays />
   <CalendarSelectedDates />
 </Calendar>
@@ -598,7 +644,13 @@ const [date, setDate] = useState<Date | null>(null);
 const [range, setRange] = useState<DateRange>({ from: null, to: null });
 
 <Calendar mode="range" value={range} onChange={setRange}>
-  <CalendarNav showMonthPicker showYearPicker clear />
+  <CalendarToolbar>
+    <CalendarToolbarPrev />
+    <CalendarToolbarMonthTrigger />
+    <CalendarToolbarYearTrigger />
+    <CalendarToolbarNext />
+    <CalendarToolbarClear />
+  </CalendarToolbar>
   <CalendarDays />
   <CalendarSelectedDates />
 </Calendar>;
@@ -608,7 +660,13 @@ const [range, setRange] = useState<DateRange>({ from: null, to: null });
 
 ```tsx
 <Calendar mode="range" value={range} onChange={setRange}>
-  <CalendarNav showMonthPicker showYearPicker clear />
+  <CalendarToolbar>
+    <CalendarToolbarPrev />
+    <CalendarToolbarMonthTrigger />
+    <CalendarToolbarYearTrigger />
+    <CalendarToolbarNext />
+    <CalendarToolbarClear />
+  </CalendarToolbar>
   <CalendarPresets presets={basicPresets} />
   <CalendarDays />
   <CalendarSelectedDates />
@@ -619,8 +677,18 @@ const [range, setRange] = useState<DateRange>({ from: null, to: null });
 
 ```tsx
 <Calendar mode="range" cols={2} value={range} onChange={setRange}>
-  <CalendarNav col={1} />
-  <CalendarNav offset={1} col={2} />
+  <CalendarToolbar col={1} justify="space-between">
+    <CalendarToolbarPrev />
+    <CalendarToolbarMonthLabel />
+    <CalendarToolbarYearLabel />
+    <CalendarToolbarNext />
+  </CalendarToolbar>
+  <CalendarToolbar offset={1} col={2} justify="space-between">
+    <CalendarToolbarPrev />
+    <CalendarToolbarMonthLabel />
+    <CalendarToolbarYearLabel />
+    <CalendarToolbarNext />
+  </CalendarToolbar>
   <CalendarDays offset={0} col={1} />
   <CalendarDays offset={1} col={2} />
   <CalendarSelectedDates col="1 / span 2" />
@@ -633,7 +701,12 @@ const [range, setRange] = useState<DateRange>({ from: null, to: null });
 const [dates, setDates] = useState<Date[]>([]);
 
 <Calendar mode="multiple" maxDates={3} value={dates} onChange={setDates}>
-  <CalendarNav />
+  <CalendarToolbar>
+    <CalendarToolbarPrev />
+    <CalendarToolbarMonthLabel />
+    <CalendarToolbarYearLabel />
+    <CalendarToolbarNext />
+  </CalendarToolbar>
   <CalendarDays />
   <CalendarSelectedDates />
 </Calendar>;
@@ -643,7 +716,12 @@ const [dates, setDates] = useState<Date[]>([]);
 
 ```tsx
 <Calendar mode="single" value={date} onChange={setDate}>
-  <CalendarNav />
+  <CalendarToolbar>
+    <CalendarToolbarPrev />
+    <CalendarToolbarMonthLabel />
+    <CalendarToolbarYearLabel />
+    <CalendarToolbarNext />
+  </CalendarToolbar>
   <CalendarDays />
   <CalendarTimeWheel />
 </Calendar>
@@ -655,7 +733,9 @@ Single mode auto-creates a date from `viewDate.day` + the new time on the first 
 
 ```tsx
 <Calendar mode="single" value={date} onChange={setDate}>
-  <CalendarNav showNowTime />
+  <CalendarToolbar>
+    <CalendarToolbarClock />
+  </CalendarToolbar>
   <CalendarTimeWheel />
 </Calendar>
 ```
@@ -665,7 +745,12 @@ Single mode auto-creates a date from `viewDate.day` + the new time on the first 
 ```tsx
 <Calendar mode="single" value={date} onChange={setDate}>
   <CalendarManualInput />
-  <CalendarNav />
+  <CalendarToolbar>
+    <CalendarToolbarPrev />
+    <CalendarToolbarMonthLabel />
+    <CalendarToolbarYearLabel />
+    <CalendarToolbarNext />
+  </CalendarToolbar>
   <CalendarDays />
 </Calendar>
 ```
@@ -674,7 +759,10 @@ Single mode auto-creates a date from `viewDate.day` + the new time on the first 
 
 ```tsx
 <Calendar readOnly defaultViewDate={new Date(1990, 4, 1)}>
-  <CalendarNav />
+  <CalendarToolbar>
+    <CalendarToolbarMonthLabel />
+    <CalendarToolbarYearLabel />
+  </CalendarToolbar>
   <CalendarDays />
 </Calendar>
 ```
@@ -691,7 +779,7 @@ Single mode auto-creates a date from `viewDate.day` + the new time on the first 
 
 ### Days + MonthsTrack (compact month switcher above the grid)
 
-A scrollable month strip plus a regular day grid. Saves vertical space compared to a full Nav header — the month strip doubles as the navigation control.
+A scrollable month strip plus a regular day grid. Saves vertical space compared to a full toolbar header — the month strip doubles as the navigation control.
 
 ```tsx
 <Calendar mode="single" value={date} onChange={setDate}>
@@ -800,53 +888,69 @@ Module components are optional building blocks placed as children of `<Calendar>
 
 ---
 
-### CalendarNav
+### CalendarToolbar
 
-Navigation header with configurable controls.
+Composable toolbar container. It provides toolbar-local popup state and a shared date context for small focused submodules.
 
 ```tsx
-<CalendarNav showMonthPicker showYearPicker clear />
+<CalendarToolbar>
+  <CalendarToolbarPrev />
+  <CalendarToolbarMonthTrigger />
+  <CalendarToolbarYearTrigger compact />
+  <CalendarToolbarNext />
+  <CalendarToolbarClear />
+</CalendarToolbar>
 ```
 
-### Props
+### Container props
 
-| Prop              | Type               | Default | Description                                                                                                                                                                                                    |
-| ----------------- | ------------------ | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `label`           | `string`           | —       | Custom text shown as the header label, max 180 length.                                                                                                                                                         |
-| `showMonthPicker` | `boolean`          | `false` | Render the month controls block: previous/next month arrows plus a clickable month label that opens a full-page month grid popup. Mutually exclusive with `compactMonths` (combining both fires a dev warning) |
-| `compactMonths`   | `boolean`          | `false` | Render the same month popup behind a compact dropdown button (no inline arrows). Use this **instead of** `showMonthPicker` for a smaller header                                                                |
-| `showYearPicker`  | `boolean`          | `false` | Render the year controls block: previous/next year arrows plus a clickable year label that opens a year grid popup. Mutually exclusive with `compactYears`                                                     |
-| `compactYears`    | `boolean`          | `false` | Render the same year popup behind a compact dropdown button. Use this **instead of** `showYearPicker`                                                                                                          |
-| `animateTime`     | `boolean`          | `true`  | Enable per-digit flip animation for both `showTime` (the inline display of the selected time) and `showNowTime` (the live system clock). Set `false` to render plain text                                      |
-| `monthLabel`      | `boolean`          | `false` | Show the current month name as plain text (no controls, no popup)                                                                                                                                              |
-| `yearLabel`       | `boolean`          | `false` | Show the current year as plain text (no controls, no popup)                                                                                                                                                    |
-| `showTime`        | `boolean`          | `false` | Show a button that opens the time picker popup                                                                                                                                                                 |
-| `compactTime`     | `boolean`          | `false` | Show a compact icon-only button (clock icon) that opens the same time picker popup as `showTime`. Use instead of `showTime` for a smaller header                                                               |
-| `showNowTime`     | `boolean`          | `false` | Show the current system time as a live read-only display (updates every second). A pulsing dot indicates it is live. Respects the `hour12` setting from `<Calendar>`                                           |
-| `seconds`         | `boolean`          | `false` | Include seconds in `showTime` and `showNowTime` displays, and in the time picker popup                                                                                                                         |
-| `home`            | `boolean`          | `false` | Show a button that navigates back to today                                                                                                                                                                     |
-| `homeLabel`       | `string`           | global / `"Go to current month"` | aria-label for the `home` button. Overrides `<Calendar homeLabel>`                                                                                                                                                         |
-| `clear`           | `boolean`          | `false` | Show a button that clears the current selection                                                                                                                                                                |
-| `clearLabel`      | `string`           | global / `"Clear"` | aria-label for the `clear` button. Overrides `<Calendar clearLabel>`                                                                                                                                                       |
-| `themeToggle`     | `boolean`          | `false` | Show a light/dark theme toggle button. Works with the default palette and with imported/custom theme families.                                                                                                      |
-| `offset`          | `number`           | `0`     | Month offset relative to `viewDate`. Use to render two synced nav headers in `cols={2}` layouts (`<CalendarNav offset={1} />`)                                                                                 |
-| `col`             | `number \| string` | —       | CSS grid `grid-column` value                                                                                                                                                                                   |
-| `bound`           | `"from" \| "to"`   | —       | In range mode binds the nav to a range boundary. Header reflects that bound's date; arrows / popups / `home` / `clear` write to that bound only. Falls back to opposite bound when own bound is null           |
+| Prop      | Type                  | Default | Description                                                                                           |
+| --------- | --------------------- | ------- | ----------------------------------------------------------------------------------------------------- |
+| `cols`    | `number \| string`    | —       | Optional inner grid columns. A number becomes `repeat(n, minmax(0, 1fr))`; a string is passed to CSS  |
+| `col`     | `number \| string`    | —       | CSS grid `grid-column` placement in the parent `<Calendar>` grid                                      |
+| `justify` | CSS `justify-content` | —       | Align wrapped toolbar content (`"space-between"`, `"center"`, `"flex-end"`, etc.)                     |
+| `theme`   | `CalendarTheme`       | —       | Local theme scope for this toolbar only                                                               |
+| `offset`  | `number`              | `0`     | Month offset relative to `viewDate`. Use for synced multi-month headers                               |
+| `bound`   | `"from" \| "to"`      | —       | In range mode binds toolbar navigation / clear / time to a range boundary                             |
+
+### Toolbar submodules
+
+| Module                         | Purpose                                                                                                    |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| `CalendarToolbarPrev`          | Previous day / month / year button. `unit` defaults to `"month"`                                           |
+| `CalendarToolbarNext`          | Next day / month / year button. `unit` defaults to `"month"`                                               |
+| `CalendarToolbarMonthTrigger`  | Month label button that opens the month drum popup. `compact` shows the compact dropdown form              |
+| `CalendarToolbarYearTrigger`   | Year label button that opens the year drum popup. `compact` shows the compact dropdown form                |
+| `CalendarToolbarMonthLabel`    | Static localized month label. `short` uses the short month form                                            |
+| `CalendarToolbarYearLabel`     | Static year label                                                                                         |
+| `CalendarToolbarDayLabel`      | Static day/date label. `format` is `"numeric"`, `"2-digit"`, or `"long"`                                  |
+| `CalendarToolbarLabel`         | Custom heading label. Use `label` / `children` and optional `level`                                        |
+| `CalendarToolbarTime`          | Button that opens the time popup. Supports `compact`, `seconds`, `labels`, `theme`, and `onTimeSelect`    |
+| `CalendarToolbarClock`         | Live read-only clock. `seconds` controls minute-vs-second ticking                                         |
+| `CalendarToolbarHome`          | Navigate back to the current month                                                                        |
+| `CalendarToolbarClear`         | Clear current selection, or clear only the active boundary when the container has `bound`                  |
+| `CalendarToolbarThemeToggle`   | Toggle light/dark UI theme                                                                                |
+
+Each submodule also accepts `col` for placement inside a toolbar with `cols`.
+Action-label props (`previousMonthLabel`, `changeMonthLabel`, `confirmLabel`, etc.) override the matching root label only for that submodule instance.
 
 ### Behavior matrix
 
-`<CalendarNav>` is a hybrid module — its category depends on which props are enabled.
+`<CalendarToolbar>` is a hybrid composition — its category depends on which submodules you place inside it.
 
-| Prop                                                             | Effect                                                                                                                     | Fires `onChange`? | Respects `readOnly`?                              |
-| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------------------------------------------------- |
-| `showMonthPicker` / `compactMonths` / month/year arrows / popups | `navigateTo` (changes `viewDate`)                                                                                          | no                | n/a — navigation                                  |
-| `home`                                                           | `navigateTo(today)`                                                                                                        | no                | n/a — navigation                                  |
-| `monthLabel` / `yearLabel` / `showNowTime`                       | display only                                                                                                               | no                | n/a                                               |
-| `themeToggle`                                                    | toggles UI theme via `UIContext.toggleTheme`                                                                               | no                | yes — UI not blocked                              |
-| `clear`                                                          | `onChangeDate(null)` — clears current selection. With `bound` clears that boundary only via `onRangeBoundSet(bound, null)` | yes               | yes — button disabled when `readOnly`             |
-| `showTime` / `compactTime`                                       | opens time popup; confirm calls `onChangeTime`                                                                             | yes (on confirm)  | yes — drums and confirm read-only when `readOnly` |
+| Submodule / action                                     | Effect                                                                                                                     | Fires `onChange`? | Respects `readOnly`?                              |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------------------------------------------------- |
+| `Prev` / `Next` month or year                          | `navigateTo` (changes `viewDate`)                                                                                          | no                | navigation is disabled when `readOnly`            |
+| `MonthTrigger` / `YearTrigger` popup confirm           | `navigateTo` (changes `viewDate`)                                                                                          | no                | popup trigger disabled when `readOnly`            |
+| `Home`                                                 | `navigateTo(today)`                                                                                                        | no                | button disabled when `readOnly`                   |
+| `MonthLabel` / `YearLabel` / `DayLabel` / `Clock`      | display only                                                                                                               | no                | n/a                                               |
+| `ThemeToggle`                                          | toggles UI theme via `UIContext.toggleTheme`                                                                               | no                | yes — UI not blocked                              |
+| `Clear`                                                | `onChangeDate(null)` — clears current selection. With `bound` clears that boundary only via `onRangeBoundSet(bound, null)` | yes               | button disabled when `readOnly`                   |
+| `Time` popup confirm                                   | calls `onChangeTime`; with `bound`, writes that boundary through `onRangeBoundSet`                                         | yes (on confirm)  | drums and confirm read-only when `readOnly`       |
 
-Use this table to decide which guarantees apply to your composition. A `<CalendarNav>` without `clear` and without `showTime` is purely navigational and never fires `onChange`.
+Use this table to decide which guarantees apply to your composition. A toolbar made only from arrows, labels, and month/year triggers is navigational and never fires `onChange`.
+
+The old monolithic `CalendarNav` module was removed in the major toolbar release. Compose the same UI from `CalendarToolbar` and focused toolbar submodules instead.
 
 ---
 
@@ -924,7 +1028,7 @@ Time picker — hours, minutes, optional seconds, AM/PM toggle when `hour12` is 
 <CalendarTimeWheel seconds />
 ```
 
-Step granularity is configured via the `timeStep` prop on `<Calendar>` and applies to both this inline grid and the `CalendarNav` time popup:
+Step granularity is configured via the `timeStep` prop on `<Calendar>` and applies to both this inline grid and the `CalendarToolbarTime` popup:
 
 ```tsx
 <Calendar timeStep={{ minute: 5 }}>
@@ -1207,7 +1311,7 @@ format="YYYY-MM-DD"
 "20240615" → "2024-06-15"
 ```
 
-Time is **not** parseable from the input. To set time use `<CalendarTimeWheel>` or `<CalendarNav showTime>`.
+Time is **not** parseable from the input. To set time use `<CalendarTimeWheel>` or `<CalendarToolbarTime>`.
 
 ### When `onChange` fires
 
@@ -1255,7 +1359,7 @@ A horizontal scrollable strip of day numbers for the current month.
 | `bound`          | `"from" \| "to"`   | —       | In range mode binds the track to a range boundary. Without it tracks single-mode behavior |
 | `col`            | `number \| string` | —       | CSS grid `grid-column` value                                                              |
 
-> **Scroll axis limitation.** The track loops day 1..N within `viewDate.getMonth()`. Scrolling past the last day wraps back to day 1 of the same month — it does not advance the month. Compose with `<CalendarMonthsTrack>` / `<CalendarYearsTrack>` / `<CalendarNav>` to change month or year. See `ARCHITECTURE.md → D. Hybrid modules → Track scroll axis (current limitation)`.
+> **Scroll axis limitation.** The track loops day 1..N within `viewDate.getMonth()`. Scrolling past the last day wraps back to day 1 of the same month — it does not advance the month. Compose with `<CalendarMonthsTrack>` / `<CalendarYearsTrack>` / `CalendarToolbar` controls to change month or year. See `ARCHITECTURE.md → D. Hybrid modules → Track scroll axis (current limitation)`.
 
 In `mode="multiple"` the track automatically renders a save / remove button. Item click only previews; the button commits the date (toggles in/out of `selectedDates`). The button shows `Check` when the previewed date is not selected, `Clear` (×) when it is.
 
@@ -1268,7 +1372,7 @@ In `mode="multiple"` the track automatically renders a save / remove button. Ite
 
 #### Bound coordination
 
-When two `bound` modules (Tracks or `<CalendarNav bound>`) coexist:
+When two `bound` modules (Tracks, Wheels, or `<CalendarToolbar bound>`) coexist:
 
 - The `to`-bound module never moves before `rangeStart`, and the `from`-bound module never moves past `rangeEnd`. Per-field min/max on each track is recomputed each render from the opposite bound + the track's own other fields.
 - Crossing is clamped (no swap): writing a `from > to` (or `to < from`) collapses the moving bound onto the opposite. Identity stays stable mid-drag.
@@ -1294,7 +1398,7 @@ A horizontal scrollable strip of month names for the current year.
 | `col`           | `number \| string`     | —       | CSS grid `grid-column` value                                                           |
 | `onMonthSelect` | `(date: Date) => void` | —       | Fires after the user lands on a month. Receives navigated date (or clamped bound date) |
 
-> **Scroll axis limitation.** The track loops month 0–11 within `viewDate.getFullYear()`. Scrolling past December does not advance the year — it wraps back to January of the same year. Compose with `<CalendarYearsTrack>` or `<CalendarNav>` to change year. See `ARCHITECTURE.md → D. Hybrid modules → Track scroll axis (current limitation)`.
+> **Scroll axis limitation.** The track loops month 0–11 within `viewDate.getFullYear()`. Scrolling past December does not advance the year — it wraps back to January of the same year. Compose with `<CalendarYearsTrack>` or `CalendarToolbar` controls to change year. See `ARCHITECTURE.md → D. Hybrid modules → Track scroll axis (current limitation)`.
 
 ---
 
@@ -1640,16 +1744,16 @@ const myAppearance = createAppearance({
 | `border`          | Border width for the container and internal dividers                                |
 | `containerGap`    | Gap between calendar module areas. Use `"0px"` for borderless layouts              |
 | `spacing`         | Internal padding / gap between elements                                             |
-| `navPadding`      | Padding for `CalendarNav`                                                           |
-| `navMinHeight`    | Minimum height for `CalendarNav`                                                    |
-| `navFontSize`     | Root font-size of `CalendarNav` container — cascades to all nav children via `em`   |
-| `navMetaFontSize` | Font-size of the year/month text inside the nav's current selector                  |
-| `navButtonBg`     | Background for month/year picker buttons in `CalendarNav`                           |
+| `navPadding`      | Padding for toolbar containers                                                      |
+| `navMinHeight`    | Minimum height for toolbar containers                                               |
+| `navFontSize`     | Root font-size of toolbar containers — cascades to children via `em`                |
+| `navMetaFontSize` | Font-size of the year/month text inside current selector labels                     |
+| `navButtonBg`     | Background for month/year trigger buttons                                           |
 | `font`            | Font family                                                                         |
 | `fontSize`        | Base font size                                                                      |
 | `dayFontSize`     | Font size for day numbers. Accepts fixed or responsive CSS values like `clamp(...)` |
 | `dayWeight`       | Font weight for non-selected day numbers                                            |
-| `controlFontSize` | Font size for primary controls such as nav/time buttons                             |
+| `controlFontSize` | Font size for primary controls such as toolbar/time buttons                         |
 | `daysSpacing`     | Gap between individual day cells                                                    |
 | `dayRatio`        | Aspect ratio of each day cell (e.g. `"1 / 1"`)                                      |
 | `trackHeight`     | Height of Track module items                                                        |

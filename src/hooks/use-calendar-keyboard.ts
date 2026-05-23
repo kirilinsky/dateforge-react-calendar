@@ -29,7 +29,7 @@ export function useCalendarKeyboard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [syncDateT]);
 
-  // When the visible month changes (e.g. user clicked Nav prev/next, or any
+  // When the visible month changes (e.g. user clicked toolbar prev/next, or any
   // other module called `navigateTo`), make sure `focusedDate` still falls
   // inside the visible month. Otherwise no cell carries `tabIndex={0}` and
   // Tab from outside the grid skips it entirely. Keyboard nav inside the

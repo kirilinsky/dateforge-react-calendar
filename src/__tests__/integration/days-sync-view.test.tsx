@@ -3,8 +3,8 @@ import { useState } from "react";
 import { describe, expect, it } from "vitest";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
-import { CalendarNav } from "@/modules/nav";
 import { createDisabled } from "@/utils/create-disabled";
+import { TestToolbar } from "../helpers/test-toolbar";
 
 const VIEW_DATE = new Date(2024, 5, 15); // June 15 2024
 
@@ -28,7 +28,7 @@ describe("CalendarDays — syncViewOnSelect", () => {
   it("offset > 0: clicking a day does NOT change primary viewDate (default)", () => {
     const { container } = render(
       <Calendar mode="single" defaultViewDate={VIEW_DATE}>
-        <CalendarNav />
+        <TestToolbar />
         <CalendarDays offset={0} />
         <CalendarDays offset={1} />
       </Calendar>,
@@ -48,7 +48,7 @@ describe("CalendarDays — syncViewOnSelect", () => {
   it("offset === 0: clicking a day DOES change viewDate (default)", () => {
     const { container } = render(
       <Calendar mode="single" defaultViewDate={VIEW_DATE}>
-        <CalendarNav />
+        <TestToolbar />
         <CalendarDays offset={0} />
         <CalendarDays offset={1} />
       </Calendar>,
@@ -67,7 +67,7 @@ describe("CalendarDays — syncViewOnSelect", () => {
   it("offset > 0 with syncViewOnSelect={true}: viewDate DOES move", () => {
     const { container } = render(
       <Calendar mode="single" defaultViewDate={VIEW_DATE}>
-        <CalendarNav />
+        <TestToolbar />
         <CalendarDays offset={0} />
         <CalendarDays offset={1} syncViewOnSelect />
       </Calendar>,
@@ -92,7 +92,7 @@ describe("CalendarDays — syncViewOnSelect", () => {
           onChange={setV}
           defaultViewDate={VIEW_DATE}
         >
-          <CalendarNav />
+          <TestToolbar />
           <CalendarDays offset={0} syncViewOnSelect={false} />
         </Calendar>
       );
@@ -130,7 +130,7 @@ describe("CalendarDays — syncViewOnSelect", () => {
           onChange={setR}
           defaultViewDate={VIEW_DATE}
         >
-          <CalendarNav />
+          <TestToolbar />
           <CalendarDays offset={0} />
           <CalendarDays offset={1} />
         </Calendar>
@@ -169,7 +169,7 @@ describe("CalendarDays — syncViewOnSelect", () => {
             defaultViewDate={VIEW_DATE}
             disabled={disabled}
           >
-            <CalendarNav />
+            <TestToolbar />
             <CalendarDays offset={0} />
             <CalendarDays offset={1} />
           </Calendar>

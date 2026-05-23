@@ -133,10 +133,7 @@
   }
 
   .day {
-    /* Track day-grid font (`--cal-text-day` = clamp(...cqi...)). Anchor uses
-       same token + bumped weight so day numbers stay visually balanced with
-       the adjacent Days grid at every container width. */
-    font-size: var(--cal-lunar-day-font, var(--cal-text-day, var(--cal-text-sm)));
+    font-size: var(--cal-text-day);
     font-weight: var(--cal-weight-medium);
     line-height: var(--cal-leading-tight);
     font-variant-numeric: tabular-nums;

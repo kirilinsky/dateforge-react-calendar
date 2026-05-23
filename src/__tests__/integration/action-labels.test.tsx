@@ -7,11 +7,11 @@ import { CalendarInfo } from "@/modules/info";
 import { CalendarManualInput } from "@/modules/manual-input";
 import { CalendarMonthsGrid } from "@/modules/months-grid";
 import { CalendarMonthsTrack } from "@/modules/months-track";
-import { CalendarNav } from "@/modules/nav";
 import { CalendarSelectedDates } from "@/modules/selected-dates";
 import { CalendarTimeWheel } from "@/modules/time";
 import { CalendarYearsGrid } from "@/modules/years-grid";
 import { CalendarYearsTrack } from "@/modules/years-track";
+import { TestToolbar } from "../helpers/test-toolbar";
 
 const D = (y: number, m: number, d: number) => new Date(y, m, d);
 
@@ -24,7 +24,7 @@ describe("action aria labels", () => {
         clearLabel="Очистить"
         homeLabel="Текущий месяц"
       >
-        <CalendarNav home clear />
+        <TestToolbar home clear />
         <CalendarInfo showHome allowClear />
         <CalendarSelectedDates allowClear />
         <CalendarManualInput />
@@ -43,7 +43,12 @@ describe("action aria labels", () => {
         clearLabel="Global clear"
         homeLabel="Global home"
       >
-        <CalendarNav home clear clearLabel="Nav clear" homeLabel="Nav home" />
+        <TestToolbar
+          home
+          clear
+          clearLabel="Toolbar clear"
+          homeLabel="Toolbar home"
+        />
         <CalendarInfo
           showHome
           allowClear
@@ -53,8 +58,8 @@ describe("action aria labels", () => {
       </Calendar>,
     );
 
-    expect(getByLabelText("Nav clear")).toBeTruthy();
-    expect(getByLabelText("Nav home")).toBeTruthy();
+    expect(getByLabelText("Toolbar clear")).toBeTruthy();
+    expect(getByLabelText("Toolbar home")).toBeTruthy();
     expect(getByLabelText("Info clear")).toBeTruthy();
     expect(getByLabelText("Info home")).toBeTruthy();
     expect(queryByLabelText("Global clear")).toBeNull();
@@ -67,7 +72,7 @@ describe("action aria labels", () => {
         mode="multiple"
         value={[D(2024, 5, 15)]}
         defaultViewDate={D(2024, 5, 15)}
-        calendarNavigationLabel="Main nav"
+        calendarNavigationLabel="Main toolbar"
         changeMonthLabel="Open month {month}"
         changeTimeLabel="Open time {time}"
         changeYearLabel="Open year {year}"
@@ -75,7 +80,6 @@ describe("action aria labels", () => {
         hoursLabel="Hour drum"
         minutesLabel="Minute drum"
         monthGridLabel="Month grid {year}"
-        monthPickerLabel="Month controls"
         monthTrackLabel="Month rail"
         nextMonthLabel="Forward month"
         nextYearLabel="Forward year"
@@ -89,10 +93,9 @@ describe("action aria labels", () => {
         weekLabel="Week row"
         yearGridLabel="Year grid {from}-{to}"
         yearPageNavigationLabel="Year pages"
-        yearPickerLabel="Year controls"
         yearTrackLabel="Year rail"
       >
-        <CalendarNav showTime showMonthPicker showYearPicker />
+        <TestToolbar showTime showMonthPicker showYearPicker />
         <CalendarDays weekNumbers />
         <CalendarDaysTrack />
         <CalendarMonthsTrack />
@@ -103,13 +106,11 @@ describe("action aria labels", () => {
       </Calendar>,
     );
 
-    expect(getByLabelText("Main nav")).toBeTruthy();
+    expect(getByLabelText("Main toolbar")).toBeTruthy();
     expect(getByLabelText(/Open time/)).toBeTruthy();
-    expect(getByLabelText("Month controls")).toBeTruthy();
     expect(getByLabelText(/Open month/)).toBeTruthy();
     expect(getByLabelText("Back month")).toBeTruthy();
     expect(getByLabelText("Forward month")).toBeTruthy();
-    expect(getByLabelText("Year controls")).toBeTruthy();
     expect(getByLabelText(/Open year/)).toBeTruthy();
     expect(getByLabelText("Back year")).toBeTruthy();
     expect(getByLabelText("Forward year")).toBeTruthy();

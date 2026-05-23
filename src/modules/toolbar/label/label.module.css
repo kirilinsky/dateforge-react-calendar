@@ -1,0 +1,15 @@
+@layer cal-modules {
+  .label {
+    min-width: 0;
+    height: var(--cal-size-chip, 2.3em);
+    display: inline-flex;
+    align-items: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--cal-text-lg);
+    font-weight: var(--cal-weight-semibold);
+    color: var(--c-m, var(--c-c));
+    padding: 0 0.32em;
+  }
+}
