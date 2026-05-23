@@ -9,6 +9,7 @@ import {
 import shared from "@/global/global.module.css";
 import { ChevronRight } from "@/Icons";
 import {
+  DEFAULT_NEXT_DAY_LABEL,
   DEFAULT_NEXT_MONTH_LABEL,
   DEFAULT_NEXT_YEAR_LABEL,
   resolveActionLabel,
@@ -89,7 +90,11 @@ export const CalendarToolbarNext: React.FC<CalendarToolbarNextProps> = ({
     const next = new Date(date);
     next.setDate(next.getDate() + 1);
     canGo = !maxDate || next <= maxDate;
-    ariaLabel = nextDayLabel ?? "Next day";
+    ariaLabel = resolveActionLabel(
+      nextDayLabel,
+      actionLabels.nextDayLabel,
+      DEFAULT_NEXT_DAY_LABEL,
+    );
   }
 
   const handleClick = () => {

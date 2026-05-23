@@ -1,7 +1,7 @@
 @layer cal-modules {
   .label {
     min-width: 0;
-    height: var(--cal-size-chip, 2.3em);
+    height: var(--cal-size-chip, 2.4em);
     display: inline-flex;
     align-items: center;
     overflow: hidden;
@@ -9,7 +9,9 @@
     white-space: nowrap;
     font-size: var(--cal-text-lg);
     font-weight: var(--cal-weight-semibold);
+    line-height: var(--cal-leading-none, 1);
     color: var(--c-m, var(--c-c));
+    transition: color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
     padding: 0 0.32em;
   }
 }

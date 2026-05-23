@@ -9,6 +9,7 @@ import {
 import shared from "@/global/global.module.css";
 import { ChevronLeft } from "@/Icons";
 import {
+  DEFAULT_PREVIOUS_DAY_LABEL,
   DEFAULT_PREVIOUS_MONTH_LABEL,
   DEFAULT_PREVIOUS_YEAR_LABEL,
   resolveActionLabel,
@@ -89,7 +90,11 @@ export const CalendarToolbarPrev: React.FC<CalendarToolbarPrevProps> = ({
     const prev = new Date(date);
     prev.setDate(prev.getDate() - 1);
     canGo = !minDate || prev >= minDate;
-    ariaLabel = previousDayLabel ?? "Previous day";
+    ariaLabel = resolveActionLabel(
+      previousDayLabel,
+      actionLabels.previousDayLabel,
+      DEFAULT_PREVIOUS_DAY_LABEL,
+    );
   }
 
   const handleClick = () => {

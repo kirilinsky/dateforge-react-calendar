@@ -1,55 +1,30 @@
 @layer cal-modules {
-  .labelButton {
+  .label {
+    font-size: var(--cal-nav-font-size);
     font-weight: var(--cal-weight-bold);
-    line-height: var(--cal-leading-none);
+    line-height: var(--cal-leading-none, 1);
+    color: var(--c-c);
+    transition: color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
     flex: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: var(--cal-size-chip, 2.3em);
+    height: var(--cal-size-chip, 2.4em);
     white-space: nowrap;
     min-width: 0;
-    &:active {
-      transform: scale(var(--cal-press-scale, 0.96));
-    }
   }
 
-  .compactButton {
-    flex: 0 0 auto;
-    min-width: max-content;
-    padding: 0 0.7em;
-    height: var(--cal-size-chip, 2.3em);
-    font-size: var(--cal-text-md);
-    background-color: var(--cal-nav-button-bg, var(--c-t));
-    color: var(--c-c);
-    font-weight: var(--cal-weight-bold);
-    gap: 0.3em;
-    display: inline-flex;
-    align-items: center;
-    & svg {
-      width: 1.1em;
-      height: 1.1em;
-      stroke-width: 3;
-    }
+  .slot {
+    display: inline-grid;
+    place-items: center;
   }
 
-  .staticButton {
-    cursor: default;
+  .slot > * {
+    grid-area: 1 / 1;
+  }
+
+  .sizer {
+    visibility: hidden;
     pointer-events: none;
-    background: transparent;
-    box-shadow: none;
-  }
-
-  .monthShort {
-    display: none;
-  }
-
-  @container cal-toolbar (max-width: 18em) {
-    .monthLong {
-      display: none;
-    }
-    .monthShort {
-      display: inline;
-    }
   }
 }

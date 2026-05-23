@@ -32,6 +32,7 @@
     --cal-weight-regular: 300;
     --cal-weight-semibold: 400;
     --cal-weight-bold: 600;
+    --cal-leading-none: 1;
     --cal-leading-tight: 1.1;
     --cal-leading-normal: 1.45;
     --cal-leading-relaxed: 1.8;

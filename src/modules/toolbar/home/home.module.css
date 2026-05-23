@@ -7,6 +7,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    transition: color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
     & svg {
       width: 1.1em;
       height: 1.1em;

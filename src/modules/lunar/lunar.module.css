@@ -137,6 +137,7 @@
     font-weight: var(--cal-weight-medium);
     line-height: var(--cal-leading-tight);
     font-variant-numeric: tabular-nums;
+    transition: color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
   }
 
   .icon {
@@ -144,6 +145,7 @@
     align-items: center;
     justify-content: center;
     color: var(--cal-lunar-icon-color, var(--c-r, var(--c-h)));
+    transition: color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
   }
 
   /* All 8 illuminated paths render inside one SVG. Each layer is hidden by
@@ -182,6 +184,7 @@
     );
     font-weight: var(--cal-weight-semibold);
     color: var(--c-m, var(--c-c));
+    transition: color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
     letter-spacing: var(--cal-letter-spacing, 0.04em);
     text-transform: uppercase;
     line-height: var(--cal-leading-tight, 1.1);

@@ -38,6 +38,9 @@ export interface CalendarActionLabels {
   changeTimeLabel?: string;
   changeYearLabel?: string;
   clearLabel?: string;
+  currentDayLabel?: string;
+  currentMonthLabel?: string;
+  currentYearLabel?: string;
   confirmLabel?: string;
   dayTrackLabel?: string;
   homeLabel?: string;
@@ -48,9 +51,11 @@ export interface CalendarActionLabels {
   monthTrackLabel?: string;
   monthsLabel?: string;
   yearsLabel?: string;
+  nextDayLabel?: string;
   nextMonthLabel?: string;
   nextYearLabel?: string;
   nextYearsLabel?: string;
+  previousDayLabel?: string;
   previousMonthLabel?: string;
   previousYearLabel?: string;
   previousYearsLabel?: string;
@@ -98,6 +103,9 @@ export interface CalendarProps<M extends CalendarMode = "single"> {
   changeTimeLabel?: string;
   changeYearLabel?: string;
   clearLabel?: string;
+  currentDayLabel?: string;
+  currentMonthLabel?: string;
+  currentYearLabel?: string;
   confirmLabel?: string;
   dayTrackLabel?: string;
   homeLabel?: string;
@@ -108,9 +116,11 @@ export interface CalendarProps<M extends CalendarMode = "single"> {
   monthTrackLabel?: string;
   monthsLabel?: string;
   yearsLabel?: string;
+  nextDayLabel?: string;
   nextMonthLabel?: string;
   nextYearLabel?: string;
   nextYearsLabel?: string;
+  previousDayLabel?: string;
   previousMonthLabel?: string;
   previousYearLabel?: string;
   previousYearsLabel?: string;
