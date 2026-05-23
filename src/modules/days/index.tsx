@@ -161,8 +161,11 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
     [maxDate],
   );
 
-  const [direction, setDirection] = useState<"left" | "right" | "none">("none");
+  const [direction, setDirection] = useState<
+    "left" | "right" | "up" | "down" | "none"
+  >("none");
   const [prevDate, setPrevDate] = useState(date);
+  const keyboardDirRef = useRef<"up" | "down" | null>(null);
 
   const currentMonth = date.getMonth();
   const currentYear = date.getFullYear();
@@ -170,6 +173,13 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
   useEffect(() => {
+    const kbDir = keyboardDirRef.current;
+    if (kbDir) {
+      keyboardDirRef.current = null;
+      setDirection(kbDir);
+      setPrevDate(date);
+      return;
+    }
     const dir = computeSwipeDirection(date, prevDate);
     if (dir !== "same") {
       setDirection(dir);
@@ -428,6 +438,9 @@ export const CalendarDays: React.FC<CalendarDaysProps> = ({
     blockNavigation,
     navigateTo,
     onSelect: onKeyboardSelect,
+    onMonthNavigate: (dir) => {
+      keyboardDirRef.current = dir;
+    },
   });
 
   return (
