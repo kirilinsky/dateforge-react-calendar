@@ -1,6 +1,7 @@
 import type React from "react";
 import {
   CalendarToolbar,
+  CalendarToolbarApply,
   CalendarToolbarClear,
   CalendarToolbarClock,
   CalendarToolbarHome,
@@ -14,9 +15,13 @@ import {
   CalendarToolbarYearLabel,
   CalendarToolbarYearTrigger,
 } from "@/modules/toolbar";
+import type { ApplyValue } from "@/modules/toolbar/apply";
 import type { CalendarTheme } from "@/types/themes";
 
 export interface TestToolbarProps {
+  apply?: boolean;
+  applyLabel?: string;
+  onApply?: (value: ApplyValue) => void;
   bound?: "from" | "to";
   calendarNavigationLabel?: string;
   changeMonthLabel?: string;
@@ -48,6 +53,9 @@ export interface TestToolbarProps {
 }
 
 export const TestToolbar: React.FC<TestToolbarProps> = ({
+  apply,
+  applyLabel,
+  onApply,
   bound,
   calendarNavigationLabel,
   changeMonthLabel,
@@ -92,6 +100,7 @@ export const TestToolbar: React.FC<TestToolbarProps> = ({
     showNowTime ||
     home ||
     clear ||
+    apply ||
     themeToggle;
 
   return (
@@ -177,6 +186,9 @@ export const TestToolbar: React.FC<TestToolbarProps> = ({
       {themeToggle && <CalendarToolbarThemeToggle />}
       {home && <CalendarToolbarHome homeLabel={homeLabel} />}
       {clear && <CalendarToolbarClear clearLabel={clearLabel} />}
+      {apply && (
+        <CalendarToolbarApply applyLabel={applyLabel} onApply={onApply} />
+      )}
     </CalendarToolbar>
   );
 };
