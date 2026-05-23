@@ -150,3 +150,37 @@ chip) and popup confirm button gain a subtle scale + spring easing on press
 (`transform: scale(0.95)` for 80ms down, 180ms springy release). Tuneable via
 `--cal-press-scale`, `--cal-press-down-duration`, `--cal-press-up-duration`,
 `--cal-press-up-easing`. Honours `prefers-reduced-motion`.
+
+**New module: `CalendarToolbar` + toolbar submodules (replaces `CalendarNav` composition pattern)**
+
+`CalendarToolbar` is a composable toolbar shell that replaces the monolithic `CalendarNav` for custom header layouts. Drop it anywhere in the `<Calendar>` tree; it reads the active `bound` and date from context.
+
+Submodules (all under `@dateforge/react-calendar/modules/toolbar`):
+
+| Component | Role |
+|---|---|
+| `CalendarToolbarGroup` | `flex` wrapper with optional `grow` (fills remaining space) |
+| `CalendarToolbarMonthLabel` | Static month display, `short?`, `currentMonthLabel?` |
+| `CalendarToolbarYearLabel` | Static year display, `currentYearLabel?` |
+| `CalendarToolbarDayLabel` | Static day display, `format?: "numeric" \| "2-digit" \| "long"`, `currentDayLabel?` |
+| `CalendarToolbarLabel` | Generic text label, `content?: ReactNode` |
+| `CalendarToolbarClock` | Live clock (mirrors `CalendarNav showNowTime`) |
+| `CalendarToolbarPrev` / `CalendarToolbarNext` | Prev/next nav buttons, `unit?: "day" \| "week" \| "month" \| "year"` |
+| `CalendarToolbarHome` | Jump-to-today button |
+| `CalendarToolbarClear` | Clear selection button |
+| `CalendarToolbarThemeToggle` | Toggle light/dark theme |
+| `CalendarToolbarTime` | Open time-picker popup button |
+| `CalendarToolbarMonthTrigger` | Open month-picker popup button |
+| `CalendarToolbarYearTrigger` | Open year-picker popup button |
+
+All label submodules use the visually-hidden text pattern for screen readers — the accessible name is always announced regardless of display format. Label text is resolved via `resolveActionLabel` (per-instance prop → `actionLabels` config → English default), so the full localization pipeline applies.
+
+New `CalendarActionLabels` keys: `currentDayLabel` (default `"Current day, {day}"`), `currentMonthLabel` (default `"Current month, {month}"`), `currentYearLabel` (default `"Current year, {year}"`), `nextDayLabel`, `previousDayLabel`.
+
+**`CalendarDays` — keyboard month navigation slide animation**
+
+Arrow-key and Page-key navigation that crosses a month boundary now plays a vertical slide animation (`slideInDown` for previous month, `slideInUp` for next month) instead of the existing horizontal `slideInLeft` / `slideInRight`. Left/right swipe and toolbar prev/next buttons retain the horizontal animation. Honours `prefers-reduced-motion`.
+
+**`CalendarLunar` — accessibility**
+
+Strip upgraded from `role="group"` to `role="list"` / `role="listitem"`. Each cell now includes visually-hidden text (`date + phase name`) so screen readers in browse mode announce content correctly. `phaseAriaLabels` overrides apply to the hidden text, not an `aria-label` attribute.
