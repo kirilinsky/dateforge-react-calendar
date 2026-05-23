@@ -618,3 +618,55 @@ export const SeparateTheme: Story = {
   },
 };
 SeparateTheme.storyName = "Themed — toolbar with own theme (dracula on slate)";
+
+// ─── Kitchen Sink ─────────────────────────────────────────────────────────────
+
+export const KitchenSink: Story = {
+  render: (args, ctx) => {
+    const [date, setDate] = useState<Date | null>(FIXED_DATE);
+    return (
+      <Calendar
+        value={date}
+        onChange={setDate}
+        locale={args.locale ?? resolveStoryLocale(ctx.globals.locale)}
+        theme={resolveStoryTheme(ctx.globals.theme)}
+        {...resolveStoryThemeMode(ctx.globals.themeMode)}
+        appearance={resolveStoryAppearance(ctx.globals.appearance)}
+        gradient={resolveStoryGradient(ctx.globals.gradient)}
+      >
+        <CalendarToolbar>
+          <CalendarToolbarClock seconds />
+          <CalendarToolbarGroup grow>
+            <CalendarToolbarPrev unit="year" />
+            <CalendarToolbarYearTrigger />
+            <CalendarToolbarNext unit="year" />
+          </CalendarToolbarGroup>
+          <CalendarToolbarGroup grow>
+            <CalendarToolbarPrev unit="month" />
+            <CalendarToolbarMonthTrigger />
+            <CalendarToolbarNext unit="month" />
+          </CalendarToolbarGroup>
+          <CalendarToolbarGroup grow>
+            <CalendarToolbarPrev unit="day" />
+            <CalendarToolbarMonthLabel />
+            <CalendarToolbarDayLabel format="numeric" />
+            <CalendarToolbarYearLabel />
+            <CalendarToolbarNext unit="day" />
+          </CalendarToolbarGroup>
+          <CalendarToolbarGroup>
+            <CalendarToolbarMonthTrigger compact />
+            <CalendarToolbarYearTrigger compact />
+          </CalendarToolbarGroup>
+          <CalendarToolbarGroup>
+            <CalendarToolbarTime compact />
+            <CalendarToolbarHome />
+            <CalendarToolbarClear />
+            <CalendarToolbarThemeToggle />
+          </CalendarToolbarGroup>
+        </CalendarToolbar>
+        <CalendarDays />
+      </Calendar>
+    );
+  },
+};
+KitchenSink.storyName = "Kitchen sink — all modules (overflow demo)";

@@ -2,6 +2,12 @@ import type React from "react";
 import { useMemo } from "react";
 import "@/styles/layers.css";
 import { useConfig } from "@/context/config-context";
+import shared from "@/global/global.module.css";
+import {
+  DEFAULT_CURRENT_MONTH_LABEL,
+  formatActionLabel,
+  resolveActionLabel,
+} from "@/utils/action-labels";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { getDateTimeFormat } from "@/utils/intl-cache";
 import { getMonthNames } from "@/utils/month-utils";
@@ -15,13 +21,14 @@ export interface CalendarToolbarMonthLabelProps {
   col?: number | string;
   /** Use localized short month name. */
   short?: boolean;
+  currentMonthLabel?: string;
 }
 
 export const CalendarToolbarMonthLabel: React.FC<
   CalendarToolbarMonthLabelProps
-> = ({ col, short = false }) => {
+> = ({ col, short = false, currentMonthLabel }) => {
   const tb = useToolbarContext();
-  const { locale } = useConfig();
+  const { locale, actionLabels } = useConfig();
   const sizer = useMemo(
     () => longestBy(getMonthNames(locale, short)),
     [locale, short],
@@ -33,12 +40,25 @@ export const CalendarToolbarMonthLabel: React.FC<
     month: short ? "short" : "long",
   }).format(tb.date);
 
+  const monthLong = short
+    ? getDateTimeFormat(locale, { month: "long" }).format(tb.date)
+    : month;
+
+  const ariaLabel = formatActionLabel(
+    resolveActionLabel(
+      currentMonthLabel,
+      actionLabels.currentMonthLabel,
+      DEFAULT_CURRENT_MONTH_LABEL,
+    ),
+    "month",
+    monthLong,
+  );
+
   return (
     <span className={styles.label} style={getGridSlotStyle(col)}>
-      <span className={styles.slot}>
-        <span className={styles.sizer} aria-hidden>
-          {sizer}
-        </span>
+      <span className={shared.srOnly}>{ariaLabel}</span>
+      <span className={styles.slot} aria-hidden>
+        <span className={styles.sizer}>{sizer}</span>
         <span>{month}</span>
       </span>
     </span>

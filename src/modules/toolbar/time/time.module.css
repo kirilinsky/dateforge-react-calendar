@@ -3,6 +3,10 @@
     background: var(--active-cell-bg, var(--c-h));
     color: var(--active-cell-color, var(--c-at, var(--c-a)));
     box-shadow: var(--active-cell-stroke, none);
+    transition:
+      background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      box-shadow var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
     padding: 0 0.7em;
     height: var(--cal-size-chip, 2.3em);
     font-size: var(--cal-text-md);

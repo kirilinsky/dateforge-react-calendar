@@ -4,6 +4,7 @@ import { useConfig } from "@/context/config-context";
 import { useNavigation } from "@/context/navigation-context";
 import { useSelectionValue } from "@/context/selection-context";
 import { useUI } from "@/context/ui-context";
+import shared from "@/global/global.module.css";
 import type { CalendarTheme } from "@/types/themes";
 import { isSameDay } from "@/utils/date-core";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
@@ -137,7 +138,7 @@ export const CalendarLunar: React.FC<CalendarLunarProps> = ({
       data-theme={themeScope.dataTheme}
       style={{ ...getGridSlotStyle(col), ...themeScope.style }}
     >
-      <div className={styles.strip} role="group" aria-label={lunarLabel}>
+      <div className={styles.strip} role="list" aria-label={lunarLabel}>
         {window.map((d, idx) => {
           const phase = getLunarPhaseKey(d);
           const isAnchor = isSameDay(d, anchor);
@@ -151,13 +152,15 @@ export const CalendarLunar: React.FC<CalendarLunarProps> = ({
             // without disturbing the day-number text or container layout.
             <div
               key={idx}
-              role="group"
-              aria-label={`${ariaDate}, ${ariaPhase}`}
+              role="listitem"
               aria-current={isAnchor ? "date" : undefined}
               data-anchor={isAnchor || undefined}
               data-phase={phase}
               className={`${styles.cell} ${isAnchor ? styles.anchor : ""}`}
             >
+              <span className={shared.srOnly}>
+                {ariaDate}, {ariaPhase}
+              </span>
               <span className={styles.day} aria-hidden>
                 {dayNum}
               </span>

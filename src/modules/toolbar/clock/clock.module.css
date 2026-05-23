@@ -7,6 +7,7 @@
     height: var(--cal-size-chip, 2.3em);
     padding: 0 0.55em;
     color: var(--c-m, var(--c-c));
+    transition: color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
     font-size: var(--cal-text-md);
     font-weight: var(--cal-weight-medium);
     font-variant-numeric: tabular-nums;
@@ -17,5 +18,6 @@
     height: 0.42em;
     border-radius: 999px;
     background: var(--active-cell-bg, var(--c-h));
+    transition: background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
   }
 }
