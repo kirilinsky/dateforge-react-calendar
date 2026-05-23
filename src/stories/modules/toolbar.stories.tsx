@@ -3,6 +3,8 @@ import { useState } from "react";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
 import { CalendarToolbar } from "@/modules/toolbar";
+import type { ApplyValue } from "@/modules/toolbar/apply";
+import { CalendarToolbarApply } from "@/modules/toolbar/apply";
 import { CalendarToolbarClear } from "@/modules/toolbar/clear";
 import { CalendarToolbarClock } from "@/modules/toolbar/clock";
 import { CalendarToolbarDayLabel } from "@/modules/toolbar/day-label";
@@ -624,49 +626,182 @@ SeparateTheme.storyName = "Themed — toolbar with own theme (dracula on slate)"
 export const KitchenSink: Story = {
   render: (args, ctx) => {
     const [date, setDate] = useState<Date | null>(FIXED_DATE);
+    const [last, setLast] = useState<ApplyValue | undefined>(undefined);
     return (
-      <Calendar
-        value={date}
-        onChange={setDate}
-        locale={args.locale ?? resolveStoryLocale(ctx.globals.locale)}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        {...resolveStoryThemeMode(ctx.globals.themeMode)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-        gradient={resolveStoryGradient(ctx.globals.gradient)}
-      >
-        <CalendarToolbar>
-          <CalendarToolbarClock seconds />
-          <CalendarToolbarGroup grow>
-            <CalendarToolbarPrev unit="year" />
-            <CalendarToolbarYearTrigger />
-            <CalendarToolbarNext unit="year" />
-          </CalendarToolbarGroup>
-          <CalendarToolbarGroup grow>
-            <CalendarToolbarPrev unit="month" />
-            <CalendarToolbarMonthTrigger />
-            <CalendarToolbarNext unit="month" />
-          </CalendarToolbarGroup>
-          <CalendarToolbarGroup grow>
-            <CalendarToolbarPrev unit="day" />
-            <CalendarToolbarMonthLabel />
-            <CalendarToolbarDayLabel format="numeric" />
-            <CalendarToolbarYearLabel />
-            <CalendarToolbarNext unit="day" />
-          </CalendarToolbarGroup>
-          <CalendarToolbarGroup>
-            <CalendarToolbarMonthTrigger compact />
-            <CalendarToolbarYearTrigger compact />
-          </CalendarToolbarGroup>
-          <CalendarToolbarGroup>
-            <CalendarToolbarTime compact />
-            <CalendarToolbarHome />
-            <CalendarToolbarClear />
-            <CalendarToolbarThemeToggle />
-          </CalendarToolbarGroup>
-        </CalendarToolbar>
-        <CalendarDays />
-      </Calendar>
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+        <Calendar
+          value={date}
+          onChange={setDate}
+          locale={args.locale ?? resolveStoryLocale(ctx.globals.locale)}
+          theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
+          appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          gradient={resolveStoryGradient(ctx.globals.gradient)}
+        >
+          <CalendarToolbar>
+            <CalendarToolbarClock seconds />
+            <CalendarToolbarGroup grow>
+              <CalendarToolbarPrev unit="year" />
+              <CalendarToolbarYearTrigger />
+              <CalendarToolbarNext unit="year" />
+            </CalendarToolbarGroup>
+            <CalendarToolbarGroup grow>
+              <CalendarToolbarPrev unit="month" />
+              <CalendarToolbarMonthTrigger />
+              <CalendarToolbarNext unit="month" />
+            </CalendarToolbarGroup>
+            <CalendarToolbarGroup grow>
+              <CalendarToolbarPrev unit="day" />
+              <CalendarToolbarMonthLabel />
+              <CalendarToolbarDayLabel format="numeric" />
+              <CalendarToolbarYearLabel />
+              <CalendarToolbarNext unit="day" />
+            </CalendarToolbarGroup>
+            <CalendarToolbarGroup>
+              <CalendarToolbarMonthTrigger compact />
+              <CalendarToolbarYearTrigger compact />
+            </CalendarToolbarGroup>
+            <CalendarToolbarGroup>
+              <CalendarToolbarTime compact />
+              <CalendarToolbarHome />
+              <CalendarToolbarClear />
+              <CalendarToolbarApply onApply={setLast} />
+              <CalendarToolbarThemeToggle />
+            </CalendarToolbarGroup>
+          </CalendarToolbar>
+          <CalendarDays />
+        </Calendar>
+        <pre style={{ margin: 0, fontSize: "0.8rem", opacity: 0.7 }}>
+          {last === undefined
+            ? "— pick a date then Apply (✓)"
+            : formatApplyValue(last)}
+        </pre>
+      </div>
     );
   },
 };
 KitchenSink.storyName = "Kitchen sink — all modules (overflow demo)";
+
+// ─── Apply ────────────────────────────────────────────────────────────────────
+
+const formatApplyValue = (v: ApplyValue): string => {
+  if (v === null) return "null";
+  if (v instanceof Date) return v.toLocaleString();
+  if (Array.isArray(v)) return v.map((d) => d.toLocaleString()).join(", ");
+  return `from: ${v.from?.toLocaleString() ?? "null"}  |  to: ${v.to?.toLocaleString() ?? "null"}`;
+};
+
+export const ApplySingle: Story = {
+  render: (args, ctx) => {
+    const [date, setDate] = useState<Date | null>(null);
+    const [last, setLast] = useState<ApplyValue | undefined>(undefined);
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+        <Calendar
+          value={date}
+          onChange={setDate}
+          locale={args.locale ?? resolveStoryLocale(ctx.globals.locale)}
+          theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
+          appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          gradient={resolveStoryGradient(ctx.globals.gradient)}
+        >
+          <CalendarToolbar>
+            <CalendarToolbarGroup grow>
+              <CalendarToolbarPrev unit="month" />
+              <CalendarToolbarMonthTrigger />
+              <CalendarToolbarYearTrigger />
+              <CalendarToolbarNext unit="month" />
+            </CalendarToolbarGroup>
+            <CalendarToolbarApply onApply={setLast} />
+          </CalendarToolbar>
+          <CalendarDays />
+        </Calendar>
+        <pre style={{ margin: 0, fontSize: "0.8rem", opacity: 0.7 }}>
+          {last === undefined
+            ? "— pick a date then Apply"
+            : formatApplyValue(last)}
+        </pre>
+      </div>
+    );
+  },
+};
+ApplySingle.storyName = "Apply — single mode (check icon)";
+
+export const ApplyRange: Story = {
+  render: (args, ctx) => {
+    const [range, setRange] = useState<RangeValue>({ from: null, to: null });
+    const [last, setLast] = useState<ApplyValue | undefined>(undefined);
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+        <Calendar
+          value={range}
+          onChange={setRange}
+          mode="range"
+          locale={args.locale ?? resolveStoryLocale(ctx.globals.locale)}
+          theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
+          appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          gradient={resolveStoryGradient(ctx.globals.gradient)}
+        >
+          <CalendarToolbar>
+            <CalendarToolbarGroup grow>
+              <CalendarToolbarPrev unit="month" />
+              <CalendarToolbarMonthTrigger />
+              <CalendarToolbarYearTrigger />
+              <CalendarToolbarNext unit="month" />
+            </CalendarToolbarGroup>
+            <CalendarToolbarClear />
+            <CalendarToolbarApply onApply={setLast} />
+          </CalendarToolbar>
+          <CalendarDays />
+        </Calendar>
+        <pre style={{ margin: 0, fontSize: "0.8rem", opacity: 0.7 }}>
+          {last === undefined
+            ? "— pick a range then Apply"
+            : formatApplyValue(last)}
+        </pre>
+      </div>
+    );
+  },
+};
+ApplyRange.storyName = "Apply — range mode";
+
+export const ApplyCustomLabel: Story = {
+  render: (args, ctx) => {
+    const [date, setDate] = useState<Date | null>(null);
+    const [last, setLast] = useState<ApplyValue | undefined>(undefined);
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+        <Calendar
+          value={date}
+          onChange={setDate}
+          locale={args.locale ?? resolveStoryLocale(ctx.globals.locale)}
+          theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
+          appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          gradient={resolveStoryGradient(ctx.globals.gradient)}
+        >
+          <CalendarToolbar>
+            <CalendarToolbarGroup grow>
+              <CalendarToolbarPrev unit="month" />
+              <CalendarToolbarMonthTrigger />
+              <CalendarToolbarYearTrigger />
+              <CalendarToolbarNext unit="month" />
+            </CalendarToolbarGroup>
+            <CalendarToolbarApply onApply={setLast}>
+              Confirm
+            </CalendarToolbarApply>
+          </CalendarToolbar>
+          <CalendarDays />
+        </Calendar>
+        <pre style={{ margin: 0, fontSize: "0.8rem", opacity: 0.7 }}>
+          {last === undefined
+            ? "— pick a date then Confirm"
+            : formatApplyValue(last)}
+        </pre>
+      </div>
+    );
+  },
+};
+ApplyCustomLabel.storyName = "Apply — custom label (text button)";
