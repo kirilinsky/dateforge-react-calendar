@@ -164,6 +164,7 @@ export const CalendarToolbar: React.FC<CalendarToolbarProps> = ({
   );
 };
 
+export { CalendarToolbarApply } from "./apply";
 export { CalendarToolbarClear } from "./clear";
 export { CalendarToolbarClock } from "./clock";
 export { CalendarToolbarDayLabel } from "./day-label";

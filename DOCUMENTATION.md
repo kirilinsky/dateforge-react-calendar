@@ -276,7 +276,7 @@ Module props use the same names and override the matching root prop only for tha
 
 | Module | Override props |
 | ------ | -------------- |
-| `CalendarToolbar` modules | `calendarNavigationLabel`, `changeMonthLabel`, `changeTimeLabel`, `changeYearLabel`, `clearLabel`, `confirmLabel`, `homeLabel`, `hoursLabel`, `minutesLabel`, `monthTrackLabel`, `nextMonthLabel`, `nextYearLabel`, `previousMonthLabel`, `previousYearLabel`, `secondsLabel`, `selectMonthLabel`, `selectTimeLabel`, `selectYearLabel`, `themeSwitchToDarkLabel`, `themeSwitchToLightLabel`, `themeToggleLabel`, `timePeriodLabel`, `timePickerLabel`, `yearTrackLabel` |
+| `CalendarToolbar` modules | `applyLabel`, `calendarNavigationLabel`, `changeMonthLabel`, `changeTimeLabel`, `changeYearLabel`, `clearLabel`, `confirmLabel`, `homeLabel`, `hoursLabel`, `minutesLabel`, `monthTrackLabel`, `nextMonthLabel`, `nextYearLabel`, `previousMonthLabel`, `previousYearLabel`, `secondsLabel`, `selectMonthLabel`, `selectTimeLabel`, `selectYearLabel`, `themeSwitchToDarkLabel`, `themeSwitchToLightLabel`, `themeToggleLabel`, `timePeriodLabel`, `timePickerLabel`, `yearTrackLabel` |
 | `CalendarDays` | `weekLabel` |
 | `CalendarInfo` | `clearLabel`, `homeLabel` |
 | `CalendarManualInput` | `applyLabel`, `clearLabel`, `removeLabel` |
@@ -929,6 +929,7 @@ Composable toolbar container. It provides toolbar-local popup state and a shared
 | `CalendarToolbarClock`         | Live read-only clock. `seconds` controls minute-vs-second ticking                                         |
 | `CalendarToolbarHome`          | Navigate back to the current month                                                                        |
 | `CalendarToolbarClear`         | Clear current selection, or clear only the active boundary when the container has `bound`                  |
+| `CalendarToolbarApply`         | Confirm the current selection. Default: check-mark icon. Pass `children` for custom text. Fires `onApply(value)` with the typed selection value (`Date \| null`, `Date[]`, or `DateRange`). Auto-disabled when nothing is selected or `readOnly` |
 | `CalendarToolbarThemeToggle`   | Toggle light/dark UI theme                                                                                |
 | `CalendarToolbarGroup`         | Flex wrapper that clusters submodules. `grow` makes the group expand to fill available toolbar width      |
 
@@ -953,6 +954,7 @@ Action-label props (`previousMonthLabel`, `changeMonthLabel`, `confirmLabel`, et
   <CalendarToolbarGroup>
     <CalendarToolbarHome />
     <CalendarToolbarClear />
+    <CalendarToolbarApply onApply={(v) => console.log(v)} />
     <CalendarToolbarThemeToggle />
   </CalendarToolbarGroup>
 </CalendarToolbar>
@@ -979,6 +981,7 @@ With the default `justify-content: space-between` on `<CalendarToolbar>`, two un
 | `MonthLabel` / `YearLabel` / `DayLabel` / `Clock`      | display only                                                                                                               | no                | n/a                                               |
 | `ThemeToggle`                                          | toggles UI theme via `UIContext.toggleTheme`                                                                               | no                | yes — UI not blocked                              |
 | `Clear`                                                | `onChangeDate(null)` — clears current selection. With `bound` clears that boundary only via `onRangeBoundSet(bound, null)` | yes               | button disabled when `readOnly`                   |
+| `Apply`                                                | fires `onApply(value)` — does **not** change calendar state; purely signals the caller to consume the current selection    | no                | button disabled when `readOnly`                   |
 | `Time` popup confirm                                   | calls `onChangeTime`; with `bound`, writes that boundary through `onRangeBoundSet`                                         | yes (on confirm)  | drums and confirm read-only when `readOnly`       |
 
 Use this table to decide which guarantees apply to your composition. A toolbar made only from arrows, labels, and month/year triggers is navigational and never fires `onChange`.
