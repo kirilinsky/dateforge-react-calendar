@@ -81,7 +81,7 @@ export const StoryToolbar: React.FC<StoryToolbarProps> = ({
       {label && <CalendarToolbarLabel>{label}</CalendarToolbarLabel>}
 
       {!hasAnyContent && (
-        <CalendarToolbarGroup>
+        <CalendarToolbarGroup grow>
           <CalendarToolbarPrev />
           <CalendarToolbarMonthLabel />
           <CalendarToolbarYearLabel />
@@ -94,7 +94,7 @@ export const StoryToolbar: React.FC<StoryToolbarProps> = ({
       {compactTime && <CalendarToolbarTime compact seconds={seconds} />}
 
       {showMonthPicker && (
-        <CalendarToolbarGroup>
+        <CalendarToolbarGroup grow>
           <CalendarToolbarPrev />
           <CalendarToolbarMonthTrigger />
           <CalendarToolbarNext />
@@ -102,7 +102,7 @@ export const StoryToolbar: React.FC<StoryToolbarProps> = ({
       )}
 
       {showYearPicker && (
-        <CalendarToolbarGroup>
+        <CalendarToolbarGroup grow>
           <CalendarToolbarPrev unit="year" />
           <CalendarToolbarYearTrigger />
           <CalendarToolbarNext unit="year" />

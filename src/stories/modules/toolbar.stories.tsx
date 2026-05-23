@@ -47,7 +47,7 @@ const meta: Meta<Args> = {
         gradient={resolveStoryGradient(ctx.globals.gradient)}
       >
         <CalendarToolbar>
-          <CalendarToolbarGroup>
+          <CalendarToolbarGroup grow>
             <CalendarToolbarPrev unit="month" />
             <CalendarToolbarMonthTrigger />
             <CalendarToolbarYearTrigger />
@@ -84,7 +84,7 @@ export const NavYear: Story = {
         gradient={resolveStoryGradient(ctx.globals.gradient)}
       >
         <CalendarToolbar>
-          <CalendarToolbarGroup>
+          <CalendarToolbarGroup grow>
             <CalendarToolbarPrev unit="year" />
             <CalendarToolbarYearTrigger />
             <CalendarToolbarNext unit="year" />
@@ -111,7 +111,7 @@ export const NavDay: Story = {
         gradient={resolveStoryGradient(ctx.globals.gradient)}
       >
         <CalendarToolbar>
-          <CalendarToolbarGroup>
+          <CalendarToolbarGroup grow>
             <CalendarToolbarPrev unit="day" />
             <CalendarToolbarMonthLabel />
             <CalendarToolbarDayLabel format="numeric" />
@@ -142,7 +142,7 @@ export const TriggerMonth: Story = {
         gradient={resolveStoryGradient(ctx.globals.gradient)}
       >
         <CalendarToolbar>
-          <CalendarToolbarGroup>
+          <CalendarToolbarGroup grow>
             <CalendarToolbarPrev unit="month" />
             <CalendarToolbarMonthTrigger />
             <CalendarToolbarNext unit="month" />
@@ -169,7 +169,7 @@ export const TriggerYear: Story = {
         gradient={resolveStoryGradient(ctx.globals.gradient)}
       >
         <CalendarToolbar>
-          <CalendarToolbarGroup>
+          <CalendarToolbarGroup grow>
             <CalendarToolbarPrev unit="year" />
             <CalendarToolbarYearTrigger />
             <CalendarToolbarNext unit="year" />
@@ -226,7 +226,7 @@ export const TriggerTime: Story = {
         gradient={resolveStoryGradient(ctx.globals.gradient)}
       >
         <CalendarToolbar>
-          <CalendarToolbarGroup>
+          <CalendarToolbarGroup grow>
             <CalendarToolbarPrev unit="month" />
             <CalendarToolbarMonthTrigger />
             <CalendarToolbarYearTrigger />
@@ -280,7 +280,7 @@ export const StaticLabels: Story = {
         gradient={resolveStoryGradient(ctx.globals.gradient)}
       >
         <CalendarToolbar>
-          <CalendarToolbarGroup>
+          <CalendarToolbarGroup grow>
             <CalendarToolbarPrev unit="day" />
             <CalendarToolbarMonthLabel />
             <CalendarToolbarDayLabel format="2-digit" />
@@ -362,7 +362,7 @@ export const UtilityButtons: Story = {
         gradient={resolveStoryGradient(ctx.globals.gradient)}
       >
         <CalendarToolbar>
-          <CalendarToolbarGroup>
+          <CalendarToolbarGroup grow>
             <CalendarToolbarPrev unit="month" />
             <CalendarToolbarMonthTrigger />
             <CalendarToolbarYearTrigger />
@@ -395,7 +395,7 @@ export const Group: Story = {
         gradient={resolveStoryGradient(ctx.globals.gradient)}
       >
         <CalendarToolbar>
-          <CalendarToolbarGroup>
+          <CalendarToolbarGroup grow>
             <CalendarToolbarPrev unit="month" />
             <CalendarToolbarMonthTrigger />
             <CalendarToolbarYearTrigger />
@@ -458,7 +458,7 @@ export const ToolbarBelow: Story = {
       >
         <CalendarDays />
         <CalendarToolbar>
-          <CalendarToolbarGroup>
+          <CalendarToolbarGroup grow>
             <CalendarToolbarPrev unit="month" />
             <CalendarToolbarMonthTrigger />
             <CalendarToolbarYearTrigger />
@@ -526,7 +526,7 @@ export const TwoPanel: Story = {
         gradient={resolveStoryGradient(ctx.globals.gradient)}
       >
         <CalendarToolbar col={2}>
-          <CalendarToolbarGroup>
+          <CalendarToolbarGroup grow>
             <CalendarToolbarPrev unit="month" />
             <CalendarToolbarMonthTrigger />
             <CalendarToolbarYearTrigger />
@@ -534,7 +534,7 @@ export const TwoPanel: Story = {
           </CalendarToolbarGroup>
         </CalendarToolbar>
         <CalendarToolbar offset={1} col={2}>
-          <CalendarToolbarGroup>
+          <CalendarToolbarGroup grow>
             <CalendarToolbarPrev unit="month" />
             <CalendarToolbarMonthTrigger />
             <CalendarToolbarYearTrigger />
@@ -567,12 +567,12 @@ export const WithMinMax: Story = {
         gradient={resolveStoryGradient(ctx.globals.gradient)}
       >
         <CalendarToolbar>
-          <CalendarToolbarGroup>
+          <CalendarToolbarGroup grow>
             <CalendarToolbarPrev unit="year" />
             <CalendarToolbarYearTrigger />
             <CalendarToolbarNext unit="year" />
           </CalendarToolbarGroup>
-          <CalendarToolbarGroup>
+          <CalendarToolbarGroup grow>
             <CalendarToolbarPrev unit="month" />
             <CalendarToolbarMonthTrigger />
             <CalendarToolbarNext unit="month" />
@@ -601,7 +601,7 @@ export const SeparateTheme: Story = {
         gradient={resolveStoryGradient(ctx.globals.gradient)}
       >
         <CalendarToolbar theme={themes.dracula}>
-          <CalendarToolbarGroup>
+          <CalendarToolbarGroup grow>
             <CalendarToolbarPrev unit="month" />
             <CalendarToolbarMonthTrigger />
             <CalendarToolbarYearTrigger />

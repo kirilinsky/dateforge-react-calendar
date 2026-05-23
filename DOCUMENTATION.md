@@ -908,7 +908,7 @@ Composable toolbar container. It provides toolbar-local popup state and a shared
 | --------- | --------------------- | ------- | ----------------------------------------------------------------------------------------------------- |
 | `cols`    | `number \| string`    | —       | Optional inner grid columns. A number becomes `repeat(n, minmax(0, 1fr))`; a string is passed to CSS  |
 | `col`     | `number \| string`    | —       | CSS grid `grid-column` placement in the parent `<Calendar>` grid                                      |
-| `justify` | CSS `justify-content` | —       | Align wrapped toolbar content (`"space-between"`, `"center"`, `"flex-end"`, etc.)                     |
+| `justify` | CSS `justify-content` | `"space-between"` | Align toolbar content. Override with `"center"`, `"flex-end"`, etc.                  |
 | `theme`   | `CalendarTheme`       | —       | Local theme scope for this toolbar only                                                               |
 | `offset`  | `number`              | `0`     | Month offset relative to `viewDate`. Use for synced multi-month headers                               |
 | `bound`   | `"from" \| "to"`      | —       | In range mode binds toolbar navigation / clear / time to a range boundary                             |
@@ -930,9 +930,42 @@ Composable toolbar container. It provides toolbar-local popup state and a shared
 | `CalendarToolbarHome`          | Navigate back to the current month                                                                        |
 | `CalendarToolbarClear`         | Clear current selection, or clear only the active boundary when the container has `bound`                  |
 | `CalendarToolbarThemeToggle`   | Toggle light/dark UI theme                                                                                |
+| `CalendarToolbarGroup`         | Flex wrapper that clusters submodules. `grow` makes the group expand to fill available toolbar width      |
 
 Each submodule also accepts `col` for placement inside a toolbar with `cols`.
 Action-label props (`previousMonthLabel`, `changeMonthLabel`, `confirmLabel`, etc.) override the matching root label only for that submodule instance.
+
+### Grouping
+
+`CalendarToolbarGroup` wraps two or more submodules into a single flex container. Use it to cluster related controls, and give nav groups `grow` so they fill the space between action clusters.
+
+```tsx
+<CalendarToolbar>
+  {/* nav group fills available width */}
+  <CalendarToolbarGroup grow>
+    <CalendarToolbarPrev />
+    <CalendarToolbarMonthTrigger />
+    <CalendarToolbarYearTrigger />
+    <CalendarToolbarNext />
+  </CalendarToolbarGroup>
+
+  {/* action group stays compact */}
+  <CalendarToolbarGroup>
+    <CalendarToolbarHome />
+    <CalendarToolbarClear />
+    <CalendarToolbarThemeToggle />
+  </CalendarToolbarGroup>
+</CalendarToolbar>
+```
+
+`CalendarToolbarGroup` props:
+
+| Prop       | Type               | Default | Description                                              |
+| ---------- | ------------------ | ------- | -------------------------------------------------------- |
+| `grow`     | `boolean`          | `false` | Sets `flex: 1` — group expands to fill available width   |
+| `col`      | `number \| string` | —       | Grid column placement when the toolbar uses `cols`       |
+
+With the default `justify-content: space-between` on `<CalendarToolbar>`, two ungrouped groups naturally sit at opposite edges. Add `grow` to the nav group when you want the label/trigger to center itself between arrows regardless of how many action buttons are on the right.
 
 ### Behavior matrix
 

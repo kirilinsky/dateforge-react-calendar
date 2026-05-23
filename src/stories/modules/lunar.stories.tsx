@@ -69,7 +69,7 @@ export const LocalizedLabels: Story = {
         appearance={resolveStoryAppearance(ctx.globals.appearance)}
         gradient={resolveStoryGradient(ctx.globals.gradient)}
       >
-        <StoryToolbar />
+        <StoryToolbar home />
         <CalendarDays />
         <CalendarLunar
           lunarLabel="Фазы луны"
