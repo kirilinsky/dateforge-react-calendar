@@ -8,6 +8,7 @@ interface UseCalendarKeyboardArgs {
   blockNavigation?: boolean;
   navigateTo: (d: Date) => void;
   onSelect: (d: Date) => void;
+  onMonthNavigate?: (dir: "up" | "down") => void;
 }
 
 export function useCalendarKeyboard({
@@ -18,6 +19,7 @@ export function useCalendarKeyboard({
   blockNavigation = false,
   navigateTo,
   onSelect,
+  onMonthNavigate,
 }: UseCalendarKeyboardArgs) {
   const gridRef = useRef<HTMLDivElement>(null);
   const [focusedDate, setFocusedDate] = useState<Date>(() => initialFocusDate);
@@ -63,6 +65,7 @@ export function useCalendarKeyboard({
       shouldFocusRef.current = true;
       setFocusedDate(next);
       if (leavesMonth) {
+        onMonthNavigate?.(next.getTime() > viewDate.getTime() ? "down" : "up");
         navigateTo(
           new Date(
             next.getFullYear(),
@@ -75,7 +78,7 @@ export function useCalendarKeyboard({
         );
       }
     },
-    [viewDate, navigateTo, blockNavigation],
+    [viewDate, navigateTo, blockNavigation, onMonthNavigate],
   );
 
   const handleKeyDown = useCallback(
