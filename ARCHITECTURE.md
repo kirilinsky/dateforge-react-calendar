@@ -85,10 +85,12 @@ Common layouts:
 // Header full width, then two equal modules.
 <Calendar cols={2}>
   <CalendarToolbar>
-    <CalendarToolbarPrev />
-    <CalendarToolbarMonthLabel />
-    <CalendarToolbarYearLabel />
-    <CalendarToolbarNext />
+    <CalendarToolbarGroup grow>
+      <CalendarToolbarPrev />
+      <CalendarToolbarMonthLabel />
+      <CalendarToolbarYearLabel />
+      <CalendarToolbarNext />
+    </CalendarToolbarGroup>
   </CalendarToolbar>
   <CalendarMonthsGrid col={1} />
   <CalendarDays col={1} />
@@ -99,10 +101,12 @@ Common layouts:
 // Sidebar + main content.
 <Calendar cols={3}>
   <CalendarToolbar>
-    <CalendarToolbarPrev />
-    <CalendarToolbarMonthLabel />
-    <CalendarToolbarYearLabel />
-    <CalendarToolbarNext />
+    <CalendarToolbarGroup grow>
+      <CalendarToolbarPrev />
+      <CalendarToolbarMonthLabel />
+      <CalendarToolbarYearLabel />
+      <CalendarToolbarNext />
+    </CalendarToolbarGroup>
   </CalendarToolbar>
   <CalendarPresets col={1} />
   <CalendarDays col={2} />
@@ -113,10 +117,12 @@ Common layouts:
 // Left / main / right proportions.
 <Calendar cols={4}>
   <CalendarToolbar>
-    <CalendarToolbarPrev />
-    <CalendarToolbarMonthLabel />
-    <CalendarToolbarYearLabel />
-    <CalendarToolbarNext />
+    <CalendarToolbarGroup grow>
+      <CalendarToolbarPrev />
+      <CalendarToolbarMonthLabel />
+      <CalendarToolbarYearLabel />
+      <CalendarToolbarNext />
+    </CalendarToolbarGroup>
   </CalendarToolbar>
   <CalendarPresets col={1} />
   <CalendarDays col={2} />
@@ -291,6 +297,7 @@ The single source of truth for which user actions change view, mutate selection,
 | `<CalendarToolbarTime>` confirm                                   | yes (time-of-day)   | yes (time-of-day) | yes              | drums / AM-PM / confirm disabled |
 | `<CalendarToolbarThemeToggle>`                                    | no                  | no (UI-only)      | no               | works                            |
 | `<CalendarToolbarMonth/Year/DayLabel>` / `<CalendarToolbarClock>` | no                  | no (display)      | no               | n/a                              |
+| `<CalendarToolbarGroup>`                                          | no                  | no (layout only)  | no               | n/a                              |
 | `<CalendarToolbarMonth/YearTrigger>` popup confirm                | yes                 | no                | no               | trigger disabled                 |
 | `<CalendarDays>` day click                                        | maybe (cross-month) | yes               | yes              | aria-disabled, click blocked     |
 | `<CalendarDays>` arrow keys / PgUp / PgDn                         | maybe               | no                | no               | works (focus moves)              |
