@@ -121,15 +121,22 @@ export const Heatmap: Story = {
             if (state.isOtherMonth) return renderOtherMonth(d, state);
             const intensity = seededRandom(d);
             return (
-              <span
-                style={{
-                  ...dayContainerStyle,
-                  background: heatColor(intensity, isDark),
-                  borderRadius: 4,
-                }}
-              >
-                <span style={dayNumberStyle(state)}>{d.getDate()}</span>
-              </span>
+              <>
+                {/* Absolute fill overrides the library's .activeItem background
+                    so the heatmap color wins on all appearances/border-radii. */}
+                <span
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    background: heatColor(intensity, isDark),
+                    borderRadius: "inherit",
+                  }}
+                />
+                <span style={{ ...dayContainerStyle, position: "relative" }}>
+                  <span style={dayNumberStyle(state)}>{d.getDate()}</span>
+                </span>
+              </>
             );
           }}
         />
