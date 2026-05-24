@@ -172,10 +172,32 @@ Submodules (all under `@dateforge/react-calendar/modules/toolbar`):
 | `CalendarToolbarTime` | Open time-picker popup button |
 | `CalendarToolbarMonthTrigger` | Open month-picker popup button |
 | `CalendarToolbarYearTrigger` | Open year-picker popup button |
+| `CalendarToolbarApply` | Confirm / apply button (`applyLabel?`, `onApply?`, `disabled?`) |
 
 All label submodules use the visually-hidden text pattern for screen readers — the accessible name is always announced regardless of display format. Label text is resolved via `resolveActionLabel` (per-instance prop → `actionLabels` config → English default), so the full localization pipeline applies.
 
 New `CalendarActionLabels` keys: `currentDayLabel` (default `"Current day, {day}"`), `currentMonthLabel` (default `"Current month, {month}"`), `currentYearLabel` (default `"Current year, {year}"`), `nextDayLabel`, `previousDayLabel`.
+
+**Toolbar submodules — `offset` prop**
+
+`CalendarToolbarMonthLabel`, `CalendarToolbarMonthTrigger`, `CalendarToolbarYearLabel`, and `CalendarToolbarYearTrigger` accept `offset?: number` to shift the displayed month/year by N months relative to the Calendar's base view date. Positive values go forward, negative backward; year rolls over correctly at December/January boundaries.
+
+Component-level `offset` is **independent** of any `offset` set on the parent `<CalendarToolbar>` — it is always applied to the raw view date (`baseDate`), not to the already-offset toolbar date. This makes it safe to build multi-month panels using a single toolbar:
+
+```tsx
+<CalendarToolbar>
+  <CalendarToolbarPrev />
+  <CalendarToolbarMonthLabel />          {/* current month */}
+  <CalendarToolbarMonthLabel offset={1} /> {/* next month */}
+  <CalendarToolbarNext />
+</CalendarToolbar>
+```
+
+New `ToolbarContextValue` field: `baseDate` (pre-offset view date); previously only `date` (post-offset) was exposed. Custom toolbar submodules that need the raw anchor can read `baseDate` from `useToolbarContext()`.
+
+**Toolbar — disabled-button animation fix**
+
+Interactive toolbar buttons (MonthTrigger, YearTrigger, and any `.interactive` element) no longer show the `:active` press animation when `disabled` or `aria-disabled="true"`. Both the module-level `:active:not([disabled])` guard and a global `transform: none` fallback in `global.module.css` enforce this.
 
 **`CalendarDays` — keyboard month navigation slide animation**
 
