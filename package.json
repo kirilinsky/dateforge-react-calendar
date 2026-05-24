@@ -62,6 +62,16 @@
         "default": "./dist/modules/toolbar.cjs"
       }
     },
+    "./modules/toolbar/apply": {
+      "import": {
+        "types": "./dist/modules/toolbar/apply.d.ts",
+        "default": "./dist/modules/toolbar/apply.mjs"
+      },
+      "require": {
+        "types": "./dist/modules/toolbar/apply.d.cts",
+        "default": "./dist/modules/toolbar/apply.cjs"
+      }
+    },
     "./modules/toolbar/clear": {
       "import": {
         "types": "./dist/modules/toolbar/clear.d.ts",

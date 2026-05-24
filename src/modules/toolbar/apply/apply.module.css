@@ -11,6 +11,11 @@
     transition: color var(--cal-paint-transition, var(--cal-transition, 0.2s))
       var(--cal-paint-easing, linear);
 
+    &[disabled],
+    &[aria-disabled="true"] {
+      color: var(--c-dt, var(--c-c));
+    }
+
     & svg {
       width: 1.1em;
       height: 1.1em;
