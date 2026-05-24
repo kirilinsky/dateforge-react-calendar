@@ -199,11 +199,9 @@ export const TriggerCompact: Story = {
       >
         <CalendarToolbar>
           <CalendarToolbarGroup>
+            <CalendarToolbarPrev unit="month" />
             <CalendarToolbarMonthTrigger compact />
             <CalendarToolbarYearTrigger compact />
-          </CalendarToolbarGroup>
-          <CalendarToolbarGroup>
-            <CalendarToolbarPrev unit="month" />
             <CalendarToolbarNext unit="month" />
           </CalendarToolbarGroup>
         </CalendarToolbar>
@@ -432,10 +430,9 @@ export const GridLayout: Story = {
         gradient={resolveStoryGradient(ctx.globals.gradient)}
       >
         <CalendarToolbar cols={5}>
-          <CalendarToolbarPrev unit="year" />
-          <CalendarToolbarYearTrigger />
-          <CalendarToolbarNext unit="year" />
           <CalendarToolbarPrev unit="month" />
+          <CalendarToolbarMonthTrigger col={2} />
+          <CalendarToolbarYearTrigger />
           <CalendarToolbarNext unit="month" />
         </CalendarToolbar>
         <CalendarDays />
@@ -488,20 +485,20 @@ export const DualToolbar: Story = {
         gradient={resolveStoryGradient(ctx.globals.gradient)}
       >
         <CalendarToolbar>
+          <CalendarToolbarPrev />
           <CalendarToolbarGroup>
             <CalendarToolbarMonthTrigger />
             <CalendarToolbarYearTrigger />
           </CalendarToolbarGroup>
-          <CalendarToolbarThemeToggle />
+          <CalendarToolbarNext />
         </CalendarToolbar>
         <CalendarDays />
         <CalendarToolbar>
-          <CalendarToolbarPrev unit="month" />
+          <CalendarToolbarHome />
           <CalendarToolbarGroup>
-            <CalendarToolbarHome />
             <CalendarToolbarClear />
+            <CalendarToolbarApply onApply={() => {}} />
           </CalendarToolbarGroup>
-          <CalendarToolbarNext unit="month" />
         </CalendarToolbar>
       </Calendar>
     );
@@ -510,42 +507,47 @@ export const DualToolbar: Story = {
 DualToolbar.storyName = "Layout — toolbar above + below days";
 
 export const TwoPanel: Story = {
+  parameters: { storyWidth: "auto" },
   render: (args, ctx) => {
     const [range, setRange] = useState<RangeValue>({
       from: FIXED_DATE,
       to: new Date(2016, 1, 20),
     });
+    const [_last, _setLast] = useState<ApplyValue | undefined>(undefined);
     return (
-      <Calendar
-        mode="range"
-        value={range}
-        onChange={setRange}
-        cols={4}
-        locale={args.locale ?? resolveStoryLocale(ctx.globals.locale)}
-        theme={resolveStoryTheme(ctx.globals.theme)}
-        {...resolveStoryThemeMode(ctx.globals.themeMode)}
-        appearance={resolveStoryAppearance(ctx.globals.appearance)}
-        gradient={resolveStoryGradient(ctx.globals.gradient)}
-      >
-        <CalendarToolbar col={2}>
-          <CalendarToolbarGroup grow>
-            <CalendarToolbarPrev unit="month" />
-            <CalendarToolbarMonthTrigger />
-            <CalendarToolbarYearTrigger />
-            <CalendarToolbarNext unit="month" />
-          </CalendarToolbarGroup>
-        </CalendarToolbar>
-        <CalendarToolbar offset={1} col={2}>
-          <CalendarToolbarGroup grow>
-            <CalendarToolbarPrev unit="month" />
-            <CalendarToolbarMonthTrigger />
-            <CalendarToolbarYearTrigger />
-            <CalendarToolbarNext unit="month" />
-          </CalendarToolbarGroup>
-        </CalendarToolbar>
-        <CalendarDays offset={0} col={2} />
-        <CalendarDays offset={1} col={2} />
-      </Calendar>
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+        <Calendar
+          mode="range"
+          value={range}
+          onChange={setRange}
+          cols={2}
+          locale={args.locale ?? resolveStoryLocale(ctx.globals.locale)}
+          theme={resolveStoryTheme(ctx.globals.theme)}
+          {...resolveStoryThemeMode(ctx.globals.themeMode)}
+          appearance={resolveStoryAppearance(ctx.globals.appearance)}
+          gradient={resolveStoryGradient(ctx.globals.gradient)}
+        >
+          <CalendarToolbar col={2}>
+            <CalendarToolbarPrev />
+            <CalendarToolbarGroup grow>
+              <CalendarToolbarMonthLabel />
+              <CalendarToolbarYearLabel />
+            </CalendarToolbarGroup>
+            <CalendarToolbarGroup grow>
+              <CalendarToolbarMonthLabel offset={1} />
+              <CalendarToolbarYearLabel offset={1} />
+            </CalendarToolbarGroup>
+            <CalendarToolbarNext />
+          </CalendarToolbar>
+
+          <CalendarDays col={1} />
+          <CalendarDays offset={1} col={1} />
+
+          <CalendarToolbar col={2}>
+            <CalendarToolbarHome />
+          </CalendarToolbar>
+        </Calendar>
+      </div>
     );
   },
 };

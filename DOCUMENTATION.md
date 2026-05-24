@@ -675,23 +675,24 @@ const [range, setRange] = useState<DateRange>({ from: null, to: null });
 
 ### Multi-month range picker (two months side by side)
 
+One shared toolbar — left group shows the current month, right group shows month+1 via `offset`:
+
 ```tsx
 <Calendar mode="range" cols={2} value={range} onChange={setRange}>
-  <CalendarToolbar col={1} justify="space-between">
+  <CalendarToolbar col={2}>
     <CalendarToolbarPrev />
-    <CalendarToolbarMonthLabel />
-    <CalendarToolbarYearLabel />
+    <CalendarToolbarGroup grow>
+      <CalendarToolbarMonthTrigger />
+      <CalendarToolbarYearTrigger compact />
+    </CalendarToolbarGroup>
+    <CalendarToolbarGroup grow>
+      <CalendarToolbarMonthLabel offset={1} />
+      <CalendarToolbarYearLabel offset={1} />
+    </CalendarToolbarGroup>
     <CalendarToolbarNext />
   </CalendarToolbar>
-  <CalendarToolbar offset={1} col={2} justify="space-between">
-    <CalendarToolbarPrev />
-    <CalendarToolbarMonthLabel />
-    <CalendarToolbarYearLabel />
-    <CalendarToolbarNext />
-  </CalendarToolbar>
-  <CalendarDays offset={0} col={1} />
-  <CalendarDays offset={1} col={2} />
-  <CalendarSelectedDates col="1 / span 2" />
+  <CalendarDays col={1} />
+  <CalendarDays offset={1} col={1} />
 </Calendar>
 ```
 
@@ -919,10 +920,10 @@ Composable toolbar container. It provides toolbar-local popup state and a shared
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
 | `CalendarToolbarPrev`          | Previous day / month / year button. `unit` defaults to `"month"`                                           |
 | `CalendarToolbarNext`          | Next day / month / year button. `unit` defaults to `"month"`                                               |
-| `CalendarToolbarMonthTrigger`  | Month label button that opens the month drum popup. `compact` shows the compact dropdown form              |
-| `CalendarToolbarYearTrigger`   | Year label button that opens the year drum popup. `compact` shows the compact dropdown form                |
-| `CalendarToolbarMonthLabel`    | Static localized month label. `short` uses the short month form                                            |
-| `CalendarToolbarYearLabel`     | Static year label                                                                                         |
+| `CalendarToolbarMonthTrigger`  | Month label button that opens the month drum popup. `compact` shows the compact dropdown form. `offset` shifts the displayed month N months from the base view date |
+| `CalendarToolbarYearTrigger`   | Year label button that opens the year drum popup. `compact` shows the compact dropdown form. `offset` shifts the displayed year N months from the base view date   |
+| `CalendarToolbarMonthLabel`    | Static localized month label. `short` uses the short month form. `offset` shifts the displayed month N months from the base view date                              |
+| `CalendarToolbarYearLabel`     | Static year label. `offset` shifts the displayed year N months from the base view date                                                                             |
 | `CalendarToolbarDayLabel`      | Static day/date label. `format` is `"numeric"`, `"2-digit"`, or `"long"`                                  |
 | `CalendarToolbarLabel`         | Custom heading label. Use `label` / `children` and optional `level`                                        |
 | `CalendarToolbarTime`          | Button that opens the time popup. Supports `compact`, `seconds`, `labels`, `theme`, and `onTimeSelect`    |
@@ -934,6 +935,7 @@ Composable toolbar container. It provides toolbar-local popup state and a shared
 | `CalendarToolbarGroup`         | Flex wrapper that clusters submodules. `grow` makes the group expand to fill available toolbar width      |
 
 Each submodule also accepts `col` for placement inside a toolbar with `cols`.
+`MonthTrigger`, `YearTrigger`, `MonthLabel`, and `YearLabel` accept `offset` (integer) to shift the displayed month/year relative to the toolbar's base view date — independent of any `offset` set on the parent `<CalendarToolbar>`. Use this to build a single shared toolbar for two-panel layouts instead of two separate toolbars.
 Action-label props (`previousMonthLabel`, `changeMonthLabel`, `confirmLabel`, etc.) override the matching root label only for that submodule instance.
 
 ### Grouping

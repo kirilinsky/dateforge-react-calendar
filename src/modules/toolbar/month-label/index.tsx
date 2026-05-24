@@ -22,11 +22,13 @@ export interface CalendarToolbarMonthLabelProps {
   /** Use localized short month name. */
   short?: boolean;
   currentMonthLabel?: string;
+  /** Shift displayed month by N months relative to the toolbar view date. */
+  offset?: number;
 }
 
 export const CalendarToolbarMonthLabel: React.FC<
   CalendarToolbarMonthLabelProps
-> = ({ col, short = false, currentMonthLabel }) => {
+> = ({ col, short = false, currentMonthLabel, offset }) => {
   const tb = useToolbarContext();
   const { locale, actionLabels } = useConfig();
   const sizer = useMemo(
@@ -36,12 +38,16 @@ export const CalendarToolbarMonthLabel: React.FC<
 
   if (!tb) return null;
 
+  const displayDate = offset
+    ? new Date(tb.baseDate.getFullYear(), tb.baseDate.getMonth() + offset, 1)
+    : tb.date;
+
   const month = getDateTimeFormat(locale, {
     month: short ? "short" : "long",
-  }).format(tb.date);
+  }).format(displayDate);
 
   const monthLong = short
-    ? getDateTimeFormat(locale, { month: "long" }).format(tb.date)
+    ? getDateTimeFormat(locale, { month: "long" }).format(displayDate)
     : month;
 
   const ariaLabel = formatActionLabel(

@@ -32,6 +32,8 @@ export interface CalendarToolbarMonthTriggerProps {
   confirmLabel?: string;
   selectMonthLabel?: string;
   monthTrackLabel?: string;
+  /** Shift displayed month by N months relative to the toolbar view date. */
+  offset?: number;
 }
 
 export const CalendarToolbarMonthTrigger: React.FC<
@@ -43,6 +45,7 @@ export const CalendarToolbarMonthTrigger: React.FC<
   confirmLabel,
   selectMonthLabel,
   monthTrackLabel,
+  offset,
 }) => {
   const tb = useToolbarContext();
   const { minDate, maxDate, locale, readOnly, actionLabels } = useConfig();
@@ -62,14 +65,22 @@ export const CalendarToolbarMonthTrigger: React.FC<
     setMonthPopupOpen,
   } = tb;
 
+  const displayDate = offset
+    ? new Date(tb.baseDate.getFullYear(), tb.baseDate.getMonth() + offset, 1)
+    : date;
+
   const monthFixed = isYearFixed(
-    date.getFullYear(),
+    displayDate.getFullYear(),
     minDate,
     maxDate,
-    date.getMonth(),
+    displayDate.getMonth(),
   );
-  const monthLong = getDateTimeFormat(locale, { month: "long" }).format(date);
-  const monthShort = getDateTimeFormat(locale, { month: "short" }).format(date);
+  const monthLong = getDateTimeFormat(locale, { month: "long" }).format(
+    displayDate,
+  );
+  const monthShort = getDateTimeFormat(locale, { month: "short" }).format(
+    displayDate,
+  );
 
   const resolvedChangeLabel = resolveActionLabel(
     changeMonthLabel,
@@ -127,7 +138,7 @@ export const CalendarToolbarMonthTrigger: React.FC<
 
       {monthPopupOpen && (
         <MonthPopup
-          date={date}
+          date={displayDate}
           locale={locale}
           minDate={minDate}
           maxDate={maxDate}

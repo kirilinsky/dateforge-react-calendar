@@ -9,7 +9,7 @@
     height: var(--cal-size-chip, 2.3em);
     white-space: nowrap;
     min-width: 0;
-    &:active {
+    &:active:not([disabled]):not([aria-disabled="true"]) {
       transform: scale(var(--cal-press-scale, 0.96));
     }
   }
