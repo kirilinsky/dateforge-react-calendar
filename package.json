@@ -405,6 +405,8 @@
     "test:coverage": "vitest run --coverage",
     "test:ssr": "vitest run src/__tests__/integration/ssr.test.tsx",
     "test:storybook": "vitest run --project=storybook --passWithNoTests",
+    "fuzz": "FUZZ_RUNS=1000 vitest run src/__tests__/fuzz --reporter=verbose --reporter=./src/__tests__/fuzz/md-reporter",
+    "fuzz:ci": "FUZZ_RUNS=100 vitest run src/__tests__/fuzz --reporter=./src/__tests__/fuzz/md-reporter",
     "verify": "npm run typecheck && npm run check && npm run check:css && npm run knip && npm run build && npm run check:exports && npm run size && npm run test",
     "storybook": "storybook dev -p 6006 --no-open",
     "build-storybook": "storybook build",
