@@ -31,6 +31,8 @@ export interface CalendarToolbarYearTriggerProps {
   confirmLabel?: string;
   selectYearLabel?: string;
   yearTrackLabel?: string;
+  /** Shift displayed year by N months relative to the toolbar view date. */
+  offset?: number;
 }
 
 export const CalendarToolbarYearTrigger: React.FC<
@@ -42,6 +44,7 @@ export const CalendarToolbarYearTrigger: React.FC<
   confirmLabel,
   selectYearLabel,
   yearTrackLabel,
+  offset,
 }) => {
   const tb = useToolbarContext();
   const { minDate, maxDate, readOnly, actionLabels } = useConfig();
@@ -61,7 +64,11 @@ export const CalendarToolbarYearTrigger: React.FC<
     setYearPopupOpen,
   } = tb;
 
-  const cur = date.getFullYear();
+  const displayDate = offset
+    ? new Date(tb.baseDate.getFullYear(), tb.baseDate.getMonth() + offset, 1)
+    : date;
+
+  const cur = displayDate.getFullYear();
   const yearFixed = isYearFixed(cur, minDate, maxDate);
 
   const resolvedChangeLabel = resolveActionLabel(
@@ -119,7 +126,7 @@ export const CalendarToolbarYearTrigger: React.FC<
 
       {yearPopupOpen && (
         <YearPopup
-          date={date}
+          date={displayDate}
           minDate={minDate}
           maxDate={maxDate}
           confirmLabel={resolvedConfirmLabel}

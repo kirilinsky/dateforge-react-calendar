@@ -5,6 +5,7 @@ export interface ToolbarContextValue {
   bound: "from" | "to" | undefined;
   offset: number;
   date: Date;
+  baseDate: Date;
   isBound: boolean;
   boundDate: Date | null;
   setLocalView: (date: Date) => void;

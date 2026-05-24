@@ -14,17 +14,22 @@ import styles from "./year-label.module.css";
 export interface CalendarToolbarYearLabelProps {
   col?: number | string;
   currentYearLabel?: string;
+  /** Shift displayed year by N months relative to the toolbar view date. */
+  offset?: number;
 }
 
 export const CalendarToolbarYearLabel: React.FC<
   CalendarToolbarYearLabelProps
-> = ({ col, currentYearLabel }) => {
+> = ({ col, currentYearLabel, offset }) => {
   const tb = useToolbarContext();
   const { actionLabels } = useConfig();
 
   if (!tb) return null;
 
-  const year = tb.date.getFullYear();
+  const displayDate = offset
+    ? new Date(tb.baseDate.getFullYear(), tb.baseDate.getMonth() + offset, 1)
+    : tb.date;
+  const year = displayDate.getFullYear();
 
   const ariaLabel = formatActionLabel(
     resolveActionLabel(

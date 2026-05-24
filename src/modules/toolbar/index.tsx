@@ -60,19 +60,23 @@ export const CalendarToolbar: React.FC<CalendarToolbarProps> = ({
     viewDate,
   });
 
+  const baseDate = useMemo(
+    () => (isBound ? refDate : viewDate),
+    [isBound, refDate, viewDate],
+  );
+
   const date = useMemo(() => {
-    const raw = isBound ? refDate : viewDate;
-    if (!offset) return raw;
+    if (!offset) return baseDate;
     return new Date(
-      raw.getFullYear(),
-      raw.getMonth() + offset,
+      baseDate.getFullYear(),
+      baseDate.getMonth() + offset,
       1,
-      raw.getHours(),
-      raw.getMinutes(),
-      raw.getSeconds(),
-      raw.getMilliseconds(),
+      baseDate.getHours(),
+      baseDate.getMinutes(),
+      baseDate.getSeconds(),
+      baseDate.getMilliseconds(),
     );
-  }, [isBound, refDate, viewDate, offset]);
+  }, [baseDate, offset]);
 
   const [timePopupOpen, setTimePopupOpen] = useState(false);
   const [monthPopupOpen, setMonthPopupOpen] = useState(false);
@@ -116,6 +120,7 @@ export const CalendarToolbar: React.FC<CalendarToolbarProps> = ({
       bound,
       offset,
       date,
+      baseDate,
       isBound,
       boundDate,
       setLocalView,
@@ -130,6 +135,7 @@ export const CalendarToolbar: React.FC<CalendarToolbarProps> = ({
       bound,
       offset,
       date,
+      baseDate,
       isBound,
       boundDate,
       setLocalView,

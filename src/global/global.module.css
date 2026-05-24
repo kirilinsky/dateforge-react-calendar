@@ -43,6 +43,10 @@
     cursor: not-allowed;
     background: color-mix(in srgb, var(--c-d) 10%, transparent);
     color: var(--c-dt, var(--c-c));
+
+    &:active {
+      transform: none;
+    }
   }
 
   .interactive svg {

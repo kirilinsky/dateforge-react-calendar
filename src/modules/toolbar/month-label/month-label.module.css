@@ -5,7 +5,6 @@
     line-height: var(--cal-leading-none, 1);
     color: var(--c-c);
     transition: color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
-    flex: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
