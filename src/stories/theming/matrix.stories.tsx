@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
+import { expect } from "storybook/test";
 import { Calendar } from "@/components/calendar/calendar";
 import { CalendarDays } from "@/modules/days";
 import { CalendarNav } from "@/modules/nav";
@@ -29,6 +30,8 @@ const lightThemeEntries = [
   ["chalk", themes.chalk],
   ["split", themes.split],
   ["riso", themes.riso],
+  ["mono", themes.mono],
+  ["atelier", themes.atelier],
 ] satisfies readonly (readonly [string, CalendarTheme])[];
 
 const darkThemeEntries = [
@@ -51,6 +54,8 @@ const darkThemeEntries = [
   ["fjord", themes.fjord],
   ["velvet", themes.velvet],
   ["eclipse", themes.eclipse],
+  ["noir", themes.noir],
+  ["bauhaus", themes.bauhaus],
 ] satisfies readonly (readonly [string, CalendarTheme])[];
 
 const appearanceEntries = Object.entries(appearances) as [
@@ -145,3 +150,40 @@ export const AppearancesOverview: Story = {
   ),
 };
 AppearancesOverview.storyName = "All appearances (default theme)";
+
+// Proof that theme + appearance token cascades reach the rendered DOM.
+// Without this, `toBeVisible` passes on an unstyled component — we'd have
+// no signal if a token regressed (e.g. loft skipping `--cal-nav-font-size`).
+export const CssCheck: Story = {
+  render: () => {
+    const [date, setDate] = useState<Date | null>(FIXED_DATE);
+    return (
+      <Calendar
+        value={date}
+        onChange={setDate}
+        theme={themes.dracula}
+        appearance={appearances.loft}
+      >
+        <CalendarNav showMonthPicker />
+        <CalendarDays />
+      </Calendar>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const header = canvasElement.querySelector(
+      '[data-area="header"]',
+    ) as HTMLElement | null;
+    await expect(header).not.toBeNull();
+    const style = getComputedStyle(header!);
+    // Dracula highlight token must reach descendants of [data-theme].
+    // Browser normalizes the hex `#ff5e5e` to its rgb() form on resolve.
+    await expect(style.getPropertyValue("--c-h").trim()).toBe(
+      "rgb(255, 94, 94)",
+    );
+    // Loft appearance must override --cal-nav-font-size on .calendarContainer.
+    await expect(style.getPropertyValue("--cal-nav-font-size").trim()).toBe(
+      "1.1em",
+    );
+  },
+};
+CssCheck.storyName = "CssCheck — theme + appearance cascade";

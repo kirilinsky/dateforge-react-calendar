@@ -159,3 +159,8 @@ export const StandaloneTimePicker: Story = {
   },
 };
 StandaloneTimePicker.storyName = "Standalone time picker (onTimeSelect)";
+StandaloneTimePicker.parameters = {
+  // Drum picker has a settle animation after mount; without a delay the
+  // snapshot catches mid-flight frames and diffs randomly.
+  chromatic: { delay: 800, pauseAnimationAtEnd: true },
+};

@@ -10,6 +10,13 @@ interface TimePopupProps {
   hour12?: boolean;
   showSeconds?: boolean;
   readOnly?: boolean;
+  confirmLabel?: string;
+  hoursLabel?: string;
+  label?: string;
+  minutesLabel?: string;
+  secondsLabel?: string;
+  timePeriodLabel?: string;
+  timePickerLabel?: string;
 }
 
 export const TimePopup = ({
@@ -19,6 +26,13 @@ export const TimePopup = ({
   hour12 = false,
   showSeconds = false,
   readOnly = false,
+  confirmLabel,
+  hoursLabel,
+  label = "Select time",
+  minutesLabel,
+  secondsLabel,
+  timePeriodLabel,
+  timePickerLabel,
 }: TimePopupProps) => {
   const { locale, timeStep } = useConfig();
   const [current, setCurrent] = useState(date);
@@ -31,7 +45,8 @@ export const TimePopup = ({
 
   return (
     <Popup
-      label="Select time"
+      label={label}
+      confirmLabel={confirmLabel}
       onConfirm={() => onConfirm(currentRef.current)}
       onClose={onClose}
     >
@@ -42,6 +57,11 @@ export const TimePopup = ({
         showSeconds={showSeconds}
         readOnly={readOnly}
         step={timeStep}
+        hoursLabel={hoursLabel}
+        minutesLabel={minutesLabel}
+        secondsLabel={secondsLabel}
+        timePeriodLabel={timePeriodLabel}
+        timePickerLabel={timePickerLabel}
         onChange={handleChange}
       />
     </Popup>

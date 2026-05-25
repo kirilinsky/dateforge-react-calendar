@@ -4,8 +4,10 @@ export type AppearanceTokens = {
   border: string;
   containerGap: string;
   spacing: string;
-  headerPadding: string;
-  headerMinHeight: string;
+  navPadding: string;
+  navMinHeight: string;
+  navFontSize: string;
+  navMetaFontSize: string;
   navButtonBg: string;
   shadowSm: string;
   shadowMd: string;
@@ -38,8 +40,10 @@ export const APPEARANCE_TOKEN_TO_VAR: Record<keyof AppearanceTokens, string> = {
   border: "--cal-border",
   containerGap: "--cal-container-gap",
   spacing: "--cal-spacing",
-  headerPadding: "--header-padding",
-  headerMinHeight: "--header-min-height",
+  navPadding: "--cal-nav-padding",
+  navMinHeight: "--cal-nav-min-height",
+  navFontSize: "--cal-nav-font-size",
+  navMetaFontSize: "--cal-nav-meta-font-size",
   navButtonBg: "--cal-nav-button-bg",
   shadowSm: "--cal-shadow-sm",
   shadowMd: "--cal-shadow-md",

@@ -121,6 +121,26 @@ describe("WeekDays — weekNumbers", () => {
     expect(row?.children.length).toBe(8);
     expect(row?.firstElementChild?.getAttribute("aria-hidden")).toBe("true");
   });
+
+  it("uses the weekLabel prop for week number aria labels", () => {
+    const { container } = render(
+      <Calendar value={VIEW_DATE} locale="de-DE" weekLabel="Woche">
+        <CalendarDays weekNumbers />
+      </Calendar>,
+    );
+    const weekHeaders = within(container).getAllByRole("rowheader");
+    expect(weekHeaders[0]).toHaveAccessibleName(/Woche \d{2}/);
+  });
+
+  it("lets the module weekLabel override the Calendar weekLabel", () => {
+    const { container } = render(
+      <Calendar value={VIEW_DATE} weekLabel="Global week">
+        <CalendarDays weekNumbers weekLabel="Module week" />
+      </Calendar>,
+    );
+    const weekHeaders = within(container).getAllByRole("rowheader");
+    expect(weekHeaders[0]).toHaveAccessibleName(/Module week \d{2}/);
+  });
 });
 
 describe("WeekDays — highlightWeekends", () => {

@@ -29,6 +29,7 @@ import {
   toValidDateOrNull,
 } from "@/core/state";
 import type {
+  CalendarActionLabels,
   CalendarMode,
   CalendarProps,
   CalendarValue,
@@ -78,11 +79,13 @@ export function CalendarProvider<M extends CalendarMode = "single">({
   timeZone,
   readOnly = false,
   timeStep,
+  actionLabels = {},
 }: CalendarProps<M> & {
   children: ReactNode;
   containerWidth?: number;
   toggleTheme?: () => void;
   activeTheme?: "light" | "dark" | "auto";
+  actionLabels?: CalendarActionLabels;
 }) {
   const range = mode === "range";
   const multiselect: number | boolean | undefined =
@@ -407,6 +410,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       timeZone: resolvedTimeZone,
       readOnly,
       timeStep,
+      actionLabels,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -425,6 +429,7 @@ export function CalendarProvider<M extends CalendarMode = "single">({
       timeStep?.hour,
       timeStep?.minute,
       timeStep?.second,
+      actionLabels,
     ],
   );
 

@@ -86,6 +86,13 @@
     height: 1.1em;
   }
 
+  .actionsGroup {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.35em;
+  }
+
   .actionBtnDisabled {
     color: var(--c-dt, var(--c-c));
     cursor: default;

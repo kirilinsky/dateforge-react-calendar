@@ -87,6 +87,7 @@ function MonthTrack({
   minDate,
   maxDate,
   shortMonths,
+  label,
   onChange,
 }: {
   month: number;
@@ -95,6 +96,7 @@ function MonthTrack({
   minDate?: Date | null;
   maxDate?: Date | null;
   shortMonths?: boolean;
+  label: string;
   onChange: (month: number) => void;
 }) {
   const monthsData = getMonthListData(
@@ -129,7 +131,7 @@ function MonthTrack({
         isDisabled={isDisabled}
         onStep={step}
         onJump={onChange}
-        label="Month"
+        label={label}
       />
     </div>
   );
@@ -139,11 +141,13 @@ function YearTrack({
   year,
   minDate,
   maxDate,
+  label,
   onChange,
 }: {
   year: number;
   minDate?: Date | null;
   maxDate?: Date | null;
+  label: string;
   onChange: (year: number) => void;
 }) {
   const minYear = minDate ? minDate.getFullYear() : -Infinity;
@@ -167,7 +171,7 @@ function YearTrack({
         isDisabled={isDisabled}
         onStep={step}
         onJump={onChange}
-        label="Year"
+        label={label}
       />
     </div>
   );
@@ -179,6 +183,9 @@ interface MonthPopupProps {
   minDate?: Date | null;
   maxDate?: Date | null;
   shortMonths?: boolean;
+  confirmLabel?: string;
+  label?: string;
+  monthTrackLabel?: string;
   onConfirm: (date: Date) => void;
   onClose: () => void;
 }
@@ -189,13 +196,17 @@ export const MonthPopup = ({
   minDate,
   maxDate,
   shortMonths,
+  confirmLabel,
+  label = "Select month",
+  monthTrackLabel = "Month",
   onConfirm,
   onClose,
 }: MonthPopupProps) => {
   const [month, setMonth] = useState(date.getMonth());
   return (
     <Popup
-      label="Select month"
+      label={label}
+      confirmLabel={confirmLabel}
       onConfirm={() => onConfirm(applyMonth(date, month))}
       onClose={onClose}
     >
@@ -206,6 +217,7 @@ export const MonthPopup = ({
         minDate={minDate}
         maxDate={maxDate}
         shortMonths={shortMonths}
+        label={monthTrackLabel}
         onChange={setMonth}
       />
     </Popup>
@@ -216,6 +228,9 @@ interface YearPopupProps {
   date: Date;
   minDate?: Date | null;
   maxDate?: Date | null;
+  confirmLabel?: string;
+  label?: string;
+  yearTrackLabel?: string;
   onConfirm: (date: Date) => void;
   onClose: () => void;
 }
@@ -224,13 +239,17 @@ export const YearPopup = ({
   date,
   minDate,
   maxDate,
+  confirmLabel,
+  label = "Select year",
+  yearTrackLabel = "Year",
   onConfirm,
   onClose,
 }: YearPopupProps) => {
   const [year, setYear] = useState(date.getFullYear());
   return (
     <Popup
-      label="Select year"
+      label={label}
+      confirmLabel={confirmLabel}
       onConfirm={() => onConfirm(applyYear(date, year))}
       onClose={onClose}
     >
@@ -238,6 +257,7 @@ export const YearPopup = ({
         year={year}
         minDate={minDate}
         maxDate={maxDate}
+        label={yearTrackLabel}
         onChange={setYear}
       />
     </Popup>

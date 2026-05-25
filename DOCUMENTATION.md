@@ -141,6 +141,8 @@ import { CalendarNav, CalendarDays } from "@dateforge/react-calendar/modules";
 | `locale`          | `string`                                              | `"en"`     | BCP 47 language tag used for all labels and formatting                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | `timeZone`        | `string \| "auto"`                                    | `"auto"`   | IANA timezone (`"Europe/Paris"`, `"UTC"`), fixed offset (`"UTC+2"`, `"UTC-5"`), or `"auto"`. When `"auto"` (or omitted) the library detects the user's timezone via `Intl.DateTimeFormat().resolvedOptions().timeZone` after mount. Invalid values fall back to auto-detect with a dev warning. Affects today detection, emitted date midnight, and formatting. **Important:** with an explicit `timeZone`, the `Date` passed to `onChange` is the absolute instant of midnight **in that zone** — see [Timezone](#timezone) for examples and storage guidance |
 | `readOnly`        | `boolean`                                             | `false`    | Disables all state-changing interactions (date/time selection). Navigation still works. Adds `data-readonly` on the root and `aria-disabled` on each interactive cell — the wrapper itself carries no ARIA state because plain `<div>` does not support `aria-readonly` per ARIA spec                                                                                                                                                                                                                                                                          |
+| `clearLabel`      | `string`                                              | `"Clear"`  | Global aria-label for clear buttons. Module-level `clearLabel` props override it                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `homeLabel`       | `string`                                              | `"Go to current month"` | Global aria-label for home/current-month buttons. Module-level `homeLabel` props override it                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | `hour12`          | `boolean`                                             | `false`    | Use 12-hour time format instead of 24-hour                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `timeStep`        | `{ hour?: number; minute?: number; second?: number }` | `{1,1,1}`  | Granularity (step) for time drums. Affects both inline `CalendarTimeGrid` and `CalendarNav` time popup. Example: `timeStep={{ minute: 5 }}` snaps minutes to 0/5/10/.../55. Step values divide the unit range; `aria-valuemax`, keyboard `±step`, and scroll snap follow the step. Default `1` (no snapping)                                                                                                                                                                                                                                                   |
 | `theme`           | `CalendarTheme`                                       | `"auto"`   | Base value (`"auto"` / `"light"` / `"dark"`), a pre-built theme object from `@dateforge/react-calendar/themes[/name]`, or a `CustomTheme` from `createTheme()`. Named string themes (e.g. `"midnight"`) are not supported — import the object instead.                                                                                                                                                                                                                                                                                                         |
@@ -154,6 +156,89 @@ import { CalendarNav, CalendarDays } from "@dateforge/react-calendar/modules";
 | `maxRangeDays`    | `number`                                              | —          | Maximum number of days in a range selection                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | `disabled`        | `DisabledConfig`                                      | —          | Rules for disabling specific dates. Build with `createDisabled()`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | `children`        | `React.ReactNode`                                     | —          | Module components that compose the calendar UI                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+
+### Action aria labels
+
+Control aria-labels resolve as `module prop → Calendar prop → built-in default`. Use root props for a whole calendar, then override a specific module only when needed.
+
+Template labels support named placeholders:
+
+```tsx
+<Calendar
+  clearLabel="Auswahl löschen"
+  changeMonthLabel="Monat öffnen: {month}"
+  weekLabel="Woche"
+  showMoreSelectedDatesLabel="{count} weitere ausgewählte Daten anzeigen"
+/>
+```
+
+Date labels remain locale-derived through `Intl` where the label describes an actual date, month, year, or weekday. Week number labels use `weekLabel`.
+
+#### Root label props
+
+All of these props can be passed to `<Calendar>`.
+
+| Prop | Default | Placeholders | Used for |
+| ---- | ------- | ------------ | -------- |
+| `applyLabel` | `"Apply"` | — | Manual input apply buttons |
+| `calendarNavigationLabel` | `"Calendar navigation"` | — | Nav toolbar when no visible `label` prop is provided |
+| `changeMonthLabel` | `"Change month, currently {month}"` | `{month}` | Nav month popup trigger |
+| `changeTimeLabel` | `"Change time, currently {time}"` | `{time}` | Nav time popup trigger |
+| `changeYearLabel` | `"Change year, currently {year}"` | `{year}` | Nav year popup trigger |
+| `clearLabel` | `"Clear"` | — | Clear buttons |
+| `confirmLabel` | `"Confirm"` | — | Popup confirm buttons |
+| `dayTrackLabel` | `"Day"` | — | Days track spinbutton |
+| `homeLabel` | `"Go to current month"` | — | Home/current-month buttons |
+| `hoursLabel` | `"Hours"` | — | Time hour drum |
+| `minutesLabel` | `"Minutes"` | — | Time minute drum |
+| `monthGridLabel` | `"Select month, {year}"` | `{year}` | Months grid group |
+| `monthPickerLabel` | `"Month picker"` | — | Nav month picker group |
+| `monthTrackLabel` | `"Month"` | — | Month track / month popup drum |
+| `nextMonthLabel` | `"Next month"` | — | Nav next-month button |
+| `nextYearLabel` | `"Next year"` | — | Nav next-year button |
+| `nextYearsLabel` | `"Next years"` | — | Years grid next-page button |
+| `previousMonthLabel` | `"Previous month"` | — | Nav previous-month button |
+| `previousYearLabel` | `"Previous year"` | — | Nav previous-year button |
+| `previousYearsLabel` | `"Previous years"` | — | Years grid previous-page button |
+| `removeLabel` | `"Remove"` | — | Manual input per-chip remove button |
+| `removeRangeEndLabel` | `"Remove range end"` | — | Selected-dates range-end remove button |
+| `removeRangeStartLabel` | `"Remove range start"` | — | Selected-dates range-start remove button |
+| `removeSelectedDateLabel` | `"Remove selected date"` | — | Selected date remove/toggle buttons |
+| `resetTimeLabel` | `"Reset to {time}"` | `{time}` | Time reset button |
+| `saveSelectedDateLabel` | `"Save selected date"` | — | Days track multi-mode save button |
+| `secondsLabel` | `"Seconds"` | — | Time second drum |
+| `selectMonthLabel` | `"Select month"` | — | Month popup dialog |
+| `selectTimeLabel` | `"Select time"` | — | Time popup dialog |
+| `selectYearLabel` | `"Select year"` | — | Year popup dialog |
+| `showMoreSelectedDatesLabel` | `"Show {count} more selected dates"` | `{count}` | Selected-dates overflow chip |
+| `themeSwitchToDarkLabel` | `"Switch to dark mode"` | — | Theme toggle when current theme is light |
+| `themeSwitchToLightLabel` | `"Switch to light mode"` | — | Theme toggle when current theme is dark |
+| `themeToggleLabel` | `"Toggle theme"` | — | Theme toggle while theme is still auto/unresolved |
+| `timePeriodLabel` | `"Time period, currently {period}"` | `{period}` | AM/PM switch |
+| `timePickerLabel` | `"Time picker"` | — | Time track group |
+| `weekLabel` | `"Week"` | — | Days grid week-number rows and row headers |
+| `yearGridLabel` | `"Select year, showing {from} to {to}"` | `{from}`, `{to}` | Years grid group |
+| `yearPageNavigationLabel` | `"Year page navigation"` | — | Years grid page controls group |
+| `yearPickerLabel` | `"Year picker"` | — | Nav year picker group |
+| `yearTrackLabel` | `"Year"` | — | Year track / year popup drum |
+
+#### Module override props
+
+Module props use the same names and override the matching root prop only for that module instance.
+
+| Module | Override props |
+| ------ | -------------- |
+| `CalendarNav` | `calendarNavigationLabel`, `changeMonthLabel`, `changeTimeLabel`, `changeYearLabel`, `clearLabel`, `confirmLabel`, `homeLabel`, `hoursLabel`, `minutesLabel`, `monthPickerLabel`, `monthTrackLabel`, `nextMonthLabel`, `nextYearLabel`, `previousMonthLabel`, `previousYearLabel`, `secondsLabel`, `selectMonthLabel`, `selectTimeLabel`, `selectYearLabel`, `themeSwitchToDarkLabel`, `themeSwitchToLightLabel`, `themeToggleLabel`, `timePeriodLabel`, `timePickerLabel`, `yearPickerLabel`, `yearTrackLabel` |
+| `CalendarDays` | `weekLabel` |
+| `CalendarInfo` | `clearLabel`, `homeLabel` |
+| `CalendarManualInput` | `applyLabel`, `clearLabel`, `removeLabel` |
+| `CalendarSelectedDates` | `clearLabel`, `removeRangeEndLabel`, `removeRangeStartLabel`, `removeSelectedDateLabel`, `showMoreSelectedDatesLabel` |
+| `CalendarDaysTrack` | `dayTrackLabel`, `removeSelectedDateLabel`, `saveSelectedDateLabel` |
+| `CalendarMonthsTrack` | `monthTrackLabel` |
+| `CalendarYearsTrack` | `yearTrackLabel` |
+| `CalendarTimeGrid` | `hoursLabel`, `minutesLabel`, `resetTimeLabel`, `secondsLabel`, `timePeriodLabel`, `timePickerLabel` |
+| `CalendarMonthsGrid` | `monthGridLabel` |
+| `CalendarYearsGrid` | `nextYearsLabel`, `previousYearsLabel`, `yearGridLabel`, `yearPageNavigationLabel` |
 
 ### When does each action fire `onChange`?
 
@@ -610,6 +695,7 @@ Renders the month grid — weekday headers, week numbers (optional), and the day
 | `boldWeekends`      | `boolean`                       | `false`   | Render Saturday and Sunday in bold with the weekend accent color (`--c-we`)                                                                                                                                                                                                                                                      |
 | `highlightToday`    | `boolean`                       | `true`    | Highlight today's date                                                                                                                                                                                                                                                                                                           |
 | `todayDot`          | `boolean`                       | `true`    | Render a small dot under today's digit. Selected-today dot color uses gradient/active text color first, then the theme `todayDot` token. Dot size and lower inset can be tuned by appearance tokens.                                                                                                                             |
+| `weekLabel`         | `string`                        | `"Week"`  | Aria-label prefix for week-number rows and row headers. The root `Calendar` `weekLabel` applies globally; this prop overrides it for this days grid                                                                                                                                                                             |
 | `fixedRows`         | `boolean`                       | `true`    | Always render 6 rows of day cells                                                                                                                                                                                                                                                                                                |
 | `weekNumbers`       | `boolean`                       | `false`   | Show ISO week numbers in the leftmost column                                                                                                                                                                                                                                                                                     |
 | `hideWeekdays`      | `boolean`                       | `false`   | Hide the row of weekday name headers                                                                                                                                                                                                                                                                                             |
@@ -668,7 +754,9 @@ Navigation header with configurable controls.
 | `showNowTime`     | `boolean`          | `false` | Show the current system time as a live read-only display (updates every second). A pulsing dot indicates it is live. Respects the `hour12` setting from `<Calendar>`                                           |
 | `seconds`         | `boolean`          | `false` | Include seconds in `showTime` and `showNowTime` displays, and in the time picker popup                                                                                                                         |
 | `home`            | `boolean`          | `false` | Show a button that navigates back to today                                                                                                                                                                     |
+| `homeLabel`       | `string`           | global / `"Go to current month"` | aria-label for the `home` button. Overrides `<Calendar homeLabel>`                                                                                                                                                         |
 | `clear`           | `boolean`          | `false` | Show a button that clears the current selection                                                                                                                                                                |
+| `clearLabel`      | `string`           | global / `"Clear"` | aria-label for the `clear` button. Overrides `<Calendar clearLabel>`                                                                                                                                                       |
 | `themeToggle`     | `boolean`          | `false` | Show a light/dark theme toggle button. Has no effect when a custom theme (`createTheme()` or pre-built palette) is passed to `<Calendar theme={...} />`                                                        |
 | `offset`          | `number`           | `0`     | Month offset relative to `viewDate`. Use to render two synced nav headers in `cols={2}` layouts (`<CalendarNav offset={1} />`)                                                                                 |
 | `col`             | `number \| string` | —       | CSS grid `grid-column` value                                                                                                                                                                                   |
@@ -920,6 +1008,7 @@ Displays the currently selected dates as chips. Clicking a chip navigates the vi
 | `allowNavigate`   | `boolean`                       | `true`       | Clicking a chip navigates the calendar to that date                                                 |
 | `animated`        | `boolean`                       | `true`       | Animate chips appearing and disappearing                                                            |
 | `align`           | `"left" \| "center" \| "right"` | `"left"`     | Horizontal alignment of the chip list                                                               |
+| `clearLabel`      | `string`                        | global / `"Clear"` | aria-label for the clear-all button. Overrides `<Calendar clearLabel>`                              |
 | `maxVisibleChips` | `number`                        | —            | Maximum number of selected-date chips before overflow. Applies to `mode="multiple"` only; range chips are not collapsed |
 | `overflowLabel`   | `string`                        | `"+{count}"` | Overflow chip label. `{count}` is replaced with the number of hidden selected dates                  |
 | `showTime`        | `boolean`                       | `false`      | Include time (hours and minutes) in the chip label. Respects the `hour12` setting from `<Calendar>` |
@@ -946,6 +1035,8 @@ When `showSummary` is `true` and no custom `formatter` is passed:
 
 `showRelative` can be enabled at the same time as `showSummary`; the module renders a second compact text chip such as `in 3 days`. Relative time always uses the current selected value (`selectedDate`, first selected date, `rangeStart`, then `rangeEnd`) and compares it to today.
 
+Keyboard: `showHome` and `allowClear` render native buttons. When both actions are available, `ArrowLeft` / `ArrowUp`, `ArrowRight` / `ArrowDown`, `Home`, and `End` move focus between them; `Enter` / `Space` activate the focused button.
+
 ### Props
 
 | Prop           | Type                                           | Default     | Description                                                                                                                                                       |
@@ -953,9 +1044,11 @@ When `showSummary` is `true` and no custom `formatter` is passed:
 | `allowClear`   | `boolean`                                      | `false`     | Show a clear-all button when there is a selection. Clears `null` in single mode, `[]` in multiple mode, and `{ from: null, to: null }` in range mode. Disabled in `readOnly` |
 | `align`        | `"left" \| "center" \| "right"`                | `"left"`    | Horizontal alignment of the text group                                                                                                                            |
 | `animated`     | `boolean`                                      | `true`      | Animate the module's height when content appears/disappears                                                                                                        |
+| `clearLabel`   | `string`                                       | global / `"Clear"` | aria-label for the clear-all button. Overrides `<Calendar clearLabel>`                                                                                  |
 | `col`          | `number \| string`                             | —           | CSS grid `grid-column` value                                                                                                                                      |
 | `emptyLabel`   | `React.ReactNode`                              | `null`      | Text/content shown when nothing is selected. Boolean values and empty strings are treated as empty                                                                |
 | `formatter`    | `(value: CalendarInfoValue) => React.ReactNode` | —           | Custom summary renderer. Receives `Date`, `Date[]`, `{ from, to }`, or `null`. Overrides the default summary only; it does not affect `showRelative`               |
+| `homeLabel`    | `string`                                       | global / `"Go to current month"` | aria-label for the home/current-month button. Overrides `<Calendar homeLabel>`                                                                         |
 | `prefix`       | `React.ReactNode`                              | —           | Small content rendered before the summary. Hidden for `emptyLabel` and hidden when there is no summary                                                             |
 | `rangeStyle`   | `"days" \| "duration"`                         | `"days"`    | Range-only summary style for complete ranges. `"days"` uses calendar-day difference; `"duration"` uses elapsed time (`3 days 4 hours`, etc.)                       |
 | `showHome`     | `boolean`                                      | `false`     | Show a button that navigates to the current month. Does not change selection                                                                                       |
@@ -1012,6 +1105,7 @@ Text input that lets the user type a date directly. Adapts shape to the calendar
 | ------------ | ------------------------------- | -------- | ------------------------------------------------------------- |
 | `allowClear` | `boolean`                       | `true`   | Show a top-level clear button that wipes the entire selection |
 | `align`      | `"left" \| "center" \| "right"` | `"left"` | Horizontal alignment of the input content                     |
+| `clearLabel` | `string`                        | global / `"Clear"` | aria-label for clear controls. Overrides `<Calendar clearLabel>` |
 | `col`        | `number \| string`              | —        | CSS grid `grid-column` value                                  |
 | `label`      | `React.ReactNode`               | —        | Inline label shown before the input / selected chips          |
 
@@ -1298,8 +1392,10 @@ const myAppearance = createAppearance({
 | `border`          | Border width for the container and internal dividers                                |
 | `containerGap`    | Gap between calendar module areas. Use `"0px"` for borderless layouts              |
 | `spacing`         | Internal padding / gap between elements                                             |
-| `headerPadding`   | Padding for `CalendarNav`                                                           |
-| `headerMinHeight` | Minimum height for `CalendarNav`                                                    |
+| `navPadding`      | Padding for `CalendarNav`                                                           |
+| `navMinHeight`    | Minimum height for `CalendarNav`                                                    |
+| `navFontSize`     | Root font-size of `CalendarNav` container — cascades to all nav children via `em`   |
+| `navMetaFontSize` | Font-size of the year/month text inside the nav's current selector                  |
 | `navButtonBg`     | Background for month/year picker buttons in `CalendarNav`                           |
 | `font`            | Font family                                                                         |
 | `fontSize`        | Base font size                                                                      |

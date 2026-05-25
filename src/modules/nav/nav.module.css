@@ -11,9 +11,9 @@
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 0.35em;
-    font-size: var(--cal-text-2xl);
-    padding: var(--header-padding, 0.45em 0.7em);
-    min-height: var(--header-min-height, 3.2em);
+    font-size: var(--cal-nav-font-size);
+    padding: var(--cal-nav-padding, 0.45em 0.7em);
+    min-height: var(--cal-nav-min-height, 3.2em);
     height: auto;
     z-index: 3;
     position: relative;
@@ -33,8 +33,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 0.2em;
-    gap: 0.2em;
+    padding: 0 0.1em;
+    gap: 0.1em;
     min-width: max-content;
     max-width: 100%;
   }
@@ -60,7 +60,7 @@
     font-weight: var(--cal-weight-bold);
     line-height: var(--cal-leading-none);
     flex: 0 1 auto;
-    margin: 0 0.3em;
+    margin: 0 0.15em;
     height: var(--cal-size-chip, 2.3em);
     white-space: nowrap;
     min-width: max-content;
@@ -70,14 +70,15 @@
   }
 
   .currentYear > * {
-    font-size: var(--cal-text-xl);
+    font-size: var(--cal-nav-meta-font-size);
   }
 
   .arrow {
-    width: var(--cal-size-chip, 2.3em);
+    width: auto;
+    min-width: 2em;
     height: var(--cal-size-chip, 2.3em);
     flex: 0 0 auto;
-    padding: 0;
+    padding: 0 0.25em;
   }
 
   .monthButton {
@@ -85,7 +86,7 @@
     min-width: max-content;
     padding: 0 0.7em;
     height: 2.3em;
-    font-size: var(--cal-text-base);
+    font-size: var(--cal-text-md);
     background-color: var(--cal-nav-button-bg, var(--c-t)) !important;
     color: var(--c-c);
     font-weight: var(--cal-weight-bold);
@@ -227,7 +228,7 @@
     box-shadow: var(--active-cell-stroke, none);
     padding: 0 0.7em;
     height: 2.3em;
-    font-size: var(--cal-text-base);
+    font-size: var(--cal-text-md);
     font-weight: var(--cal-weight-semibold);
     flex: 0 0 auto;
     min-width: max-content;
@@ -292,7 +293,7 @@
 
   @container (max-width: 13.75em) {
     .headerContainer {
-      font-size: var(--cal-text-base);
+      font-size: var(--cal-text-md);
       padding: 0.4em;
       gap: 0.25em;
     }

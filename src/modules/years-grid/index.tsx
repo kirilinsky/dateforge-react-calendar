@@ -8,6 +8,14 @@ import shared from "@/global/global.module.css";
 import { useRovingTileFocus } from "@/hooks/use-roving-tile-focus";
 import { ChevronLeft, ChevronRight } from "@/Icons";
 import type { DisabledConfig } from "@/types/calendar";
+import {
+  DEFAULT_NEXT_YEARS_LABEL,
+  DEFAULT_PREVIOUS_YEARS_LABEL,
+  DEFAULT_YEAR_GRID_LABEL,
+  DEFAULT_YEAR_PAGE_NAVIGATION_LABEL,
+  formatActionLabel,
+  resolveActionLabel,
+} from "@/utils/action-labels";
 import { setYear } from "@/utils/date-utils";
 import { getGridSlotStyle } from "@/utils/get-grid-slot-style";
 import { MAX_CALENDAR_YEAR, MIN_CALENDAR_YEAR } from "@/utils/year-range";
@@ -20,6 +28,10 @@ export interface CalendarYearsGridProps {
   disableOutOfRange?: boolean;
   hideOutOfRange?: boolean;
   col?: number | string;
+  nextYearsLabel?: string;
+  previousYearsLabel?: string;
+  yearGridLabel?: string;
+  yearPageNavigationLabel?: string;
   /**
    * Fires after the user clicks a year cell. Receives the navigated viewDate
    * (same month/day, picked year). Use this for a standalone year-picker UX
@@ -71,6 +83,10 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
   disableOutOfRange = true,
   hideOutOfRange = false,
   col,
+  nextYearsLabel,
+  previousYearsLabel,
+  yearGridLabel,
+  yearPageNavigationLabel,
   onYearSelect,
 }) => {
   const pageSize = Math.min(40, Math.max(1, yearsPerPage));
@@ -85,7 +101,27 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
       `<CalendarYearsGrid yearsPerPage={${yearsPerPage}} /> is out of the supported 1..40 integer range. Clamped to ${pageSize}.`,
     );
   }
-  const { minDate, maxDate, disabled } = useConfig();
+  const { minDate, maxDate, disabled, actionLabels } = useConfig();
+  const resolvedYearGridLabel = resolveActionLabel(
+    yearGridLabel,
+    actionLabels.yearGridLabel,
+    DEFAULT_YEAR_GRID_LABEL,
+  );
+  const resolvedYearPageNavigationLabel = resolveActionLabel(
+    yearPageNavigationLabel,
+    actionLabels.yearPageNavigationLabel,
+    DEFAULT_YEAR_PAGE_NAVIGATION_LABEL,
+  );
+  const resolvedPreviousYearsLabel = resolveActionLabel(
+    previousYearsLabel,
+    actionLabels.previousYearsLabel,
+    DEFAULT_PREVIOUS_YEARS_LABEL,
+  );
+  const resolvedNextYearsLabel = resolveActionLabel(
+    nextYearsLabel,
+    actionLabels.nextYearsLabel,
+    DEFAULT_NEXT_YEARS_LABEL,
+  );
   const { viewDate, navigateTo } = useNavigation();
   const { selectedDates, rangeStart, rangeEnd } = useSelectionValue();
 
@@ -205,20 +241,24 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
       data-area="years-grid"
       className={styles.root}
       role="group"
-      aria-label={`Select year, showing ${pageStartYear} to ${pageEndYear}`}
+      aria-label={formatActionLabel(
+        formatActionLabel(resolvedYearGridLabel, "from", pageStartYear),
+        "to",
+        pageEndYear,
+      )}
       style={getGridSlotStyle(col)}
     >
       {showControls && (
         <div
           className={styles.nav}
           role="group"
-          aria-label="Year page navigation"
+          aria-label={resolvedYearPageNavigationLabel}
         >
           <button
             type="button"
             className={[shared.interactive, shared.hovered].join(" ")}
             disabled={page <= 0}
-            aria-label="Previous years"
+            aria-label={resolvedPreviousYearsLabel}
             onClick={() => navigate(-1)}
           >
             <ChevronLeft />
@@ -230,7 +270,7 @@ export const CalendarYearsGrid: React.FC<CalendarYearsGridProps> = ({
             type="button"
             className={[shared.interactive, shared.hovered].join(" ")}
             disabled={page >= totalPages - 1}
-            aria-label="Next years"
+            aria-label={resolvedNextYearsLabel}
             onClick={() => navigate(1)}
           >
             <ChevronRight />

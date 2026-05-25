@@ -7,6 +7,10 @@ import {
   useSelectionValue,
 } from "@/context/selection-context";
 import { useBoundDateView } from "@/hooks/use-bound-date-view";
+import {
+  DEFAULT_YEAR_TRACK_LABEL,
+  resolveActionLabel,
+} from "@/utils/action-labels";
 import { clampBoundDate, computeBoundLimits } from "@/utils/clamp-bound-date";
 import { MAX_CALENDAR_YEAR, MIN_CALENDAR_YEAR } from "@/utils/year-range";
 import styles from "./years-track.module.css";
@@ -19,6 +23,7 @@ const YEARS = Array.from(
 export interface CalendarYearsTrackProps {
   bound?: "from" | "to";
   col?: number | string;
+  yearTrackLabel?: string;
   /**
    * Fires after the user lands on a year via the track. Receives the
    * navigated date (or clamped bound date in range mode). Use for standalone
@@ -30,10 +35,16 @@ export interface CalendarYearsTrackProps {
 export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({
   bound,
   col,
+  yearTrackLabel,
   onYearSelect,
 }) => {
   const { viewDate, navigateTo } = useNavigation();
-  const { minDate, maxDate, range, readOnly } = useConfig();
+  const { minDate, maxDate, range, readOnly, actionLabels } = useConfig();
+  const resolvedYearTrackLabel = resolveActionLabel(
+    yearTrackLabel,
+    actionLabels.yearTrackLabel,
+    DEFAULT_YEAR_TRACK_LABEL,
+  );
   const { rangeStart, rangeEnd } = useSelectionValue();
   const { onRangeBoundSet } = useSelectionActions();
   const { isBound, setLocalView, refDate } = useBoundDateView({
@@ -115,7 +126,7 @@ export const CalendarYearsTrack: React.FC<CalendarYearsTrackProps> = ({
       half={6}
       initialItemWidth={52}
       pageStep={10}
-      ariaLabel="Year"
+      ariaLabel={resolvedYearTrackLabel}
       getAriaValueNow={(i) => YEARS[i]}
       getAriaValueMin={() => YEARS[minIdx]}
       getAriaValueMax={() => YEARS[maxIdx]}
