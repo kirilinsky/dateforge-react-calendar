@@ -9,13 +9,17 @@ import { useSelectionValue } from "@/context/selection-context";
 import { CalendarDays } from "@/modules/days";
 import { createDisabled } from "@/utils/create-disabled";
 import {
+  fcActionCount,
   fcCols,
   fcDate,
   fcDisabledSpec,
+  fcLocale,
   fcMinMax,
+  fcMode,
   fcMultipleValue,
   fcRangeValue,
   fcReadOnly,
+  fcTimeZone,
   fcValidTimeZone,
 } from "./arbitraries";
 
@@ -54,11 +58,12 @@ describe("Calendar render — single mode — never throws", () => {
     fc.assert(
       fc.property(
         fcDate,
+        fcLocale,
         fcMinMax,
         fcReadOnly,
         fcDisabledSpec,
         fcCols,
-        (value, minMax, readOnly, disabledSpec, cols) => {
+        (value, locale, minMax, readOnly, disabledSpec, cols) => {
           const disabled = disabledSpec
             ? createDisabled(disabledSpec)
             : undefined;
@@ -68,7 +73,7 @@ describe("Calendar render — single mode — never throws", () => {
               {
                 value,
                 onChange: () => {},
-                locale: "en",
+                locale,
                 cols,
                 minDate: minMax?.min,
                 maxDate: minMax?.max,
@@ -267,10 +272,12 @@ describe("Calendar action chain", () => {
           from: fcDate,
           to: fcDate,
         }),
-        fc.array(fc.integer({ min: 0, max: 99 }), {
-          minLength: 1,
-          maxLength: 5,
-        }),
+        fcActionCount.chain((n) =>
+          fc.array(fc.integer({ min: 0, max: 99 }), {
+            minLength: 1,
+            maxLength: n,
+          }),
+        ),
         ({ from, to }, clickIndices) => {
           const sorted = from <= to ? { from, to } : { from: to, to: from };
           probe = {};
@@ -308,6 +315,56 @@ describe("Calendar action chain", () => {
           }
         },
       ),
+      { numRuns },
+    );
+  });
+});
+
+// ─── Render invariant — arbitrary mode ───────────────────────────────────────
+
+describe("Calendar render — arbitrary mode — never throws", () => {
+  it("any mode + locale renders without crash", () => {
+    fc.assert(
+      fc.property(fcMode, fcDate, fcLocale, (mode, value, locale) => {
+        const { unmount } = render(
+          React.createElement(
+            Calendar,
+            {
+              value: value as never,
+              onChange: () => {},
+              locale,
+              mode,
+            },
+            React.createElement(CalendarDays, null),
+          ),
+        );
+        unmount();
+      }),
+      { numRuns },
+    );
+  });
+});
+
+// ─── Resilience — invalid timezone never throws ───────────────────────────────
+
+describe("Calendar timezone resilience — never throws", () => {
+  it("valid or invalid timeZone does not crash", () => {
+    fc.assert(
+      fc.property(fcDate, fcTimeZone, (value, timeZone) => {
+        const { unmount } = render(
+          React.createElement(
+            Calendar,
+            {
+              value,
+              onChange: () => {},
+              locale: "en",
+              timeZone: timeZone as string | undefined,
+            },
+            React.createElement(CalendarDays, null),
+          ),
+        );
+        unmount();
+      }),
       { numRuns },
     );
   });
