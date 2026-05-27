@@ -125,8 +125,23 @@ export function validateTimeZone(tz: string | undefined): boolean {
     );
     return false;
   }
-  // UTC±N is normalized internally — accept it without probing Intl.
-  if (/^UTC[+-]\d{1,2}$/i.test(tz)) return true;
+  // UTC±N normalizes to Etc/GMT∓N — probe Intl with the normalized form to
+  // reject out-of-range offsets (e.g. "UTC+99" → "Etc/GMT-99" is invalid).
+  const utcOffsetMatch = tz.match(/^UTC([+-])(\d{1,2})$/i);
+  if (utcOffsetMatch) {
+    const sign = utcOffsetMatch[1] === "+" ? "-" : "+";
+    const normalized = `Etc/GMT${sign}${parseInt(utcOffsetMatch[2], 10)}`;
+    try {
+      new Intl.DateTimeFormat("en-US", { timeZone: normalized });
+      return true;
+    } catch {
+      warnOnce(
+        `tz:invalid:${tz}`,
+        `timeZone="${tz}" is not a valid IANA timezone. Falling back to local time. Use values like "Europe/Paris", "America/New_York", "UTC", or "UTC+2".`,
+      );
+      return false;
+    }
+  }
   try {
     new Intl.DateTimeFormat("en-US", { timeZone: tz });
     return true;
