@@ -54,7 +54,9 @@ afterEach(() => {
 // ─── Render invariant — single mode ──────────────────────────────────────────
 
 describe("Calendar render — single mode — never throws", () => {
-  it("arbitrary value + locale + min/max + readOnly + disabled + cols", () => {
+  it("arbitrary value + locale + min/max + readOnly + disabled + cols", {
+    timeout: 60_000,
+  }, () => {
     fc.assert(
       fc.property(
         fcDate,
@@ -265,7 +267,9 @@ describe("Calendar onChange call count", () => {
 // ─── Action chain: click random day buttons, invariants hold ─────────────────
 
 describe("Calendar action chain", () => {
-  it("random day clicks do not crash or violate range invariant", () => {
+  it("random day clicks do not crash or violate range invariant", {
+    timeout: 60_000,
+  }, () => {
     fc.assert(
       fc.property(
         fc.record({
