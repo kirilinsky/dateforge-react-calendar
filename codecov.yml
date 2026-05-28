@@ -10,8 +10,11 @@ coverage:
         target: 70%
         threshold: 5%
 
+bundle_analysis:
+  warning_threshold: "5%"
+
 comment:
-  layout: "diff, flags, files"
+  layout: "diff, flags, files, bundle"
   behavior: default
   require_changes: true
 

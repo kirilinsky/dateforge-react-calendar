@@ -1,3 +1,4 @@
+import { codecovRollupPlugin } from "@codecov/rollup-plugin";
 import { defineConfig } from "tsdown";
 
 import pkg from "./package.json" with { type: "json" };
@@ -23,6 +24,20 @@ const externalizeContextsPlugin = {
   },
 };
 
+const codecovToken = process.env.CODECOV_TOKEN;
+const codecovBase = codecovRollupPlugin({
+  enableBundleAnalysis: !!codecovToken,
+  bundleName: "dateforge-core",
+  uploadToken: codecovToken,
+  gitService: "github",
+});
+const codecovModules = codecovRollupPlugin({
+  enableBundleAnalysis: !!codecovToken,
+  bundleName: "dateforge-modules",
+  uploadToken: codecovToken,
+  gitService: "github",
+});
+
 export default defineConfig([
   // ── Main + context: ESM (with CSS inject) ────────────────────────────────
   {
@@ -34,6 +49,7 @@ export default defineConfig([
     outExtensions: () => ({ dts: ".d.ts" }),
     dts: true,
     css: { inject: true, minify: true },
+    plugins: [codecovBase],
     deps: sharedDeps,
   },
   // ── Main + context: CJS (no CSS inject — avoids ESM syntax in .cjs) ──────
@@ -87,7 +103,7 @@ export default defineConfig([
     outExtensions: () => ({ dts: ".d.ts" }),
     dts: true,
     css: { inject: true, minify: true },
-    plugins: [externalizeContextsPlugin],
+    plugins: [externalizeContextsPlugin, codecovModules],
     deps: {
       neverBundle: [
         ...sharedDeps.neverBundle,

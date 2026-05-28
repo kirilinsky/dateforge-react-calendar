@@ -53,6 +53,8 @@ jobs:
         run: npx playwright install-deps chromium
 
       - run: npm run build
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - run: npm run check:exports
 

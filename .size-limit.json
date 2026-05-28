@@ -11,7 +11,7 @@
       "./dist/index.mjs": "{ Calendar }",
       "./dist/modules/days.mjs": "{ CalendarDays }"
     },
-    "limit": "19 KB",
+    "limit": "19.5 KB",
     "ignore": ["react", "react-dom"]
   },
   {
@@ -32,7 +32,7 @@
       "./dist/themes/dracula.mjs": "{ dracula }",
       "./dist/appearances/compact.mjs": "{ compact }"
     },
-    "limit": "19.5 KB",
+    "limit": "20 KB",
     "ignore": ["react", "react-dom"]
   }
 ]

@@ -422,6 +422,7 @@
     "@changesets/changelog-github": "0.6.0",
     "@changesets/cli": "2.31.0",
     "@chromatic-com/storybook": "^5.1.2",
+    "@codecov/rollup-plugin": "^2.0.1",
     "@size-limit/esbuild-why": "12.1.0",
     "@size-limit/preset-small-lib": "12.1.0",
     "@storybook/addon-a11y": "^10.4.0",
