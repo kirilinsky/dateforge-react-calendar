@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.1
+
+### Patch Changes
+
+- [#103](https://github.com/kirilinsky/dateforge-react-calendar/pull/103) [`ec7ec10`](https://github.com/kirilinsky/dateforge-react-calendar/commit/ec7ec1075a976cd7e272c94386881d66dfb2813c) Thanks [@kirilinsky](https://github.com/kirilinsky)! - Fix MonthsGrid and YearsGrid container query (moved `container-type/name` to parent wrapper so responsive column switch now fires), remove `max-width` cap on grid tiles so buttons fill cells.
+
+  Add `id` prop to `<Calendar>`.
+
 ## 2.0.0
 
 ### Major Changes
