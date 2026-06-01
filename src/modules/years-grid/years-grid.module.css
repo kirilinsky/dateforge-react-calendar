@@ -3,6 +3,8 @@
     display: flex;
     flex-direction: column;
     min-height: 0;
+    container-type: inline-size;
+    container-name: cal-years-grid;
   }
 
   .nav {
@@ -24,8 +26,7 @@
     --adaptive-tile-min-height: 3.15em;
     --adaptive-tile-padding: 0.35em 0.55em;
     --adaptive-tile-font-size: var(--cal-text-base);
-    container-type: inline-size;
-    container-name: cal-years-grid;
+    --adaptive-tile-max-width: none;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-auto-rows: auto;

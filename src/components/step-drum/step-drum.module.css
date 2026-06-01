@@ -34,7 +34,7 @@
   top: 50%;
   left: 3px;
   right: 3px;
-  height: calc(100% / 7);
+  height: calc(100% / 7 + 4px);
   transform: translateY(-50%);
   background: var(--active-cell-bg, var(--c-h));
   border-radius: var(--cal-radius, 0.5em);

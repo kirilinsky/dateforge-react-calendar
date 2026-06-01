@@ -186,4 +186,6 @@ export interface CalendarProps<M extends CalendarMode = "single"> {
    * multiple calendars.
    */
   "data-testid"?: string;
+  /** `id` applied to the calendar root wrapper. */
+  id?: string;
 }

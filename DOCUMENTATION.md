@@ -10,11 +10,12 @@
 - [Calendar (Main Component)](#calendar)
 - [Edge cases](#edge-cases)
 - [Recommended compositions](#recommended-compositions)
-- [CalendarDays](#calendardays)
-- [Modules](#modules)
-  - [CalendarToolbar](#calendartoolbar)
+- [Grids](#grids)
+  - [CalendarDays](#calendardays)
   - [CalendarMonthsGrid](#calendarmonthsgrid)
   - [CalendarYearsGrid](#calendaryearsgrid)
+- [Modules](#modules)
+  - [CalendarToolbar](#calendartoolbar)
   - [CalendarPresets](#calendarpresets)
   - [CalendarManualInput](#calendarmanualinput)
 - [Tracks (scrollable strips)](#tracks-scrollable-strips)
@@ -204,6 +205,7 @@ import {
 | `disabled`        | `DisabledConfig`                                      | —          | Rules for disabling specific dates. Build with `createDisabled()`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | `children`        | `React.ReactNode`                                     | —          | Module components that compose the calendar UI                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `data-testid`     | `string`                                              | `"dateforge-calendar"` | Applied to the calendar root wrapper. Override per-instance when mounting multiple calendars (e.g. `data-testid="booking-from"` / `"booking-to"`).                                                                                                                                                                                                                                                                                                                                                                              |
+| `id`              | `string`                                              | —                      | HTML `id` applied to the calendar root wrapper.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
 ### Action aria labels
 
@@ -791,7 +793,13 @@ A scrollable month strip plus a regular day grid. Saves vertical space compared 
 
 ---
 
-## CalendarDays
+## Grids
+
+Tabular layout modules. Best for desktop / wide compositions. `CalendarDays` is interactive (commits selection); month and year grids are navigational by default and expose `onMonthSelect` / `onYearSelect` for standalone pickers.
+
+---
+
+### CalendarDays
 
 Renders the month grid — weekday headers, week numbers (optional), and the day cells.
 
@@ -799,7 +807,7 @@ Renders the month grid — weekday headers, week numbers (optional), and the day
 <CalendarDays />
 ```
 
-### Props
+#### Props
 
 | Prop                | Type                            | Default   | Description                                                                                                                                                                                                                                                                                                                      |
 | ------------------- | ------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -823,7 +831,7 @@ Renders the month grid — weekday headers, week numbers (optional), and the day
 | `col`               | `number \| string`              | —         | CSS grid `grid-column` value for layout positioning                                                                                                                                                                                                                                                                              |
 | `renderDay`         | `(date: Date, state: DayState) => ReactNode` | —  | Custom renderer for the day cell's inner content. Replaces the default day-number label only — the button shell, `data-*` state attributes, keyboard handlers, and a11y stay owned by the library. See "[renderDay — custom day content](#renderday--custom-day-content)" below for the `DayState` shape and sizing notes.       |
 
-### `renderDay` — custom day content
+#### `renderDay` — custom day content
 
 `renderDay` lets you replace what is painted inside each day button. The library still owns the button itself (click handling, focus, `aria-label`, `aria-disabled`, the `data-*` state attributes, range styling), so a custom renderer cannot break a11y or selection logic. Only the inner label is replaced.
 
@@ -867,7 +875,7 @@ The appearance token (`--cal-day-ratio`) still applies to the default rendering 
 
 **`React.memo` and stability.** `DayCell` is memoized. If you want to avoid unnecessary re-renders, keep the `renderDay` reference stable across renders (`useCallback`).
 
-### `hideOutOfRange` accessibility
+#### `hideOutOfRange` accessibility
 
 When `hideOutOfRange` is enabled, dates outside `minDate`/`maxDate` (or matching disabled rules) are not rendered as interactive day buttons. To keep the visual grid aligned, an empty placeholder `<div role="presentation" />` is rendered in their place.
 
@@ -880,6 +888,72 @@ WCAG/ARIA semantics:
 **Trade-off — keyboard navigation.** Arrow-key navigation is computed by date math, not by what is visible. If the user arrows past the visible edge into a hidden region, focus may not land on a button (because no button was rendered for that date). To keep keyboard traversal predictable, pair `hideOutOfRange` with `blockNavigation` so arrows do not leave the visible range, or prefer the default disabled-and-visible mode when full keyboard reachability matters more than visual cleanliness.
 
 This trade-off is exercised by `axe` checks in `src/__tests__/integration/a11y.test.tsx`.
+
+---
+
+### CalendarMonthsGrid
+
+Full-page **month navigation grid** (12 cells). Clicking a month sets `viewDate` to that month — it does **not** select a date and does **not** call `onChange`. Pair with `<CalendarDays>` (or another interactive module) for date selection, or use `onMonthSelect` for a standalone month-picker UX.
+
+```tsx
+<CalendarMonthsGrid />
+```
+
+Standalone month picker (no `CalendarDays` needed):
+
+```tsx
+<Calendar>
+  <CalendarMonthsGrid onMonthSelect={(date) => setMonth(date)} />
+</Calendar>
+```
+
+`date` is the navigated `viewDate` — first day of the picked month, same year.
+
+#### Props
+
+| Prop                | Type                   | Default | Description                                                                       |
+| ------------------- | ---------------------- | ------- | --------------------------------------------------------------------------------- |
+| `short`             | `boolean`              | `true`  | Use abbreviated month names (e.g. "Jan" instead of "January")                     |
+| `disableOutOfRange` | `boolean`              | `true`  | Disable months outside `minDate`/`maxDate` range                                  |
+| `hideOutOfRange`    | `boolean`              | `false` | Completely hide months outside the allowed range                                  |
+| `col`               | `number \| string`     | —       | CSS grid `grid-column` value                                                      |
+| `onMonthSelect`     | `(date: Date) => void` | —       | Fires after a month click. Receives navigated `viewDate` (first day of the month) |
+
+---
+
+### CalendarYearsGrid
+
+Full-page **year navigation grid** with pagination. Clicking a year sets `viewDate` to that year — it does **not** select a date and does **not** call `onChange`. Pair with `<CalendarDays>` (or another interactive module) for date selection, or use `onYearSelect` for a standalone year-picker UX.
+
+```tsx
+<CalendarYearsGrid yearsPerPage={12} />
+```
+
+Custom first year / no pagination controls:
+
+```tsx
+<CalendarYearsGrid startYear={2014} yearsPerPage={12} showControls={false} />
+```
+
+Standalone year picker:
+
+```tsx
+<Calendar>
+  <CalendarYearsGrid onYearSelect={(date) => setYear(date.getFullYear())} />
+</Calendar>
+```
+
+#### Props
+
+| Prop                | Type                   | Default | Description                                                                                       |
+| ------------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------------- |
+| `yearsPerPage`      | `number`               | `10`    | Number of years shown per page. Integer in 1..40; out-of-range values are clamped and warn in dev |
+| `startYear`         | `number`               | —       | First year rendered on the first page. Integer in 1900..2100; out-of-range values are clamped     |
+| `showControls`      | `boolean`              | `true`  | Render the previous/next pagination controls and visible year range label                         |
+| `disableOutOfRange` | `boolean`              | `true`  | Disable years outside `minDate`/`maxDate` range                                                   |
+| `hideOutOfRange`    | `boolean`              | `false` | Completely hide years outside the allowed range                                                   |
+| `col`               | `number \| string`     | —       | CSS grid `grid-column` value                                                                      |
+| `onYearSelect`      | `(date: Date) => void` | —       | Fires after a year click. Receives navigated `viewDate` (same month/day, picked year)             |
 
 ---
 
@@ -989,72 +1063,6 @@ With the default `justify-content: space-between` on `<CalendarToolbar>`, two un
 Use this table to decide which guarantees apply to your composition. A toolbar made only from arrows, labels, and month/year triggers is navigational and never fires `onChange`.
 
 The old monolithic `CalendarNav` module was removed in the major toolbar release. Compose the same UI from `CalendarToolbar` and focused toolbar submodules instead.
-
----
-
-### CalendarMonthsGrid
-
-Full-page **month navigation grid** (12 cells). Clicking a month sets `viewDate` to that month — it does **not** select a date and does **not** call `onChange`. Pair with `<CalendarDays>` (or another interactive module) for date selection, or use `onMonthSelect` for a standalone month-picker UX.
-
-```tsx
-<CalendarMonthsGrid />
-```
-
-Standalone month picker (no `CalendarDays` needed):
-
-```tsx
-<Calendar>
-  <CalendarMonthsGrid onMonthSelect={(date) => setMonth(date)} />
-</Calendar>
-```
-
-`date` is the navigated `viewDate` — first day of the picked month, same year.
-
-### Props
-
-| Prop                | Type                   | Default | Description                                                                       |
-| ------------------- | ---------------------- | ------- | --------------------------------------------------------------------------------- |
-| `short`             | `boolean`              | `true`  | Use abbreviated month names (e.g. "Jan" instead of "January")                     |
-| `disableOutOfRange` | `boolean`              | `true`  | Disable months outside `minDate`/`maxDate` range                                  |
-| `hideOutOfRange`    | `boolean`              | `false` | Completely hide months outside the allowed range                                  |
-| `col`               | `number \| string`     | —       | CSS grid `grid-column` value                                                      |
-| `onMonthSelect`     | `(date: Date) => void` | —       | Fires after a month click. Receives navigated `viewDate` (first day of the month) |
-
----
-
-### CalendarYearsGrid
-
-Full-page **year navigation grid** with pagination. Clicking a year sets `viewDate` to that year — it does **not** select a date and does **not** call `onChange`. Pair with `<CalendarDays>` (or another interactive module) for date selection, or use `onYearSelect` for a standalone year-picker UX.
-
-```tsx
-<CalendarYearsGrid yearsPerPage={12} />
-```
-
-Custom first year / no pagination controls:
-
-```tsx
-<CalendarYearsGrid startYear={2014} yearsPerPage={12} showControls={false} />
-```
-
-Standalone year picker:
-
-```tsx
-<Calendar>
-  <CalendarYearsGrid onYearSelect={(date) => setYear(date.getFullYear())} />
-</Calendar>
-```
-
-### Props
-
-| Prop                | Type                   | Default | Description                                                                                       |
-| ------------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------------- |
-| `yearsPerPage`      | `number`               | `10`    | Number of years shown per page. Integer in 1..40; out-of-range values are clamped and warn in dev |
-| `startYear`         | `number`               | —       | First year rendered on the first page. Integer in 1900..2100; out-of-range values are clamped     |
-| `showControls`      | `boolean`              | `true`  | Render the previous/next pagination controls and visible year range label                         |
-| `disableOutOfRange` | `boolean`              | `true`  | Disable years outside `minDate`/`maxDate` range                                                   |
-| `hideOutOfRange`    | `boolean`              | `false` | Completely hide years outside the allowed range                                                   |
-| `col`               | `number \| string`     | —       | CSS grid `grid-column` value                                                                      |
-| `onYearSelect`      | `(date: Date) => void` | —       | Fires after a year click. Receives navigated `viewDate` (same month/day, picked year)             |
 
 ---
 

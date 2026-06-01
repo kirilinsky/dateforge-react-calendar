@@ -3,11 +3,11 @@
     display: flex;
     flex-direction: column;
     z-index: 2;
+    container-type: inline-size;
+    container-name: cal-months-grid;
   }
 
   .monthsContainer {
-    container-type: inline-size;
-    container-name: cal-months-grid;
     flex: 1;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -16,6 +16,7 @@
     padding: 0.65em 0.55em;
     --adaptive-tile-min-height: 3.4em;
     --adaptive-tile-padding: 0.45em 0.65em;
+    --adaptive-tile-max-width: none;
   }
 
   /* 12 months: 4×3 on medium+ */
