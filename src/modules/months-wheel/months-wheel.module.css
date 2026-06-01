@@ -78,7 +78,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: var(--cal-size-chip, 2.3em);
+  height: calc(var(--cal-size-chip, 2.3em) + 4px);
   width: 100%;
   padding: 0 var(--cal-spacing);
   font-size: var(--cal-text-sm);

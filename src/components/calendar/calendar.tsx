@@ -37,6 +37,7 @@ export function Calendar<M extends CalendarMode = "single">({
   children,
   readOnly = false,
   "data-testid": testId = "dateforge-calendar",
+  id,
   ...restProps
 }: CalendarProps<M>) {
   const reactId = useId();
@@ -130,6 +131,7 @@ export function Calendar<M extends CalendarMode = "single">({
       {...(restProps as import("@/types/calendar").CalendarProps<CalendarMode>)}
     >
       <div
+        id={id}
         data-theme={activeTheme}
         data-readonly={readOnly || undefined}
         data-testid={testId}
