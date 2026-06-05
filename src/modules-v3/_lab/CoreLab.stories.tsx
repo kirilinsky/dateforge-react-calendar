@@ -13,6 +13,10 @@ import {
   weekdayOf,
 } from "@/core-v3/calendar-date";
 import {
+  type CalendarDateTime,
+  calendarDateTime,
+} from "@/core-v3/calendar-date-time";
+import {
   type CalendarRange,
   mergeRanges,
   orderRange,
@@ -28,6 +32,11 @@ import {
   normalizeTime,
 } from "@/core-v3/calendar-time";
 import { buildMonthGrid } from "@/core-v3/month-grid";
+import {
+  fromCalendarDateTime,
+  toCalendarDateTime,
+  today,
+} from "@/core-v3/timezone-boundary";
 
 /**
  * v3 Core Lab — a living visual harness for the v3 rebuild.
@@ -569,6 +578,85 @@ function MonthGridBlock() {
   );
 }
 
+const ZONES = [
+  "UTC",
+  "America/New_York",
+  "Europe/Berlin",
+  "Asia/Kolkata",
+  "Asia/Tokyo",
+];
+
+function fmtWall(dt: CalendarDateTime): string {
+  const { date: d, time: t } = dt;
+  return `${d.year}-${pad(d.month)}-${pad(d.day)} ${pad(t.hour)}:${pad(t.minute)}`;
+}
+
+function resolveWall(
+  dt: CalendarDateTime,
+  opts: Parameters<typeof fromCalendarDateTime>[2],
+) {
+  const r = fromCalendarDateTime(dt, "America/New_York", opts);
+  if (!r.ok) return "rejected (nonexistent)";
+  const wall = toCalendarDateTime(r.date, "America/New_York");
+  return `${fmtWall(wall)}${r.adjusted ? " ⟳ adjusted" : ""}`;
+}
+
+function TimeZoneBlock() {
+  const now = new Date();
+  const gap = calendarDateTime(calendarDate(2026, 3, 8), calendarTime(2, 30));
+  const fold = calendarDateTime(calendarDate(2026, 11, 1), calendarTime(1, 30));
+
+  return (
+    <div style={{ ...card, maxWidth: 460 }}>
+      <strong>Timezone boundary · today + now across zones</strong>
+
+      <div style={{ display: "grid", gap: 4 }}>
+        {ZONES.map((tz) => {
+          const t = toCalendarDateTime(now, tz).time;
+          return (
+            <div key={tz} style={{ ...row, justifyContent: "space-between" }}>
+              <span style={{ color: "#666" }}>{tz}</span>
+              <span>{fmtWall({ date: today(tz), time: t })}</span>
+            </div>
+          );
+        })}
+      </div>
+
+      <strong style={{ marginTop: 8 }}>
+        DST gap — New York, 2026-03-08 02:30 (does not exist)
+      </strong>
+      <div style={{ display: "grid", gap: 2 }}>
+        <div style={row}>
+          <span style={{ width: 120, color: "#666" }}>next-valid</span>
+          <span>{resolveWall(gap, { nonexistent: "next-valid" })}</span>
+        </div>
+        <div style={row}>
+          <span style={{ width: 120, color: "#666" }}>previous-valid</span>
+          <span>{resolveWall(gap, { nonexistent: "previous-valid" })}</span>
+        </div>
+        <div style={row}>
+          <span style={{ width: 120, color: "#666" }}>reject</span>
+          <span>{resolveWall(gap, { nonexistent: "reject" })}</span>
+        </div>
+      </div>
+
+      <strong style={{ marginTop: 8 }}>
+        DST fold — New York, 2026-11-01 01:30 (happens twice)
+      </strong>
+      <div style={{ display: "grid", gap: 2 }}>
+        <div style={row}>
+          <span style={{ width: 120, color: "#666" }}>earlier</span>
+          <span>{resolveWall(fold, { ambiguous: "earlier" })}</span>
+        </div>
+        <div style={row}>
+          <span style={{ width: 120, color: "#666" }}>later</span>
+          <span>{resolveWall(fold, { ambiguous: "later" })}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const meta: Meta<typeof CalendarDateBlock> = {
   title: "v3/Core Lab",
   component: CalendarDateBlock,
@@ -594,4 +682,9 @@ export const CalendarRangePrimitives: Story = {
 /** Phase B · step 5 — month grid + animation-ready range roles. */
 export const MonthGridDraft: Story = {
   render: () => <MonthGridBlock />,
+};
+
+/** Phase B · step 7 — timezone boundary: today, now across zones, DST gap/fold. */
+export const TimeZoneBoundary: Story = {
+  render: () => <TimeZoneBlock />,
 };
