@@ -31,7 +31,15 @@ import {
   msOfDay,
   normalizeTime,
 } from "@/core-v3/calendar-time";
+import { compileDateRules } from "@/core-v3/date-rule-engine";
 import { buildMonthGrid } from "@/core-v3/month-grid";
+import {
+  commonPresets,
+  compilePresets,
+  type PresetResult,
+  type PresetStatus,
+} from "@/core-v3/preset-engine";
+import type { SelectionMode } from "@/core-v3/selection-types";
 import {
   fromCalendarDateTime,
   toCalendarDateTime,
@@ -657,6 +665,211 @@ function TimeZoneBlock() {
   );
 }
 
+const REASON_LABEL: Record<string, string> = {
+  all: "all",
+  weekday: "weekday",
+  date: "exact date",
+  before: "before min",
+  after: "after max",
+  range: "in range",
+  predicate: "Friday 13th",
+};
+
+function EngineBlock() {
+  const year = 2026;
+  const month = 6;
+  const [weekends, setWeekends] = useState(true);
+  const [before, setBefore] = useState(0); // day of June, 0 = none
+  const [after, setAfter] = useState(0);
+  const [fri13, setFri13] = useState(false);
+  const [exact, setExact] = useState<number[]>([]); // day numbers
+
+  const engine = compileDateRules({
+    weekends,
+    before: before ? calendarDate(year, month, before) : undefined,
+    after: after ? calendarDate(year, month, after) : undefined,
+    dates: exact.map((d) => calendarDate(year, month, d)),
+    predicate: fri13 ? (d) => d.day === 13 && weekdayOf(d) === 5 : undefined,
+  });
+
+  const grid = buildMonthGrid({ year, month, firstDayOfWeek: 1 });
+
+  const toggleExact = (day: number) =>
+    setExact((prev) =>
+      prev.includes(day) ? prev.filter((x) => x !== day) : [...prev, day],
+    );
+
+  return (
+    <div style={{ ...card, maxWidth: 360 }}>
+      <strong>disabled / exclude engine · matched days</strong>
+
+      <div style={{ ...row, flexWrap: "wrap" }}>
+        <label style={row}>
+          <input
+            type="checkbox"
+            checked={weekends}
+            onChange={(e) => setWeekends(e.target.checked)}
+          />
+          <span>weekends</span>
+        </label>
+        <label style={row}>
+          <input
+            type="checkbox"
+            checked={fri13}
+            onChange={(e) => setFri13(e.target.checked)}
+          />
+          <span>Friday 13th (predicate)</span>
+        </label>
+      </div>
+      <Field label="before" value={before} onChange={setBefore} />
+      <Field label="after" value={after} onChange={setAfter} />
+      <div style={{ color: "#666", fontSize: 11 }}>
+        click a day to toggle it as an exact-excluded date
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(7, 1fr)",
+          gap: 2,
+        }}
+      >
+        {grid.weekdayOrder.map((w) => (
+          <div
+            key={w}
+            style={{ textAlign: "center", color: "#999", fontSize: 11 }}
+          >
+            {WEEKDAY_NAMES[w]}
+          </div>
+        ))}
+        {grid.weeks.flat().map((cell) => {
+          const hit = engine.matches(cell.date);
+          const reason = hit ? engine.getReason(cell.date) : null;
+          return (
+            <button
+              type="button"
+              key={dateKey(cell.date)}
+              onClick={() => cell.inMonth && toggleExact(cell.date.day)}
+              title={reason ? REASON_LABEL[reason] : undefined}
+              style={{
+                appearance: "none",
+                border: "none",
+                cursor: cell.inMonth ? "pointer" : "default",
+                padding: "8px 0",
+                borderRadius: 6,
+                background: hit ? "#fbe7e7" : "transparent",
+                color: hit ? "#b3261e" : cell.inMonth ? "#222" : "#bbb",
+                textDecoration: hit ? "line-through" : "none",
+              }}
+            >
+              {cell.date.day}
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={{ color: "#666" }}>
+        isEmpty: <b>{String(engine.isEmpty)}</b>
+        {"  ·  "}
+        limits: <b>{engine.limits.min?.day ?? "—"}</b>..
+        <b>{engine.limits.max?.day ?? "—"}</b>
+      </div>
+    </div>
+  );
+}
+
+const STATUS_HUE: Record<PresetStatus, string> = {
+  ok: "#137333",
+  incompatible: "#999",
+  disabled: "#b3261e",
+  empty: "#b06000",
+};
+
+function describeResult(r: PresetResult | null): string {
+  if (!r) return "—";
+  if (r.kind === "date") return `${r.date.month}/${r.date.day}`;
+  if (r.kind === "dates") return `${r.dates.length} dates`;
+  return `${r.range.start.month}/${r.range.start.day} – ${r.range.end.month}/${r.range.end.day}`;
+}
+
+const ALL_MODES: SelectionMode[] = [
+  "single",
+  "multiple",
+  "range",
+  "multi-range",
+];
+
+function PresetBlock() {
+  const [mode, setMode] = useState<SelectionMode>("range");
+  const [blockToday, setBlockToday] = useState(false);
+
+  const ctx = { today: today(), firstDayOfWeek: 1 };
+  const engine = compilePresets(commonPresets);
+  const rules = blockToday
+    ? compileDateRules({ dates: [ctx.today] })
+    : undefined;
+  const evaluated = engine.evaluate(ctx, { mode, rules });
+
+  return (
+    <div style={{ ...card, maxWidth: 380 }}>
+      <strong>Preset engine · status by mode (display filter only)</strong>
+
+      <label style={row}>
+        <span style={{ color: "#666" }}>mode</span>
+        <select
+          value={mode}
+          onChange={(e) => setMode(e.target.value as SelectionMode)}
+        >
+          {ALL_MODES.map((m) => (
+            <option key={m} value={m}>
+              {m}
+            </option>
+          ))}
+        </select>
+        <label style={row}>
+          <input
+            type="checkbox"
+            checked={blockToday}
+            onChange={(e) => setBlockToday(e.target.checked)}
+          />
+          <span>disable today</span>
+        </label>
+      </label>
+
+      <div style={{ display: "grid", gap: 4 }}>
+        {evaluated.map(({ preset, result, status }) => (
+          <div
+            key={preset.id}
+            style={{ ...row, justifyContent: "space-between" }}
+          >
+            <span style={{ opacity: status === "ok" ? 1 : 0.6 }}>
+              {preset.label ?? preset.id}
+            </span>
+            <span style={{ color: "#999", fontSize: 11 }}>
+              {describeResult(result)}
+            </span>
+            <span
+              style={{
+                ...tag(status === "ok"),
+                background: "transparent",
+                color: STATUS_HUE[status],
+                fontWeight: 600,
+              }}
+            >
+              {status}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ color: "#666", fontSize: 11 }}>
+        presets resolve to candidate values; mode only filters what is offered —
+        it never drives selection behavior.
+      </div>
+    </div>
+  );
+}
+
 const meta: Meta<typeof CalendarDateBlock> = {
   title: "v3/Core Lab",
   component: CalendarDateBlock,
@@ -687,4 +900,14 @@ export const MonthGridDraft: Story = {
 /** Phase B · step 7 — timezone boundary: today, now across zones, DST gap/fold. */
 export const TimeZoneBoundary: Story = {
   render: () => <TimeZoneBlock />,
+};
+
+/** Phase C · step 1 — disabled/exclude rule engine over a month. */
+export const RuleEngine: Story = {
+  render: () => <EngineBlock />,
+};
+
+/** Phase C · step 2 — preset engine: mode-aware status + disabled validation. */
+export const PresetEngine: Story = {
+  render: () => <PresetBlock />,
 };
