@@ -157,3 +157,14 @@ export function addYears(d: CalendarDate, n: number): CalendarDate {
 export function differenceInDays(a: CalendarDate, b: CalendarDate): number {
   return dayNumber(a) - dayNumber(b);
 }
+
+/**
+ * Day of week, `0 = Sunday` .. `6 = Saturday`.
+ *
+ * Derived from the serial day number (1970-01-01 is a Thursday = 4), so it is
+ * pure and correct for all years without a JS `Date`.
+ */
+export function weekdayOf(d: CalendarDate): number {
+  const w = (dayNumber(d) + 4) % 7;
+  return w < 0 ? w + 7 : w;
+}
