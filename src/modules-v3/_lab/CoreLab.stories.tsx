@@ -10,7 +10,24 @@ import {
   daysInMonth,
   isLeapYear,
   isValidDate,
+  weekdayOf,
 } from "@/core-v3/calendar-date";
+import {
+  type CalendarRange,
+  mergeRanges,
+  orderRange,
+  rangeIndexOf,
+  rangeLengthDays,
+  rangeRole,
+  weekRange,
+} from "@/core-v3/calendar-range";
+import {
+  calendarTime,
+  isValidTime,
+  msOfDay,
+  normalizeTime,
+} from "@/core-v3/calendar-time";
+import { buildMonthGrid } from "@/core-v3/month-grid";
 
 /**
  * v3 Core Lab — a living visual harness for the v3 rebuild.
@@ -172,6 +189,386 @@ function CalendarDateBlock() {
   );
 }
 
+function pad(n: number, len = 2) {
+  return String(n).padStart(len, "0");
+}
+
+function CalendarTimeBlock() {
+  const [hour, setHour] = useState(14);
+  const [minute, setMinute] = useState(30);
+  const [second, setSecond] = useState(0);
+  const [ms, setMs] = useState(0);
+  const [carry, setCarry] = useState(0);
+
+  const t = calendarTime(hour, minute, second, ms);
+  const valid = isValidTime(t);
+
+  const step = (deltaMs: number) => {
+    const total = msOfDay(t) + deltaMs;
+    const r = normalizeTime(calendarTime(0, 0, 0, total));
+    setHour(r.time.hour);
+    setMinute(r.time.minute);
+    setSecond(r.time.second);
+    setMs(r.time.ms);
+    setCarry(r.dayOffset);
+  };
+
+  return (
+    <div style={card}>
+      <strong>CalendarTime</strong>
+
+      <Field label="hour" value={hour} onChange={setHour} />
+      <Field label="minute" value={minute} onChange={setMinute} />
+      <Field label="second" value={second} onChange={setSecond} />
+      <Field label="ms" value={ms} onChange={setMs} />
+
+      <div style={{ ...row, flexWrap: "wrap" }}>
+        {(
+          [
+            ["−1h", -3_600_000],
+            ["+1h", 3_600_000],
+            ["−15m", -900_000],
+            ["+15m", 900_000],
+            ["−1s", -1000],
+            ["+1s", 1000],
+          ] as const
+        ).map(([label, delta]) => (
+          <button
+            key={label}
+            type="button"
+            disabled={!valid}
+            onClick={() => step(delta)}
+            style={{
+              padding: "4px 10px",
+              borderRadius: 6,
+              border: "1px solid #cdd",
+              background: "#fafafe",
+              cursor: valid ? "pointer" : "not-allowed",
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <div style={row}>
+        <span style={tag(valid)}>{valid ? "valid" : "invalid"}</span>
+        {carry !== 0 && (
+          <span style={tag(false)}>
+            rolled {carry > 0 ? "+" : ""}
+            {carry} day
+          </span>
+        )}
+      </div>
+
+      <div style={{ fontSize: 22, letterSpacing: 1 }}>
+        {valid
+          ? `${pad(hour)}:${pad(minute)}:${pad(second)}.${pad(ms, 3)}`
+          : "—"}
+      </div>
+      <div>
+        msOfDay: <b>{valid ? msOfDay(t) : "—"}</b>
+      </div>
+    </div>
+  );
+}
+
+// Distinct hues so each merged span reads as its own block in the strip.
+const SPAN_HUES = ["#1a73e8", "#137333", "#b3261e", "#8430ce", "#b06000"];
+
+function RangeBlock() {
+  const year = 2026;
+  const month = 6;
+  const dim = daysInMonth(year, month);
+
+  // Two raw spans (by day-of-month) the user can edit; merged into canonical form.
+  const [aStart, setAStart] = useState(2);
+  const [aEnd, setAEnd] = useState(8);
+  const [bStart, setBStart] = useState(6);
+  const [bEnd, setBEnd] = useState(14);
+
+  const raw: CalendarRange[] = [
+    orderRange(
+      calendarDate(year, month, aStart),
+      calendarDate(year, month, aEnd),
+    ),
+    orderRange(
+      calendarDate(year, month, bStart),
+      calendarDate(year, month, bEnd),
+    ),
+  ];
+  const merged = mergeRanges(raw);
+
+  return (
+    <div style={card}>
+      <strong>CalendarRange · membership + merge</strong>
+
+      <div style={{ color: "#666" }}>span A (June)</div>
+      <Field label="from" value={aStart} onChange={setAStart} />
+      <Field label="to" value={aEnd} onChange={setAEnd} />
+      <div style={{ color: "#666" }}>span B (June)</div>
+      <Field label="from" value={bStart} onChange={setBStart} />
+      <Field label="to" value={bEnd} onChange={setBEnd} />
+
+      {/* month strip colored by merged-span membership via O(log R) binary search */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(7, 1fr)",
+          gap: 4,
+        }}
+      >
+        {Array.from({ length: dim }, (_, i) => {
+          const d = calendarDate(year, month, i + 1);
+          const idx = rangeIndexOf(merged, d);
+          const hue = idx === -1 ? null : SPAN_HUES[idx % SPAN_HUES.length];
+          return (
+            <div
+              key={i + 1}
+              style={{
+                textAlign: "center",
+                padding: "6px 0",
+                borderRadius: 6,
+                background: hue ?? "#f1f1f5",
+                color: hue ? "#fff" : "#333",
+              }}
+            >
+              {i + 1}
+            </div>
+          );
+        })}
+      </div>
+
+      <div style={{ display: "grid", gap: 4 }}>
+        <span style={{ color: "#666" }}>
+          merged into {merged.length} span(s):
+        </span>
+        {merged.map((r, i) => (
+          <div key={dateKey(r.start)} style={row}>
+            <span
+              style={{
+                width: 12,
+                height: 12,
+                borderRadius: 3,
+                background: SPAN_HUES[i % SPAN_HUES.length],
+              }}
+            />
+            <span>
+              {r.start.day}–{r.end.day} · {rangeLengthDays(r)} days
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const WEEKDAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+const RANGE_HUE = "#1a73e8";
+const PREVIEW_HUE = "#bcd4f7";
+
+function radiusFor(role: "start" | "middle" | "end" | "single" | null): string {
+  switch (role) {
+    case "single":
+      return "8px";
+    case "start":
+      return "8px 0 0 8px";
+    case "end":
+      return "0 8px 8px 0";
+    case "middle":
+      return "0";
+    default:
+      return "8px";
+  }
+}
+
+function MonthGridBlock() {
+  const [view, setView] = useState(calendarDate(2026, 6, 1));
+  const [firstDayOfWeek, setFirstDayOfWeek] = useState(1);
+  const [start, setStart] = useState<CalendarDate | null>(null);
+  const [end, setEnd] = useState<CalendarDate | null>(null);
+  const [hover, setHover] = useState<CalendarDate | null>(null);
+  const [weekMode, setWeekMode] = useState(false);
+  const [excludeWeekends, setExcludeWeekends] = useState(false);
+
+  const grid = buildMonthGrid({
+    year: view.year,
+    month: view.month,
+    firstDayOfWeek,
+  });
+
+  // Drop Sat/Sun from a span and merge survivors -> business-day segments.
+  // This is the Lab stand-in for the future segmented-exclusion engine.
+  const segmentize = (span: CalendarRange): CalendarRange[] => {
+    if (!excludeWeekends) return mergeRanges([span]);
+    const days: CalendarRange[] = [];
+    for (let k = 0; k < rangeLengthDays(span); k++) {
+      const d = addDays(span.start, k);
+      const wd = weekdayOf(d);
+      if (wd !== 0 && wd !== 6) days.push(orderRange(d, d));
+    }
+    return mergeRanges(days);
+  };
+
+  const committed = start && end ? segmentize(orderRange(start, end)) : [];
+  const preview =
+    start && !end ? segmentize(orderRange(start, hover ?? start)) : [];
+
+  const clickDay = (d: CalendarDate) => {
+    if (weekMode) {
+      const w = weekRange(d, firstDayOfWeek);
+      setStart(w.start);
+      setEnd(w.end);
+      return;
+    }
+    if (!start || (start && end)) {
+      setStart(d);
+      setEnd(null);
+    } else {
+      setEnd(d);
+    }
+  };
+
+  return (
+    <div style={{ ...card, maxWidth: 360 }}>
+      <strong>Month grid · click two days to draw a range</strong>
+
+      <div style={{ ...row, justifyContent: "space-between" }}>
+        <button
+          type="button"
+          onClick={() => setView(addMonths(view, -1))}
+          style={{ padding: "4px 12px" }}
+        >
+          ‹
+        </button>
+        <span>
+          {MONTH_NAMES[view.month - 1]} {view.year}
+        </span>
+        <button
+          type="button"
+          onClick={() => setView(addMonths(view, 1))}
+          style={{ padding: "4px 12px" }}
+        >
+          ›
+        </button>
+      </div>
+
+      <label style={row}>
+        <span style={{ color: "#666" }}>week starts</span>
+        <select
+          value={firstDayOfWeek}
+          onChange={(e) => setFirstDayOfWeek(Number(e.target.value))}
+        >
+          {WEEKDAY_NAMES.map((name, i) => (
+            <option key={name} value={i}>
+              {name}
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          onClick={() => {
+            setStart(null);
+            setEnd(null);
+          }}
+        >
+          reset
+        </button>
+      </label>
+
+      <div style={{ ...row, flexWrap: "wrap" }}>
+        <label style={row}>
+          <input
+            type="checkbox"
+            checked={weekMode}
+            onChange={(e) => {
+              setWeekMode(e.target.checked);
+              setStart(null);
+              setEnd(null);
+            }}
+          />
+          <span>week mode (click = whole week)</span>
+        </label>
+        <label style={row}>
+          <input
+            type="checkbox"
+            checked={excludeWeekends}
+            onChange={(e) => setExcludeWeekends(e.target.checked)}
+          />
+          <span>exclude weekends</span>
+        </label>
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(7, 1fr)",
+          gap: "2px 0",
+        }}
+      >
+        {grid.weekdayOrder.map((w) => (
+          <div
+            key={w}
+            style={{ textAlign: "center", color: "#999", fontSize: 11 }}
+          >
+            {WEEKDAY_NAMES[w]}
+          </div>
+        ))}
+
+        {grid.weeks.flat().map((cell) => {
+          const cRole = rangeRole(committed, cell.date);
+          const pRole = preview.length ? rangeRole(preview, cell.date) : null;
+          const bg = cRole ? RANGE_HUE : pRole ? PREVIEW_HUE : "transparent";
+          return (
+            <button
+              type="button"
+              key={dateKey(cell.date)}
+              onClick={() => clickDay(cell.date)}
+              onMouseEnter={() => setHover(cell.date)}
+              style={{
+                appearance: "none",
+                border: "none",
+                cursor: "pointer",
+                padding: "8px 0",
+                background: bg,
+                borderRadius: radiusFor(cRole ?? pRole),
+                color: cRole ? "#fff" : cell.inMonth ? "#222" : "#bbb",
+                fontWeight: cRole ? 600 : 400,
+                transition: "background 140ms ease, border-radius 140ms ease",
+              }}
+            >
+              {cell.date.day}
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={{ color: "#666" }}>
+        {start && end
+          ? `range: ${start.day} → ${end.day} (${rangeLengthDays(orderRange(start, end))} days)`
+          : start
+            ? "pick the second day…"
+            : "pick the first day"}
+      </div>
+    </div>
+  );
+}
+
 const meta: Meta<typeof CalendarDateBlock> = {
   title: "v3/Core Lab",
   component: CalendarDateBlock,
@@ -183,3 +580,18 @@ type Story = StoryObj<typeof CalendarDateBlock>;
 
 /** Phase B · step 1 — CalendarDate primitives. */
 export const CalendarDatePrimitives: Story = {};
+
+/** Phase B · step 3 — CalendarTime primitives. */
+export const CalendarTimePrimitives: Story = {
+  render: () => <CalendarTimeBlock />,
+};
+
+/** Phase B · step 4 — CalendarRange membership + merge (heavy-path primitive). */
+export const CalendarRangePrimitives: Story = {
+  render: () => <RangeBlock />,
+};
+
+/** Phase B · step 5 — month grid + animation-ready range roles. */
+export const MonthGridDraft: Story = {
+  render: () => <MonthGridBlock />,
+};
