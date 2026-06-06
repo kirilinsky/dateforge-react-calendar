@@ -21,6 +21,7 @@ export type ValidationReason =
   | "after-max"
   | "range-too-short"
   | "range-too-long"
+  | "range-crosses-disabled"
   | "max-dates-reached"
   | "max-ranges-reached"
   | "malformed-input"

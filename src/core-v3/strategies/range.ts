@@ -11,6 +11,7 @@ import {
   spanSetTime,
   unitSnap,
   validateDay,
+  validateRangeCrossing,
   validateSpanLength,
 } from "./shared";
 
@@ -47,6 +48,9 @@ function selectDay(ctx: SelectionContext, date: CalendarDate): ReduceResult {
   const lengthRejection = validateSpanLength(range, ctx.config);
   if (lengthRejection) return rejected(ctx.state, lengthRejection); // keep anchor
 
+  const crossing = validateRangeCrossing(range, ctx.config);
+  if (crossing) return rejected(ctx.state, crossing); // keep anchor
+
   return commitSpan(ctx.state, [range], timesFor(ctx), ctx.config);
 }
 
@@ -57,6 +61,8 @@ function applyPreset(
   if (preset.kind !== "range") return noChange(ctx.state);
   const lengthRejection = validateSpanLength(preset.range, ctx.config);
   if (lengthRejection) return rejected(ctx.state, lengthRejection);
+  const crossing = validateRangeCrossing(preset.range, ctx.config);
+  if (crossing) return rejected(ctx.state, crossing);
   return commitSpan(ctx.state, [preset.range], timesFor(ctx), ctx.config);
 }
 

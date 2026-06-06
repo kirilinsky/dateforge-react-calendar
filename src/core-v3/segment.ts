@@ -1,6 +1,33 @@
 import { addDays, type CalendarDate, compareDate } from "./calendar-date";
 import type { CalendarRange } from "./calendar-range";
-import type { DateRuleEngine } from "./date-rule-engine";
+
+/**
+ * The minimal shape a span-cutting rule needs: does a day fall out of the span,
+ * and is the rule a no-op. `DateRuleEngine` satisfies it structurally, and so
+ * does the combined cut below — so `exclude` and `disabled` can be merged into
+ * one membership test for segmentation.
+ */
+export type DayCut = {
+  matches(date: CalendarDate, weekday?: number): boolean;
+  readonly isEmpty: boolean;
+};
+
+const EMPTY_CUT: DayCut = { matches: () => false, isEmpty: true };
+
+/**
+ * Merge several cuts into one: a day is cut when ANY rule matches. Used to drop
+ * both `exclude`d and `disabled` days from a span's value/render in a single
+ * pass (a disabled day must never survive in the selection, same as excluded).
+ */
+export function combineCuts(...cuts: DayCut[]): DayCut {
+  const active = cuts.filter((c) => !c.isEmpty);
+  if (active.length === 0) return EMPTY_CUT;
+  if (active.length === 1) return active[0];
+  return {
+    isEmpty: false,
+    matches: (date, weekday) => active.some((c) => c.matches(date, weekday)),
+  };
+}
 
 /**
  * Split a span into contiguous segments, dropping days the `exclude` engine
@@ -11,7 +38,7 @@ import type { DateRuleEngine } from "./date-rule-engine";
  */
 export function applyExclusion(
   span: CalendarRange,
-  exclude: DateRuleEngine,
+  exclude: DayCut,
 ): CalendarRange[] {
   if (exclude.isEmpty) return [span];
 
@@ -41,7 +68,7 @@ export function applyExclusion(
 /** Apply exclusion across many spans, flattening to all segments in order. */
 export function applyExclusionAll(
   spans: readonly CalendarRange[],
-  exclude: DateRuleEngine,
+  exclude: DayCut,
 ): CalendarRange[] {
   if (exclude.isEmpty) return spans.slice();
   const out: CalendarRange[] = [];
