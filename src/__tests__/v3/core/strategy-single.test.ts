@@ -148,6 +148,20 @@ describe("time", () => {
     const r = reduce(s, { type: "setTime", time: calendarTime(10, 0) }, cfg);
     expect(r.state).toBe(s);
   });
+
+  it("rejects malformed time edits", () => {
+    const cfg = config({ withTime: true });
+    const s = reduce(
+      start(cfg),
+      { type: "selectDay", date: D(2026, 6, 5) },
+      cfg,
+    ).state;
+    const r = reduce(s, { type: "setTime", time: calendarTime(25, 0) }, cfg);
+    expect(r.state).toBe(s);
+    expect((r.effects[0] as { result: { reason: string } }).result.reason).toBe(
+      "malformed-input",
+    );
+  });
 });
 
 describe("clear / preset", () => {
