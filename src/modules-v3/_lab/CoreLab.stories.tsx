@@ -744,8 +744,8 @@ function EngineBlock() {
           </div>
         ))}
         {grid.weeks.flat().map((cell) => {
-          const hit = engine.matches(cell.date);
-          const reason = hit ? engine.getReason(cell.date) : null;
+          const hit = engine.matches(cell.date, cell.weekday);
+          const reason = hit ? engine.getReason(cell.date, cell.weekday) : null;
           return (
             <button
               type="button"

@@ -49,16 +49,23 @@ function partsFormatter(timeZone?: string): Intl.DateTimeFormat {
   const key = timeZone ?? "";
   let f = partsCache.get(key);
   if (!f) {
-    f = new Intl.DateTimeFormat("en-US", {
-      timeZone,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-    });
+    try {
+      f = new Intl.DateTimeFormat("en-US", {
+        timeZone,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      });
+    } catch (error) {
+      if (timeZone !== undefined && error instanceof RangeError) {
+        return partsFormatter(undefined);
+      }
+      throw error;
+    }
     partsCache.set(key, f);
   }
   return f;

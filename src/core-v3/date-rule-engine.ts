@@ -53,14 +53,18 @@ export type DateRuleReason =
   | "predicate";
 
 export type DateRuleEngine = {
-  /** Hot path: does this day match the rules? O(1)–O(log R), allocation-free. */
-  matches(date: CalendarDate): boolean;
+  /**
+   * Hot path: does this day match the rules? O(1)–O(log R), allocation-free.
+   * Pass `weekday` (0=Sun..6=Sat) when a grid cell already has it to avoid
+   * recomputing weekday math for weekday/weekend rules.
+   */
+  matches(date: CalendarDate, weekday?: number): boolean;
   /** True when no rule is configured — callers can skip the engine entirely. */
   isEmpty: boolean;
   /** True when {@link getReason} can return a tag (i.e. not empty). */
   hasReasons: boolean;
   /** Lazy, opt-in: which rule matched, for tooltips / aria / validation. */
-  getReason(date: CalendarDate): DateRuleReason | null;
+  getReason(date: CalendarDate, weekday?: number): DateRuleReason | null;
   /** Bounds implied by `before`/`after`, for view clamping. */
   limits: { min?: CalendarDate; max?: CalendarDate };
 };
@@ -82,6 +86,15 @@ function normalizeWeekdayMask(config: DateRuleConfig): number {
     }
   }
   return mask;
+}
+
+function weekdayFor(date: CalendarDate, weekday?: number): number {
+  return weekday !== undefined &&
+    Number.isInteger(weekday) &&
+    weekday >= 0 &&
+    weekday <= 6
+    ? weekday
+    : weekdayOf(date);
 }
 
 /**
@@ -128,9 +141,12 @@ export function compileDateRules(config?: DateRuleConfig): DateRuleEngine {
 
   if (isEmpty) return EMPTY_ENGINE;
 
-  const matches = (date: CalendarDate): boolean => {
+  const matches = (date: CalendarDate, weekday?: number): boolean => {
     if (all) return true;
-    if (weekdayMask !== 0 && (weekdayMask & (1 << weekdayOf(date))) !== 0)
+    if (
+      weekdayMask !== 0 &&
+      (weekdayMask & (1 << weekdayFor(date, weekday))) !== 0
+    )
       return true;
     if (exactKeys.size !== 0 && exactKeys.has(dateKey(date))) return true;
     if (before && compareDate(date, before) < 0) return true;
@@ -140,9 +156,15 @@ export function compileDateRules(config?: DateRuleConfig): DateRuleEngine {
     return false;
   };
 
-  const getReason = (date: CalendarDate): DateRuleReason | null => {
+  const getReason = (
+    date: CalendarDate,
+    weekday?: number,
+  ): DateRuleReason | null => {
     if (all) return "all";
-    if (weekdayMask !== 0 && (weekdayMask & (1 << weekdayOf(date))) !== 0)
+    if (
+      weekdayMask !== 0 &&
+      (weekdayMask & (1 << weekdayFor(date, weekday))) !== 0
+    )
       return "weekday";
     if (exactKeys.size !== 0 && exactKeys.has(dateKey(date))) return "date";
     if (before && compareDate(date, before) < 0) return "before";
