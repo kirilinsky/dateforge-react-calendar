@@ -14,6 +14,7 @@ import {
 } from "../calendar-range";
 import { type CalendarTime, isValidTime } from "../calendar-time";
 import { noChange, type ReduceResult, result } from "../effects";
+import { applyExclusion } from "../segment";
 import type {
   CalendarConfig,
   CalendarState,
@@ -127,11 +128,36 @@ export function rangesEqual(a: CalendarRange, b: CalendarRange): boolean {
 
 export type SpanTimes = { from?: CalendarTime; to?: CalendarTime };
 
+function materializeSpanRanges(
+  ranges: readonly CalendarRange[],
+  config?: CalendarConfig,
+): CalendarRange[] | null {
+  if (!config || config.exclude.isEmpty || ranges.length === 0) {
+    return ranges.slice();
+  }
+
+  const out: CalendarRange[] = [];
+  for (const range of ranges) {
+    if (
+      config.excludedEndpointPolicy === "reject" &&
+      (config.exclude.matches(range.start) || config.exclude.matches(range.end))
+    ) {
+      return null;
+    }
+
+    const segments = applyExclusion(range, config.exclude);
+    if (segments.length === 0) return null;
+    out.push(...segments);
+  }
+  return out;
+}
+
 /** Commit a span selection (clears any draft anchor) and emit notify. */
 export function commitSpan(
   state: CalendarState,
   ranges: CalendarRange[],
   times?: SpanTimes,
+  config?: CalendarConfig,
 ): ReduceResult {
   const selection: SpanSelection = {
     shape: "span",
@@ -139,7 +165,18 @@ export function commitSpan(
     fromTime: times?.from,
     toTime: times?.to,
   };
-  return result({ ...state, selection }, [{ type: "notify", selection }]);
+
+  const notifyRanges = materializeSpanRanges(ranges, config);
+  if (!notifyRanges) return rejected(state, invalid("empty-after-exclude"));
+
+  const notifySelection: SpanSelection = {
+    ...selection,
+    ranges: notifyRanges,
+  };
+
+  return result({ ...state, selection }, [
+    { type: "notify", selection: notifySelection },
+  ]);
 }
 
 /** Set/clear the pending range anchor. Pending = no notify (range incomplete). */
@@ -174,14 +211,17 @@ export function spanSetTime(
   if (!isValidTime(time)) return rejected(state, invalid("malformed-input"));
   const from = bound === "to" ? sel.fromTime : time;
   const to = bound === "from" ? sel.toTime : time;
-  return commitSpan(state, [...sel.ranges], { from, to });
+  return commitSpan(state, [...sel.ranges], { from, to }, config);
 }
 
 /** Clear a span selection. Drops a lone draft anchor without a notify. */
-export function spanClear(state: CalendarState): ReduceResult {
+export function spanClear(
+  state: CalendarState,
+  config?: CalendarConfig,
+): ReduceResult {
   const sel = state.selection;
   if (sel.shape !== "span") return noChange(state);
-  if (sel.ranges.length > 0) return commitSpan(state, []);
+  if (sel.ranges.length > 0) return commitSpan(state, [], undefined, config);
   if (sel.draftAnchor) return setDraftAnchor(state, undefined);
   return noChange(state);
 }

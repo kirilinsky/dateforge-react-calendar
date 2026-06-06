@@ -179,7 +179,7 @@ describe("selection routing", () => {
     expect(r.effects[0]?.type).toBe("notify");
   });
 
-  it("a not-yet-wired mode routes to the pending no-op strategy", () => {
+  it("multi-range routes to the span collection strategy", () => {
     const cfg = config("day", "multi-range");
     const s = createInitialState(cfg, { view: calendarDate(2026, 6, 1) });
     const r = reduce(
@@ -187,6 +187,10 @@ describe("selection routing", () => {
       { type: "selectDay", date: calendarDate(2026, 6, 5) },
       cfg,
     );
-    expect(r.state).toBe(s);
+    expect(r.state.selection.shape).toBe("span");
+    expect(
+      r.state.selection.shape === "span" && r.state.selection.draftAnchor,
+    ).toEqual(calendarDate(2026, 6, 5));
+    expect(r.effects).toHaveLength(0);
   });
 });

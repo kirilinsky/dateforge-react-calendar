@@ -40,6 +40,12 @@ function anchor(state: ReturnType<typeof start>) {
     ? state.selection.draftAnchor
     : undefined;
 }
+function notifySpans(result: ReturnType<typeof reduce>) {
+  const effect = result.effects.find((e) => e.type === "notify");
+  return effect?.type === "notify" && effect.selection.shape === "span"
+    ? effect.selection.ranges.map((r) => [dateKey(r.start), dateKey(r.end)])
+    : [];
+}
 
 describe("single span (week / month · single)", () => {
   it("commits the whole week in one click", () => {
@@ -220,10 +226,251 @@ describe("range time", () => {
       cfg,
     ).state;
     s = reduce(s, { type: "selectDay", date: D(2026, 6, 9) }, cfg).state;
-    const r = reduce(s, { type: "setTime", time: { ...MIDNIGHT, hour: 24 } }, cfg);
+    const r = reduce(
+      s,
+      { type: "setTime", time: { ...MIDNIGHT, hour: 24 } },
+      cfg,
+    );
     expect(r.state).toBe(s);
     expect((r.effects[0] as { result: { reason: string } }).result.reason).toBe(
       "malformed-input",
+    );
+  });
+});
+
+describe("multi-range", () => {
+  it("creates several spans with two-click commits", () => {
+    const cfg = config("day", "multi-range");
+    let s = reduce(
+      start(cfg),
+      { type: "selectDay", date: D(2026, 6, 5) },
+      cfg,
+    ).state;
+    let r = reduce(s, { type: "selectDay", date: D(2026, 6, 7) }, cfg);
+    expect(spans(r.state)).toEqual([[20260605, 20260607]]);
+    expect(anchor(r.state)).toBeUndefined();
+
+    s = reduce(r.state, { type: "selectDay", date: D(2026, 6, 15) }, cfg).state;
+    r = reduce(s, { type: "selectDay", date: D(2026, 6, 18) }, cfg);
+    expect(spans(r.state)).toEqual([
+      [20260605, 20260607],
+      [20260615, 20260618],
+    ]);
+  });
+
+  it("merges adjacent or overlapping spans deterministically", () => {
+    const cfg = config("day", "multi-range");
+    let s = reduce(
+      start(cfg),
+      { type: "selectDay", date: D(2026, 6, 5) },
+      cfg,
+    ).state;
+    s = reduce(s, { type: "selectDay", date: D(2026, 6, 7) }, cfg).state;
+    s = reduce(s, { type: "selectDay", date: D(2026, 6, 8) }, cfg).state;
+    const r = reduce(s, { type: "selectDay", date: D(2026, 6, 10) }, cfg);
+    expect(spans(r.state)).toEqual([[20260605, 20260610]]);
+  });
+
+  it("rejects adding past maxRanges and keeps the pending anchor", () => {
+    const cfg = config("day", "multi-range", { maxRanges: 1 });
+    let s = reduce(
+      start(cfg),
+      { type: "selectDay", date: D(2026, 6, 5) },
+      cfg,
+    ).state;
+    s = reduce(s, { type: "selectDay", date: D(2026, 6, 7) }, cfg).state;
+    s = reduce(s, { type: "selectDay", date: D(2026, 6, 15) }, cfg).state;
+    const r = reduce(s, { type: "selectDay", date: D(2026, 6, 18) }, cfg);
+    expect(spans(r.state)).toEqual([[20260605, 20260607]]);
+    expect((r.effects[0] as { result: { reason: string } }).result.reason).toBe(
+      "max-ranges-reached",
+    );
+    expect(anchor(r.state)).toEqual(D(2026, 6, 15));
+  });
+
+  it("removeRange drops a span by index", () => {
+    const cfg = config("day", "multi-range");
+    let s = reduce(
+      start(cfg),
+      {
+        type: "applyPreset",
+        result: {
+          kind: "range",
+          range: { start: D(2026, 6, 5), end: D(2026, 6, 7) },
+        },
+      },
+      cfg,
+    ).state;
+    s = reduce(
+      s,
+      {
+        type: "applyPreset",
+        result: {
+          kind: "range",
+          range: { start: D(2026, 6, 15), end: D(2026, 6, 18) },
+        },
+      },
+      cfg,
+    ).state;
+    const r = reduce(s, { type: "removeRange", index: 0 }, cfg);
+    expect(spans(r.state)).toEqual([[20260615, 20260618]]);
+  });
+
+  it("clicking inside a span splits it on the clicked day", () => {
+    const cfg = config("day", "multi-range");
+    let s = reduce(
+      start(cfg),
+      { type: "selectDay", date: D(2026, 6, 5) },
+      cfg,
+    ).state;
+    s = reduce(s, { type: "selectDay", date: D(2026, 6, 10) }, cfg).state;
+    const r = reduce(s, { type: "selectDay", date: D(2026, 6, 7) }, cfg);
+    expect(spans(r.state)).toEqual([
+      [20260605, 20260606],
+      [20260608, 20260610],
+    ]);
+    expect(r.effects[0].type).toBe("notify");
+  });
+
+  it("clicking an edge day trims the span", () => {
+    const cfg = config("day", "multi-range");
+    let s = reduce(
+      start(cfg),
+      { type: "selectDay", date: D(2026, 6, 5) },
+      cfg,
+    ).state;
+    s = reduce(s, { type: "selectDay", date: D(2026, 6, 10) }, cfg).state;
+    const r = reduce(s, { type: "selectDay", date: D(2026, 6, 5) }, cfg);
+    expect(spans(r.state)).toEqual([[20260606, 20260610]]);
+  });
+
+  it("clicking a single-day span removes it entirely", () => {
+    const cfg = config("day", "multi-range");
+    let s = reduce(
+      start(cfg),
+      { type: "selectDay", date: D(2026, 6, 5) },
+      cfg,
+    ).state;
+    s = reduce(s, { type: "selectDay", date: D(2026, 6, 5) }, cfg).state;
+    expect(spans(s)).toEqual([[20260605, 20260605]]);
+    const r = reduce(s, { type: "selectDay", date: D(2026, 6, 5) }, cfg);
+    expect(spans(r.state)).toEqual([]);
+  });
+
+  it("removes a disabled day from an existing span", () => {
+    const cfg = config("day", "multi-range", {
+      disabled: compileDateRules({ dates: [D(2026, 6, 7)] }),
+    });
+    // build span via preset so the disabled day lands inside it
+    const s = reduce(
+      start(cfg),
+      {
+        type: "applyPreset",
+        result: {
+          kind: "range",
+          range: { start: D(2026, 6, 5), end: D(2026, 6, 10) },
+        },
+      },
+      cfg,
+    ).state;
+    // clicking the disabled day still removes it (removal before validation)
+    const r = reduce(s, { type: "selectDay", date: D(2026, 6, 7) }, cfg);
+    expect(spans(r.state)).toEqual([
+      [20260605, 20260606],
+      [20260608, 20260610],
+    ]);
+  });
+
+  it("week multi-range removes a clicked week from a multi-week span", () => {
+    const cfg = config("week", "multi-range");
+    let s = reduce(
+      start(cfg),
+      { type: "selectDay", date: D(2026, 6, 1) },
+      cfg,
+    ).state;
+    s = reduce(s, { type: "selectDay", date: D(2026, 6, 21) }, cfg).state;
+    expect(spans(s)).toEqual([[20260601, 20260621]]); // 3 weeks
+    const r = reduce(s, { type: "selectDay", date: D(2026, 6, 10) }, cfg); // middle week Jun 8-14
+    expect(spans(r.state)).toEqual([
+      [20260601, 20260607],
+      [20260615, 20260621],
+    ]);
+  });
+});
+
+describe("week/month multiple", () => {
+  it("toggles whole weeks in multiple mode", () => {
+    const cfg = config("week", "multiple");
+    let r = reduce(start(cfg), { type: "selectDay", date: D(2026, 6, 5) }, cfg);
+    expect(spans(r.state)).toEqual([[20260601, 20260607]]);
+    r = reduce(r.state, { type: "selectDay", date: D(2026, 6, 3) }, cfg);
+    expect(spans(r.state)).toEqual([]);
+  });
+
+  it("toggles whole months in multiple mode", () => {
+    const cfg = config("month", "multiple");
+    const r = reduce(
+      start(cfg),
+      { type: "selectDay", date: D(2026, 6, 15) },
+      cfg,
+    );
+    expect(spans(r.state)).toEqual([[20260601, 20260630]]);
+  });
+});
+
+describe("segmented exclusion", () => {
+  it("keeps logical state ranges but emits excluded-day segments", () => {
+    const cfg = config("day", "range", {
+      exclude: compileDateRules({ weekends: true }),
+    });
+    const s = reduce(
+      start(cfg),
+      { type: "selectDay", date: D(2026, 6, 5) }, // Fri
+      cfg,
+    ).state;
+    const r = reduce(s, { type: "selectDay", date: D(2026, 6, 9) }, cfg); // Tue
+
+    expect(spans(r.state)).toEqual([[20260605, 20260609]]);
+    expect(notifySpans(r)).toEqual([
+      [20260605, 20260605],
+      [20260608, 20260609],
+    ]);
+  });
+
+  it("rejects when every day is excluded", () => {
+    const cfg = config("day", "range", {
+      exclude: compileDateRules({ all: true }),
+    });
+    const s = reduce(
+      start(cfg),
+      { type: "selectDay", date: D(2026, 6, 5) },
+      cfg,
+    ).state;
+    const r = reduce(s, { type: "selectDay", date: D(2026, 6, 6) }, cfg);
+
+    expect(spans(r.state)).toEqual([]);
+    expect(anchor(r.state)).toEqual(D(2026, 6, 5));
+    expect((r.effects[0] as { result: { reason: string } }).result.reason).toBe(
+      "empty-after-exclude",
+    );
+  });
+
+  it("rejects excluded endpoints when endpoint policy is reject", () => {
+    const cfg = config("day", "range", {
+      excludedEndpointPolicy: "reject",
+      exclude: compileDateRules({ weekends: true }),
+    });
+    const s = reduce(
+      start(cfg),
+      { type: "selectDay", date: D(2026, 6, 5) }, // Fri
+      cfg,
+    ).state;
+    const r = reduce(s, { type: "selectDay", date: D(2026, 6, 6) }, cfg); // Sat
+
+    expect(spans(r.state)).toEqual([]);
+    expect(anchor(r.state)).toEqual(D(2026, 6, 5));
+    expect((r.effects[0] as { result: { reason: string } }).result.reason).toBe(
+      "empty-after-exclude",
     );
   });
 });

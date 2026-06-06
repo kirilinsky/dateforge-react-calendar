@@ -39,10 +39,10 @@ function selectDay(ctx: SelectionContext, date: CalendarDate): ReduceResult {
     rangesEqual(current, range) &&
     ctx.config.deselectOnReclick !== false
   ) {
-    return commitSpan(ctx.state, []);
+    return commitSpan(ctx.state, [], undefined, ctx.config);
   }
 
-  return commitSpan(ctx.state, [range], timesFor(ctx));
+  return commitSpan(ctx.state, [range], timesFor(ctx), ctx.config);
 }
 
 function applyPreset(
@@ -51,7 +51,7 @@ function applyPreset(
 ): ReduceResult {
   if (preset.kind === "date") return selectDay(ctx, preset.date);
   if (preset.kind === "range")
-    return commitSpan(ctx.state, [preset.range], timesFor(ctx));
+    return commitSpan(ctx.state, [preset.range], timesFor(ctx), ctx.config);
   return noChange(ctx.state);
 }
 
@@ -59,6 +59,6 @@ export const singleSpanStrategy: SelectionStrategy = {
   selectDay,
   setTime: (ctx, time, bound) =>
     spanSetTime(ctx.state, ctx.config, time, bound),
-  clear: (ctx) => spanClear(ctx.state),
+  clear: (ctx) => spanClear(ctx.state, ctx.config),
   applyPreset,
 };

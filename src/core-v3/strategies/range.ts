@@ -47,7 +47,7 @@ function selectDay(ctx: SelectionContext, date: CalendarDate): ReduceResult {
   const lengthRejection = validateSpanLength(range, ctx.config);
   if (lengthRejection) return rejected(ctx.state, lengthRejection); // keep anchor
 
-  return commitSpan(ctx.state, [range], timesFor(ctx));
+  return commitSpan(ctx.state, [range], timesFor(ctx), ctx.config);
 }
 
 function applyPreset(
@@ -57,13 +57,13 @@ function applyPreset(
   if (preset.kind !== "range") return noChange(ctx.state);
   const lengthRejection = validateSpanLength(preset.range, ctx.config);
   if (lengthRejection) return rejected(ctx.state, lengthRejection);
-  return commitSpan(ctx.state, [preset.range], timesFor(ctx));
+  return commitSpan(ctx.state, [preset.range], timesFor(ctx), ctx.config);
 }
 
 export const rangeStrategy: SelectionStrategy = {
   selectDay,
   setTime: (ctx, time, bound) =>
     spanSetTime(ctx.state, ctx.config, time, bound),
-  clear: (ctx) => spanClear(ctx.state),
+  clear: (ctx) => spanClear(ctx.state, ctx.config),
   applyPreset,
 };
