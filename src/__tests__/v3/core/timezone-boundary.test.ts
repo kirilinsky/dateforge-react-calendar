@@ -120,4 +120,12 @@ describe("today", () => {
     const tz = "America/New_York";
     expect(today(tz)).toEqual(toCalendarDateTime(new Date(), tz).date);
   });
+
+  it("falls back to the system zone for invalid time zones", () => {
+    const instant = new Date(Date.UTC(2026, 5, 5, 12, 0, 0));
+    expect(toCalendarDateTime(instant, "Mars/Phobos")).toEqual(
+      toCalendarDateTime(instant),
+    );
+    expect(() => today("Mars/Phobos")).not.toThrow();
+  });
 });

@@ -4,6 +4,7 @@ import {
   compareDate,
   dateKey,
   daysInMonth,
+  isValidDate,
 } from "../calendar-date";
 import type { CalendarDateTime } from "../calendar-date-time";
 import {
@@ -31,6 +32,7 @@ export function validateDay(
   date: CalendarDate,
   config: CalendarConfig,
 ): ValidationResult | null {
+  if (!isValidDate(date)) return invalid("malformed-input");
   if (config.disabled.matches(date)) return invalid("disabled");
   if (config.min && compareDate(date, config.min) < 0)
     return invalid("before-min");

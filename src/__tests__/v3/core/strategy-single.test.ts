@@ -115,6 +115,16 @@ describe("invariants", () => {
       (after.effects[0] as { result: { reason: string } }).result.reason,
     ).toBe("after-max");
   });
+
+  it("rejects malformed dates before committing", () => {
+    const cfg = config();
+    const s = start(cfg);
+    const r = reduce(s, { type: "selectDay", date: D(2026, 13, 1) }, cfg);
+    expect(r.state).toBe(s);
+    expect((r.effects[0] as { result: { reason: string } }).result.reason).toBe(
+      "malformed-input",
+    );
+  });
 });
 
 describe("time", () => {

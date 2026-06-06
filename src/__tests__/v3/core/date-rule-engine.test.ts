@@ -44,6 +44,13 @@ describe("weekends / weekdays mask", () => {
     expect(e.matches(D(2026, 6, 3))).toBe(true); // Wed
     expect(e.matches(D(2026, 6, 2))).toBe(false); // Tue
   });
+
+  it("accepts a precomputed weekday hint for grid cells", () => {
+    const e = compileDateRules({ weekends: true });
+    expect(e.matches(D(2026, 6, 6), 6)).toBe(true); // Sat
+    expect(e.matches(D(2026, 6, 5), 5)).toBe(false); // Fri
+    expect(e.getReason(D(2026, 6, 6), 6)).toBe("weekday");
+  });
 });
 
 describe("dates (exact Set)", () => {
