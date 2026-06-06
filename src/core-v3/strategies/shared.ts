@@ -1,4 +1,5 @@
 import {
+  addDays,
   type CalendarDate,
   calendarDate,
   compareDate,
@@ -116,6 +117,28 @@ export function validateSpanLength(
     return invalid("range-too-short");
   if (config.maxSpan !== undefined && len > config.maxSpan)
     return invalid("range-too-long");
+  return null;
+}
+
+/**
+ * A user-drawn day range may not step over a disabled day: the second endpoint
+ * lands past a blocked day, so the span is rejected (keeping the anchor). This
+ * applies to `unit:"day"` only — week/month units are atomic, so a disabled day
+ * inside a selected week/month is not a "crossing" and must not reject the unit.
+ * Returns the rejection reason, or `null` when the span is clear.
+ */
+export function validateRangeCrossing(
+  range: CalendarRange,
+  config: CalendarConfig,
+): ValidationResult | null {
+  if (config.unit !== "day" || config.disabled.isEmpty) return null;
+  for (
+    let cur = range.start;
+    compareDate(cur, range.end) <= 0;
+    cur = addDays(cur, 1)
+  ) {
+    if (config.disabled.matches(cur)) return invalid("range-crosses-disabled");
+  }
   return null;
 }
 

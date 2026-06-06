@@ -22,6 +22,7 @@ import {
   spanSetTime,
   unitSnap,
   validateDay,
+  validateRangeCrossing,
   validateSpanLength,
 } from "./shared";
 
@@ -56,6 +57,9 @@ function addRange(ctx: SelectionContext, range: CalendarRange): ReduceResult {
 
   const lengthRejection = validateSpanLength(range, ctx.config);
   if (lengthRejection) return rejected(ctx.state, lengthRejection);
+
+  const crossing = validateRangeCrossing(range, ctx.config);
+  if (crossing) return rejected(ctx.state, crossing);
 
   const next = mergeRanges([...sel.ranges, range]);
   const maxRejection = countRejection(next, ctx.config);

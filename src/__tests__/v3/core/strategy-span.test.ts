@@ -173,6 +173,66 @@ describe("range (week · range) snaps endpoints to whole weeks", () => {
   });
 });
 
+describe("disabled range crossing", () => {
+  it("rejects a day range that steps over a disabled day, keeping the anchor", () => {
+    const cfg = config("day", "range", {
+      disabled: compileDateRules({ weekends: true }),
+    });
+    const s = reduce(
+      start(cfg),
+      { type: "selectDay", date: D(2026, 6, 5) }, // Fri, valid anchor
+      cfg,
+    ).state;
+    const r = reduce(s, { type: "selectDay", date: D(2026, 6, 9) }, cfg); // crosses Sat/Sun
+    expect((r.effects[0] as { result: { reason: string } }).result.reason).toBe(
+      "range-crosses-disabled",
+    );
+    expect(spans(r.state)).toEqual([]);
+    expect(anchor(r.state)).toEqual(D(2026, 6, 5)); // anchor kept
+  });
+
+  it("allows a day range with no disabled day inside", () => {
+    const cfg = config("day", "range", {
+      disabled: compileDateRules({ weekends: true }),
+    });
+    const s = reduce(
+      start(cfg),
+      { type: "selectDay", date: D(2026, 6, 8) }, // Mon
+      cfg,
+    ).state;
+    const r = reduce(s, { type: "selectDay", date: D(2026, 6, 10) }, cfg); // Mon-Wed, clean
+    expect(spans(r.state)).toEqual([[20260608, 20260610]]);
+  });
+
+  it("does NOT reject a week unit that contains disabled days (atomic)", () => {
+    const cfg = config("week", "single", {
+      disabled: compileDateRules({ weekends: true }),
+    });
+    const r = reduce(
+      start(cfg),
+      { type: "selectDay", date: D(2026, 6, 3) }, // Wed -> whole week Jun 1-7
+      cfg,
+    );
+    expect(spans(r.state)).toEqual([[20260601, 20260607]]);
+  });
+
+  it("rejects a crossing span in multi-range too", () => {
+    const cfg = config("day", "multi-range", {
+      disabled: compileDateRules({ weekends: true }),
+    });
+    const s = reduce(
+      start(cfg),
+      { type: "selectDay", date: D(2026, 6, 5) },
+      cfg,
+    ).state;
+    const r = reduce(s, { type: "selectDay", date: D(2026, 6, 9) }, cfg);
+    expect((r.effects[0] as { result: { reason: string } }).result.reason).toBe(
+      "range-crosses-disabled",
+    );
+    expect(spans(r.state)).toEqual([]);
+  });
+});
+
 describe("disabled endpoints", () => {
   it("rejects a disabled day before arming or committing", () => {
     const cfg = config("day", "range", {
@@ -357,13 +417,12 @@ describe("multi-range", () => {
     expect(spans(r.state)).toEqual([]);
   });
 
-  it("removes a disabled day from an existing span", () => {
-    const cfg = config("day", "multi-range", {
-      disabled: compileDateRules({ dates: [D(2026, 6, 7)] }),
-    });
-    // build span via preset so the disabled day lands inside it
+  it("removes a day that became disabled after the span was committed", () => {
+    // Span built with no disabled rule (a crossing span can't be created once
+    // a day inside it is disabled).
+    const cleanCfg = config("day", "multi-range");
     const s = reduce(
-      start(cfg),
+      start(cleanCfg),
       {
         type: "applyPreset",
         result: {
@@ -371,10 +430,18 @@ describe("multi-range", () => {
           range: { start: D(2026, 6, 5), end: D(2026, 6, 10) },
         },
       },
-      cfg,
+      cleanCfg,
     ).state;
-    // clicking the disabled day still removes it (removal before validation)
-    const r = reduce(s, { type: "selectDay", date: D(2026, 6, 7) }, cfg);
+    // Config now disables Jun 7 (e.g. controlled prop change). Clicking it still
+    // removes it — removal runs before disabled/min-max validation.
+    const disabledCfg = config("day", "multi-range", {
+      disabled: compileDateRules({ dates: [D(2026, 6, 7)] }),
+    });
+    const r = reduce(
+      s,
+      { type: "selectDay", date: D(2026, 6, 7) },
+      disabledCfg,
+    );
     expect(spans(r.state)).toEqual([
       [20260605, 20260606],
       [20260608, 20260610],
