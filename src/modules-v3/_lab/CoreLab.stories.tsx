@@ -32,6 +32,7 @@ import {
   normalizeTime,
 } from "@/core-v3/calendar-time";
 import { compileDateRules } from "@/core-v3/date-rule-engine";
+import { type LabelKey, resolveLabel } from "@/core-v3/labels";
 import { buildMonthGrid } from "@/core-v3/month-grid";
 import {
   commonPresets,
@@ -870,6 +871,93 @@ function PresetBlock() {
   );
 }
 
+const LABEL_KEYS: LabelKey[] = [
+  "apply",
+  "changeMonth",
+  "currentDay",
+  "showMoreSelectedDates",
+  "yearGrid",
+];
+
+function LabelBlock() {
+  const [key, setKey] = useState<LabelKey>("changeMonth");
+  const [root, setRoot] = useState("");
+  const [moduleOverride, setModuleOverride] = useState("");
+  const [param, setParam] = useState("June");
+
+  // The {placeholder} this key uses (first one), for a live param.
+  const sources = {
+    root: root ? { [key]: root } : undefined,
+    module: moduleOverride ? { [key]: moduleOverride } : undefined,
+  };
+  // Feed common placeholder names so any selected key interpolates.
+  const params = {
+    month: param,
+    day: param,
+    year: param,
+    count: param,
+    from: param,
+    to: param,
+    time: param,
+  };
+  const resolved = resolveLabel(key, sources, params);
+  const winner = moduleOverride ? "module" : root ? "root" : "default";
+
+  return (
+    <div style={{ ...card, maxWidth: 420 }}>
+      <strong>Label registry · module → root → default</strong>
+
+      <label style={row}>
+        <span style={{ width: 64, color: "#666" }}>key</span>
+        <select
+          value={key}
+          onChange={(e) => setKey(e.target.value as LabelKey)}
+        >
+          {LABEL_KEYS.map((k) => (
+            <option key={k} value={k}>
+              {k}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label style={row}>
+        <span style={{ width: 64, color: "#666" }}>root</span>
+        <input
+          value={root}
+          placeholder="(no root override)"
+          onChange={(e) => setRoot(e.target.value)}
+          style={{ flex: 1, padding: "4px 6px" }}
+        />
+      </label>
+      <label style={row}>
+        <span style={{ width: 64, color: "#666" }}>module</span>
+        <input
+          value={moduleOverride}
+          placeholder="(no module override)"
+          onChange={(e) => setModuleOverride(e.target.value)}
+          style={{ flex: 1, padding: "4px 6px" }}
+        />
+      </label>
+      <label style={row}>
+        <span style={{ width: 64, color: "#666" }}>param</span>
+        <input
+          value={param}
+          onChange={(e) => setParam(e.target.value)}
+          style={{ flex: 1, padding: "4px 6px" }}
+        />
+      </label>
+
+      <div style={{ ...row, justifyContent: "space-between" }}>
+        <span style={{ fontSize: 16 }}>{resolved}</span>
+        <span style={{ ...tag(true), background: "#eef", color: "#3344aa" }}>
+          {winner}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 const meta: Meta<typeof CalendarDateBlock> = {
   title: "v3/Core Lab",
   component: CalendarDateBlock,
@@ -910,4 +998,9 @@ export const RuleEngine: Story = {
 /** Phase C · step 2 — preset engine: mode-aware status + disabled validation. */
 export const PresetEngine: Story = {
   render: () => <PresetBlock />,
+};
+
+/** Phase C · step 3 — label registry: module → root → default + interpolation. */
+export const LabelRegistry: Story = {
+  render: () => <LabelBlock />,
 };
