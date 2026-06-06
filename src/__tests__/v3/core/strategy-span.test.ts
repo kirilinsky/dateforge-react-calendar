@@ -210,3 +210,20 @@ describe("clear", () => {
     expect(r.effects[0].type).toBe("notify");
   });
 });
+
+describe("range time", () => {
+  it("rejects malformed time edits", () => {
+    const cfg = config("day", "range", { withTime: true });
+    let s = reduce(
+      start(cfg),
+      { type: "selectDay", date: D(2026, 6, 5) },
+      cfg,
+    ).state;
+    s = reduce(s, { type: "selectDay", date: D(2026, 6, 9) }, cfg).state;
+    const r = reduce(s, { type: "setTime", time: { ...MIDNIGHT, hour: 24 } }, cfg);
+    expect(r.state).toBe(s);
+    expect((r.effects[0] as { result: { reason: string } }).result.reason).toBe(
+      "malformed-input",
+    );
+  });
+});

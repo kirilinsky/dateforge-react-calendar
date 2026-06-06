@@ -11,7 +11,7 @@ import {
   rangeLengthDays,
   weekRange,
 } from "../calendar-range";
-import type { CalendarTime } from "../calendar-time";
+import { type CalendarTime, isValidTime } from "../calendar-time";
 import { noChange, type ReduceResult, result } from "../effects";
 import type {
   CalendarConfig,
@@ -169,6 +169,7 @@ export function spanSetTime(
   if (!config.withTime || sel.shape !== "span" || sel.ranges.length === 0) {
     return noChange(state);
   }
+  if (!isValidTime(time)) return rejected(state, invalid("malformed-input"));
   const from = bound === "to" ? sel.fromTime : time;
   const to = bound === "from" ? sel.toTime : time;
   return commitSpan(state, [...sel.ranges], { from, to });
