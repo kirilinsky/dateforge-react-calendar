@@ -2,6 +2,7 @@ import {
   createContext,
   type ReactNode,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -9,7 +10,12 @@ import {
 import type { CalendarDate } from "../core-v3/calendar-date";
 import type { CalendarTime } from "../core-v3/calendar-time";
 import type { PresetResult } from "../core-v3/preset-engine";
-import { type AnyCalendarValue, toPublicValue } from "../core-v3/public-value";
+import {
+  type AnyCalendarValue,
+  fromPublicValue,
+  serializeValue,
+  toPublicValue,
+} from "../core-v3/public-value";
 import {
   type CalendarConfig,
   createInitialState,
@@ -29,6 +35,12 @@ import { type CalendarStore, createCalendarStore } from "./store";
 export type CalendarProviderProps = {
   /** Compiled, static config (engines compiled, locale resolved). */
   config: CalendarConfig;
+  /**
+   * Controlled value. When provided (including `null` = empty), the host owns
+   * the selection: changes are synced into the store and `onChange` reports the
+   * host's intent. Omit (`undefined`) for uncontrolled use with `defaultSelection`.
+   */
+  value?: AnyCalendarValue;
   /** Seeded selection for uncontrolled use (defaultValue). */
   defaultSelection?: SelectionState;
   /** Initial view anchor. Defaults to today in the configured zone. */
@@ -51,6 +63,7 @@ type Callbacks = Pick<
 
 export function CalendarProvider({
   config,
+  value,
   defaultSelection,
   initialView,
   onChange,
@@ -64,12 +77,17 @@ export function CalendarProvider({
   callbacks.current.onViewChange = onViewChange;
   callbacks.current.onValidationReject = onValidationReject;
 
+  const controlled = value !== undefined;
+
   const [store] = useState<CalendarStore>(() =>
     createCalendarStore(
       config,
       createInitialState(config, {
         view: initialView ?? today(config.timeZone),
-        selection: defaultSelection,
+        // Controlled mount seeds from `value`; otherwise from `defaultSelection`.
+        selection: controlled
+          ? fromPublicValue(value, config)
+          : defaultSelection,
       }),
       (effect, state) => {
         const cb = callbacks.current;
@@ -89,6 +107,23 @@ export function CalendarProvider({
       },
     ),
   );
+
+  // Controlled sync: when the host's value changes (by serialized identity, not
+  // object reference), replace the store's selection without echoing onChange.
+  const valueKey = controlled ? serializeValue(value) : null;
+  const firstSync = useRef(true);
+  useEffect(() => {
+    if (!controlled) return;
+    // Mount already seeded the store from `value`; skip the first run.
+    if (firstSync.current) {
+      firstSync.current = false;
+      return;
+    }
+    store.dispatch({
+      type: "syncExternal",
+      selection: fromPublicValue(value, config),
+    });
+  }, [valueKey]);
 
   return (
     <StoreContext.Provider value={store}>{children}</StoreContext.Provider>

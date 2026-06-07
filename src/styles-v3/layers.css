@@ -1,0 +1,51 @@
+/*
+ * v3 cascade foundation. The layer ORDER is declared once, up front, so every
+ * later rule (themes, appearances, modules, user overrides) lands in a
+ * predictable place regardless of import order. Themes set `--c-*` tokens in
+ * `cal-themes`; the neutral defaults here keep an unthemed calendar legible.
+ *
+ * No `!important` anywhere — raise specificity or restructure instead
+ * (enforced by scripts/check-css-important.mjs).
+ */
+@layer cal-base, cal-themes, cal-appearances, cal-modules, cal-user;
+
+@layer cal-base {
+  [data-dateforge-root] {
+    /* Neutral token defaults; a theme overrides these in cal-themes. */
+    --c-accent: #1a73e8;
+    --c-range: #1a73e8;
+    --c-activeText: #ffffff;
+    --c-text: #1f2024;
+    --c-mutedText: #8a8f98;
+    --c-disabledText: #c4c7cc;
+    --c-backdrop: #ffffff;
+    --c-highlight: #eef1f7;
+    --c-stroke: #d0d3d9;
+    --c-weekend: #f6f7fa;
+    --c-outOfMonth: #b9bdc4;
+    --c-todayDot: #b06000;
+
+    box-sizing: border-box;
+    container-type: inline-size;
+    container-name: cal-root;
+    display: grid;
+    gap: var(--c-gap, 8px);
+    inline-size: 100%;
+    padding: var(--c-pad, 12px);
+    border: 1px solid var(--c-stroke);
+    border-radius: var(--c-radius, 12px);
+    background: var(--c-backdrop);
+    color: var(--c-text);
+    font-family: var(--c-font, system-ui, -apple-system, sans-serif);
+  }
+
+  [data-dateforge-root] *,
+  [data-dateforge-root] *::before,
+  [data-dateforge-root] *::after {
+    box-sizing: border-box;
+  }
+
+  [data-dateforge-root][data-readonly] {
+    cursor: default;
+  }
+}

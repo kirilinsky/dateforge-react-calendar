@@ -1,6 +1,7 @@
 import type { CalendarDate } from "./calendar-date";
 import type { CalendarTime } from "./calendar-time";
 import type { PresetResult } from "./preset-engine";
+import type { SelectionState } from "./state";
 
 /**
  * Every way state can change. A flat, serializable discriminated union — no
@@ -28,6 +29,12 @@ export type CalendarAction =
   /** Remove one point selection (multiple mode). */
   | { type: "removeDate"; date: CalendarDate }
   /** Remove one logical span by index (multi-range mode). */
-  | { type: "removeRange"; index: number };
+  | { type: "removeRange"; index: number }
+  /**
+   * Replace the selection from a controlled `value` change. Updates state (so
+   * subscribers re-render) but emits NO `notify` — the new value came from the
+   * host, echoing `onChange` would loop.
+   */
+  | { type: "syncExternal"; selection: SelectionState };
 
 export type CalendarActionType = CalendarAction["type"];

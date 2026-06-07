@@ -44,6 +44,10 @@ export function reduce(
     case "focus":
       return setFocus(state, action.date);
 
+    case "syncExternal":
+      // Controlled value changed: swap the selection, no notify (host-driven).
+      return noChange({ ...state, selection: action.selection });
+
     case "selectDay":
     case "setTime":
     case "clear":

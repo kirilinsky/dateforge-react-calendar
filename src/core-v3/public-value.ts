@@ -1,10 +1,11 @@
 import { type CalendarDateTime, calendarDateTime } from "./calendar-date-time";
-import type { CalendarRange } from "./calendar-range";
+import { type CalendarRange, mergeRanges } from "./calendar-range";
 import { MIDNIGHT } from "./calendar-time";
 import { applyExclusionAll, combineCuts } from "./segment";
 import type { SelectionMode, SelectionUnit } from "./selection-types";
 import type { CalendarConfig, SelectionState, SpanSelection } from "./state";
-import { fromCalendarDateTime } from "./timezone-boundary";
+import { selectionShape } from "./state";
+import { fromCalendarDateTime, toCalendarDateTime } from "./timezone-boundary";
 
 /**
  * The public boundary value — what `onChange` emits and `value` accepts.
@@ -126,4 +127,81 @@ export function toPublicValue(
   // to the lone range (or null) so the no-exclude case stays `{ start, end }`.
   if (segments.length === 0) return null;
   return segments.length === 1 ? segments[0] : segments;
+}
+
+/**
+ * Stable string key for a public value — used by the controlled adapter to tell
+ * whether `value` really changed before re-syncing the store (the host often
+ * passes a fresh array/object identity each render). Order-sensitive by design.
+ */
+export function serializeValue(value: AnyCalendarValue): string {
+  if (value === null) return "";
+  if (value instanceof Date) return String(value.getTime());
+  if (Array.isArray(value)) {
+    return value
+      .map((item) =>
+        item instanceof Date
+          ? String(item.getTime())
+          : `${item.start.getTime()}_${item.end.getTime()}`,
+      )
+      .join("|");
+  }
+  return `${value.start.getTime()}_${value.end.getTime()}`;
+}
+
+/** Normalize the loose `SpanValue` runtime shapes into an array of ranges. */
+function spanValueToRanges(value: AnyCalendarValue): readonly PublicRange[] {
+  if (value === null) return [];
+  if (Array.isArray(value)) return value as PublicRange[];
+  // A lone PublicRange (range / week-month single without exclusion).
+  return [value as PublicRange];
+}
+
+/**
+ * Inverse of {@link toPublicValue}: parse a public `Date`-based value into the
+ * internal selection for the configured unit × mode. The boundary adapter for
+ * controlled mode — `value` in, state out, no callbacks.
+ *
+ * Not a perfect round-trip when `exclude`/`disabled` are active: the emitted
+ * value is already segmented, so the rebuilt selection holds those segments
+ * rather than the original logical span. Re-emitting is idempotent (the grid and
+ * value stay consistent), so controlled round-trips are visually stable.
+ */
+export function fromPublicValue(
+  value: AnyCalendarValue,
+  config: CalendarConfig,
+): SelectionState {
+  const timeZone = config.timeZone;
+  const shape = selectionShape(config.unit, config.mode);
+
+  if (shape === "point") {
+    const dates =
+      config.mode === "multiple"
+        ? ((value as Date[] | null) ?? [])
+        : value
+          ? [value as Date]
+          : [];
+    return {
+      shape: "point",
+      dates: dates.map((d) => toCalendarDateTime(d, timeZone)),
+    };
+  }
+
+  const publicRanges = spanValueToRanges(value);
+  const bounds = publicRanges.map((r) => ({
+    start: toCalendarDateTime(r.start, timeZone),
+    end: toCalendarDateTime(r.end, timeZone),
+  }));
+  const ranges = mergeRanges(
+    bounds.map((b) => ({ start: b.start.date, end: b.end.date })),
+  );
+
+  // One pair of time bounds per span selection: first start, last end.
+  const withTime = config.withTime && bounds.length > 0;
+  return {
+    shape: "span",
+    ranges,
+    fromTime: withTime ? bounds[0].start.time : undefined,
+    toTime: withTime ? bounds[bounds.length - 1].end.time : undefined,
+  };
 }
