@@ -1,0 +1,63 @@
+import { render, within } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+import { calendarDate } from "@/core-v3/calendar-date";
+import { MIDNIGHT } from "@/core-v3/calendar-time";
+import { compileDateRules } from "@/core-v3/date-rule-engine";
+import type { CalendarConfig } from "@/core-v3/state";
+import { CalendarDays } from "@/modules-v3/days/CalendarDays";
+import { Calendar } from "@/react-v3/calendar";
+
+const D = (y: number, m: number, d: number) => calendarDate(y, m, d);
+
+function config(over: Partial<CalendarConfig> = {}): CalendarConfig {
+  return {
+    unit: "day",
+    mode: "single",
+    firstDayOfWeek: 1,
+    readOnly: false,
+    withTime: false,
+    defaultTime: MIDNIGHT,
+    excludedEndpointPolicy: "snap-inward",
+    disabled: compileDateRules(),
+    exclude: compileDateRules(),
+    ...over,
+  };
+}
+
+describe("Calendar root", () => {
+  it("renders the shell with theme + testid and wraps the store", () => {
+    const { getByTestId } = render(
+      <Calendar config={config()} initialView={D(2026, 6, 1)} theme="noir">
+        <CalendarDays />
+      </Calendar>,
+    );
+    const root = getByTestId("dateforge-calendar");
+    expect(root.getAttribute("data-dateforge-root")).toBe("");
+    expect(root.getAttribute("data-theme")).toBe("noir");
+    expect(within(root).getAllByRole("gridcell")).toHaveLength(42);
+  });
+
+  it("defaults theme to auto and omits data-readonly when writable", () => {
+    const { getByTestId } = render(
+      <Calendar config={config()} initialView={D(2026, 6, 1)}>
+        <CalendarDays />
+      </Calendar>,
+    );
+    const root = getByTestId("dateforge-calendar");
+    expect(root.getAttribute("data-theme")).toBe("auto");
+    expect(root.getAttribute("data-readonly")).toBeNull();
+  });
+
+  it("marks data-readonly for a read-only config", () => {
+    const { getByTestId } = render(
+      <Calendar
+        config={config({ readOnly: true })}
+        initialView={D(2026, 6, 1)}
+        data-testid="cal"
+      >
+        <CalendarDays />
+      </Calendar>,
+    );
+    expect(getByTestId("cal").getAttribute("data-readonly")).toBe("");
+  });
+});

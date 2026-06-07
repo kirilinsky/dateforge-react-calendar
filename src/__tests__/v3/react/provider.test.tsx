@@ -1,10 +1,10 @@
-import { act, renderHook } from "@testing-library/react";
+import { act, render, renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { calendarDate } from "@/core-v3/calendar-date";
 import { MIDNIGHT } from "@/core-v3/calendar-time";
 import { compileDateRules } from "@/core-v3/date-rule-engine";
-import type { PublicRange } from "@/core-v3/public-value";
+import type { AnyCalendarValue, PublicRange } from "@/core-v3/public-value";
 import type { SelectionMode, SelectionUnit } from "@/core-v3/selection-types";
 import type { CalendarConfig } from "@/core-v3/state";
 import {
@@ -146,5 +146,68 @@ describe("CalendarProvider", () => {
     expect(() => renderHook(() => useCalendarStore())).toThrow(
       /within a CalendarProvider/,
     );
+  });
+});
+
+describe("CalendarProvider · controlled", () => {
+  function PointCount() {
+    const store = useCalendarStore();
+    const count = useStoreSelector(store, (s) =>
+      s.selection.shape === "point" ? s.selection.dates.length : 0,
+    );
+    return <div data-testid="count">{count}</div>;
+  }
+
+  function Harness({
+    value,
+    onChange,
+  }: {
+    value: AnyCalendarValue;
+    onChange?: (v: AnyCalendarValue) => void;
+  }) {
+    return (
+      <CalendarProvider
+        config={config("day", "single")}
+        initialView={D(2026, 6, 1)}
+        value={value}
+        onChange={onChange}
+      >
+        <PointCount />
+      </CalendarProvider>
+    );
+  }
+
+  it("seeds the selection from a controlled value", () => {
+    const { getByTestId } = render(<Harness value={new Date(2026, 5, 5)} />);
+    expect(getByTestId("count").textContent).toBe("1");
+  });
+
+  it("syncs the store when the controlled value changes", () => {
+    const { getByTestId, rerender } = render(<Harness value={null} />);
+    expect(getByTestId("count").textContent).toBe("0");
+
+    rerender(<Harness value={new Date(2026, 5, 5)} />);
+    expect(getByTestId("count").textContent).toBe("1");
+
+    rerender(<Harness value={null} />);
+    expect(getByTestId("count").textContent).toBe("0");
+  });
+
+  it("does not echo onChange while syncing a controlled value", () => {
+    const onChange = vi.fn();
+    const { rerender } = render(
+      <Harness value={new Date(2026, 5, 5)} onChange={onChange} />,
+    );
+    rerender(<Harness value={new Date(2026, 5, 9)} onChange={onChange} />);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("ignores a re-render with an equal value (no redundant sync)", () => {
+    const { getByTestId, rerender } = render(
+      <Harness value={new Date(2026, 5, 5)} />,
+    );
+    // Fresh Date object, same instant -> serialized key unchanged.
+    rerender(<Harness value={new Date(2026, 5, 5)} />);
+    expect(getByTestId("count").textContent).toBe("1");
   });
 });

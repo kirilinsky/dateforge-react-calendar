@@ -193,4 +193,18 @@ describe("selection routing", () => {
     ).toEqual(calendarDate(2026, 6, 5));
     expect(r.effects).toHaveLength(0);
   });
+
+  it("syncExternal swaps the selection without emitting notify", () => {
+    const next = {
+      shape: "point" as const,
+      dates: [{ date: calendarDate(2026, 6, 9), time: MIDNIGHT }],
+    };
+    const r = reduce(
+      base(),
+      { type: "syncExternal", selection: next },
+      config(),
+    );
+    expect(r.state.selection).toBe(next);
+    expect(r.effects).toHaveLength(0); // host-driven: no echo
+  });
 });

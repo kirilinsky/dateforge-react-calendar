@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest";
 import { calendarDate } from "@/core-v3/calendar-date";
 import { MIDNIGHT } from "@/core-v3/calendar-time";
 import { compileDateRules } from "@/core-v3/date-rule-engine";
-import { type PublicRange, toPublicValue } from "@/core-v3/public-value";
+import {
+  fromPublicValue,
+  type PublicRange,
+  toPublicValue,
+} from "@/core-v3/public-value";
 import type { SelectionMode, SelectionUnit } from "@/core-v3/selection-types";
 import type {
   CalendarConfig,
@@ -212,5 +216,80 @@ describe("toPublicValue · time bounds", () => {
     ) as PublicRange;
     expect(v.start.getTime()).toBe(new Date(2026, 5, 5, 9, 30).getTime());
     expect(v.end.getTime()).toBe(new Date(2026, 5, 9, 17, 0).getTime());
+  });
+});
+
+describe("fromPublicValue", () => {
+  const jsDate = (y: number, m: number, d: number, h = 0, min = 0) =>
+    new Date(y, m - 1, d, h, min);
+
+  it("parses a single Date into a point selection", () => {
+    const cfg = config("day", "single");
+    const sel = fromPublicValue(jsDate(2026, 6, 5), cfg);
+    expect(sel.shape).toBe("point");
+    if (sel.shape !== "point") throw new Error("point");
+    expect(sel.dates).toHaveLength(1);
+    expect(sel.dates[0].date).toEqual(D(2026, 6, 5));
+  });
+
+  it("parses null/[] into empty selections", () => {
+    expect(fromPublicValue(null, config("day", "single"))).toEqual({
+      shape: "point",
+      dates: [],
+    });
+    expect(fromPublicValue([], config("day", "multiple"))).toEqual({
+      shape: "point",
+      dates: [],
+    });
+    expect(fromPublicValue(null, config("day", "range"))).toMatchObject({
+      shape: "span",
+      ranges: [],
+    });
+  });
+
+  it("parses a lone range and an array of ranges", () => {
+    const single = fromPublicValue(
+      { start: jsDate(2026, 6, 5), end: jsDate(2026, 6, 9) },
+      config("day", "range"),
+    );
+    expect(single).toMatchObject({
+      shape: "span",
+      ranges: [{ start: D(2026, 6, 5), end: D(2026, 6, 9) }],
+    });
+
+    const multi = fromPublicValue(
+      [
+        { start: jsDate(2026, 6, 5), end: jsDate(2026, 6, 7) },
+        { start: jsDate(2026, 6, 15), end: jsDate(2026, 6, 18) },
+      ],
+      config("day", "multi-range"),
+    );
+    if (multi.shape !== "span") throw new Error("span");
+    expect(multi.ranges).toHaveLength(2);
+  });
+
+  it("recovers time bounds when withTime", () => {
+    const sel = fromPublicValue(
+      { start: jsDate(2026, 6, 5, 9, 30), end: jsDate(2026, 6, 9, 17, 0) },
+      config("day", "range", { withTime: true }),
+    );
+    if (sel.shape !== "span") throw new Error("span");
+    expect(sel.fromTime).toMatchObject({ hour: 9, minute: 30 });
+    expect(sel.toTime).toMatchObject({ hour: 17, minute: 0 });
+  });
+
+  it("round-trips a point/multiple selection without exclusion", () => {
+    const cfg = config("day", "multiple");
+    const original = point({ d: D(2026, 6, 5) }, { d: D(2026, 6, 9) });
+    const back = fromPublicValue(toPublicValue(original, cfg), cfg);
+    expect(back).toEqual(original);
+  });
+
+  it("round-trips a range selection without exclusion", () => {
+    const cfg = config("day", "range");
+    const original = span([[D(2026, 6, 5), D(2026, 6, 9)]]);
+    const back = fromPublicValue(toPublicValue(original, cfg), cfg);
+    if (back.shape !== "span") throw new Error("span");
+    expect(back.ranges).toEqual([{ start: D(2026, 6, 5), end: D(2026, 6, 9) }]);
   });
 });

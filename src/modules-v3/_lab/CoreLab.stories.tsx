@@ -1,33 +1,26 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useMemo, useState, useSyncExternalStore } from "react";
-import { dateKey } from "@/core-v3/calendar-date";
+import { useMemo, useState } from "react";
 import { MIDNIGHT } from "@/core-v3/calendar-time";
 import { compileDateRules } from "@/core-v3/date-rule-engine";
-import {
-  buildDayLookup,
-  buildPreviewSegments,
-  DayFlag,
-  dayFlags,
-} from "@/core-v3/day-flags";
-import { buildMonthGrid } from "@/core-v3/month-grid";
-import { toPublicValue } from "@/core-v3/public-value";
+import type { AnyCalendarValue } from "@/core-v3/public-value";
 import type { SelectionMode, SelectionUnit } from "@/core-v3/selection-types";
-import { type CalendarConfig, createInitialState } from "@/core-v3/state";
+import type { CalendarConfig } from "@/core-v3/state";
 import { today } from "@/core-v3/timezone-boundary";
 import type { ValidationReason } from "@/core-v3/validation";
-import { createCalendarStore } from "@/react-v3/store";
+import { CalendarDays } from "@/modules-v3/days/CalendarDays";
+import { Calendar as CalendarRoot } from "@/react-v3/calendar";
+import { useCalendarActions, useCalendarStore } from "@/react-v3/provider";
+import { useStoreSelector } from "@/react-v3/use-store-selector";
 
 /**
- * v3 Core Lab — one universal harness for the whole core + adapter.
+ * v3 Core Lab — one universal harness running the real modules.
  *
- * A real interactive calendar wired to the framework-agnostic store: pick any
- * `unit × mode`, draw selections, and watch the public value (what `onChange`
- * would emit) and rejected actions update live. Day cells are styled straight
- * from the packed `dayFlags` bitmask — the same hot path the shipped Days
- * module will use. Dev-only; not a published component.
+ * `CalendarProvider` + `CalendarDays` on the v3 core: pick any `unit × mode`,
+ * draw selections, and watch the public value (`onChange`) and rejected actions
+ * update live. Cells are styled purely through the `data-*` attributes the Days
+ * module emits — the same escape hatch consumers get. Dev-only.
  */
 
-const WEEKDAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTH_NAMES = [
   "January",
   "February",
@@ -45,9 +38,7 @@ const MONTH_NAMES = [
 
 const UNITS: SelectionUnit[] = ["day", "week", "month"];
 const MODES: SelectionMode[] = ["single", "multiple", "range", "multi-range"];
-
-const ACCENT = "#1a73e8";
-const PREVIEW = "#bcd4f7";
+const WEEKDAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 type Options = {
   unit: SelectionUnit;
@@ -83,7 +74,7 @@ const card: React.CSSProperties = {
   font: "13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace",
   display: "grid",
   gap: 14,
-  maxWidth: 420,
+  maxWidth: 460,
 };
 const row: React.CSSProperties = {
   display: "flex",
@@ -93,69 +84,38 @@ const row: React.CSSProperties = {
 };
 const labelCol = { color: "#666", width: 96 } as React.CSSProperties;
 
-/** Per-cell visual style derived entirely from the packed bitmask. */
-function cellStyle(f: number): React.CSSProperties {
-  const inRange = (f & DayFlag.InRange) !== 0;
-  const selected = (f & DayFlag.Selected) !== 0;
-  const preview = (f & DayFlag.Preview) !== 0;
-  const disabled = (f & DayFlag.Disabled) !== 0;
-  const excluded = (f & DayFlag.Excluded) !== 0;
-  const today = (f & DayFlag.Today) !== 0;
-  const weekend = (f & DayFlag.Weekend) !== 0;
-  const outOfMonth = (f & DayFlag.OutOfMonth) !== 0;
-
-  // Edge-aware corner rounding for ranges and previews.
-  const edgeRadius = (start: boolean, end: boolean) =>
-    start && end ? "8px" : start ? "8px 0 0 8px" : end ? "0 8px 8px 0" : "0";
-
-  let background = "transparent";
-  let radius = "8px";
-  if (inRange) {
-    background = ACCENT;
-    radius = edgeRadius(
-      (f & DayFlag.RangeStart) !== 0,
-      (f & DayFlag.RangeEnd) !== 0,
-    );
-  } else if (preview) {
-    background = PREVIEW;
-    radius = edgeRadius(
-      (f & DayFlag.PreviewStart) !== 0,
-      (f & DayFlag.PreviewEnd) !== 0,
-    );
-  } else if (selected) {
-    background = ACCENT;
-  }
-
-  const onAccent = inRange || (selected && !preview);
-  return {
-    appearance: "none",
-    border: today ? "2px solid #b06000" : "2px solid transparent",
-    cursor: disabled ? "not-allowed" : "pointer",
-    padding: "8px 0",
-    background:
-      background === "transparent" && weekend ? "#f6f6fa" : background,
-    borderRadius: radius,
-    color: disabled
-      ? "#ccc"
-      : onAccent
-        ? "#fff"
-        : excluded
-          ? "#b06000"
-          : outOfMonth
-            ? "#bbb"
-            : "#222",
-    textDecoration: excluded ? "line-through" : "none",
-    fontWeight: onAccent ? 600 : 400,
-    opacity: disabled ? 0.6 : 1,
-    transition: "background 120ms ease, border-radius 120ms ease",
-  };
+function NavBar() {
+  const store = useCalendarStore();
+  const { navigateBy } = useCalendarActions();
+  const view = useStoreSelector(store, (s) => s.view.viewDate);
+  return (
+    <div style={{ ...row, justifyContent: "space-between" }}>
+      <button
+        type="button"
+        onClick={() => navigateBy("month", -1)}
+        style={{ padding: "4px 12px" }}
+      >
+        ‹
+      </button>
+      <span>
+        {MONTH_NAMES[view.month - 1]} {view.year}
+      </span>
+      <button
+        type="button"
+        onClick={() => navigateBy("month", 1)}
+        style={{ padding: "4px 12px" }}
+      >
+        ›
+      </button>
+    </div>
+  );
 }
 
 function fmtDate(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-function describeValue(v: unknown): string {
+function describeValue(v: AnyCalendarValue): string {
   if (v === null) return "null";
   if (v instanceof Date) return fmtDate(v);
   if (Array.isArray(v)) {
@@ -164,12 +124,11 @@ function describeValue(v: unknown): string {
       .map((x) =>
         x instanceof Date
           ? fmtDate(x)
-          : `${fmtDate((x as { start: Date }).start)} → ${fmtDate((x as { end: Date }).end)}`,
+          : `${fmtDate(x.start)} → ${fmtDate(x.end)}`,
       )
       .join(", ");
   }
-  const r = v as { start: Date; end: Date };
-  return `${fmtDate(r.start)} → ${fmtDate(r.end)}`;
+  return `${fmtDate(v.start)} → ${fmtDate(v.end)}`;
 }
 
 function Playground() {
@@ -181,67 +140,20 @@ function Playground() {
     excludeWeekends: false,
     withTime: false,
   });
+  const [value, setValue] = useState<AnyCalendarValue>(null);
   const [rejections, setRejections] = useState<ValidationReason[]>([]);
 
   const config = useMemo(() => buildConfig(opts), [opts]);
-
-  // A fresh store whenever the config changes (mode/unit/options switch).
-  const store = useMemo(
-    () =>
-      createCalendarStore(
-        config,
-        createInitialState(config, { view: today(config.timeZone) }),
-        (effect) => {
-          if (effect.type === "validationRejected" && !effect.result.ok) {
-            const { reason } = effect.result;
-            setRejections((prev) => [reason, ...prev].slice(0, 6));
-          }
-        },
-      ),
-    [config],
-  );
-
-  const state = useSyncExternalStore(store.subscribe, store.getState);
-
-  const view = state.view.viewDate;
-  const grid = useMemo(
-    () =>
-      buildMonthGrid({
-        year: view.year,
-        month: view.month,
-        firstDayOfWeek: config.firstDayOfWeek,
-      }),
-    [view.year, view.month, config.firstDayOfWeek],
-  );
-
-  // Selection digest: rebuilt only when the selection changes (rare). Pass
-  // exclude so the grid dribbles into the same segments the value emits.
-  const lookup = useMemo(
-    () => buildDayLookup(state.selection, config),
-    [state.selection, config],
-  );
-  // Preview segments: rebuilt on hover, once per move (handed to every cell),
-  // split by exclude so the preview shows the same holes as the committed span.
-  const preview = useMemo(
-    () =>
-      buildPreviewSegments(
-        state.selection,
-        config,
-        state.interaction.hoverDate,
-      ),
-    [state.selection, config, state.interaction.hoverDate],
-  );
-  const todayDate = useMemo(() => today(config.timeZone), [config.timeZone]);
-
-  const value = toPublicValue(state.selection, config);
+  const configKey = JSON.stringify(opts);
 
   const set = <K extends keyof Options>(key: K, v: Options[K]) => {
     setOpts((p) => ({ ...p, [key]: v }));
+    setValue(null);
     setRejections([]);
   };
 
   return (
-    <div style={{ ...card, maxWidth: 460 }}>
+    <div style={{ ...card, width: "100%", maxWidth: 960 }}>
       <strong>
         Calendar · {opts.unit} × {opts.mode}
       </strong>
@@ -308,89 +220,20 @@ function Playground() {
           />
           <span>exclude weekends</span>
         </label>
-        <label style={row}>
-          <input
-            type="checkbox"
-            checked={opts.withTime}
-            onChange={(e) => set("withTime", e.target.checked)}
-          />
-          <span>with time</span>
-        </label>
       </div>
 
-      <div style={{ ...row, justifyContent: "space-between" }}>
-        <button
-          type="button"
-          onClick={() =>
-            store.dispatch({ type: "navigateBy", step: "month", amount: -1 })
-          }
-          style={{ padding: "4px 12px" }}
-        >
-          ‹
-        </button>
-        <span>
-          {MONTH_NAMES[view.month - 1]} {view.year}
-        </span>
-        <button
-          type="button"
-          onClick={() =>
-            store.dispatch({ type: "navigateBy", step: "month", amount: 1 })
-          }
-          style={{ padding: "4px 12px" }}
-        >
-          ›
-        </button>
-      </div>
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(7, 1fr)",
-          gap: "2px 0",
+      <CalendarRoot
+        key={configKey}
+        config={config}
+        initialView={today(config.timeZone)}
+        onChange={setValue}
+        onValidationReject={(r) => {
+          if (!r.ok) setRejections((prev) => [r.reason, ...prev].slice(0, 6));
         }}
-        onMouseLeave={() => store.dispatch({ type: "hover", date: undefined })}
       >
-        {grid.weekdayOrder.map((w) => (
-          <div
-            key={w}
-            style={{ textAlign: "center", color: "#999", fontSize: 11 }}
-          >
-            {WEEKDAY_NAMES[w]}
-          </div>
-        ))}
-
-        {grid.weeks.flat().map((cell) => {
-          const f = dayFlags(
-            cell.date,
-            lookup,
-            config,
-            preview,
-            todayDate,
-            cell.inMonth,
-          );
-          return (
-            <button
-              type="button"
-              key={dateKey(cell.date)}
-              onClick={() =>
-                store.dispatch({ type: "selectDay", date: cell.date })
-              }
-              onMouseEnter={() =>
-                store.dispatch({ type: "hover", date: cell.date })
-              }
-              style={cellStyle(f)}
-            >
-              {cell.date.day}
-            </button>
-          );
-        })}
-      </div>
-
-      <div style={{ ...row, justifyContent: "space-between" }}>
-        <button type="button" onClick={() => store.dispatch({ type: "clear" })}>
-          clear
-        </button>
-      </div>
+        <NavBar />
+        <CalendarDays />
+      </CalendarRoot>
 
       <div style={{ display: "grid", gap: 4 }}>
         <span style={{ color: "#666" }}>public value (onChange):</span>
@@ -434,5 +277,5 @@ export default meta;
 
 type Story = StoryObj<typeof Playground>;
 
-/** The one universal harness — every unit × mode, live public value + rejections. */
+/** The one universal harness — real modules, every unit × mode, live value. */
 export const Calendar: Story = {};
