@@ -25,6 +25,8 @@
     --c-outOfMonth: #b9bdc4;
     --c-todayDot: #b06000;
 
+    /* Drives CSS light-dark() in themes; `scheme` prop narrows it below. */
+    color-scheme: light dark;
     box-sizing: border-box;
     container-type: inline-size;
     container-name: cal-root;
@@ -47,5 +49,13 @@
 
   [data-dateforge-root][data-readonly] {
     cursor: default;
+  }
+
+  /* `scheme` prop: force a side, or leave auto to follow the OS. */
+  [data-dateforge-root][data-scheme="light"] {
+    color-scheme: light;
+  }
+  [data-dateforge-root][data-scheme="dark"] {
+    color-scheme: dark;
   }
 }

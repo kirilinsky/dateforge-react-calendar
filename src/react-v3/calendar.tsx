@@ -1,4 +1,5 @@
 import "../styles-v3/layers.css";
+import "../styles-v3/themes.css";
 import { CalendarProvider, type CalendarProviderProps } from "./provider";
 
 /**
@@ -13,8 +14,10 @@ import { CalendarProvider, type CalendarProviderProps } from "./provider";
  * layer.
  */
 export type CalendarProps = CalendarProviderProps & {
-  /** Theme name, or `"auto"` to follow the OS. Rendered as `data-theme`. */
+  /** Theme family name (e.g. `"noir"`). Rendered as `data-theme`. */
   theme?: string;
+  /** Light/dark choice. `"auto"` (default) follows the OS via `color-scheme`. */
+  scheme?: "light" | "dark" | "auto";
   /** Extra class on the root shell (user escape hatch). */
   className?: string;
   /** Test handle on the root. Default `"dateforge-calendar"`. */
@@ -22,7 +25,8 @@ export type CalendarProps = CalendarProviderProps & {
 };
 
 export function Calendar({
-  theme = "auto",
+  theme = "noir",
+  scheme = "auto",
   className,
   "data-testid": testId = "dateforge-calendar",
   children,
@@ -34,6 +38,7 @@ export function Calendar({
       <div
         data-dateforge-root=""
         data-theme={theme}
+        data-scheme={scheme}
         data-readonly={readOnly ? "" : undefined}
         data-testid={testId}
         className={className}

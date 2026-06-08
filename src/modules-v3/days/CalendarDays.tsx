@@ -1,12 +1,13 @@
-import { memo, useMemo } from "react";
+import { memo, useEffect, useMemo, useRef } from "react";
 import type { CalendarDate } from "../../core-v3/calendar-date";
-import { dateKey } from "../../core-v3/calendar-date";
+import { calendarDate, dateKey, datesEqual } from "../../core-v3/calendar-date";
 import {
   buildDayLookup,
   buildPreviewSegments,
   DayFlag,
   dayFlags,
 } from "../../core-v3/day-flags";
+import { dayKeyboardTarget } from "../../core-v3/day-keyboard";
 import { buildMonthGrid } from "../../core-v3/month-grid";
 import { today } from "../../core-v3/timezone-boundary";
 import { dayDataAttrs } from "../../react-v3/day-attrs";
@@ -27,6 +28,8 @@ import styles from "./days.module.css";
 type DayCellProps = {
   date: CalendarDate;
   flags: number;
+  /** Roving tabindex: only the focus target is 0, the rest are -1. */
+  focusable: boolean;
   onSelect: (date: CalendarDate) => void;
   onHover: (date: CalendarDate) => void;
 };
@@ -34,6 +37,7 @@ type DayCellProps = {
 const DayCell = memo(function DayCell({
   date,
   flags,
+  focusable,
   onSelect,
   onHover,
 }: DayCellProps) {
@@ -42,7 +46,8 @@ const DayCell = memo(function DayCell({
     <button
       type="button"
       role="gridcell"
-      tabIndex={-1}
+      tabIndex={focusable ? 0 : -1}
+      data-date={dateKey(date)}
       className={styles.cell}
       {...dayDataAttrs(flags)}
       aria-disabled={disabled || undefined}
@@ -74,13 +79,15 @@ function useWeekdayLabels(order: readonly number[], locale?: string): string[] {
 export function CalendarDays() {
   const store = useCalendarStore();
   const config = store.getConfig();
-  const { selectDay, hover } = useCalendarActions();
+  const { selectDay, hover, focus, navigateTo } = useCalendarActions();
+  const gridRef = useRef<HTMLDivElement>(null);
 
   // Narrow subscriptions: navigation, commit, and hover each wake only the work
   // that depends on them.
   const viewDate = useStoreSelector(store, (s) => s.view.viewDate);
   const selection = useStoreSelector(store, (s) => s.selection);
   const hoverDate = useStoreSelector(store, (s) => s.interaction.hoverDate);
+  const focusDate = useStoreSelector(store, (s) => s.interaction.focusDate);
 
   const grid = useMemo(
     () =>
@@ -106,11 +113,59 @@ export function CalendarDays() {
 
   const weekdayLabels = useWeekdayLabels(grid.weekdayOrder, config.locale);
 
+  // The roving-tabindex target: the explicit focus, else today-in-view, else the
+  // first of the displayed month — so Tab always lands somewhere sensible.
+  const effectiveFocus = useMemo<CalendarDate>(() => {
+    if (focusDate) return focusDate;
+    if (
+      todayDate.year === viewDate.year &&
+      todayDate.month === viewDate.month
+    ) {
+      return todayDate;
+    }
+    return calendarDate(viewDate.year, viewDate.month, 1);
+  }, [focusDate, todayDate, viewDate.year, viewDate.month]);
+
+  // Move DOM focus to follow the focused day, but only when focus already lives
+  // inside the grid (a keyboard move) — never steal it on mount or commit.
+  useEffect(() => {
+    if (!focusDate) return;
+    const root = gridRef.current;
+    if (!root?.contains(document.activeElement)) return;
+    root
+      .querySelector<HTMLButtonElement>(`[data-date="${dateKey(focusDate)}"]`)
+      ?.focus();
+  }, [focusDate]);
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const result = dayKeyboardTarget(
+      e.key,
+      effectiveFocus,
+      config.firstDayOfWeek,
+    );
+    if (!result) return;
+    e.preventDefault();
+    if (result.kind === "select") {
+      selectDay(effectiveFocus);
+      return;
+    }
+    focus(result.date);
+    // Stepping out of the visible month brings that month into view.
+    if (
+      result.date.month !== viewDate.month ||
+      result.date.year !== viewDate.year
+    ) {
+      navigateTo(result.date);
+    }
+  };
+
   return (
     <div
+      ref={gridRef}
       role="grid"
       data-dateforge-days=""
       className={styles.grid}
+      onKeyDown={onKeyDown}
       onMouseLeave={() => hover(undefined)}
     >
       <div role="row" data-weekdays="" className={styles.row}>
@@ -139,6 +194,7 @@ export function CalendarDays() {
                 todayDate,
                 cell.inMonth,
               )}
+              focusable={datesEqual(cell.date, effectiveFocus)}
               onSelect={selectDay}
               onHover={hover}
             />
