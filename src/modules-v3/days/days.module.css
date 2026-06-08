@@ -39,8 +39,18 @@
       color 120ms ease;
   }
 
-  .cell:hover:not([data-disabled]) {
+  /* Hover on an empty cell: subtle highlight. */
+  .cell:hover:not([data-disabled]):not([data-in-range]):not([data-selected]):not(
+      [data-preview]
+    ) {
     background: var(--c-highlight, #eef1f7);
+  }
+
+  /* Hover on a filled cell: keep the fill, darken it a touch. */
+  .cell:is([data-in-range], [data-selected], [data-preview]):hover:not(
+      [data-disabled]
+    ) {
+    filter: brightness(0.93);
   }
 
   /* Out-of-month and weekend de-emphasis (only when not otherwise filled). */
@@ -66,12 +76,24 @@
     border-radius: 0 var(--c-day-radius, 8px) var(--c-day-radius, 8px) 0;
   }
 
-  /* Committed range / selected point. */
-  .cell[data-in-range],
+  /* Range middle: soft fill (a light tint of the accent), readable text. */
+  .cell[data-in-range] {
+    background: color-mix(
+      in srgb,
+      var(--c-range, var(--c-accent, #1a73e8)) 18%,
+      var(--c-backdrop, #fff)
+    );
+    color: var(--c-text, #222);
+    border-radius: 0;
+  }
+
+  /* Range endpoints + selected point: full accent, inverted text. They sit
+     after the middle rule so they override it on the start/end cells. */
+  .cell[data-range-start],
+  .cell[data-range-end],
   .cell[data-selected] {
     background: var(--c-range, var(--c-accent, #1a73e8));
     color: var(--c-activeText, #fff);
-    border-radius: 0;
   }
   .cell[data-range-start] {
     border-radius: var(--c-day-radius, 8px) 0 0 var(--c-day-radius, 8px);

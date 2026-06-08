@@ -37,15 +37,32 @@ describe("Calendar root", () => {
     expect(within(root).getAllByRole("gridcell")).toHaveLength(42);
   });
 
-  it("defaults theme to auto and omits data-readonly when writable", () => {
+  it("defaults theme/scheme and omits data-readonly when writable", () => {
     const { getByTestId } = render(
       <Calendar config={config()} initialView={D(2026, 6, 1)}>
         <CalendarDays />
       </Calendar>,
     );
     const root = getByTestId("dateforge-calendar");
-    expect(root.getAttribute("data-theme")).toBe("auto");
+    expect(root.getAttribute("data-theme")).toBe("noir");
+    expect(root.getAttribute("data-scheme")).toBe("auto");
     expect(root.getAttribute("data-readonly")).toBeNull();
+  });
+
+  it("reflects an explicit theme and scheme", () => {
+    const { getByTestId } = render(
+      <Calendar
+        config={config()}
+        initialView={D(2026, 6, 1)}
+        theme="meadow"
+        scheme="dark"
+      >
+        <CalendarDays />
+      </Calendar>,
+    );
+    const root = getByTestId("dateforge-calendar");
+    expect(root.getAttribute("data-theme")).toBe("meadow");
+    expect(root.getAttribute("data-scheme")).toBe("dark");
   });
 
   it("marks data-readonly for a read-only config", () => {

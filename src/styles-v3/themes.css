@@ -1,0 +1,72 @@
+/*
+ * v3 themes — color tokens in the `cal-themes` layer, so they override the
+ * neutral cal-base defaults but stay under cal-modules/cal-user.
+ *
+ * Each family ships ONE set of tokens using CSS `light-dark()`: the active side
+ * follows the root's `color-scheme` (set in layers.css from the `scheme` prop —
+ * light/dark force, auto follows the OS). No duplicated dark blocks, no JS.
+ *
+ * A handful of starter families; the full set is generated in Phase K. No
+ * `!important` (enforced by scripts/check-css-important.mjs).
+ */
+@layer cal-themes {
+  [data-theme="noir"] {
+    --c-accent: light-dark(#2b2f36, #e8eaed);
+    --c-range: var(--c-accent);
+    --c-activeText: light-dark(#ffffff, #1f2024);
+    --c-text: light-dark(#1f2024, #e8eaed);
+    --c-mutedText: light-dark(#8a8f98, #9aa0a8);
+    --c-disabledText: light-dark(#c4c7cc, #4a4f57);
+    --c-backdrop: light-dark(#ffffff, #1a1c1f);
+    --c-highlight: light-dark(#eef0f3, #26292e);
+    --c-stroke: light-dark(#d7dade, #33373d);
+    --c-weekend: light-dark(#f5f6f8, #202327);
+    --c-outOfMonth: light-dark(#b9bdc4, #5a6068);
+    --c-todayDot: var(--c-accent);
+  }
+
+  [data-theme="meadow"] {
+    --c-accent: light-dark(#2f8f4e, #6ed18b);
+    --c-range: var(--c-accent);
+    --c-activeText: light-dark(#ffffff, #0f2417);
+    --c-text: light-dark(#1c2b21, #dcefe2);
+    --c-mutedText: light-dark(#789082, #8fb39d);
+    --c-disabledText: light-dark(#c2d4c8, #3d5446);
+    --c-backdrop: light-dark(#ffffff, #14201a);
+    --c-highlight: light-dark(#e8f4ec, #1f3328);
+    --c-stroke: light-dark(#d2e2d7, #2c4536);
+    --c-weekend: light-dark(#f3f8f4, #18271e);
+    --c-outOfMonth: light-dark(#b6c9bc, #547061);
+    --c-todayDot: var(--c-accent);
+  }
+
+  [data-theme="crimson"] {
+    --c-accent: light-dark(#c0334a, #f4889a);
+    --c-range: var(--c-accent);
+    --c-activeText: light-dark(#ffffff, #2a0e14);
+    --c-text: light-dark(#2b1c1f, #f1dde1);
+    --c-mutedText: light-dark(#9a7d82, #b59399);
+    --c-disabledText: light-dark(#d8c4c8, #54393e);
+    --c-backdrop: light-dark(#ffffff, #1f1416);
+    --c-highlight: light-dark(#fbecef, #332226);
+    --c-stroke: light-dark(#e4d2d5, #45302f);
+    --c-weekend: light-dark(#fbf4f5, #271a1c);
+    --c-outOfMonth: light-dark(#cdb9bc, #70545a);
+    --c-todayDot: var(--c-accent);
+  }
+
+  [data-theme="ocean"] {
+    --c-accent: light-dark(#1f6fb2, #6ab7f0);
+    --c-range: var(--c-accent);
+    --c-activeText: light-dark(#ffffff, #0b1d2a);
+    --c-text: light-dark(#172530, #dceaf3);
+    --c-mutedText: light-dark(#74899a, #8eaabf);
+    --c-disabledText: light-dark(#c2d2dd, #3c5161);
+    --c-backdrop: light-dark(#ffffff, #131e27);
+    --c-highlight: light-dark(#e9f2f9, #1d2f3b);
+    --c-stroke: light-dark(#d2e0ea, #2b4151);
+    --c-weekend: light-dark(#f3f7fa, #18242d);
+    --c-outOfMonth: light-dark(#b6c6d2, #506b7e);
+    --c-todayDot: var(--c-accent);
+  }
+}

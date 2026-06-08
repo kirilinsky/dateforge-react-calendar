@@ -39,6 +39,8 @@ const MONTH_NAMES = [
 const UNITS: SelectionUnit[] = ["day", "week", "month"];
 const MODES: SelectionMode[] = ["single", "multiple", "range", "multi-range"];
 const WEEKDAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const THEMES = ["noir", "meadow", "crimson", "ocean"];
+const SCHEMES = ["auto", "light", "dark"] as const;
 
 type Options = {
   unit: SelectionUnit;
@@ -47,6 +49,8 @@ type Options = {
   disableWeekends: boolean;
   excludeWeekends: boolean;
   withTime: boolean;
+  theme: string;
+  scheme: (typeof SCHEMES)[number];
 };
 
 function buildConfig(o: Options): CalendarConfig {
@@ -139,17 +143,31 @@ function Playground() {
     disableWeekends: false,
     excludeWeekends: false,
     withTime: false,
+    theme: "noir",
+    scheme: "auto",
   });
   const [value, setValue] = useState<AnyCalendarValue>(null);
   const [rejections, setRejections] = useState<ValidationReason[]>([]);
 
   const config = useMemo(() => buildConfig(opts), [opts]);
-  const configKey = JSON.stringify(opts);
+  // Only config-affecting options remount the provider; theme/scheme are purely
+  // visual and must not reset the selection.
+  const configKey = JSON.stringify({
+    unit: opts.unit,
+    mode: opts.mode,
+    firstDayOfWeek: opts.firstDayOfWeek,
+    disableWeekends: opts.disableWeekends,
+    excludeWeekends: opts.excludeWeekends,
+    withTime: opts.withTime,
+  });
 
   const set = <K extends keyof Options>(key: K, v: Options[K]) => {
     setOpts((p) => ({ ...p, [key]: v }));
-    setValue(null);
-    setRejections([]);
+    // Theme/scheme don't change config — keep the current value visible.
+    if (key !== "theme" && key !== "scheme") {
+      setValue(null);
+      setRejections([]);
+    }
   };
 
   return (
@@ -222,10 +240,41 @@ function Playground() {
         </label>
       </div>
 
+      <div style={row}>
+        <label style={row}>
+          <span style={labelCol}>theme</span>
+          <select
+            value={opts.theme}
+            onChange={(e) => set("theme", e.target.value)}
+          >
+            {THEMES.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label style={row}>
+          <span style={labelCol}>scheme</span>
+          <select
+            value={opts.scheme}
+            onChange={(e) => set("scheme", e.target.value as Options["scheme"])}
+          >
+            {SCHEMES.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
       <CalendarRoot
         key={configKey}
         config={config}
         initialView={today(config.timeZone)}
+        theme={opts.theme}
+        scheme={opts.scheme}
         onChange={setValue}
         onValidationReject={(r) => {
           if (!r.ok) setRejections((prev) => [r.reason, ...prev].slice(0, 6));
