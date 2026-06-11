@@ -26,6 +26,7 @@ import {
 } from "../core-v3/state";
 import { today } from "../core-v3/timezone-boundary";
 import type { ValidationResult } from "../core-v3/validation";
+import { type InitialFocus, resolveInitialFocus } from "./focus-manager";
 import { type CalendarStore, createCalendarStore } from "./store";
 
 /**
@@ -48,6 +49,12 @@ export type CalendarProviderProps = {
   defaultSelection?: SelectionState;
   /** Initial view anchor. Defaults to today in the configured zone. */
   initialView?: CalendarDate;
+  /**
+   * Whether mounting moves DOM focus into a day, and which (Focus Manager).
+   * `false`/omitted = don't steal focus (default); `"view"` = the view anchor;
+   * a `CalendarDate` = that day.
+   */
+  initialFocus?: InitialFocus;
   /**
    * Committed selection changed. Receives the public `Date`-based value (logical
    * spans; shape fixed by `unit × mode`) and {@link CalendarChangeDetails} —
@@ -90,6 +97,7 @@ export function CalendarProvider({
   value,
   defaultSelection,
   initialView,
+  initialFocus,
   onChange,
   onViewChange,
   onValidationReject,
@@ -103,15 +111,18 @@ export function CalendarProvider({
 
   const controlled = value !== undefined;
 
-  const [store] = useState<CalendarStore>(() =>
-    createCalendarStore(
+  const [store] = useState<CalendarStore>(() => {
+    const view = initialView ?? today(config.timeZone);
+    return createCalendarStore(
       config,
       createInitialState(config, {
-        view: initialView ?? today(config.timeZone),
+        view,
         // Controlled mount seeds from `value`; otherwise from `defaultSelection`.
         selection: controlled
           ? fromPublicValue(value, config)
           : defaultSelection,
+        // First focus is resolved once at mount (Focus Manager). Default: none.
+        focus: resolveInitialFocus(initialFocus, view),
       }),
       (effect, state, action) => {
         const cb = callbacks.current;
@@ -133,8 +144,8 @@ export function CalendarProvider({
             break;
         }
       },
-    ),
-  );
+    );
+  });
 
   // Controlled sync: when the host's value changes (by serialized identity, not
   // object reference), replace the store's selection without echoing onChange.

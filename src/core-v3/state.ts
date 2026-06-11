@@ -112,6 +112,13 @@ export type InitialStateInput = {
   view: CalendarDate;
   /** Optional seeded selection (uncontrolled `defaultValue`). */
   selection?: SelectionState;
+  /**
+   * Optional initial roving-focus target (the Focus Manager resolves this from
+   * the root `initialFocus` prop). Seeding it in state — rather than firing a
+   * mount effect — keeps first focus StrictMode-safe: the Days module DOM-focuses
+   * whatever `focusDate` points at, idempotently.
+   */
+  focus?: CalendarDate;
 };
 
 /** Build the initial reducer state. Pure — the caller supplies the view date. */
@@ -124,7 +131,7 @@ export function createInitialState(
       init.selection ??
       emptySelection(selectionShape(config.unit, config.mode)),
     view: { viewDate: init.view },
-    interaction: {},
+    interaction: init.focus ? { focusDate: init.focus } : {},
     validation: EMPTY_VALIDATION_STATE,
   };
 }
