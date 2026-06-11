@@ -41,4 +41,41 @@
     font-weight: 600;
     color: var(--c-text, #222);
   }
+
+  .pickerHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    margin-block-end: 6px;
+  }
+
+  .pickerGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    min-inline-size: 12em;
+  }
+
+  .pickerCell {
+    appearance: none;
+    padding: 0.4em 0.6em;
+    border: 1px solid transparent;
+    border-radius: var(--c-day-radius, 8px);
+    background: transparent;
+    color: var(--c-text, #222);
+    font: inherit;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 120ms ease;
+  }
+
+  .pickerCell:hover {
+    background: var(--c-highlight, #eef1f7);
+  }
+
+  .pickerCell[data-selected] {
+    background: var(--c-accent, #3b6cff);
+    color: var(--c-active-text, #fff);
+  }
 }

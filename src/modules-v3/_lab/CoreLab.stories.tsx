@@ -16,9 +16,10 @@ import {
   CalendarToolbar,
   CalendarToolbarGroup,
   CalendarToolbarHome,
-  CalendarToolbarLabel,
+  CalendarToolbarMonthTrigger,
   CalendarToolbarNext,
   CalendarToolbarPrev,
+  CalendarToolbarYearTrigger,
 } from "@/modules-v3/toolbar/CalendarToolbar";
 import { Calendar as CalendarRoot } from "@/react-v3/calendar";
 
@@ -90,7 +91,10 @@ function Toolbar() {
         <CalendarToolbarPrev />
         <CalendarToolbarHome />
       </CalendarToolbarGroup>
-      <CalendarToolbarLabel />
+      <CalendarToolbarGroup>
+        <CalendarToolbarMonthTrigger />
+        <CalendarToolbarYearTrigger />
+      </CalendarToolbarGroup>
       <CalendarToolbarNext />
     </CalendarToolbar>
   );
