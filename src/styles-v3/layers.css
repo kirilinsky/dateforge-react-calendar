@@ -10,7 +10,10 @@
 @layer cal-base, cal-themes, cal-appearances, cal-modules, cal-user;
 
 @layer cal-base {
-  [data-dateforge-root] {
+  /* Tokens + color-scheme apply to the root shell AND to portalled popups, which
+     live outside the root in document.body but re-declare data-theme/scheme. */
+  [data-dateforge-root],
+  [data-dateforge-popup] {
     /* Neutral token defaults; a theme overrides these in cal-themes. */
     --c-accent: #1a73e8;
     --c-range: #1a73e8;
@@ -28,6 +31,21 @@
     /* Drives CSS light-dark() in themes; `scheme` prop narrows it below. */
     color-scheme: light dark;
     box-sizing: border-box;
+    color: var(--c-text);
+    font-family: var(--c-font, system-ui, -apple-system, sans-serif);
+  }
+
+  [data-dateforge-root][data-scheme="light"],
+  [data-dateforge-popup][data-scheme="light"] {
+    color-scheme: light;
+  }
+  [data-dateforge-root][data-scheme="dark"],
+  [data-dateforge-popup][data-scheme="dark"] {
+    color-scheme: dark;
+  }
+
+  /* Root shell only. */
+  [data-dateforge-root] {
     container-type: inline-size;
     container-name: cal-root;
     display: grid;
@@ -37,8 +55,6 @@
     border: 1px solid var(--c-stroke);
     border-radius: var(--c-radius, 12px);
     background: var(--c-backdrop);
-    color: var(--c-text);
-    font-family: var(--c-font, system-ui, -apple-system, sans-serif);
   }
 
   [data-dateforge-root] *,
@@ -51,11 +67,20 @@
     cursor: default;
   }
 
-  /* `scheme` prop: force a side, or leave auto to follow the OS. */
-  [data-dateforge-root][data-scheme="light"] {
-    color-scheme: light;
+  /* Portalled popup shell: floats above everything, never clipped. */
+  [data-dateforge-popup] {
+    z-index: 1000;
+    min-inline-size: max-content;
+    padding: 8px;
+    border: 1px solid var(--c-stroke);
+    border-radius: var(--c-radius, 10px);
+    background: var(--c-backdrop);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 18%);
   }
-  [data-dateforge-root][data-scheme="dark"] {
-    color-scheme: dark;
+
+  [data-dateforge-popup] *,
+  [data-dateforge-popup] *::before,
+  [data-dateforge-popup] *::after {
+    box-sizing: border-box;
   }
 }

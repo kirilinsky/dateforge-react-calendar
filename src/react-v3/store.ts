@@ -18,7 +18,11 @@ import type { CalendarConfig, CalendarState } from "../core-v3/state";
  *   identical but still emits `validationRejected`; subscribers stay quiet while
  *   the sink still sees the effect.
  */
-export type EffectSink = (effect: CalendarEffect, state: CalendarState) => void;
+export type EffectSink = (
+  effect: CalendarEffect,
+  state: CalendarState,
+  action: CalendarAction,
+) => void;
 export type StoreListener = () => void;
 
 export type CalendarStore = {
@@ -56,7 +60,7 @@ export function createCalendarStore(
         for (const listener of listeners) listener();
       }
       if (onEffect) {
-        for (const effect of effects) onEffect(effect, state);
+        for (const effect of effects) onEffect(effect, state, action);
       }
     },
   };

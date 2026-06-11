@@ -1,6 +1,9 @@
 import "../styles-v3/layers.css";
 import "../styles-v3/themes.css";
+import { useMemo } from "react";
 import { CalendarProvider, type CalendarProviderProps } from "./provider";
+import { ThemeScopeProvider } from "./theme-scope";
+import { UIProvider } from "./ui-context";
 
 /**
  * The v3 root: the visual shell plus the store provider. It renders the single
@@ -33,18 +36,23 @@ export function Calendar({
   ...providerProps
 }: CalendarProps) {
   const readOnly = providerProps.config.readOnly;
+  const themeScope = useMemo(() => ({ theme, scheme }), [theme, scheme]);
   return (
     <CalendarProvider {...providerProps}>
-      <div
-        data-dateforge-root=""
-        data-theme={theme}
-        data-scheme={scheme}
-        data-readonly={readOnly ? "" : undefined}
-        data-testid={testId}
-        className={className}
-      >
-        {children}
-      </div>
+      <ThemeScopeProvider value={themeScope}>
+        <UIProvider>
+          <div
+            data-dateforge-root=""
+            data-theme={theme}
+            data-scheme={scheme}
+            data-readonly={readOnly ? "" : undefined}
+            data-testid={testId}
+            className={className}
+          >
+            {children}
+          </div>
+        </UIProvider>
+      </ThemeScopeProvider>
     </CalendarProvider>
   );
 }

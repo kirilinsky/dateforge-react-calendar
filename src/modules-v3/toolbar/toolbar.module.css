@@ -1,0 +1,44 @@
+@layer cal-modules {
+  /*
+   * Toolbar primitives. Tokens from --c-* with fallbacks; no !important
+   * (enforced by scripts/check-css-important.mjs).
+   */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--c-gap, 8px);
+  }
+
+  .group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .nav {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: 2em;
+    padding: 0.3em 0.7em;
+    border: 1px solid var(--c-stroke, #d0d3d9);
+    border-radius: var(--c-day-radius, 8px);
+    background: transparent;
+    color: var(--c-text, #222);
+    font: inherit;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 120ms ease;
+  }
+
+  .nav:hover {
+    background: var(--c-highlight, #eef1f7);
+  }
+
+  .label {
+    font-weight: 600;
+    color: var(--c-text, #222);
+  }
+}

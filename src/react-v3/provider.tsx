@@ -12,9 +12,12 @@ import type { CalendarTime } from "../core-v3/calendar-time";
 import type { PresetResult } from "../core-v3/preset-engine";
 import {
   type AnyCalendarValue,
+  type CalendarChangeDetails,
+  type ChangeReason,
   fromPublicValue,
-  serializeValue,
   toPublicValue,
+  toSegments,
+  valueKey,
 } from "../core-v3/public-value";
 import {
   type CalendarConfig,
@@ -45,8 +48,12 @@ export type CalendarProviderProps = {
   defaultSelection?: SelectionState;
   /** Initial view anchor. Defaults to today in the configured zone. */
   initialView?: CalendarDate;
-  /** Committed selection changed — receives the public `Date`-based value. */
-  onChange?: (value: AnyCalendarValue) => void;
+  /**
+   * Committed selection changed. Receives the public `Date`-based value (logical
+   * spans; shape fixed by `unit × mode`) and {@link CalendarChangeDetails} —
+   * `segments` (business-day cut when `exclude`/`disabled` apply) and `reason`.
+   */
+  onChange?: (value: AnyCalendarValue, details: CalendarChangeDetails) => void;
   /** View anchor moved (prev/next, navigateTo). */
   onViewChange?: (viewDate: CalendarDate) => void;
   /** A transient action was rejected (disabled click, cap reached, crossing). */
@@ -55,6 +62,23 @@ export type CalendarProviderProps = {
 };
 
 const StoreContext = createContext<CalendarStore | null>(null);
+
+/** Map the committing action to the public `reason` carried in change details. */
+function changeReason(actionType: string): ChangeReason {
+  switch (actionType) {
+    case "clear":
+      return "clear";
+    case "applyPreset":
+      return "preset";
+    case "setTime":
+      return "time";
+    case "removeDate":
+    case "removeRange":
+      return "remove";
+    default:
+      return "select";
+  }
+}
 
 type Callbacks = Pick<
   CalendarProviderProps,
@@ -89,13 +113,17 @@ export function CalendarProvider({
           ? fromPublicValue(value, config)
           : defaultSelection,
       }),
-      (effect, state) => {
+      (effect, state, action) => {
         const cb = callbacks.current;
         switch (effect.type) {
           case "notify":
-            // Emit from the logical state selection (single source of truth for
-            // exclude + disabled segmentation), not the effect payload.
-            cb.onChange?.(toPublicValue(state.selection, config));
+            // Emit logical spans as the value (§2d); the segmented business-day
+            // view rides in details.segments. Both derive from the committed
+            // state selection — the single source of truth.
+            cb.onChange?.(toPublicValue(state.selection, config), {
+              segments: toSegments(state.selection, config),
+              reason: changeReason(action.type),
+            });
             break;
           case "viewChanged":
             cb.onViewChange?.(effect.viewDate);
@@ -110,7 +138,7 @@ export function CalendarProvider({
 
   // Controlled sync: when the host's value changes (by serialized identity, not
   // object reference), replace the store's selection without echoing onChange.
-  const valueKey = controlled ? serializeValue(value) : null;
+  const syncKey = controlled ? valueKey(value, config) : null;
   const firstSync = useRef(true);
   useEffect(() => {
     if (!controlled) return;
@@ -123,7 +151,7 @@ export function CalendarProvider({
       type: "syncExternal",
       selection: fromPublicValue(value, config),
     });
-  }, [valueKey]);
+  }, [syncKey]);
 
   return (
     <StoreContext.Provider value={store}>{children}</StoreContext.Provider>

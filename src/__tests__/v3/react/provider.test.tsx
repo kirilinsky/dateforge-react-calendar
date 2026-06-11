@@ -57,7 +57,7 @@ describe("CalendarProvider", () => {
     expect(v.getTime()).toBe(new Date(2026, 5, 5).getTime());
   });
 
-  it("emits a range value and respects exclude segmentation", () => {
+  it("emits the logical span as value and segments in details (§2d)", () => {
     const onChange = vi.fn();
     const cfg = config("day", "range", {
       exclude: compileDateRules({ weekends: true }),
@@ -69,9 +69,18 @@ describe("CalendarProvider", () => {
     act(() => result.current.selectDay(D(2026, 6, 5))); // anchor (no notify)
     act(() => result.current.selectDay(D(2026, 6, 9))); // commit
     expect(onChange).toHaveBeenCalledTimes(1);
-    const segs = onChange.mock.calls[0][0] as PublicRange[];
-    expect(Array.isArray(segs)).toBe(true);
-    expect(segs).toHaveLength(2); // weekend cut
+    // value = the whole logical span, NOT the segmented array.
+    const value = onChange.mock.calls[0][0] as PublicRange;
+    expect(Array.isArray(value)).toBe(false);
+    expect(value.start.getTime()).toBe(new Date(2026, 5, 5).getTime());
+    expect(value.end.getTime()).toBe(new Date(2026, 5, 9).getTime());
+    // segments (weekend cut) ride in details, plus the reason.
+    const details = onChange.mock.calls[0][1] as {
+      segments?: PublicRange[];
+      reason: string;
+    };
+    expect(details.reason).toBe("select");
+    expect(details.segments).toHaveLength(2);
   });
 
   it("fires onViewChange when navigating", () => {
