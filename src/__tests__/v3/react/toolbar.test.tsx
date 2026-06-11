@@ -47,7 +47,7 @@ function setup(
       {children}
     </CalendarProvider>
   );
-  return render(<>{ui}</>, { wrapper });
+  return render(ui, { wrapper });
 }
 
 describe("Toolbar primitives", () => {
@@ -66,12 +66,12 @@ describe("Toolbar primitives", () => {
       </CalendarToolbar>,
       { onViewChange },
     );
-    fireEvent.click(getByLabelText("Next"));
+    fireEvent.click(getByLabelText("Next month"));
     expect(getByText("July 2026")).toBeTruthy();
     expect(onViewChange).toHaveBeenLastCalledWith(D(2026, 7, 1));
 
-    fireEvent.click(getByLabelText("Previous"));
-    fireEvent.click(getByLabelText("Previous"));
+    fireEvent.click(getByLabelText("Previous month"));
+    fireEvent.click(getByLabelText("Previous month"));
     expect(getByText("May 2026")).toBeTruthy();
   });
 
@@ -82,14 +82,14 @@ describe("Toolbar primitives", () => {
         <CalendarToolbarLabel />
       </CalendarToolbar>,
     );
-    fireEvent.click(getByLabelText("Next"));
+    fireEvent.click(getByLabelText("Next year"));
     expect(getByText("June 2027")).toBeTruthy();
   });
 
   it("Home jumps the view to today", () => {
     const onViewChange = vi.fn();
     const { getByLabelText } = setup(<CalendarToolbarHome />, { onViewChange });
-    fireEvent.click(getByLabelText("Today"));
+    fireEvent.click(getByLabelText("Go to current month"));
     expect(onViewChange).toHaveBeenCalledTimes(1);
   });
 
@@ -149,14 +149,14 @@ describe("Toolbar month/year triggers", () => {
         <UIProvider>{children}</UIProvider>
       </CalendarProvider>
     );
-    return render(<>{ui}</>, { wrapper });
+    return render(ui, { wrapper });
   }
 
   it("month trigger shows the view month and is closed initially", () => {
     const { getByLabelText, queryByRole } = triggerSetup(
       <CalendarToolbarMonthTrigger />,
     );
-    const btn = getByLabelText("Choose month");
+    const btn = getByLabelText("Select month");
     expect(btn.textContent).toBe("June");
     expect(btn.getAttribute("aria-expanded")).toBe("false");
     expect(queryByRole("dialog")).toBeNull();
@@ -168,7 +168,7 @@ describe("Toolbar month/year triggers", () => {
       <CalendarToolbarMonthTrigger />,
       { onViewChange },
     );
-    fireEvent.click(getByLabelText("Choose month"));
+    fireEvent.click(getByLabelText("Select month"));
     expect(queryByRole("dialog")).not.toBeNull();
     fireEvent.click(getByText("Sep"));
     expect(onViewChange).toHaveBeenLastCalledWith(D(2026, 9, 1));
@@ -179,7 +179,7 @@ describe("Toolbar month/year triggers", () => {
     const { getByLabelText, getByText } = triggerSetup(
       <CalendarToolbarMonthTrigger />,
     );
-    fireEvent.click(getByLabelText("Choose month"));
+    fireEvent.click(getByLabelText("Select month"));
     expect(getByText("Jun").getAttribute("aria-current")).toBe("true");
   });
 
@@ -189,7 +189,7 @@ describe("Toolbar month/year triggers", () => {
       <CalendarToolbarYearTrigger />,
       { onViewChange },
     );
-    const btn = getByLabelText("Choose year");
+    const btn = getByLabelText("Select year");
     expect(btn.textContent).toBe("2026");
     fireEvent.click(btn);
     // Window aligned to 12-year boundary around 2026 -> 2016..2027.
@@ -202,9 +202,9 @@ describe("Toolbar month/year triggers", () => {
     const { getByLabelText, getByText } = triggerSetup(
       <CalendarToolbarYearTrigger />,
     );
-    fireEvent.click(getByLabelText("Choose year"));
+    fireEvent.click(getByLabelText("Select year"));
     // Base window 2016..2027; page later -> 2028..2039.
-    fireEvent.click(getByLabelText("Later years"));
+    fireEvent.click(getByLabelText("Next years"));
     expect(getByText("2028")).toBeTruthy();
     expect(getByText("2039")).toBeTruthy();
   });

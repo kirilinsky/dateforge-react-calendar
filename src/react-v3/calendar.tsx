@@ -1,6 +1,10 @@
 import "../styles-v3/layers.css";
 import "../styles-v3/themes.css";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
+import type { LabelOverrides } from "../core-v3/labels";
+import { today } from "../core-v3/timezone-boundary";
+import { resolveInitialFocus, useFirstFocus } from "./focus-manager";
+import { LabelsProvider } from "./labels-context";
 import { CalendarProvider, type CalendarProviderProps } from "./provider";
 import { ThemeScopeProvider } from "./theme-scope";
 import { UIProvider } from "./ui-context";
@@ -25,6 +29,8 @@ export type CalendarProps = CalendarProviderProps & {
   className?: string;
   /** Test handle on the root. Default `"dateforge-calendar"`. */
   "data-testid"?: string;
+  /** Root-level aria label overrides (module → root → English default). */
+  labels?: LabelOverrides;
 };
 
 export function Calendar({
@@ -32,26 +38,41 @@ export function Calendar({
   scheme = "auto",
   className,
   "data-testid": testId = "dateforge-calendar",
+  labels,
   children,
   ...providerProps
 }: CalendarProps) {
-  const readOnly = providerProps.config.readOnly;
+  const { config, initialView, initialFocus } = providerProps;
+  const readOnly = config.readOnly;
   const themeScope = useMemo(() => ({ theme, scheme }), [theme, scheme]);
+
+  // First focus (Focus Manager): resolve once, perform from the root after the
+  // grid has mounted. The root div is the query scope for the target day cell.
+  const rootRef = useRef<HTMLDivElement>(null);
+  const focusTarget = resolveInitialFocus(
+    initialFocus,
+    initialView ?? today(config.timeZone),
+  );
+  useFirstFocus(rootRef, focusTarget);
+
   return (
     <CalendarProvider {...providerProps}>
       <ThemeScopeProvider value={themeScope}>
-        <UIProvider>
-          <div
-            data-dateforge-root=""
-            data-theme={theme}
-            data-scheme={scheme}
-            data-readonly={readOnly ? "" : undefined}
-            data-testid={testId}
-            className={className}
-          >
-            {children}
-          </div>
-        </UIProvider>
+        <LabelsProvider labels={labels}>
+          <UIProvider>
+            <div
+              ref={rootRef}
+              data-dateforge-root=""
+              data-theme={theme}
+              data-scheme={scheme}
+              data-readonly={readOnly ? "" : undefined}
+              data-testid={testId}
+              className={className}
+            >
+              {children}
+            </div>
+          </UIProvider>
+        </LabelsProvider>
       </ThemeScopeProvider>
     </CalendarProvider>
   );

@@ -51,7 +51,8 @@ function setTime(ctx: SelectionContext, time: CalendarTime): ReduceResult {
   if (!ctx.config.withTime || sel.shape !== "point" || !sel.dates[0]) {
     return noChange(ctx.state);
   }
-  if (!isValidTime(time)) return rejected(ctx.state, invalid("malformed-input"));
+  if (!isValidTime(time))
+    return rejected(ctx.state, invalid("malformed-input"));
   return commitPoint(ctx.state, [withTime(sel.dates[0], time)]);
 }
 

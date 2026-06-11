@@ -1,6 +1,7 @@
 import { type ReactNode, useMemo, useRef, useState } from "react";
 import { today } from "../../core-v3/timezone-boundary";
 import { CalendarPopup } from "../../react-v3/CalendarPopup";
+import { useLabels } from "../../react-v3/labels-context";
 import { useCalendarActions, useCalendarStore } from "../../react-v3/provider";
 import { useUI } from "../../react-v3/ui-context";
 import { useStoreSelector } from "../../react-v3/use-store-selector";
@@ -40,22 +41,27 @@ export function CalendarToolbarGroup({ className, children }: WithClass) {
 type StepProps = WithClass & {
   /** Navigate by whole months (default) or years. */
   step?: "month" | "year";
-  /** Accessible label. */
+  /** Accessible label override (else resolves from the label registry). */
   label?: string;
 };
 
 /** Step the view backward. */
 export function CalendarToolbarPrev({
   step = "month",
-  label = "Previous",
+  label,
   className,
   children,
 }: StepProps) {
   const { navigateBy } = useCalendarActions();
+  const t = useLabels();
   return (
     <button
       type="button"
-      aria-label={label}
+      aria-label={t(
+        step === "year" ? "previousYear" : "previousMonth",
+        undefined,
+        label,
+      )}
       data-toolbar-prev=""
       className={cx(styles.nav, className)}
       onClick={() => navigateBy(step, -1)}
@@ -68,15 +74,20 @@ export function CalendarToolbarPrev({
 /** Step the view forward. */
 export function CalendarToolbarNext({
   step = "month",
-  label = "Next",
+  label,
   className,
   children,
 }: StepProps) {
   const { navigateBy } = useCalendarActions();
+  const t = useLabels();
   return (
     <button
       type="button"
-      aria-label={label}
+      aria-label={t(
+        step === "year" ? "nextYear" : "nextMonth",
+        undefined,
+        label,
+      )}
       data-toolbar-next=""
       className={cx(styles.nav, className)}
       onClick={() => navigateBy(step, 1)}
@@ -88,16 +99,17 @@ export function CalendarToolbarNext({
 
 /** Jump the view to today. */
 export function CalendarToolbarHome({
-  label = "Today",
+  label,
   className,
   children,
 }: WithClass & { label?: string }) {
   const store = useCalendarStore();
   const { navigateTo } = useCalendarActions();
+  const t = useLabels();
   return (
     <button
       type="button"
-      aria-label={label}
+      aria-label={t("home", undefined, label)}
       data-toolbar-home=""
       className={cx(styles.nav, className)}
       onClick={() => navigateTo(today(store.getConfig().timeZone))}
@@ -194,12 +206,13 @@ type TriggerProps = WithClass & {
  * state lives in `UIContext` (adapter), never the core reducer.
  */
 export function CalendarToolbarMonthTrigger({
-  label = "Choose month",
+  label,
   className,
 }: TriggerProps) {
   const store = useCalendarStore();
   const { navigateTo } = useCalendarActions();
   const ui = useUI();
+  const t = useLabels();
   const ref = useRef<HTMLButtonElement>(null);
   const locale = store.getConfig().locale;
   const view = useStoreSelector(store, (s) => s.view.viewDate);
@@ -221,7 +234,7 @@ export function CalendarToolbarMonthTrigger({
         type="button"
         aria-haspopup="dialog"
         aria-expanded={open}
-        aria-label={label}
+        aria-label={t("selectMonth", undefined, label)}
         data-toolbar-month-trigger=""
         className={cx(styles.nav, className)}
         onClick={() => ref.current && ui.toggle("month", ref.current)}
@@ -232,7 +245,7 @@ export function CalendarToolbarMonthTrigger({
         open={open}
         anchor={ref.current}
         onClose={ui.close}
-        label={label}
+        label={t("monthPicker")}
       >
         <div className={styles.pickerGrid} data-cols="3">
           {names.map((name, i) => {
@@ -267,13 +280,11 @@ const YEAR_PAGE = 12;
  * (12 years/page, prev/next shift the window). Picking a year navigates the view
  * to it (same month) and closes.
  */
-export function CalendarToolbarYearTrigger({
-  label = "Choose year",
-  className,
-}: TriggerProps) {
+export function CalendarToolbarYearTrigger({ label, className }: TriggerProps) {
   const store = useCalendarStore();
   const { navigateTo } = useCalendarActions();
   const ui = useUI();
+  const t = useLabels();
   const ref = useRef<HTMLButtonElement>(null);
   const locale = store.getConfig().locale;
   const view = useStoreSelector(store, (s) => s.view.viewDate);
@@ -301,7 +312,7 @@ export function CalendarToolbarYearTrigger({
         type="button"
         aria-haspopup="dialog"
         aria-expanded={open}
-        aria-label={label}
+        aria-label={t("selectYear", undefined, label)}
         data-toolbar-year-trigger=""
         className={cx(styles.nav, className)}
         onClick={() => ref.current && ui.toggle("year", ref.current)}
@@ -312,12 +323,12 @@ export function CalendarToolbarYearTrigger({
         open={open}
         anchor={ref.current}
         onClose={ui.close}
-        label={label}
+        label={t("yearPicker")}
       >
         <div className={styles.pickerHead}>
           <button
             type="button"
-            aria-label="Earlier years"
+            aria-label={t("previousYears")}
             className={styles.nav}
             onClick={() => setPage((p) => p - 1)}
           >
@@ -328,7 +339,7 @@ export function CalendarToolbarYearTrigger({
           </span>
           <button
             type="button"
-            aria-label="Later years"
+            aria-label={t("nextYears")}
             className={styles.nav}
             onClick={() => setPage((p) => p + 1)}
           >
@@ -362,15 +373,16 @@ export function CalendarToolbarYearTrigger({
 
 /** Clear the whole selection. */
 export function CalendarToolbarClear({
-  label = "Clear",
+  label,
   className,
   children,
 }: WithClass & { label?: string }) {
   const { clear } = useCalendarActions();
+  const t = useLabels();
   return (
     <button
       type="button"
-      aria-label={label}
+      aria-label={t("clear", undefined, label)}
       data-toolbar-clear=""
       className={cx(styles.nav, className)}
       onClick={() => clear()}
