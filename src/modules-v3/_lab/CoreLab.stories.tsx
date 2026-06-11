@@ -2,15 +2,25 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useMemo, useState } from "react";
 import { MIDNIGHT } from "@/core-v3/calendar-time";
 import { compileDateRules } from "@/core-v3/date-rule-engine";
-import type { AnyCalendarValue } from "@/core-v3/public-value";
+import type {
+  AnyCalendarValue,
+  CalendarChangeDetails,
+  PublicRange,
+} from "@/core-v3/public-value";
 import type { SelectionMode, SelectionUnit } from "@/core-v3/selection-types";
 import type { CalendarConfig } from "@/core-v3/state";
 import { today } from "@/core-v3/timezone-boundary";
 import type { ValidationReason } from "@/core-v3/validation";
 import { CalendarDays } from "@/modules-v3/days/CalendarDays";
+import {
+  CalendarToolbar,
+  CalendarToolbarGroup,
+  CalendarToolbarHome,
+  CalendarToolbarLabel,
+  CalendarToolbarNext,
+  CalendarToolbarPrev,
+} from "@/modules-v3/toolbar/CalendarToolbar";
 import { Calendar as CalendarRoot } from "@/react-v3/calendar";
-import { useCalendarActions, useCalendarStore } from "@/react-v3/provider";
-import { useStoreSelector } from "@/react-v3/use-store-selector";
 
 /**
  * v3 Core Lab — one universal harness running the real modules.
@@ -20,21 +30,6 @@ import { useStoreSelector } from "@/react-v3/use-store-selector";
  * update live. Cells are styled purely through the `data-*` attributes the Days
  * module emits — the same escape hatch consumers get. Dev-only.
  */
-
-const MONTH_NAMES = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
 
 const UNITS: SelectionUnit[] = ["day", "week", "month"];
 const MODES: SelectionMode[] = ["single", "multiple", "range", "multi-range"];
@@ -88,35 +83,26 @@ const row: React.CSSProperties = {
 };
 const labelCol = { color: "#666", width: 96 } as React.CSSProperties;
 
-function NavBar() {
-  const store = useCalendarStore();
-  const { navigateBy } = useCalendarActions();
-  const view = useStoreSelector(store, (s) => s.view.viewDate);
+function Toolbar() {
   return (
-    <div style={{ ...row, justifyContent: "space-between" }}>
-      <button
-        type="button"
-        onClick={() => navigateBy("month", -1)}
-        style={{ padding: "4px 12px" }}
-      >
-        ‹
-      </button>
-      <span>
-        {MONTH_NAMES[view.month - 1]} {view.year}
-      </span>
-      <button
-        type="button"
-        onClick={() => navigateBy("month", 1)}
-        style={{ padding: "4px 12px" }}
-      >
-        ›
-      </button>
-    </div>
+    <CalendarToolbar>
+      <CalendarToolbarGroup>
+        <CalendarToolbarPrev />
+        <CalendarToolbarHome />
+      </CalendarToolbarGroup>
+      <CalendarToolbarLabel />
+      <CalendarToolbarNext />
+    </CalendarToolbar>
   );
 }
 
 function fmtDate(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function describeSegments(segs: PublicRange[]): string {
+  if (segs.length === 0) return "[] (fully cut)";
+  return segs.map((s) => `${fmtDate(s.start)} → ${fmtDate(s.end)}`).join(", ");
 }
 
 function describeValue(v: AnyCalendarValue): string {
@@ -147,6 +133,7 @@ function Playground() {
     scheme: "auto",
   });
   const [value, setValue] = useState<AnyCalendarValue>(null);
+  const [details, setDetails] = useState<CalendarChangeDetails | null>(null);
   const [rejections, setRejections] = useState<ValidationReason[]>([]);
 
   const config = useMemo(() => buildConfig(opts), [opts]);
@@ -166,6 +153,7 @@ function Playground() {
     // Theme/scheme don't change config — keep the current value visible.
     if (key !== "theme" && key !== "scheme") {
       setValue(null);
+      setDetails(null);
       setRejections([]);
     }
   };
@@ -275,23 +263,45 @@ function Playground() {
         initialView={today(config.timeZone)}
         theme={opts.theme}
         scheme={opts.scheme}
-        onChange={setValue}
+        onChange={(v, d) => {
+          setValue(v);
+          setDetails(d);
+        }}
         onValidationReject={(r) => {
           if (!r.ok) setRejections((prev) => [r.reason, ...prev].slice(0, 6));
         }}
       >
-        <NavBar />
+        <Toolbar />
         <CalendarDays />
       </CalendarRoot>
 
       <div style={{ display: "grid", gap: 4 }}>
-        <span style={{ color: "#666" }}>public value (onChange):</span>
+        <span style={{ color: "#666" }}>
+          public value (logical spans) · reason: {details?.reason ?? "—"}
+        </span>
         <code
           style={{ background: "#f1f1f5", padding: "6px 8px", borderRadius: 6 }}
         >
           {describeValue(value)}
         </code>
       </div>
+
+      {details?.segments && (
+        <div style={{ display: "grid", gap: 4 }}>
+          <span style={{ color: "#666" }}>
+            details.segments (business-day cut):
+          </span>
+          <code
+            style={{
+              background: "#eef6ee",
+              padding: "6px 8px",
+              borderRadius: 6,
+            }}
+          >
+            {describeSegments(details.segments)}
+          </code>
+        </div>
+      )}
 
       {rejections.length > 0 && (
         <div style={{ display: "grid", gap: 4 }}>
