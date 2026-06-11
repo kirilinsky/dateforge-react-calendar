@@ -1,6 +1,8 @@
-import { type ReactNode, useMemo } from "react";
+import { type ReactNode, useMemo, useRef, useState } from "react";
 import { today } from "../../core-v3/timezone-boundary";
+import { CalendarPopup } from "../../react-v3/CalendarPopup";
 import { useCalendarActions, useCalendarStore } from "../../react-v3/provider";
+import { useUI } from "../../react-v3/ui-context";
 import { useStoreSelector } from "../../react-v3/use-store-selector";
 import styles from "./toolbar.module.css";
 
@@ -171,6 +173,190 @@ export function CalendarToolbarYearLabel({ options, className }: LabelProps) {
       className={className}
       attr="data-toolbar-year-label"
     />
+  );
+}
+
+// Month names are locale-dependent but year-independent; build once per locale
+// from a fixed non-leap reference year.
+function monthNames(locale: string | undefined): string[] {
+  const fmt = new Intl.DateTimeFormat(locale, { month: "short" });
+  return Array.from({ length: 12 }, (_, i) => fmt.format(new Date(2021, i, 1)));
+}
+
+type TriggerProps = WithClass & {
+  /** Accessible label for the trigger button + popup dialog. */
+  label?: string;
+};
+
+/**
+ * Month trigger: a button showing the current month that opens a 12-cell month
+ * picker. Picking a month navigates the view to it (day 1) and closes. Popup
+ * state lives in `UIContext` (adapter), never the core reducer.
+ */
+export function CalendarToolbarMonthTrigger({
+  label = "Choose month",
+  className,
+}: TriggerProps) {
+  const store = useCalendarStore();
+  const { navigateTo } = useCalendarActions();
+  const ui = useUI();
+  const ref = useRef<HTMLButtonElement>(null);
+  const locale = store.getConfig().locale;
+  const view = useStoreSelector(store, (s) => s.view.viewDate);
+  const open = ui.isOpen("month");
+
+  const names = useMemo(() => monthNames(locale), [locale]);
+  const text = useMemo(
+    () =>
+      new Intl.DateTimeFormat(locale, { month: "long" }).format(
+        new Date(view.year, view.month - 1, 1),
+      ),
+    [view.year, view.month, locale],
+  );
+
+  return (
+    <>
+      <button
+        ref={ref}
+        type="button"
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        aria-label={label}
+        data-toolbar-month-trigger=""
+        className={cx(styles.nav, className)}
+        onClick={() => ref.current && ui.toggle("month", ref.current)}
+      >
+        {text}
+      </button>
+      <CalendarPopup
+        open={open}
+        anchor={ref.current}
+        onClose={ui.close}
+        label={label}
+      >
+        <div className={styles.pickerGrid} data-cols="3">
+          {names.map((name, i) => {
+            const m = i + 1;
+            const selected = m === view.month;
+            return (
+              <button
+                key={name}
+                type="button"
+                data-selected={selected || undefined}
+                aria-current={selected ? "true" : undefined}
+                className={styles.pickerCell}
+                onClick={() => {
+                  navigateTo({ year: view.year, month: m, day: 1 });
+                  ui.close();
+                }}
+              >
+                {name}
+              </button>
+            );
+          })}
+        </div>
+      </CalendarPopup>
+    </>
+  );
+}
+
+const YEAR_PAGE = 12;
+
+/**
+ * Year trigger: a button showing the current year that opens a paged year grid
+ * (12 years/page, prev/next shift the window). Picking a year navigates the view
+ * to it (same month) and closes.
+ */
+export function CalendarToolbarYearTrigger({
+  label = "Choose year",
+  className,
+}: TriggerProps) {
+  const store = useCalendarStore();
+  const { navigateTo } = useCalendarActions();
+  const ui = useUI();
+  const ref = useRef<HTMLButtonElement>(null);
+  const locale = store.getConfig().locale;
+  const view = useStoreSelector(store, (s) => s.view.viewDate);
+  const open = ui.isOpen("year");
+  const [page, setPage] = useState(0);
+
+  // Window aligned to a YEAR_PAGE boundary around the current view year, shifted
+  // by the local page offset. Reset implicitly when reopened (page persists, but
+  // the base re-aligns to the view year).
+  const base = Math.floor(view.year / YEAR_PAGE) * YEAR_PAGE + page * YEAR_PAGE;
+  const years = Array.from({ length: YEAR_PAGE }, (_, i) => base + i);
+
+  const text = useMemo(
+    () =>
+      new Intl.DateTimeFormat(locale, { year: "numeric" }).format(
+        new Date(view.year, 0, 1),
+      ),
+    [view.year, locale],
+  );
+
+  return (
+    <>
+      <button
+        ref={ref}
+        type="button"
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        aria-label={label}
+        data-toolbar-year-trigger=""
+        className={cx(styles.nav, className)}
+        onClick={() => ref.current && ui.toggle("year", ref.current)}
+      >
+        {text}
+      </button>
+      <CalendarPopup
+        open={open}
+        anchor={ref.current}
+        onClose={ui.close}
+        label={label}
+      >
+        <div className={styles.pickerHead}>
+          <button
+            type="button"
+            aria-label="Earlier years"
+            className={styles.nav}
+            onClick={() => setPage((p) => p - 1)}
+          >
+            ‹
+          </button>
+          <span className={styles.label}>
+            {years[0]}–{years[years.length - 1]}
+          </span>
+          <button
+            type="button"
+            aria-label="Later years"
+            className={styles.nav}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            ›
+          </button>
+        </div>
+        <div className={styles.pickerGrid} data-cols="3">
+          {years.map((y) => {
+            const selected = y === view.year;
+            return (
+              <button
+                key={y}
+                type="button"
+                data-selected={selected || undefined}
+                aria-current={selected ? "true" : undefined}
+                className={styles.pickerCell}
+                onClick={() => {
+                  navigateTo({ year: y, month: view.month, day: 1 });
+                  ui.close();
+                }}
+              >
+                {y}
+              </button>
+            );
+          })}
+        </div>
+      </CalendarPopup>
+    </>
   );
 }
 

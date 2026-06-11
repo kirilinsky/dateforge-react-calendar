@@ -11,11 +11,14 @@ import {
   CalendarToolbarHome,
   CalendarToolbarLabel,
   CalendarToolbarMonthLabel,
+  CalendarToolbarMonthTrigger,
   CalendarToolbarNext,
   CalendarToolbarPrev,
   CalendarToolbarYearLabel,
+  CalendarToolbarYearTrigger,
 } from "@/modules-v3/toolbar/CalendarToolbar";
 import { CalendarProvider } from "@/react-v3/provider";
+import { UIProvider } from "@/react-v3/ui-context";
 
 const D = (y: number, m: number, d: number) => calendarDate(y, m, d);
 
@@ -129,5 +132,80 @@ describe("Toolbar primitives", () => {
     fireEvent.click(getByLabelText("Clear"));
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange.mock.calls[0][0]).toBeNull();
+  });
+});
+
+describe("Toolbar month/year triggers", () => {
+  function triggerSetup(
+    ui: ReactNode,
+    props: { onViewChange?: (d: ReturnType<typeof D>) => void } = {},
+  ) {
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <CalendarProvider
+        config={config()}
+        initialView={D(2026, 6, 1)}
+        {...props}
+      >
+        <UIProvider>{children}</UIProvider>
+      </CalendarProvider>
+    );
+    return render(<>{ui}</>, { wrapper });
+  }
+
+  it("month trigger shows the view month and is closed initially", () => {
+    const { getByLabelText, queryByRole } = triggerSetup(
+      <CalendarToolbarMonthTrigger />,
+    );
+    const btn = getByLabelText("Choose month");
+    expect(btn.textContent).toBe("June");
+    expect(btn.getAttribute("aria-expanded")).toBe("false");
+    expect(queryByRole("dialog")).toBeNull();
+  });
+
+  it("opens the month popup and picks a month (navigates + closes)", () => {
+    const onViewChange = vi.fn();
+    const { getByLabelText, getByText, queryByRole } = triggerSetup(
+      <CalendarToolbarMonthTrigger />,
+      { onViewChange },
+    );
+    fireEvent.click(getByLabelText("Choose month"));
+    expect(queryByRole("dialog")).not.toBeNull();
+    fireEvent.click(getByText("Sep"));
+    expect(onViewChange).toHaveBeenLastCalledWith(D(2026, 9, 1));
+    expect(queryByRole("dialog")).toBeNull();
+  });
+
+  it("marks the current month as selected", () => {
+    const { getByLabelText, getByText } = triggerSetup(
+      <CalendarToolbarMonthTrigger />,
+    );
+    fireEvent.click(getByLabelText("Choose month"));
+    expect(getByText("Jun").getAttribute("aria-current")).toBe("true");
+  });
+
+  it("year trigger opens a paged grid and picks a year", () => {
+    const onViewChange = vi.fn();
+    const { getByLabelText, getByText, queryByRole } = triggerSetup(
+      <CalendarToolbarYearTrigger />,
+      { onViewChange },
+    );
+    const btn = getByLabelText("Choose year");
+    expect(btn.textContent).toBe("2026");
+    fireEvent.click(btn);
+    // Window aligned to 12-year boundary around 2026 -> 2016..2027.
+    fireEvent.click(getByText("2024"));
+    expect(onViewChange).toHaveBeenLastCalledWith(D(2024, 6, 1));
+    expect(queryByRole("dialog")).toBeNull();
+  });
+
+  it("year grid pages earlier/later without picking", () => {
+    const { getByLabelText, getByText } = triggerSetup(
+      <CalendarToolbarYearTrigger />,
+    );
+    fireEvent.click(getByLabelText("Choose year"));
+    // Base window 2016..2027; page later -> 2028..2039.
+    fireEvent.click(getByLabelText("Later years"));
+    expect(getByText("2028")).toBeTruthy();
+    expect(getByText("2039")).toBeTruthy();
   });
 });

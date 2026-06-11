@@ -32,6 +32,19 @@ type Pos = { top: number; left: number; placement: "top" | "bottom" };
 const GAP = 4;
 const MARGIN = 8;
 
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+/**
+ * Tabbable descendants in DOM order. The selector already drops `[disabled]` and
+ * `tabindex="-1"`; we don't filter by visibility because the popup content is
+ * controlled (triggers, grid cells) and `offsetParent`-based checks are
+ * unreliable across test DOMs.
+ */
+function focusableWithin(root: HTMLElement): HTMLElement[] {
+  return Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE));
+}
+
 export function CalendarPopup({
   open,
   anchor,
@@ -86,6 +99,29 @@ export function CalendarPopup({
         e.stopPropagation();
         onClose();
         anchor?.focus();
+        return;
+      }
+      if (e.key === "Tab") {
+        const el = ref.current;
+        if (!el) return;
+        const items = focusableWithin(el);
+        // Nothing tabbable inside: keep focus pinned on the dialog itself.
+        if (items.length === 0) {
+          e.preventDefault();
+          el.focus();
+          return;
+        }
+        const first = items[0];
+        const last = items[items.length - 1];
+        const active = document.activeElement;
+        // Wrap at the edges; treat the dialog container as "before first".
+        if (e.shiftKey && (active === first || active === el)) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && active === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     };
     const onDown = (e: PointerEvent) => {

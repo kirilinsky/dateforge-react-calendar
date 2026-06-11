@@ -45,7 +45,13 @@ describe("UIContext", () => {
   });
 });
 
-function PopupHarness({ label = "Picker" }: { label?: string }) {
+function PopupHarness({
+  label = "Picker",
+  multi = false,
+}: {
+  label?: string;
+  multi?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLButtonElement>(null);
   return (
@@ -60,6 +66,12 @@ function PopupHarness({ label = "Picker" }: { label?: string }) {
         label={label}
       >
         <button type="button">inside</button>
+        {multi && (
+          <>
+            <button type="button">second</button>
+            <button type="button">third</button>
+          </>
+        )}
       </CalendarPopup>
     </>
   );
@@ -102,5 +114,32 @@ describe("CalendarPopup", () => {
     const dialog = queryByRole("dialog");
     expect(dialog?.getAttribute("data-theme")).toBe("noir");
     expect(dialog?.getAttribute("data-scheme")).toBe("auto");
+  });
+
+  it("traps Tab: wraps from last focusable back to first", () => {
+    const { getByText } = render(<PopupHarness multi />);
+    fireEvent.click(getByText("open"));
+    const last = getByText("third");
+    last.focus();
+    fireEvent.keyDown(document, { key: "Tab" });
+    expect(document.activeElement).toBe(getByText("inside"));
+  });
+
+  it("traps Shift+Tab: wraps from first focusable back to last", () => {
+    const { getByText } = render(<PopupHarness multi />);
+    fireEvent.click(getByText("open"));
+    const first = getByText("inside");
+    first.focus();
+    fireEvent.keyDown(document, { key: "Tab", shiftKey: true });
+    expect(document.activeElement).toBe(getByText("third"));
+  });
+
+  it("Shift+Tab from the dialog container wraps to the last focusable", () => {
+    const { getByText, queryByRole } = render(<PopupHarness multi />);
+    fireEvent.click(getByText("open"));
+    // Open focuses the dialog itself; Shift+Tab there should land on last.
+    (queryByRole("dialog") as HTMLElement).focus();
+    fireEvent.keyDown(document, { key: "Tab", shiftKey: true });
+    expect(document.activeElement).toBe(getByText("third"));
   });
 });
