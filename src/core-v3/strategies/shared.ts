@@ -247,6 +247,53 @@ export function spanSetTime(
   return commitSpan(state, [...sel.ranges], { from, to }, config);
 }
 
+/**
+ * Date edit for one bound of a span selection (manual input "from"/"to"
+ * fields, bound month/year wheels). Mirrors `spanSetTime`: validates the day,
+ * keeps the other bound, rejects inverted ranges instead of silently swapping
+ * — a typing user must see the input flagged, not watch their bounds flip.
+ */
+export function spanSetBoundDate(
+  state: CalendarState,
+  config: CalendarConfig,
+  date: CalendarDate,
+  bound: "from" | "to",
+): ReduceResult {
+  const sel = state.selection;
+  if (sel.shape !== "span" || sel.ranges.length === 0) return noChange(state);
+
+  const dayInvalid = validateDay(date, config);
+  if (dayInvalid) return rejected(state, dayInvalid);
+
+  const current = sel.ranges[0];
+  const next: CalendarRange =
+    bound === "from"
+      ? { start: date, end: current.end }
+      : { start: current.start, end: date };
+  if (compareDate(next.start, next.end) > 0) {
+    return rejected(state, invalid("range-out-of-order"));
+  }
+  if (rangesEqual(current, next)) return noChange(state);
+
+  const lengthInvalid = validateSpanLength(next, config);
+  if (lengthInvalid) return rejected(state, lengthInvalid);
+  const crossingInvalid = validateRangeCrossing(next, config);
+  if (crossingInvalid) return rejected(state, crossingInvalid);
+
+  // Same-day result: existing from/to times must stay ordered.
+  const { fromTime, toTime } = sel;
+  if (
+    fromTime &&
+    toTime &&
+    compareDate(next.start, next.end) === 0 &&
+    compareTime(fromTime, toTime) > 0
+  ) {
+    return rejected(state, invalid("time-out-of-order"));
+  }
+
+  return commitSpan(state, [next], { from: fromTime, to: toTime }, config);
+}
+
 /** Clear a span selection. Drops a lone draft anchor without a notify. */
 export function spanClear(
   state: CalendarState,

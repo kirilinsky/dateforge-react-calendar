@@ -1,10 +1,56 @@
 @layer cal-modules {
+  /* Field layout: label ABOVE the input (react-aria / shadcn field pattern).
+     Keeps sibling from/to bound inputs the same width regardless of label
+     text length — inline labels made them misaligned. */
   .container {
     display: flex;
-    align-items: center;
-    gap: 0.4em;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.25em;
     padding: 0.5em 0.6em;
     min-width: 0;
+  }
+
+  .label {
+    font-size: 0.85em;
+    color: var(--c-mutedText, #888);
+    white-space: nowrap;
+  }
+
+  /* Relative shell so the clear (×) overlays the input's right edge. */
+  .inputWrap {
+    position: relative;
+    display: inline-flex;
+    align-self: stretch;
+    min-width: 0;
+  }
+
+  .clearBtn {
+    appearance: none;
+    border: none;
+    background: transparent;
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0.25em;
+    margin-block: auto;
+    height: 1.6em;
+    padding: 0 0.35em;
+    font: inherit;
+    font-size: 0.9em;
+    line-height: 1;
+    color: var(--c-mutedText, #888);
+    border-radius: var(--c-day-radius, 6px);
+    cursor: pointer;
+    transition:
+      background var(--cal-paint-transition, var(--cal-transition, 0.2s))
+        var(--cal-paint-easing, linear),
+      color var(--cal-paint-transition, var(--cal-transition, 0.2s))
+        var(--cal-paint-easing, linear);
+  }
+
+  .clearBtn:hover {
+    background: var(--c-tone, #eef1f7);
+    color: var(--c-text, #222);
   }
 
   .input {
@@ -29,8 +75,19 @@
     border-color: var(--c-error, #d32f2f);
   }
 
+  /* Keep typed digits clear of the overlaid × . */
+  .inputWrap:has(.clearBtn) .input {
+    padding-inline-end: 1.7em;
+  }
+
   .input[readonly] {
     background: color-mix(in srgb, var(--c-backdrop, #fff) 70%, var(--c-tone, #aaa));
+    color: var(--c-disabledText, #999);
     cursor: default;
+  }
+
+  .input::placeholder {
+    color: var(--c-mutedText, #aaa);
+    opacity: 0.8;
   }
 }

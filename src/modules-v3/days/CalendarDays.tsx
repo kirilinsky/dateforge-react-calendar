@@ -28,6 +28,9 @@ import styles from "./days.module.css";
 type DayCellProps = {
   date: CalendarDate;
   flags: number;
+  /** Full localized date for the accessible name — the visible "15" alone
+      means nothing to a screen reader out of month context. */
+  label: string;
   /** Roving tabindex: only the focus target is 0, the rest are -1. */
   focusable: boolean;
   onSelect: (date: CalendarDate) => void;
@@ -37,6 +40,7 @@ type DayCellProps = {
 const DayCell = memo(function DayCell({
   date,
   flags,
+  label,
   focusable,
   onSelect,
   onHover,
@@ -49,6 +53,7 @@ const DayCell = memo(function DayCell({
       tabIndex={focusable ? 0 : -1}
       data-date={dateKey(date)}
       className={styles.cell}
+      aria-label={label}
       {...dayDataAttrs(flags)}
       aria-disabled={disabled || undefined}
       aria-selected={
@@ -113,6 +118,28 @@ export function CalendarDays() {
 
   const weekdayLabels = useWeekdayLabels(grid.weekdayOrder, config.locale);
 
+  // Wall-clock formatters (no timeZone — cells are calendar fields already).
+  const cellLabelFmt = useMemo(
+    () =>
+      new Intl.DateTimeFormat(config.locale, {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }),
+    [config.locale],
+  );
+  const gridLabelFmt = useMemo(
+    () =>
+      new Intl.DateTimeFormat(config.locale, {
+        month: "long",
+        year: "numeric",
+      }),
+    [config.locale],
+  );
+  const cellLabel = (d: CalendarDate) =>
+    cellLabelFmt.format(new Date(d.year, d.month - 1, d.day));
+
   // The roving-tabindex target: the explicit focus, else today-in-view, else the
   // first of the displayed month — so Tab always lands somewhere sensible.
   const effectiveFocus = useMemo<CalendarDate>(() => {
@@ -163,6 +190,9 @@ export function CalendarDays() {
     <div
       ref={gridRef}
       role="grid"
+      aria-label={gridLabelFmt.format(
+        new Date(viewDate.year, viewDate.month - 1, 1),
+      )}
       data-dateforge-days=""
       className={styles.grid}
       onKeyDown={onKeyDown}
@@ -186,6 +216,7 @@ export function CalendarDays() {
             <DayCell
               key={dateKey(cell.date)}
               date={cell.date}
+              label={cellLabel(cell.date)}
               flags={dayFlags(
                 cell.date,
                 lookup,

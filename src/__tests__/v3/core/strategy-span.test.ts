@@ -604,3 +604,76 @@ describe("segmented exclusion", () => {
     );
   });
 });
+
+describe("setBoundDate (span bound date edit)", () => {
+  const drawn = (cfg: CalendarConfig) => {
+    let s = start(cfg);
+    s = reduce(s, { type: "selectDay", date: D(2026, 6, 10) }, cfg).state;
+    s = reduce(s, { type: "selectDay", date: D(2026, 6, 15) }, cfg).state;
+    return s;
+  };
+
+  it("moves the from-bound keeping the end", () => {
+    const cfg = config("day", "range");
+    const r = reduce(
+      drawn(cfg),
+      { type: "setBoundDate", date: D(2026, 6, 8), bound: "from" },
+      cfg,
+    );
+    expect(spans(r.state)).toEqual([
+      [dateKey(D(2026, 6, 8)), dateKey(D(2026, 6, 15))],
+    ]);
+  });
+
+  it("moves the to-bound keeping the start", () => {
+    const cfg = config("day", "range");
+    const r = reduce(
+      drawn(cfg),
+      { type: "setBoundDate", date: D(2026, 6, 20), bound: "to" },
+      cfg,
+    );
+    expect(spans(r.state)).toEqual([
+      [dateKey(D(2026, 6, 10)), dateKey(D(2026, 6, 20))],
+    ]);
+  });
+
+  it("rejects an inverted result instead of swapping", () => {
+    const cfg = config("day", "range");
+    const r = reduce(
+      drawn(cfg),
+      { type: "setBoundDate", date: D(2026, 6, 20), bound: "from" },
+      cfg,
+    );
+    expect(spans(r.state)).toEqual([
+      [dateKey(D(2026, 6, 10)), dateKey(D(2026, 6, 15))],
+    ]);
+    expect((r.effects[0] as { result: { reason: string } }).result.reason).toBe(
+      "range-out-of-order",
+    );
+  });
+
+  it("rejects a disabled bound date", () => {
+    const cfg = config("day", "range", {
+      disabled: compileDateRules({ dates: [D(2026, 6, 8)] }),
+    });
+    const r = reduce(
+      drawn(cfg),
+      { type: "setBoundDate", date: D(2026, 6, 8), bound: "from" },
+      cfg,
+    );
+    expect((r.effects[0] as { result: { reason: string } }).result.reason).toBe(
+      "disabled",
+    );
+  });
+
+  it("no-ops without a committed range", () => {
+    const cfg = config("day", "range");
+    const s0 = start(cfg);
+    const r = reduce(
+      s0,
+      { type: "setBoundDate", date: D(2026, 6, 8), bound: "from" },
+      cfg,
+    );
+    expect(r.state).toBe(s0);
+  });
+});

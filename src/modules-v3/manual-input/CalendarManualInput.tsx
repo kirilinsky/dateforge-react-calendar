@@ -1,27 +1,56 @@
+import type { ReactNode } from "react";
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
-import { calendarDate } from "../../core-v3/calendar-date";
-import {
-  fromCalendarDateTime,
-  toCalendarDateTime,
-} from "../../core-v3/timezone-boundary";
+import type { CalendarDate } from "../../core-v3/calendar-date";
+import { compareDate } from "../../core-v3/calendar-date";
+import { today as getToday } from "../../core-v3/timezone-boundary";
+import { useLabels } from "../../react-v3/labels-context";
 import { useCalendarActions, useCalendarStore } from "../../react-v3/provider";
 import { useStoreSelector } from "../../react-v3/use-store-selector";
 import {
   applyMask,
   DEFAULT_DATE_FORMAT,
-  dateToMask,
-  maskToDate,
   validatePartialMask,
 } from "../../utils/date-mask";
 import { getGridSlotStyle } from "../../utils/get-grid-slot-style";
 import styles from "./manual-input.module.css";
+import { maskToCalendarDate, stepSegment } from "./segments";
 
 export type CalendarManualInputProps = {
+  /**
+   * Token string with `DD`, `MM`, `YYYY` and single-char separators —
+   * `"DD.MM.YYYY"` (default), `"MM/DD/YYYY"`, `"YYYY-MM-DD"`. Also the
+   * default placeholder.
+   */
   format?: string;
   placeholder?: string;
+  /**
+   * Span modes: which bound this input edits. Two inputs (`"from"` + `"to"`)
+   * compose a from—to row. Default `"from"`. Ignored for point selections.
+   */
+  bound?: "from" | "to";
+  /** Visible label before the input (wired via htmlFor). */
+  label?: ReactNode;
+  /** aria-label override when no visible label (registry key `manualInput`). */
+  inputLabel?: string;
+  /** Clear (×) button inside the input. Clears the whole selection. */
+  allowClear?: boolean;
+  /** Override for the clear aria-label (registry key `clear`). */
+  clearLabel?: string;
+  /** Horizontal alignment of the row. Default "left". */
+  align?: "left" | "center" | "right";
+  /** Per-module theme override (`data-theme` on the module container). */
+  theme?: string;
+  /** Per-module scheme override (`data-scheme` on the module container). */
+  scheme?: "light" | "dark" | "auto";
   col?: number | string;
   className?: string;
 };
+
+const ALIGN_TO_JUSTIFY = {
+  left: "flex-start",
+  center: "center",
+  right: "flex-end",
+} as const;
 
 const countDigits = (s: string) => (s.match(/\d/g) ?? []).length;
 
@@ -37,70 +66,115 @@ const positionAfterNDigits = (masked: string, n: number): number => {
   return masked.length;
 };
 
+const dateToMaskText = (d: CalendarDate | null, format: string): string => {
+  if (!d) return "";
+  return format
+    .replace("DD", String(d.day).padStart(2, "0"))
+    .replace("MM", String(d.month).padStart(2, "0"))
+    .replace("YYYY", String(d.year).padStart(4, "0"));
+};
+
 export function CalendarManualInput({
   format = DEFAULT_DATE_FORMAT,
   placeholder,
+  bound = "from",
+  label,
+  inputLabel,
+  allowClear = false,
+  clearLabel,
+  align = "left",
+  theme,
+  scheme,
   col,
   className,
 }: CalendarManualInputProps) {
   const store = useCalendarStore();
   const config = store.getConfig();
-  const { selectDay, clear } = useCalendarActions();
+  const t = useLabels();
+  const { selectDay, setBoundDate, clear } = useCalendarActions();
 
   const selection = useStoreSelector(store, (s) => s.selection);
 
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const pendingCursor = useRef<number | null>(null);
+  const pendingRange = useRef<[number, number] | null>(null);
 
-  // Derive controlled Date from selection (single point only)
-  // Stable key for the selected date — avoids re-running the sync effect on
-  // every render (fromCalendarDateTime creates a new Date ref each time).
-  const selectedKey =
-    selection.shape === "point" && selection.dates.length === 1
-      ? `${selection.dates[0].date.year}-${selection.dates[0].date.month}-${selection.dates[0].date.day}`
-      : null;
+  // The date this input mirrors: the single point, or the chosen span bound.
+  // Pure CalendarDate fields — wall-clock, no Date/timezone roundtrip.
+  const controlled: CalendarDate | null =
+    selection.shape === "point"
+      ? selection.dates.length === 1
+        ? selection.dates[0].date
+        : null
+      : selection.ranges.length > 0
+        ? bound === "to"
+          ? selection.ranges[0].end
+          : selection.ranges[0].start
+        : null;
 
-  const controlledDate =
-    selection.shape === "point" && selection.dates.length === 1
-      ? (() => {
-          const r = fromCalendarDateTime(selection.dates[0], config.timeZone);
-          return r.ok ? r.date : null;
-        })()
-      : null;
+  const selectedKey = controlled
+    ? `${controlled.year}-${controlled.month}-${controlled.day}`
+    : null;
 
-  const [text, setText] = useState(() => dateToMask(controlledDate, format));
+  const [text, setText] = useState(() => dateToMaskText(controlled, format));
   const [invalid, setInvalid] = useState(false);
 
   useEffect(() => {
-    setText(dateToMask(controlledDate, format));
+    setText(dateToMaskText(controlled, format));
     setInvalid(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedKey, format]);
 
   useLayoutEffect(() => {
-    if (pendingCursor.current === null || !inputRef.current) return;
-    const pos = positionAfterNDigits(text, pendingCursor.current);
-    inputRef.current.setSelectionRange(pos, pos);
-    pendingCursor.current = null;
+    const input = inputRef.current;
+    if (!input) return;
+    if (pendingRange.current !== null) {
+      input.setSelectionRange(...pendingRange.current);
+      pendingRange.current = null;
+      return;
+    }
+    if (pendingCursor.current !== null) {
+      const pos = positionAfterNDigits(text, pendingCursor.current);
+      input.setSelectionRange(pos, pos);
+      pendingCursor.current = null;
+    }
   });
 
-  const isDateAllowed = (d: Date): boolean => {
-    const { date } = toCalendarDateTime(d, config.timeZone);
-    if (config.disabled.matches(date)) return false;
-    if (
-      config.min &&
-      date.year * 10000 + date.month * 100 + date.day <
-        config.min.year * 10000 + config.min.month * 100 + config.min.day
-    )
-      return false;
-    if (
-      config.max &&
-      date.year * 10000 + date.month * 100 + date.day >
-        config.max.year * 10000 + config.max.month * 100 + config.max.day
-    )
-      return false;
+  const isDateAllowed = (d: CalendarDate): boolean => {
+    if (config.disabled.matches(d)) return false;
+    if (config.min && compareDate(d, config.min) < 0) return false;
+    if (config.max && compareDate(d, config.max) > 0) return false;
     return true;
+  };
+
+  // Commit a complete typed date: point shapes select; span shapes with an
+  // existing range move THIS input's bound (core validates ordering/crossing);
+  // an empty span starts from the anchor like a grid click would.
+  const commitDate = (d: CalendarDate): boolean => {
+    // Same date as the mirrored value: no-op (re-dispatching selectDay would
+    // TOGGLE the point selection off in single mode).
+    if (controlled && compareDate(controlled, d) === 0) return true;
+    if (selection.shape === "span" && selection.ranges.length > 0) {
+      setBoundDate(d, bound);
+      const after = store.getState().selection;
+      if (after.shape !== "span" || after.ranges.length === 0) return false;
+      const committed =
+        bound === "to" ? after.ranges[0].end : after.ranges[0].start;
+      return compareDate(committed, d) === 0;
+    }
+    selectDay(d);
+    return true;
+  };
+
+  const processMask = (masked: string) => {
+    setText(masked);
+    let nextInvalid = validatePartialMask(masked, format);
+    const date = maskToCalendarDate(masked, format);
+    if (date) {
+      nextInvalid = !(isDateAllowed(date) && commitDate(date));
+    }
+    setInvalid(nextInvalid);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,32 +182,39 @@ export function CalendarManualInput({
     const raw = e.target.value;
     const sel = e.target.selectionStart ?? raw.length;
     pendingCursor.current = countDigits(raw.slice(0, sel));
+    processMask(applyMask(raw, format));
+  };
 
-    const masked = applyMask(raw, format);
-    setText(masked);
-
-    let nextInvalid = validatePartialMask(masked, format);
-    const date = maskToDate(masked, format);
-
-    if (date) {
-      if (isDateAllowed(date)) {
-        nextInvalid = false;
-        const { date: cd } = toCalendarDateTime(date, config.timeZone);
-        selectDay(calendarDate(cd.year, cd.month, cd.day));
-      } else {
-        nextInvalid = true;
-      }
-    }
-
-    setInvalid(nextInvalid);
+  const handleClear = () => {
+    if (config.readOnly) return;
+    setText("");
+    setInvalid(false);
+    clear();
+    inputRef.current?.focus();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Escape") {
       e.preventDefault();
-      setText("");
-      setInvalid(false);
-      clear();
+      handleClear();
+      return;
+    }
+    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+      if (config.readOnly) return;
+      e.preventDefault();
+      const target = e.currentTarget;
+      const pos = target.selectionStart ?? 0;
+      const seed = controlled ?? getToday(config.timeZone);
+      const step = stepSegment(
+        text,
+        format,
+        pos,
+        e.key === "ArrowUp" ? 1 : -1,
+        seed,
+      );
+      if (!step) return;
+      pendingRange.current = [step.selStart, step.selEnd];
+      processMask(step.text);
       return;
     }
     const target = e.currentTarget;
@@ -149,46 +230,71 @@ export function CalendarManualInput({
       e.preventDefault();
       const before = text.slice(0, sel - 2);
       const after = text.slice(sel);
-      const merged = before + after;
       pendingCursor.current = countDigits(before);
-      const masked = applyMask(merged, format);
-      setText(masked);
-      let nextInvalid = validatePartialMask(masked, format);
-      const date = maskToDate(masked, format);
-      if (date && isDateAllowed(date)) {
-        nextInvalid = false;
-        const { date: cd } = toCalendarDateTime(date, config.timeZone);
-        selectDay(calendarDate(cd.year, cd.month, cd.day));
-      } else if (date) {
-        nextInvalid = true;
-      }
-      setInvalid(nextInvalid);
+      processMask(applyMask(before + after, format));
     }
   };
 
-  const gridSlot = getGridSlotStyle(col);
+  const hasLabel =
+    label !== null && label !== undefined && label !== "" && label !== false;
+  // Default accessible name: span selections get per-bound registry labels
+  // ("Start date" / "End date"), points get the generic `manualInput` key.
+  // No Intl API ships these strings — the registry (overridable per root via
+  // `labels`) is the localization path.
+  const defaultLabelKey =
+    selection.shape === "span"
+      ? bound === "to"
+        ? "rangeTo"
+        : "rangeFrom"
+      : "manualInput";
+  const ariaLabel = hasLabel
+    ? undefined
+    : t(defaultLabelKey, undefined, inputLabel);
 
   return (
     <div
       data-dateforge-manual-input=""
       data-area="manual-input"
+      data-theme={theme}
+      data-scheme={scheme}
       className={[styles.container, className].filter(Boolean).join(" ")}
-      style={gridSlot}
+      style={{
+        ...getGridSlotStyle(col),
+        alignItems: ALIGN_TO_JUSTIFY[align],
+      }}
     >
-      <input
-        id={inputId}
-        ref={inputRef}
-        type="text"
-        inputMode="numeric"
-        className={styles.input}
-        data-invalid={invalid || undefined}
-        value={text}
-        placeholder={placeholder ?? format}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-        readOnly={config.readOnly}
-        aria-invalid={invalid || undefined}
-      />
+      {hasLabel && (
+        <label className={styles.label} htmlFor={inputId}>
+          {label}
+        </label>
+      )}
+      <span className={styles.inputWrap}>
+        <input
+          id={inputId}
+          ref={inputRef}
+          type="text"
+          inputMode="numeric"
+          className={styles.input}
+          data-invalid={invalid || undefined}
+          value={text}
+          placeholder={placeholder ?? format}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          readOnly={config.readOnly}
+          aria-invalid={invalid || undefined}
+          aria-label={ariaLabel}
+        />
+        {allowClear && text !== "" && !config.readOnly && (
+          <button
+            type="button"
+            className={styles.clearBtn}
+            aria-label={t("clear", undefined, clearLabel)}
+            onClick={handleClear}
+          >
+            ×
+          </button>
+        )}
+      </span>
     </div>
   );
 }

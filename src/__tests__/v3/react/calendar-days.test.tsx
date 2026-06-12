@@ -98,3 +98,32 @@ describe("CalendarDays", () => {
     expect(dayButton(container, 7).getAttribute("data-in-range")).toBe("");
   });
 });
+
+describe("CalendarDays accessible names (Intl)", () => {
+  it("day cells carry a full localized date aria-label", () => {
+    render(
+      <CalendarProvider
+        config={config("day", "single", { locale: "en-US" })}
+        initialView={D(2026, 6, 1)}
+      >
+        <CalendarDays />
+      </CalendarProvider>,
+    );
+    const cell = document.querySelector('[data-date="20260615"]');
+    expect(cell?.getAttribute("aria-label")).toMatch(/June 15, 2026/);
+    expect(cell?.getAttribute("aria-label")).toMatch(/Monday/);
+  });
+
+  it("grid is named by the viewed month/year, localized", () => {
+    render(
+      <CalendarProvider
+        config={config("day", "single", { locale: "ru-RU" })}
+        initialView={D(2026, 6, 1)}
+      >
+        <CalendarDays />
+      </CalendarProvider>,
+    );
+    const grid = document.querySelector("[role=grid]");
+    expect(grid?.getAttribute("aria-label")).toMatch(/июнь 2026/i);
+  });
+});
