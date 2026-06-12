@@ -127,11 +127,17 @@ describe("generated themes.css", () => {
     expect(css.match(/\[data-theme="/g)).toHaveLength(FAMILIES.length);
   });
 
-  it("every family block carries the full 16-token contract", () => {
+  it("every family block carries the required token contract", () => {
+    // todayDot is intentionally omitted from generated themes — CSS defaults to
+    // var(--c-accent). Themes may still set it via createTheme for custom colors.
+    const OPTIONAL_VARS = new Set(["--c-todayDot"]);
+    const required = Object.values(TOKEN_TO_VAR).filter(
+      (v) => !OPTIONAL_VARS.has(v),
+    );
     const blocks = css.split("[data-theme=").slice(1);
     for (const block of blocks) {
       const body = block.slice(0, block.indexOf("}"));
-      for (const cssVar of Object.values(TOKEN_TO_VAR)) {
+      for (const cssVar of required) {
         expect(body, `missing ${cssVar} in ${block.slice(0, 12)}`).toContain(
           `${cssVar}:`,
         );

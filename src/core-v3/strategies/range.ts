@@ -37,6 +37,15 @@ function selectDay(ctx: SelectionContext, date: CalendarDate): ReduceResult {
   const rejection = validateDay(date, ctx.config);
   if (rejection) return rejected(ctx.state, rejection);
 
+  // A complete range exists and no draft is armed: the new click starts OVER
+  // (single-range mode) — the old range clears IMMEDIATELY (with a notify, so
+  // controlled hosts see null) and the clicked day arms the next anchor.
+  if (!sel.draftAnchor && sel.ranges.length > 0) {
+    const cleared = commitSpan(ctx.state, [], undefined, ctx.config);
+    const armed = setDraftAnchor(cleared.state, date);
+    return { state: armed.state, effects: cleared.effects };
+  }
+
   // First click — arm the anchor, commit nothing yet.
   if (!sel.draftAnchor) return setDraftAnchor(ctx.state, date);
 

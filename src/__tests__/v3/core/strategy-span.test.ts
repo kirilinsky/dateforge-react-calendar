@@ -677,3 +677,30 @@ describe("setBoundDate (span bound date edit)", () => {
     expect(r.state).toBe(s0);
   });
 });
+
+describe("range start-over (single-range click on complete range)", () => {
+  it("click with a complete range clears it and arms the new anchor", () => {
+    const cfg = config("day", "range");
+    let s = start(cfg);
+    s = reduce(s, { type: "selectDay", date: D(2026, 6, 10) }, cfg).state;
+    s = reduce(s, { type: "selectDay", date: D(2026, 6, 15) }, cfg).state;
+
+    const r = reduce(s, { type: "selectDay", date: D(2026, 6, 20) }, cfg);
+    expect(spans(r.state)).toEqual([]);
+    expect(anchor(r.state)).toEqual(D(2026, 6, 20));
+    // Old range cleared with a notify so controlled hosts see null.
+    expect(notifySpans(r)).toEqual([]);
+  });
+
+  it("the following click commits the fresh range", () => {
+    const cfg = config("day", "range");
+    let s = start(cfg);
+    s = reduce(s, { type: "selectDay", date: D(2026, 6, 10) }, cfg).state;
+    s = reduce(s, { type: "selectDay", date: D(2026, 6, 15) }, cfg).state;
+    s = reduce(s, { type: "selectDay", date: D(2026, 6, 20) }, cfg).state;
+    const r = reduce(s, { type: "selectDay", date: D(2026, 6, 22) }, cfg);
+    expect(spans(r.state)).toEqual([
+      [dateKey(D(2026, 6, 20)), dateKey(D(2026, 6, 22))],
+    ]);
+  });
+});

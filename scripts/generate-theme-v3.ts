@@ -41,12 +41,18 @@ const V2_TO_V3_KEY: Record<keyof V2ThemeTokens, keyof V3ThemeTokens> = {
 
 const V3_KEYS = Object.keys(TOKEN_TO_VAR) as (keyof V3ThemeTokens)[];
 
+// todayDot is intentionally not emitted: the CSS defaults to var(--c-accent),
+// which is legible on any backdrop. V2 todayDot values were derived for the
+// accent surface (activeText semantics), making them invisible in dark mode.
+const SKIP_V2_KEYS = new Set<keyof V2ThemeTokens>(["todayDot"]);
+
 function remap(v2: V2ThemeTokens): Partial<V3ThemeTokens> {
   const out: Partial<V3ThemeTokens> = {};
   for (const [v2Key, v3Key] of Object.entries(V2_TO_V3_KEY) as [
     keyof V2ThemeTokens,
     keyof V3ThemeTokens,
   ][]) {
+    if (SKIP_V2_KEYS.has(v2Key)) continue;
     const value = v2[v2Key];
     if (value != null) out[v3Key] = value;
   }
