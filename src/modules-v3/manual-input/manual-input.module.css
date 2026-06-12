@@ -1,0 +1,36 @@
+@layer cal-modules {
+  .container {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.5em 0.6em;
+    min-width: 0;
+  }
+
+  .input {
+    flex: 1;
+    font: inherit;
+    font-size: 0.9em;
+    padding: 0.4em 0.6em;
+    border: 1px solid var(--c-stroke, #ddd);
+    border-radius: var(--c-day-radius, 6px);
+    background: var(--c-backdrop, #fff);
+    color: var(--c-text, #222);
+    min-width: 0;
+    outline: none;
+    transition: border-color 120ms ease;
+  }
+
+  .input:focus {
+    border-color: var(--c-accent, #1a73e8);
+  }
+
+  .input[data-invalid] {
+    border-color: var(--c-error, #d32f2f);
+  }
+
+  .input[readonly] {
+    background: color-mix(in srgb, var(--c-backdrop, #fff) 70%, var(--c-tone, #aaa));
+    cursor: default;
+  }
+}

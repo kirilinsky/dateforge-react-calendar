@@ -1,0 +1,102 @@
+@layer cal-modules {
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.5em 0.6em;
+    min-width: 0;
+  }
+
+  .chip {
+    appearance: none;
+    border: 1px solid var(--c-stroke, #ddd);
+    background: color-mix(in srgb, var(--c-backdrop, #fff) 80%, var(--c-tone, #888));
+    color: var(--c-text, #222);
+    font: inherit;
+    font-size: 0.85em;
+    padding: 0.3em 0.7em;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 120ms ease;
+  }
+
+  .chip:hover:not([disabled]) {
+    background: var(--c-highlight, #eef1f7);
+  }
+
+  .chip[data-active] {
+    background: var(--c-accent, #1a73e8);
+    color: var(--c-activeText, #fff);
+    border-color: var(--c-accent, #1a73e8);
+  }
+
+  /* Chip with inline remove button */
+  .chipGroup {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--c-stroke, #ddd);
+    border-radius: 999px;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--c-backdrop, #fff) 80%, var(--c-tone, #888));
+  }
+
+  .chipGroup[data-active] {
+    background: var(--c-accent, #1a73e8);
+    border-color: var(--c-accent, #1a73e8);
+    color: var(--c-activeText, #fff);
+  }
+
+  .chipMain {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 0.85em;
+    padding: 0.3em 0.5em 0.3em 0.7em;
+    cursor: pointer;
+  }
+
+  .chipRemove {
+    appearance: none;
+    border: none;
+    border-left: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 0.8em;
+    padding: 0.3em 0.5em;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .chipRemove:hover:not([disabled]) {
+    background: color-mix(in srgb, currentColor 12%, transparent);
+  }
+
+  .sep {
+    color: var(--c-mutedText, #999);
+    font-size: 0.85em;
+    padding: 0 0.15em;
+  }
+
+  .clearBtn {
+    appearance: none;
+    border: 1px solid var(--c-stroke, #ddd);
+    background: transparent;
+    color: var(--c-mutedText, #999);
+    font: inherit;
+    font-size: 0.85em;
+    padding: 0.3em 0.65em;
+    border-radius: 999px;
+    cursor: pointer;
+    margin-inline-start: auto;
+  }
+
+  .clearBtn:hover:not([disabled]) {
+    background: var(--c-highlight, #eef1f7);
+    color: var(--c-text, #222);
+  }
+}

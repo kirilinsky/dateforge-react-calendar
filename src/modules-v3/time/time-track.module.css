@@ -1,0 +1,118 @@
+@layer cal-modules {
+  .root {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4em;
+    width: 100%;
+    flex: 1;
+    min-height: 8em;
+    overflow: hidden;
+  }
+
+  .period {
+    position: relative;
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    background: var(--c-backdrop, color-mix(in srgb, currentColor 6%, transparent));
+    border-radius: 999px;
+    border: none;
+    padding: 4px;
+    min-height: 2.4em;
+    min-width: 5.5em;
+    flex-shrink: 0;
+    cursor: pointer;
+    font: inherit;
+    color: var(--c-muted, #888);
+  }
+
+  .period:focus-visible {
+    outline: 2px solid var(--c-accent, #1a73e8);
+    outline-offset: 2px;
+  }
+
+  .period:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  .periodThumb {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    width: calc(50% - 4px);
+    border-radius: 999px;
+    background: var(--c-highlight, color-mix(in srgb, var(--c-accent, #1a73e8) 16%, transparent));
+    transition: transform 0.2s ease;
+    pointer-events: none;
+  }
+
+  .period[data-period="PM"] .periodThumb {
+    transform: translateX(100%);
+  }
+
+  .periodLabel {
+    position: relative;
+    z-index: 1;
+    padding: 0 0.6em;
+    text-align: center;
+    font-size: 0.8em;
+    font-weight: 600;
+    line-height: 1;
+    user-select: none;
+  }
+
+  .period[data-period="AM"] .periodLabel[data-value="AM"],
+  .period[data-period="PM"] .periodLabel[data-value="PM"] {
+    color: var(--c-active, var(--c-text, #222));
+  }
+
+  .drums {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 1px;
+    width: 100%;
+    padding: 5px;
+    flex: 1;
+  }
+
+  .drumCol {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .colonCol {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .drumLabel {
+    text-align: center;
+    font-size: 0.7em;
+    font-weight: 600;
+    color: var(--c-muted, #888);
+    line-height: 1.2;
+    padding-bottom: 0.25em;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    user-select: none;
+  }
+
+  .colon {
+    font-size: 1em;
+    color: var(--c-muted, #888);
+    flex-shrink: 0;
+    align-self: center;
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+}

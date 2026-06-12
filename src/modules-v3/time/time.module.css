@@ -1,0 +1,52 @@
+@layer cal-modules {
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    min-width: 0;
+    container-type: inline-size;
+    container-name: cal-time;
+  }
+
+  /* Inert: no selection to write a time onto. Dim so it reads as inactive. */
+  .container[data-readonly] {
+    opacity: 0.55;
+  }
+
+  /* Date header for a bound wheel (which boundary this edits). */
+  .boundedDate {
+    text-align: center;
+    font-size: 0.78em;
+    font-weight: 600;
+    color: var(--c-muted, #888);
+    padding: 0.35em 0 0.15em;
+    user-select: none;
+  }
+
+  /* "Now" reset button under the drums. */
+  .resetBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35em;
+    align-self: center;
+    margin: 0.35em 0 0.15em;
+    padding: 0.3em 0.9em;
+    border: none;
+    border-radius: 999px;
+    background: var(--c-backdrop, color-mix(in srgb, currentColor 6%, transparent));
+    color: var(--c-text, #222);
+    font: inherit;
+    font-size: 0.8em;
+    cursor: pointer;
+  }
+
+  .resetBtn:hover {
+    background: var(--c-highlight, color-mix(in srgb, var(--c-accent, #1a73e8) 14%, transparent));
+  }
+
+  .resetBtn:focus-visible {
+    outline: 2px solid var(--c-accent, #1a73e8);
+    outline-offset: 2px;
+  }
+}

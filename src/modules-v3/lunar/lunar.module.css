@@ -1,0 +1,83 @@
+@layer cal-modules {
+  .container {
+    container-type: inline-size;
+    container-name: cal-lunar;
+    min-width: 0;
+  }
+
+  .strip {
+    display: flex;
+    gap: 0;
+    overflow: hidden;
+    padding: 0.4em 0.3em;
+  }
+
+  .cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    gap: 0.15em;
+    padding: 0.25em 0.1em;
+    border-radius: var(--c-day-radius, 6px);
+    min-width: 0;
+    font-size: 0.72em;
+    color: var(--c-mutedText, #888);
+  }
+
+  .cell[data-anchor] {
+    background: color-mix(in srgb, var(--c-accent, #1a73e8) 12%, transparent);
+    color: var(--c-text, #222);
+  }
+
+  .day {
+    font-size: 0.9em;
+    line-height: 1.2;
+  }
+
+  .icon {
+    line-height: 0;
+    color: var(--c-text, #222);
+    opacity: 0.7;
+  }
+
+  .label {
+    font-size: 0.75em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    line-height: 1.2;
+  }
+
+  /* Phase icon layers: only the active phase path is visible */
+  .cell [data-phase-layer] {
+    opacity: 0;
+  }
+
+  .cell[data-phase="new"] [data-phase-layer="new"],
+  .cell[data-phase="waxing-crescent"] [data-phase-layer="waxing-crescent"],
+  .cell[data-phase="first-quarter"] [data-phase-layer="first-quarter"],
+  .cell[data-phase="waxing-gibbous"] [data-phase-layer="waxing-gibbous"],
+  .cell[data-phase="full"] [data-phase-layer="full"],
+  .cell[data-phase="waning-gibbous"] [data-phase-layer="waning-gibbous"],
+  .cell[data-phase="last-quarter"] [data-phase-layer="last-quarter"],
+  .cell[data-phase="waning-crescent"] [data-phase-layer="waning-crescent"] {
+    opacity: 1;
+  }
+
+  /* Narrow: hide outer cells via container queries */
+  @container cal-lunar (max-width: 18em) {
+    .cell:nth-child(-n + 4),
+    .cell:nth-last-child(-n + 4) {
+      display: none;
+    }
+  }
+
+  @container cal-lunar (max-width: 12em) {
+    .cell:nth-child(-n + 7),
+    .cell:nth-last-child(-n + 7) {
+      display: none;
+    }
+  }
+}

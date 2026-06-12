@@ -13,7 +13,7 @@ import {
   rangeLengthDays,
   weekRange,
 } from "../calendar-range";
-import { type CalendarTime, isValidTime } from "../calendar-time";
+import { type CalendarTime, compareTime, isValidTime } from "../calendar-time";
 import { noChange, type ReduceResult, result } from "../effects";
 import { applyExclusion } from "../segment";
 import type {
@@ -151,55 +151,53 @@ export function rangesEqual(a: CalendarRange, b: CalendarRange): boolean {
 
 export type SpanTimes = { from?: CalendarTime; to?: CalendarTime };
 
-function materializeSpanRanges(
+/**
+ * Exclusion validity check for a span commit. Rejects when an endpoint is
+ * excluded under the `"reject"` policy, or when exclusion would erase a span
+ * entirely (`empty-after-exclude`). VALIDATION ONLY — segments computed here are
+ * discarded: per §2d the committed/emitted value carries logical spans, and the
+ * segmented view is derived later (`toSegments`) into change details.
+ */
+function spanExclusionRejection(
   ranges: readonly CalendarRange[],
   config?: CalendarConfig,
-): CalendarRange[] | null {
-  if (!config || config.exclude.isEmpty || ranges.length === 0) {
-    return ranges.slice();
-  }
-
-  const out: CalendarRange[] = [];
+): ValidationResult | null {
+  if (!config || config.exclude.isEmpty || ranges.length === 0) return null;
   for (const range of ranges) {
     if (
       config.excludedEndpointPolicy === "reject" &&
       (config.exclude.matches(range.start) || config.exclude.matches(range.end))
     ) {
-      return null;
+      return invalid("empty-after-exclude");
     }
-
-    const segments = applyExclusion(range, config.exclude);
-    if (segments.length === 0) return null;
-    out.push(...segments);
+    if (applyExclusion(range, config.exclude).length === 0) {
+      return invalid("empty-after-exclude");
+    }
   }
-  return out;
+  return null;
 }
 
-/** Commit a span selection (clears any draft anchor) and emit notify. */
+/**
+ * Commit a span selection (clears any draft anchor) and emit notify. The notify
+ * payload is the LOGICAL selection (§2d) — never pre-segmented; the adapter
+ * derives the public value and `details.segments` from committed state.
+ */
 export function commitSpan(
   state: CalendarState,
   ranges: CalendarRange[],
   times?: SpanTimes,
   config?: CalendarConfig,
 ): ReduceResult {
+  const exclusionRejection = spanExclusionRejection(ranges, config);
+  if (exclusionRejection) return rejected(state, exclusionRejection);
+
   const selection: SpanSelection = {
     shape: "span",
     ranges,
     fromTime: times?.from,
     toTime: times?.to,
   };
-
-  const notifyRanges = materializeSpanRanges(ranges, config);
-  if (!notifyRanges) return rejected(state, invalid("empty-after-exclude"));
-
-  const notifySelection: SpanSelection = {
-    ...selection,
-    ranges: notifyRanges,
-  };
-
-  return result({ ...state, selection }, [
-    { type: "notify", selection: notifySelection },
-  ]);
+  return result({ ...state, selection }, [{ type: "notify", selection }]);
 }
 
 /** Set/clear the pending range anchor. Pending = no notify (range incomplete). */
@@ -234,6 +232,18 @@ export function spanSetTime(
   if (!isValidTime(time)) return rejected(state, invalid("malformed-input"));
   const from = bound === "to" ? sel.fromTime : time;
   const to = bound === "from" ? sel.toTime : time;
+  // Same-day span: the from-time may not pass the to-time, otherwise the
+  // selection would end before it starts. Cross-day spans order by date alone.
+  const first = sel.ranges[0].start;
+  const last = sel.ranges[sel.ranges.length - 1].end;
+  if (
+    from &&
+    to &&
+    compareDate(first, last) === 0 &&
+    compareTime(from, to) > 0
+  ) {
+    return rejected(state, invalid("time-out-of-order"));
+  }
   return commitSpan(state, [...sel.ranges], { from, to }, config);
 }
 

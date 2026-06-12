@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { calendarDate, dateKey } from "@/core-v3/calendar-date";
 import { MIDNIGHT } from "@/core-v3/calendar-time";
 import { compileDateRules } from "@/core-v3/date-rule-engine";
+import { toSegments } from "@/core-v3/public-value";
 import { reduce } from "@/core-v3/reducer";
 import type { SelectionMode, SelectionUnit } from "@/core-v3/selection-types";
 import { type CalendarConfig, createInitialState } from "@/core-v3/state";
@@ -296,6 +297,57 @@ describe("range time", () => {
       "malformed-input",
     );
   });
+
+  it("same-day range rejects from-time after to-time", () => {
+    const cfg = config("day", "range", { withTime: true });
+    // Same-day range: 2026-06-05 .. 2026-06-05.
+    let s = reduce(
+      start(cfg),
+      { type: "selectDay", date: D(2026, 6, 5) },
+      cfg,
+    ).state;
+    s = reduce(s, { type: "selectDay", date: D(2026, 6, 5) }, cfg).state;
+    // to-time 09:00 first…
+    s = reduce(
+      s,
+      { type: "setTime", time: { ...MIDNIGHT, hour: 9 }, bound: "to" },
+      cfg,
+    ).state;
+    // …then from-time 18:00 — would end before it starts.
+    const r = reduce(
+      s,
+      { type: "setTime", time: { ...MIDNIGHT, hour: 18 }, bound: "from" },
+      cfg,
+    );
+    expect(r.state).toBe(s);
+    expect((r.effects[0] as { result: { reason: string } }).result.reason).toBe(
+      "time-out-of-order",
+    );
+  });
+
+  it("cross-day range allows any from/to times", () => {
+    const cfg = config("day", "range", { withTime: true });
+    let s = reduce(
+      start(cfg),
+      { type: "selectDay", date: D(2026, 6, 5) },
+      cfg,
+    ).state;
+    s = reduce(s, { type: "selectDay", date: D(2026, 6, 9) }, cfg).state;
+    s = reduce(
+      s,
+      { type: "setTime", time: { ...MIDNIGHT, hour: 9 }, bound: "to" },
+      cfg,
+    ).state;
+    const r = reduce(
+      s,
+      { type: "setTime", time: { ...MIDNIGHT, hour: 18 }, bound: "from" },
+      cfg,
+    );
+    expect(r.effects[0].type).toBe("notify");
+    expect(
+      r.state.selection.shape === "span" && r.state.selection.fromTime?.hour,
+    ).toBe(18);
+  });
 });
 
 describe("multi-range", () => {
@@ -486,7 +538,7 @@ describe("week/month multiple", () => {
 });
 
 describe("segmented exclusion", () => {
-  it("keeps logical state ranges but emits excluded-day segments", () => {
+  it("notify carries logical span; toSegments derives segments", () => {
     const cfg = config("day", "range", {
       exclude: compileDateRules({ weekends: true }),
     });
@@ -497,10 +549,21 @@ describe("segmented exclusion", () => {
     ).state;
     const r = reduce(s, { type: "selectDay", date: D(2026, 6, 9) }, cfg); // Tue
 
+    // §2d: state holds logical span
     expect(spans(r.state)).toEqual([[20260605, 20260609]]);
-    expect(notifySpans(r)).toEqual([
-      [20260605, 20260605],
-      [20260608, 20260609],
+    // §2d: notify payload = same logical span (not segmented)
+    expect(notifySpans(r)).toEqual([[20260605, 20260609]]);
+    // segments derived separately via toSegments
+    const segs = toSegments(r.state.selection, cfg);
+    const localKey = (d: Date) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const segKeys = segs?.map((seg) => [
+      localKey(seg.start),
+      localKey(seg.end),
+    ]);
+    expect(segKeys).toEqual([
+      ["2026-06-05", "2026-06-05"],
+      ["2026-06-08", "2026-06-09"],
     ]);
   });
 
