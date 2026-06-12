@@ -18,8 +18,8 @@ export type CalendarAction =
   | { type: "setBoundDate"; date: CalendarDate; bound: "from" | "to" }
   /** Move the view anchor to an explicit date. */
   | { type: "navigateTo"; date: CalendarDate }
-  /** Step the view by whole months/years (prev/next controls). */
-  | { type: "navigateBy"; step: "month" | "year"; amount: number }
+  /** Step the view by whole days/months/years (prev/next controls). */
+  | { type: "navigateBy"; step: "day" | "month" | "year"; amount: number }
   /** Hover preview target (range drawing). `undefined` clears it. */
   | { type: "hover"; date?: CalendarDate }
   /** Roving focus target. `undefined` clears it. */

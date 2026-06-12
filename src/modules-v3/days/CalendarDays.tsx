@@ -80,7 +80,11 @@ export type CalendarDaysProps = {
   highlightWeekends?: boolean;
   /** Bold + weekend-ink weekday numbers (v2 look). Default false. */
   boldWeekends?: boolean;
-  /** Dot under today's number (`--c-todayDot`). Default true. */
+  /**
+   * Dot under today's number (`--c-todayDot`). Default true — except when
+   * `renderDay` is set: custom content owns the cell's inner layout, so the
+   * dot is off unless explicitly re-enabled.
+   */
   todayDot?: boolean;
   /** Subtle inset outline on today (50% accent). Default true. */
   highlightToday?: boolean;
@@ -203,7 +207,7 @@ export function CalendarDays({
   weekdayFormat = "short",
   highlightWeekends = true,
   boldWeekends = false,
-  todayDot = true,
+  todayDot,
   highlightToday = false,
   renderDay,
   theme,
@@ -352,7 +356,7 @@ export function CalendarDays({
       data-week-numbers={weekNumbers ? "" : undefined}
       data-weekend-tint={highlightWeekends ? "" : undefined}
       data-bold-weekends={boldWeekends ? "" : undefined}
-      data-today-dot={todayDot ? "" : undefined}
+      data-today-dot={(todayDot ?? !renderDay) ? "" : undefined}
       data-today-outline={highlightToday ? "" : undefined}
       className={[styles.grid, className].filter(Boolean).join(" ")}
       style={getGridSlotStyle(col)}

@@ -3,6 +3,7 @@ import { calendarDate } from "../../core-v3/calendar-date";
 import { toCalendarDateTime } from "../../core-v3/timezone-boundary";
 import { useToday } from "../../hooks/use-today";
 import { useLabels } from "../../react-v3/labels-context";
+import { UIButton } from "../../react-v3/ui/button";
 import { useCalendarActions, useCalendarStore } from "../../react-v3/provider";
 import { useStoreSelector } from "../../react-v3/use-store-selector";
 import { getGridSlotStyle } from "../../utils/get-grid-slot-style";
@@ -146,8 +147,8 @@ export function CalendarMonthsWheel({
         </div>
       </div>
       {canReset && (
-        <button
-          type="button"
+        <UIButton
+          size="sm"
           className={styles.resetBtn}
           onClick={handleReset}
           aria-label={t(
@@ -157,7 +158,7 @@ export function CalendarMonthsWheel({
           )}
         >
           {resetLabel ?? <span>{currentMonthName}</span>}
-        </button>
+        </UIButton>
       )}
     </div>
   );

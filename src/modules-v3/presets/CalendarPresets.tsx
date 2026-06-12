@@ -10,6 +10,7 @@ import type { SelectionState } from "../../core-v3/state";
 import { today } from "../../core-v3/timezone-boundary";
 import { useRovingTileFocus } from "../../hooks/use-roving-tile-focus";
 import { useCalendarActions, useCalendarStore } from "../../react-v3/provider";
+import { UITile } from "../../react-v3/ui/tile";
 import { useStoreSelector } from "../../react-v3/use-store-selector";
 import { getGridSlotStyle } from "../../utils/get-grid-slot-style";
 import styles from "./presets.module.css";
@@ -114,11 +115,11 @@ export function CalendarPresets({
             ep.status === "incompatible" ||
             ep.status === "disabled";
           return (
-            <button
+            <UITile
               key={ep.preset.id}
-              type="button"
               {...getItemProps(index)}
               className={styles.item}
+              selected={active}
               data-active={active ? "" : undefined}
               data-preset-id={ep.preset.id}
               data-status={ep.status}
@@ -133,7 +134,7 @@ export function CalendarPresets({
               }}
             >
               {ep.preset.label ?? ep.preset.id}
-            </button>
+            </UITile>
           );
         })}
       </div>

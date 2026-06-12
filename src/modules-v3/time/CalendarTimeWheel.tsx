@@ -7,6 +7,7 @@ import {
 import { toCalendarDateTime } from "../../core-v3/timezone-boundary";
 import { useToday } from "../../hooks/use-today";
 import { useLabels } from "../../react-v3/labels-context";
+import { UIButton } from "../../react-v3/ui/button";
 import { useCalendarActions, useCalendarStore } from "../../react-v3/provider";
 import { useStoreSelector } from "../../react-v3/use-store-selector";
 import { getGridSlotStyle } from "../../utils/get-grid-slot-style";
@@ -225,14 +226,14 @@ export function CalendarTimeWheel({
         onChange={commit}
       />
       {canReset && (
-        <button
-          type="button"
+        <UIButton
+          size="sm"
           className={styles.resetBtn}
           onClick={handleReset}
           aria-label={t("resetTime", { time: nowWord ?? "" }, resetTimeLabel)}
         >
           {resetLabel ?? <span>{nowWord}</span>}
-        </button>
+        </UIButton>
       )}
     </div>
   );

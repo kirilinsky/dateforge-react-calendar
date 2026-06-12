@@ -7,6 +7,7 @@ import {
 import { rangesOverlap } from "../../core-v3/calendar-range";
 import { useRovingTileFocus } from "../../hooks/use-roving-tile-focus";
 import { useLabels } from "../../react-v3/labels-context";
+import { UITile } from "../../react-v3/ui/tile";
 import { useCalendarActions, useCalendarStore } from "../../react-v3/provider";
 import { useStoreSelector } from "../../react-v3/use-store-selector";
 import { getGridSlotStyle } from "../../utils/get-grid-slot-style";
@@ -106,16 +107,15 @@ export function CalendarMonthsGrid({
           const isSelected = selectedMonths.has(month);
           const disabled = config.readOnly || isOutOfRange(month);
           return (
-            <button
+            <UITile
               key={month}
-              type="button"
               {...getItemProps(month - 1)}
               className={styles.item}
               aria-label={longNames[month - 1]}
               aria-current={isCurrent ? "true" : undefined}
               aria-disabled={disabled || undefined}
-              data-current={isCurrent ? "" : undefined}
-              data-selected={isSelected ? "" : undefined}
+              current={isCurrent}
+              selected={isSelected}
               onClick={() => {
                 if (disabled) return;
                 navigateTo(calendarDate(year, month, 1));
@@ -123,7 +123,7 @@ export function CalendarMonthsGrid({
               }}
             >
               {monthNames[month - 1]}
-            </button>
+            </UITile>
           );
         })}
       </div>

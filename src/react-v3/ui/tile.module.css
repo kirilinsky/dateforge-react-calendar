@@ -1,0 +1,46 @@
+@layer cal-base {
+  /*
+   * UITile — the shared roving-grid cell primitive. cal-base layer: module
+   * rules (cal-modules) override freely (presets tint the resting surface,
+   * grids set their own min-heights) without !important.
+   */
+  .tile {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: var(--c-text, #222);
+    font: inherit;
+    min-width: 0;
+    padding: 0.4em 0.6em;
+    border-radius: var(--c-day-radius, 8px);
+    cursor: pointer;
+    transition:
+      background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
+  }
+
+  .tile:hover:not(:disabled):not([aria-disabled="true"]) {
+    background: var(--c-tone, #eef1f7);
+  }
+
+  /* Committed pick. */
+  .tile[data-selected] {
+    background: var(--c-accent, #1a73e8);
+    color: var(--c-activeText, #fff);
+  }
+
+  /* "Current" (today's month/year): same subtle accent outline language as
+     the Days today marker. :not(:focus-visible) keeps the focus ring intact. */
+  .tile[data-current]:not(:focus-visible) {
+    outline: 1px solid color-mix(in srgb, var(--c-accent, #1a73e8) 50%, transparent);
+    outline-offset: -1px;
+  }
+
+  .tile:disabled,
+  .tile[aria-disabled="true"] {
+    color: var(--c-disabledText, #ccc);
+    cursor: not-allowed;
+    opacity: 0.55;
+    background: transparent;
+  }
+}

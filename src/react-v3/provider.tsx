@@ -183,7 +183,7 @@ export type CalendarActions = {
   setTime(time: CalendarTime, bound?: "from" | "to"): void;
   setBoundDate(date: CalendarDate, bound: "from" | "to"): void;
   navigateTo(date: CalendarDate): void;
-  navigateBy(step: "month" | "year", amount: number): void;
+  navigateBy(step: "day" | "month" | "year", amount: number): void;
   hover(date?: CalendarDate): void;
   focus(date?: CalendarDate): void;
   clear(): void;

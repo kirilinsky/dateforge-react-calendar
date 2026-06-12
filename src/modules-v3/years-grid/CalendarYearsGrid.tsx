@@ -2,7 +2,13 @@ import { useMemo, useState } from "react";
 import { calendarDate, daysInMonth } from "../../core-v3/calendar-date";
 import { rangesOverlap } from "../../core-v3/calendar-range";
 import { useRovingTileFocus } from "../../hooks/use-roving-tile-focus";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "../../react-v3/icons";
 import { useLabels } from "../../react-v3/labels-context";
+import { UIButton } from "../../react-v3/ui/button";
+import { UITile } from "../../react-v3/ui/tile";
 import { useCalendarActions, useCalendarStore } from "../../react-v3/provider";
 import { useStoreSelector } from "../../react-v3/use-store-selector";
 import { getGridSlotStyle } from "../../utils/get-grid-slot-style";
@@ -97,25 +103,21 @@ export function CalendarYearsGrid({
           role="group"
           aria-label={t("yearPageNavigation")}
         >
-          <button
-            type="button"
-            className={styles.navBtn}
+          <UIButton
             aria-label={t("previousYears")}
             disabled={!canGoPrev}
             onClick={() => setPageOffset((o) => o - 1)}
           >
-            ‹
-          </button>
+            <ChevronLeftIcon />
+          </UIButton>
           <span className={styles.navLabel}>{rangeLabel}</span>
-          <button
-            type="button"
-            className={styles.navBtn}
+          <UIButton
             aria-label={t("nextYears")}
             disabled={!canGoNext}
             onClick={() => setPageOffset((o) => o + 1)}
           >
-            ›
-          </button>
+            <ChevronRightIcon />
+          </UIButton>
         </div>
       )}
       <div
@@ -134,16 +136,15 @@ export function CalendarYearsGrid({
           const disabled =
             config.readOnly || isYearOutOfRange(year, config.min, config.max);
           return (
-            <button
+            <UITile
               key={year}
-              type="button"
               {...getItemProps(idx)}
               className={styles.item}
               aria-label={String(year)}
               aria-current={isCurrent ? "true" : undefined}
               aria-disabled={disabled || undefined}
-              data-current={isCurrent ? "" : undefined}
-              data-selected={isSelected ? "" : undefined}
+              current={isCurrent}
+              selected={isSelected}
               onClick={() => {
                 if (disabled) return;
                 navigateTo(calendarDate(year, viewDate.month, 1));
@@ -151,7 +152,7 @@ export function CalendarYearsGrid({
               }}
             >
               {year}
-            </button>
+            </UITile>
           );
         })}
       </div>
