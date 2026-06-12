@@ -9,6 +9,7 @@ import {
   presetToday,
 } from "../../core-v3/preset-engine";
 import { Calendar } from "../../react-v3/calendar";
+import { storyThemeProps } from "../_lab/story-globals";
 import { CalendarDays } from "../days/CalendarDays";
 import { CalendarPresets } from "./CalendarPresets";
 
@@ -21,11 +22,12 @@ export default meta;
 type Story = StoryObj;
 
 export const SingleMode: Story = {
-  render: () => {
+  render: (_, ctx) => {
     const [value, setValue] = useState<unknown>(null);
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         <Calendar
+          {...storyThemeProps(ctx.globals)}
           config={buildConfig({ mode: "single" })}
           initialView={D(2026, 6, 1)}
           onChange={(v) => setValue(v)}
@@ -42,11 +44,12 @@ export const SingleMode: Story = {
 };
 
 export const RangeMode: Story = {
-  render: () => {
+  render: (_, ctx) => {
     const [value, setValue] = useState<unknown>(null);
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         <Calendar
+          {...storyThemeProps(ctx.globals)}
           config={buildConfig({ mode: "range" })}
           initialView={D(2026, 6, 1)}
           onChange={(v) => setValue(v)}
@@ -64,8 +67,9 @@ export const RangeMode: Story = {
 
 export const AllCommonPresets: Story = {
   name: "Common presets (single)",
-  render: () => (
+  render: (_, ctx) => (
     <Calendar
+      {...storyThemeProps(ctx.globals)}
       config={buildConfig({ mode: "single" })}
       initialView={D(2026, 6, 1)}
     >
@@ -77,8 +81,9 @@ export const AllCommonPresets: Story = {
 
 export const MixedCompatibility: Story = {
   name: "Mixed mode: incompatible presets disabled",
-  render: () => (
+  render: (_, ctx) => (
     <Calendar
+      {...storyThemeProps(ctx.globals)}
       config={buildConfig({ mode: "single" })}
       initialView={D(2026, 6, 1)}
     >
@@ -91,8 +96,9 @@ export const MixedCompatibility: Story = {
 };
 
 export const ReadOnly: Story = {
-  render: () => (
+  render: (_, ctx) => (
     <Calendar
+      {...storyThemeProps(ctx.globals)}
       config={buildConfig({ mode: "single", readOnly: true })}
       initialView={D(2026, 6, 1)}
     >

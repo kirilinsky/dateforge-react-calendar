@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { buildConfig, D } from "../../__tests__/v3/fixtures/builders";
 import { Calendar } from "../../react-v3/calendar";
+import { storyThemeProps } from "../_lab/story-globals";
 import { CalendarDays } from "../days/CalendarDays";
 import { CalendarMonthsWheel } from "./CalendarMonthsWheel";
 
@@ -13,8 +14,12 @@ export default meta;
 type Story = StoryObj;
 
 export const Default: Story = {
-  render: () => (
-    <Calendar config={buildConfig()} initialView={D(2026, 6, 1)}>
+  render: (_, ctx) => (
+    <Calendar
+      {...storyThemeProps(ctx.globals)}
+      config={buildConfig()}
+      initialView={D(2026, 6, 1)}
+    >
       <CalendarMonthsWheel />
       <CalendarDays />
     </Calendar>
@@ -22,8 +27,12 @@ export const Default: Story = {
 };
 
 export const ShortWithLabel: Story = {
-  render: () => (
-    <Calendar config={buildConfig()} initialView={D(2026, 6, 1)}>
+  render: (_, ctx) => (
+    <Calendar
+      {...storyThemeProps(ctx.globals)}
+      config={buildConfig()}
+      initialView={D(2026, 6, 1)}
+    >
       <CalendarMonthsWheel shortMonths showLabel />
       <CalendarDays />
     </Calendar>
@@ -31,8 +40,12 @@ export const ShortWithLabel: Story = {
 };
 
 export const WithReset: Story = {
-  render: () => (
-    <Calendar config={buildConfig()} initialView={D(2026, 2, 1)}>
+  render: (_, ctx) => (
+    <Calendar
+      {...storyThemeProps(ctx.globals)}
+      config={buildConfig()}
+      initialView={D(2026, 2, 1)}
+    >
       <CalendarMonthsWheel showReset />
       <CalendarDays />
     </Calendar>

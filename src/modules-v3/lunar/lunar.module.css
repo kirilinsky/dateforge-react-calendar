@@ -2,81 +2,217 @@
   .container {
     container-type: inline-size;
     container-name: cal-lunar;
+    display: flex;
+    flex-direction: column;
+    gap: var(--cal-lunar-gap, 0.3em);
     min-width: 0;
   }
 
+  /* Strip always has 21 cells (anchor at index 10, 1-based :nth-child(11)).
+     CSS hides outer cells symmetrically based on container width — fewer
+     cells in narrow containers, more in wide ones. Anchor (:nth-child(11))
+     is always visible. */
   .strip {
-    display: flex;
-    gap: 0;
-    overflow: hidden;
+    display: grid;
+    grid-auto-columns: minmax(var(--cal-lunar-cell-min, 4em), 1fr);
+    grid-auto-flow: column;
+    gap: var(--cal-lunar-cell-gap, 0.3em);
+    width: 100%;
+    min-width: 0;
+    justify-content: center;
     padding: 0.4em 0.3em;
   }
 
   .cell {
-    display: flex;
+    display: none;
     flex-direction: column;
     align-items: center;
-    flex: 1;
-    gap: 0.15em;
-    padding: 0.25em 0.1em;
+    justify-content: flex-start;
+    gap: var(--cal-lunar-cell-inner-gap, 0.2em);
+    padding: var(--cal-lunar-cell-padding, 0.35em 0.2em);
     border-radius: var(--c-day-radius, 6px);
     min-width: 0;
-    font-size: 0.72em;
     color: var(--c-mutedText, #888);
+    transition:
+      background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
   }
 
-  .cell[data-anchor] {
-    background: color-mix(in srgb, var(--c-accent, #1a73e8) 12%, transparent);
-    color: var(--c-text, #222);
+  /* Reveal symmetric window around the anchor (1-based :nth-child(11)).
+     Each breakpoint widens the visible window by 2 cells (1 each side).
+     Step ≈ 8em (2 cells × 4em min). Breakpoints assume default
+     `--cal-lunar-cell-min: 4em`; override that token to shift the scale. */
+
+  /* Anchor only — always visible. */
+  .cell:nth-child(11) {
+    display: flex;
+  }
+
+  /* 3 cells — anchor + 1 each side. */
+  @container cal-lunar (min-width: 14em) {
+    .cell:nth-child(10),
+    .cell:nth-child(12) {
+      display: flex;
+    }
+  }
+
+  /* 5 cells. */
+  @container cal-lunar (min-width: 22em) {
+    .cell:nth-child(9),
+    .cell:nth-child(13) {
+      display: flex;
+    }
+  }
+
+  /* 7 cells — typical compact calendar width. */
+  @container cal-lunar (min-width: 30em) {
+    .cell:nth-child(8),
+    .cell:nth-child(14) {
+      display: flex;
+    }
+  }
+
+  /* 9 cells. */
+  @container cal-lunar (min-width: 38em) {
+    .cell:nth-child(7),
+    .cell:nth-child(15) {
+      display: flex;
+    }
+  }
+
+  /* 11 cells. */
+  @container cal-lunar (min-width: 46em) {
+    .cell:nth-child(6),
+    .cell:nth-child(16) {
+      display: flex;
+    }
+  }
+
+  /* 13 cells. */
+  @container cal-lunar (min-width: 54em) {
+    .cell:nth-child(5),
+    .cell:nth-child(17) {
+      display: flex;
+    }
+  }
+
+  /* 15 cells — half synodic cycle. */
+  @container cal-lunar (min-width: 62em) {
+    .cell:nth-child(4),
+    .cell:nth-child(18) {
+      display: flex;
+    }
+  }
+
+  /* 17 cells. */
+  @container cal-lunar (min-width: 70em) {
+    .cell:nth-child(3),
+    .cell:nth-child(19) {
+      display: flex;
+    }
+  }
+
+  /* 19 cells. */
+  @container cal-lunar (min-width: 78em) {
+    .cell:nth-child(2),
+    .cell:nth-child(20) {
+      display: flex;
+    }
+  }
+
+  /* 21 cells — full window, almost a synodic cycle. */
+  @container cal-lunar (min-width: 86em) {
+    .cell:nth-child(1),
+    .cell:nth-child(21) {
+      display: flex;
+    }
   }
 
   .day {
     font-size: 0.9em;
+    font-weight: 500;
     line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+    transition: color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
   }
 
   .icon {
-    line-height: 0;
-    color: var(--c-text, #222);
-    opacity: 0.7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--cal-lunar-icon-color, var(--c-text, #222));
+    opacity: 0.75;
+    transition: color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
   }
 
-  .label {
-    font-size: 0.75em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-    line-height: 1.2;
-  }
-
-  /* Phase icon layers: only the active phase path is visible */
-  .cell [data-phase-layer] {
+  /* All 8 illuminated paths render inside one SVG. Each layer is hidden by
+     default; the cell's `data-phase` reveals the matching layer via opacity
+     transition — crossfade between phases, no remount, no flicker. */
+  .icon [data-phase-layer] {
     opacity: 0;
+    transition: opacity
+      var(--cal-lunar-icon-anim-duration, 0.36s)
+      var(--cal-lunar-icon-anim-easing, cubic-bezier(0.22, 0.61, 0.36, 1));
   }
 
-  .cell[data-phase="new"] [data-phase-layer="new"],
-  .cell[data-phase="waxing-crescent"] [data-phase-layer="waxing-crescent"],
-  .cell[data-phase="first-quarter"] [data-phase-layer="first-quarter"],
-  .cell[data-phase="waxing-gibbous"] [data-phase-layer="waxing-gibbous"],
-  .cell[data-phase="full"] [data-phase-layer="full"],
-  .cell[data-phase="waning-gibbous"] [data-phase-layer="waning-gibbous"],
-  .cell[data-phase="last-quarter"] [data-phase-layer="last-quarter"],
-  .cell[data-phase="waning-crescent"] [data-phase-layer="waning-crescent"] {
+  [data-phase="waxing-crescent"] [data-phase-layer="waxing-crescent"],
+  [data-phase="first-quarter"] [data-phase-layer="first-quarter"],
+  [data-phase="waxing-gibbous"] [data-phase-layer="waxing-gibbous"],
+  [data-phase="full"] [data-phase-layer="full"],
+  [data-phase="waning-gibbous"] [data-phase-layer="waning-gibbous"],
+  [data-phase="last-quarter"] [data-phase-layer="last-quarter"],
+  [data-phase="waning-crescent"] [data-phase-layer="waning-crescent"] {
     opacity: 1;
   }
 
-  /* Narrow: hide outer cells via container queries */
-  @container cal-lunar (max-width: 18em) {
-    .cell:nth-child(-n + 4),
-    .cell:nth-last-child(-n + 4) {
-      display: none;
+  @media (prefers-reduced-motion: reduce) {
+    .icon [data-phase-layer] {
+      transition: none;
     }
   }
 
-  @container cal-lunar (max-width: 12em) {
-    .cell:nth-child(-n + 7),
-    .cell:nth-last-child(-n + 7) {
+  .label {
+    /* Responsive: scales with container width via `cqi`. Keeps "WAX CRES" /
+       "FIRST QTR" readable at 30em+ and shrinks gracefully when narrow.
+       Override with `--cal-lunar-label-font`. */
+    font-size: var(--cal-lunar-label-font, clamp(0.58em, 2.3cqi, 0.72em));
+    font-weight: 600;
+    color: var(--c-mutedText, #888);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1.1;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+    transition: color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
+  }
+
+  /* Anchor cell: highlighted background + accent ink. */
+  .cell[data-anchor] {
+    background: var(--c-tone, color-mix(in srgb, var(--c-accent, #1a73e8) 12%, transparent));
+    color: var(--c-text, #222);
+  }
+
+  .cell[data-anchor] .day {
+    font-weight: 600;
+    color: var(--c-text, #222);
+  }
+
+  .cell[data-anchor] .label {
+    color: var(--c-text, #222);
+  }
+
+  .cell[data-anchor] .icon {
+    color: var(--cal-lunar-anchor-icon-color, var(--c-accent, #1a73e8));
+    opacity: 1;
+  }
+
+  /* Auto-hide labels in very narrow containers where even 4em cells can't
+     keep "WAX CRES" / "FIRST QTR" readable. */
+  @container cal-lunar (max-width: 13em) {
+    .label {
       display: none;
     }
   }

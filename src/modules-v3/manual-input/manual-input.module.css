@@ -18,7 +18,7 @@
     color: var(--c-text, #222);
     min-width: 0;
     outline: none;
-    transition: border-color 120ms ease;
+    transition: border-color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
   }
 
   .input:focus {

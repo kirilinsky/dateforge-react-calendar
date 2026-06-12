@@ -28,11 +28,11 @@
     border-radius: var(--c-day-radius, 8px);
     background: color-mix(in srgb, var(--c-backdrop, #fff) 78%, var(--c-tone, #888));
     color: var(--c-text, #222);
-    transition: background 120ms ease;
+    transition: background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
   }
 
   .item:hover:not([disabled]) {
-    background: var(--c-highlight, #eef1f7);
+    background: var(--c-tone, #eef1f7);
   }
 
   .item[data-active] {

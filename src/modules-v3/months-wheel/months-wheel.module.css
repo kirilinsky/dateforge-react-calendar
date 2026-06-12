@@ -32,7 +32,7 @@
     text-align: center;
     font-size: 0.7em;
     font-weight: 600;
-    color: var(--c-muted, #888);
+    color: var(--c-mutedText, #888);
     line-height: 1.2;
     padding-bottom: 0.25em;
     text-transform: uppercase;
@@ -58,11 +58,11 @@
   }
 
   .resetBtn:hover {
-    background: var(--c-highlight, color-mix(in srgb, var(--c-accent, #1a73e8) 14%, transparent));
+    background: var(--c-tone, color-mix(in srgb, var(--c-accent, #1a73e8) 14%, transparent));
   }
 
   .resetBtn:focus-visible {
-    outline: 2px solid var(--c-accent, #1a73e8);
+    outline: 2px solid var(--c-focusRing, var(--c-accent, #1a73e8));
     outline-offset: 2px;
   }
 }

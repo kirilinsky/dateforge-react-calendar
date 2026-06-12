@@ -6,7 +6,7 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { useThemeScope } from "./theme-scope";
+import { resolveThemeScope, useThemeScope } from "./theme-scope";
 
 /**
  * A portalled popup anchored to a trigger. Rendered into `document.body` with
@@ -54,6 +54,7 @@ export function CalendarPopup({
 }: CalendarPopupProps) {
   const ref = useRef<HTMLDivElement>(null);
   const { theme, scheme } = useThemeScope();
+  const { dataTheme, style: themeStyle } = resolveThemeScope(theme);
   const [mounted, setMounted] = useState(false);
   const [pos, setPos] = useState<Pos | null>(null);
 
@@ -146,10 +147,11 @@ export function CalendarPopup({
       aria-label={label}
       tabIndex={-1}
       data-dateforge-popup=""
-      data-theme={theme}
+      data-theme={dataTheme}
       data-scheme={scheme}
       data-placement={pos?.placement}
       style={{
+        ...themeStyle,
         position: "fixed",
         top: pos?.top ?? 0,
         left: pos?.left ?? 0,

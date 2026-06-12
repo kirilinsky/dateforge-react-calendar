@@ -1,0 +1,92 @@
+/*
+ * Typed registrations for the v3 color tokens (ported from the v2 pattern).
+ *
+ * Registering each `--c-*` as `<color>` makes the tokens INTERPOLABLE: when
+ * `data-theme` flips (or `color-scheme` resolves light-dark() to the other
+ * side), surfaces that declare paint transitions crossfade smoothly instead of
+ * snapping. Without these registrations a custom property change is a discrete
+ * jump and every theme/scheme switch flashes.
+ *
+ * Initial values mirror the neutral defaults in layers.css; they only matter
+ * when a token is used outside the root shell.
+ */
+@property --c-accent {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #1a73e8;
+}
+@property --c-activeText {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #ffffff;
+}
+@property --c-todayDot {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #b06000;
+}
+@property --c-backdrop {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #ffffff;
+}
+@property --c-tone {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #eef1f7;
+}
+@property --c-text {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #1f2024;
+}
+@property --c-stroke {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #d0d3d9;
+}
+@property --c-shadow {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #1f202414;
+}
+@property --c-disabled {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #a0a0a2;
+}
+@property --c-mutedText {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #8a8f98;
+}
+@property --c-disabledText {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #c4c7cc;
+}
+@property --c-weekend {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #c62828;
+}
+@property --c-range {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #1a73e8;
+}
+@property --c-error {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #dc2626;
+}
+@property --c-outOfMonth {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #b9bdc4;
+}
+@property --c-focusRing {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #1a73e8;
+}

@@ -30,11 +30,11 @@
     font: inherit;
     line-height: 1;
     cursor: pointer;
-    transition: background 120ms ease;
+    transition: background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
   }
 
   .nav:hover {
-    background: var(--c-highlight, #eef1f7);
+    background: var(--c-tone, #eef1f7);
   }
 
   .label {
@@ -67,15 +67,15 @@
     font: inherit;
     line-height: 1;
     cursor: pointer;
-    transition: background 120ms ease;
+    transition: background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
   }
 
   .pickerCell:hover {
-    background: var(--c-highlight, #eef1f7);
+    background: var(--c-tone, #eef1f7);
   }
 
   .pickerCell[data-selected] {
     background: var(--c-accent, #3b6cff);
-    color: var(--c-active-text, #fff);
+    color: var(--c-activeText, #fff);
   }
 }

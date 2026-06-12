@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { buildConfig, D } from "../../__tests__/v3/fixtures/builders";
 import { Calendar } from "../../react-v3/calendar";
+import { storyThemeProps } from "../_lab/story-globals";
 import { CalendarDays } from "../days/CalendarDays";
 import { CalendarManualInput } from "./CalendarManualInput";
 
@@ -13,8 +14,9 @@ export default meta;
 type Story = StoryObj;
 
 export const Default: Story = {
-  render: () => (
+  render: (_, ctx) => (
     <Calendar
+      {...storyThemeProps(ctx.globals)}
       config={buildConfig({ mode: "single" })}
       initialView={D(2026, 6, 1)}
     >
@@ -25,8 +27,9 @@ export const Default: Story = {
 };
 
 export const CustomFormat: Story = {
-  render: () => (
+  render: (_, ctx) => (
     <Calendar
+      {...storyThemeProps(ctx.globals)}
       config={buildConfig({ mode: "single" })}
       initialView={D(2026, 6, 1)}
     >
@@ -37,8 +40,9 @@ export const CustomFormat: Story = {
 };
 
 export const ReadOnly: Story = {
-  render: () => (
+  render: (_, ctx) => (
     <Calendar
+      {...storyThemeProps(ctx.globals)}
       config={buildConfig({ mode: "single", readOnly: true })}
       initialView={D(2026, 6, 1)}
     >

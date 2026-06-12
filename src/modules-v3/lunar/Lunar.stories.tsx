@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { buildConfig, D } from "../../__tests__/v3/fixtures/builders";
 import { Calendar } from "../../react-v3/calendar";
+import { storyThemeProps } from "../_lab/story-globals";
 import { CalendarDays } from "../days/CalendarDays";
 import { CalendarLunar } from "./CalendarLunar";
 
@@ -13,8 +14,9 @@ export default meta;
 type Story = StoryObj;
 
 export const Default: Story = {
-  render: () => (
+  render: (_, ctx) => (
     <Calendar
+      {...storyThemeProps(ctx.globals)}
       config={buildConfig({ mode: "single" })}
       initialView={D(2026, 6, 1)}
     >
@@ -25,8 +27,9 @@ export const Default: Story = {
 };
 
 export const NoPhaseLabels: Story = {
-  render: () => (
+  render: (_, ctx) => (
     <Calendar
+      {...storyThemeProps(ctx.globals)}
       config={buildConfig({ mode: "single" })}
       initialView={D(2026, 6, 1)}
     >
@@ -37,13 +40,29 @@ export const NoPhaseLabels: Story = {
 };
 
 export const CustomLabel: Story = {
-  render: () => (
+  render: (_, ctx) => (
     <Calendar
+      {...storyThemeProps(ctx.globals)}
       config={buildConfig({ mode: "single" })}
       initialView={D(2026, 6, 1)}
     >
       <CalendarDays />
       <CalendarLunar lunarLabel="Moon calendar" />
+    </Calendar>
+  ),
+};
+
+export const RootLabels: Story = {
+  name: "Root labels override (registry chain)",
+  render: (_, ctx) => (
+    <Calendar
+      {...storyThemeProps(ctx.globals)}
+      config={buildConfig({ mode: "single" })}
+      initialView={D(2026, 6, 1)}
+      labels={{ lunar: "Лунные фазы" }}
+    >
+      <CalendarDays />
+      <CalendarLunar />
     </Calendar>
   ),
 };

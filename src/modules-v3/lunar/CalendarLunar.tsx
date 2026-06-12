@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { fromCalendarDateTime } from "../../core-v3/timezone-boundary";
+import { useLabels } from "../../react-v3/labels-context";
 import { useCalendarStore } from "../../react-v3/provider";
 import { useStoreSelector } from "../../react-v3/use-store-selector";
 import { getGridSlotStyle } from "../../utils/get-grid-slot-style";
@@ -13,13 +13,26 @@ import {
 import styles from "./lunar.module.css";
 
 export type CalendarLunarProps = {
+  /** aria-label for the strip wrapper (registry key `lunar`). */
   lunarLabel?: string;
+  /**
+   * Short visible phase labels. Default: NASA-style abbreviations. Pass a
+   * partial map to localize per-phase; `false` (or empty strings) hides them.
+   */
   phaseLabels?: false | Partial<Record<LunarPhaseKey, string>>;
+  /** Long phase names for per-cell aria. Override per locale. */
   phaseAriaLabels?: Partial<Record<LunarPhaseKey, string>>;
+  /** Per-module theme override (`data-theme` on the module container). */
+  theme?: string;
+  /** Per-module scheme override (`data-scheme` on the module container). */
+  scheme?: "light" | "dark" | "auto";
   col?: number | string;
   className?: string;
 };
 
+// The strip always renders 21 cells (anchor at index 10). CSS container
+// queries reveal a symmetric subset that fits the available width — fixed DOM
+// count keeps the layout stable without ResizeObserver.
 const LUNAR_WINDOW = 21;
 
 const PHASE_PATHS: Record<string, string | null> = {
@@ -61,57 +74,48 @@ function MoonStack() {
 }
 
 export function CalendarLunar({
-  lunarLabel = "Lunar phases",
+  lunarLabel,
   phaseLabels,
   phaseAriaLabels,
+  theme,
+  scheme,
   col,
   className,
 }: CalendarLunarProps) {
   const store = useCalendarStore();
   const config = store.getConfig();
+  const t = useLabels();
 
   const selection = useStoreSelector(store, (s) => s.selection);
   const viewDate = useStoreSelector(store, (s) => s.view.viewDate);
 
+  // Anchor priority mirrors v2: first selected date → range end (last bound
+  // placed) → range start → the viewed day. Everything stays in the wall-clock
+  // domain: cells are local-midnight Dates built straight from CalendarDate
+  // fields, so no timezone conversion can shift a day label.
   const anchorDate = useMemo((): Date => {
     if (selection.shape === "point" && selection.dates.length > 0) {
-      const r = fromCalendarDateTime(selection.dates[0], config.timeZone);
-      if (r.ok) return r.date;
+      const d = selection.dates[0].date;
+      return new Date(d.year, d.month - 1, d.day);
     }
     if (selection.shape === "span" && selection.ranges.length > 0) {
-      const range = selection.ranges[0];
-      const bound = range.end ?? range.start;
-      const MIDNIGHT = { hour: 0, minute: 0, second: 0, ms: 0 };
-      const r = fromCalendarDateTime(
-        { date: bound, time: MIDNIGHT },
-        config.timeZone,
-      );
-      if (r.ok) return r.date;
+      const last = selection.ranges[selection.ranges.length - 1];
+      const d = last.end ?? last.start;
+      return new Date(d.year, d.month - 1, d.day);
     }
-    // Fallback: first of view month
-    const MIDNIGHT = { hour: 0, minute: 0, second: 0, ms: 0 };
-    const r = fromCalendarDateTime(
-      {
-        date: { year: viewDate.year, month: viewDate.month, day: 1 },
-        time: MIDNIGHT,
-      },
-      config.timeZone,
-    );
-    return r.ok ? r.date : new Date();
-  }, [selection, viewDate, config.timeZone]);
+    return new Date(viewDate.year, viewDate.month - 1, viewDate.day);
+  }, [selection, viewDate]);
 
   const window = useMemo(
     () => buildLunarWindow(anchorDate, LUNAR_WINDOW),
     [anchorDate],
   );
 
+  // Window dates are already wall-clock — format without a timeZone option
+  // (passing one would re-shift them and desync day numbers from the cells).
   const dayFmt = useMemo(
-    () =>
-      new Intl.DateTimeFormat(config.locale, {
-        day: "numeric",
-        ...(config.timeZone && { timeZone: config.timeZone }),
-      }),
-    [config.locale, config.timeZone],
+    () => new Intl.DateTimeFormat(config.locale, { day: "numeric" }),
+    [config.locale],
   );
 
   const fullFmt = useMemo(
@@ -121,9 +125,8 @@ export function CalendarLunar({
         day: "numeric",
         month: "long",
         year: "numeric",
-        ...(config.timeZone && { timeZone: config.timeZone }),
       }),
-    [config.locale, config.timeZone],
+    [config.locale],
   );
 
   const resolvePhaseLabel = (key: LunarPhaseKey): string | null => {
@@ -142,10 +145,16 @@ export function CalendarLunar({
     <div
       data-dateforge-lunar=""
       data-area="lunar"
-      className={[className].filter(Boolean).join(" ")}
+      data-theme={theme}
+      data-scheme={scheme}
+      className={[styles.container, className].filter(Boolean).join(" ")}
       style={gridSlot}
     >
-      <div className={styles.strip} role="list" aria-label={lunarLabel}>
+      <div
+        className={styles.strip}
+        role="list"
+        aria-label={t("lunar", undefined, lunarLabel)}
+      >
         {window.map((d, idx) => {
           const phase = getLunarPhaseKey(d);
           const isAnchor =
@@ -157,14 +166,12 @@ export function CalendarLunar({
             <div
               key={idx}
               role="listitem"
+              aria-label={`${fullFmt.format(d)}, ${resolveAriaLabel(phase)}`}
               aria-current={isAnchor ? "date" : undefined}
               data-anchor={isAnchor || undefined}
               data-phase={phase}
               className={styles.cell}
             >
-              <span className="sr-only">
-                {fullFmt.format(d)}, {resolveAriaLabel(phase)}
-              </span>
               <span className={styles.day} aria-hidden>
                 {dayFmt.format(d)}
               </span>

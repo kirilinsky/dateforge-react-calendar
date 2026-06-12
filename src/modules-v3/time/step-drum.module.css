@@ -17,7 +17,7 @@
   }
 
   .drum:focus-visible {
-    outline: 2px solid var(--c-accent, #1a73e8);
+    outline: 2px solid var(--c-focusRing, var(--c-accent, #1a73e8));
     outline-offset: 2px;
   }
 
@@ -32,11 +32,11 @@
     right: 3px;
     height: calc(100% / 7 + 4px);
     transform: translateY(-50%);
-    background: var(--c-highlight, color-mix(in srgb, var(--c-accent, #1a73e8) 14%, transparent));
+    background: var(--c-tone, color-mix(in srgb, var(--c-accent, #1a73e8) 14%, transparent));
     border-radius: var(--c-day-radius, 6px);
     pointer-events: none;
     z-index: 0;
-    transition: background 0.2s linear;
+    transition: background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
   }
 
   .item {
@@ -48,8 +48,8 @@
     font-size: 1.05em;
     color: color-mix(
       in srgb,
-      var(--c-active, var(--c-text, #222)) var(--drum-item-active, 0%),
-      var(--c-muted, #888)
+      var(--c-accent, var(--c-text, #222)) var(--drum-item-active, 0%),
+      var(--c-mutedText, #888)
     );
     padding: 0.25em 0;
     cursor: pointer;

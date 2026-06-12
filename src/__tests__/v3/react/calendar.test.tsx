@@ -6,6 +6,7 @@ import { compileDateRules } from "@/core-v3/date-rule-engine";
 import type { CalendarConfig } from "@/core-v3/state";
 import { CalendarDays } from "@/modules-v3/days/CalendarDays";
 import { Calendar } from "@/react-v3/calendar";
+import { createTheme } from "@/styles-v3/theme-tokens";
 
 const D = (y: number, m: number, d: number) => calendarDate(y, m, d);
 
@@ -63,6 +64,25 @@ describe("Calendar root", () => {
     const root = getByTestId("dateforge-calendar");
     expect(root.getAttribute("data-theme")).toBe("meadow");
     expect(root.getAttribute("data-scheme")).toBe("dark");
+  });
+
+  it("applies a createTheme family as inline light-dark vars (no data-theme)", () => {
+    const family = createTheme({
+      accent: "#14b8a6",
+      light: { backdrop: "#ffffff" },
+      dark: { backdrop: "#111111" },
+    });
+    const { getByTestId } = render(
+      <Calendar config={config()} initialView={D(2026, 6, 1)} theme={family}>
+        <CalendarDays />
+      </Calendar>,
+    );
+    const root = getByTestId("dateforge-calendar");
+    expect(root.getAttribute("data-theme")).toBeNull();
+    expect(root.style.getPropertyValue("--c-accent")).toBe("#14b8a6");
+    expect(root.style.getPropertyValue("--c-backdrop")).toBe(
+      "light-dark(#ffffff, #111111)",
+    );
   });
 
   it("marks data-readonly for a read-only config", () => {

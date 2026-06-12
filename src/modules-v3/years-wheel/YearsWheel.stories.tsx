@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { buildConfig, D } from "../../__tests__/v3/fixtures/builders";
 import { Calendar } from "../../react-v3/calendar";
+import { storyThemeProps } from "../_lab/story-globals";
 import { CalendarDays } from "../days/CalendarDays";
 import { CalendarYearsWheel } from "./CalendarYearsWheel";
 
@@ -13,8 +14,12 @@ export default meta;
 type Story = StoryObj;
 
 export const Default: Story = {
-  render: () => (
-    <Calendar config={buildConfig()} initialView={D(2026, 6, 1)}>
+  render: (_, ctx) => (
+    <Calendar
+      {...storyThemeProps(ctx.globals)}
+      config={buildConfig()}
+      initialView={D(2026, 6, 1)}
+    >
       <CalendarYearsWheel showLabel />
       <CalendarDays />
     </Calendar>
@@ -22,8 +27,9 @@ export const Default: Story = {
 };
 
 export const Bounded: Story = {
-  render: () => (
+  render: (_, ctx) => (
     <Calendar
+      {...storyThemeProps(ctx.globals)}
       config={buildConfig({ min: D(2020, 1, 1), max: D(2030, 12, 31) })}
       initialView={D(2026, 6, 1)}
     >
@@ -34,8 +40,12 @@ export const Bounded: Story = {
 };
 
 export const WithReset: Story = {
-  render: () => (
-    <Calendar config={buildConfig()} initialView={D(2020, 6, 1)}>
+  render: (_, ctx) => (
+    <Calendar
+      {...storyThemeProps(ctx.globals)}
+      config={buildConfig()}
+      initialView={D(2020, 6, 1)}
+    >
       <CalendarYearsWheel showReset />
       <CalendarDays />
     </Calendar>

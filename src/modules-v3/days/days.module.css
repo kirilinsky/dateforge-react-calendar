@@ -34,16 +34,16 @@
     padding: 0;
     min-block-size: 2.4em;
     transition:
-      background 120ms ease,
+      background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
       border-radius 120ms ease,
-      color 120ms ease;
+      color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
   }
 
   /* Hover on an empty cell: subtle highlight. */
   .cell:hover:not([data-disabled]):not([data-in-range]):not([data-selected]):not(
       [data-preview]
     ) {
-    background: var(--c-highlight, #eef1f7);
+    background: var(--c-tone, #eef1f7);
   }
 
   /* Hover on a filled cell: keep the fill, darken it a touch. */
@@ -58,15 +58,23 @@
     color: var(--c-outOfMonth, #bbb);
   }
 
+  /* `--c-weekend` is an ink (v2 token semantics — themes ship reds/oranges);
+     the cell surface is a soft tint derived from it, overridable via
+     `--c-weekendSurface`. Out-of-month cells stay untinted: they are already
+     de-emphasized via `--c-outOfMonth`, and muted ink on the tint can dip
+     below the 4.5:1 contrast bar. */
   .cell[data-weekend]:not([data-in-range]):not([data-selected]):not(
       [data-preview]
-    ) {
-    background: var(--c-weekend, #f6f6fa);
+    ):not([data-outside]) {
+    background: var(
+      --c-weekendSurface,
+      color-mix(in srgb, var(--c-weekend, #c62828) 7%, transparent)
+    );
   }
 
   /* Preview (hover draft) sits under the committed range visually. */
   .cell[data-preview] {
-    background: var(--c-highlight, #bcd4f7);
+    background: var(--c-tone, #bcd4f7);
     border-radius: 0;
   }
   .cell[data-preview-start] {
@@ -88,11 +96,13 @@
   }
 
   /* Range endpoints + selected point: full accent, inverted text. They sit
-     after the middle rule so they override it on the start/end cells. */
+     after the middle rule so they override it on the start/end cells.
+     NOTE: `--c-range` only tints the middle fill above — endpoints/selected
+     use the brand accent (v2 semantics: range ≠ selected color). */
   .cell[data-range-start],
   .cell[data-range-end],
   .cell[data-selected] {
-    background: var(--c-range, var(--c-accent, #1a73e8));
+    background: var(--c-accent, #1a73e8);
     color: var(--c-activeText, #fff);
   }
   .cell[data-range-start] {
