@@ -22,6 +22,7 @@ export const LABEL_DEFAULTS = {
   dayTrack: "Day",
   home: "Go to current month",
   hours: "Hours",
+  infoRanges: "{count} ranges",
   lunar: "Lunar phases",
   minutes: "Minutes",
   monthGrid: "Select month, {year}",
