@@ -21,28 +21,7 @@
     text-align: center;
   }
 
-  .navBtn {
-    appearance: none;
-    border: none;
-    background: transparent;
-    color: var(--c-text, #222);
-    font: inherit;
-    font-size: 1em;
-    padding: 0.3em 0.5em;
-    border-radius: var(--c-day-radius, 6px);
-    cursor: pointer;
-    line-height: 1;
-    transition: background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
-  }
-
-  .navBtn:hover:not([disabled]) {
-    background: var(--c-tone, #eef1f7);
-  }
-
-  .navBtn[disabled] {
-    opacity: 0.35;
-    cursor: default;
-  }
+  /* Pager arrows are the shared UIButton primitive. */
 
   .grid {
     display: grid;
@@ -51,36 +30,10 @@
     padding: 0.3em 0.5em 0.6em;
   }
 
+  /* Cells are the shared UITile primitive; only grid-specific metrics here. */
   .item {
-    appearance: none;
-    border: 2px solid transparent;
-    background: transparent;
-    color: var(--c-text, #222);
-    font: inherit;
     font-size: 0.875em;
     padding: 0.5em 0.3em;
-    border-radius: var(--c-day-radius, 8px);
-    cursor: pointer;
-    transition: background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
     min-height: 2.6em;
-  }
-
-  .item:hover:not([aria-disabled="true"]):not([disabled]) {
-    background: var(--c-tone, #eef1f7);
-  }
-
-  .item[data-current] {
-    border-color: var(--c-todayDot, #b06000);
-  }
-
-  .item[data-selected] {
-    background: var(--c-accent, #1a73e8);
-    color: var(--c-activeText, #fff);
-  }
-
-  .item[aria-disabled="true"] {
-    color: var(--c-disabledText, #ccc);
-    cursor: default;
-    opacity: 0.55;
   }
 }

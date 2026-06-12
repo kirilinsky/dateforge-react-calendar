@@ -4,6 +4,7 @@ import { dateKey } from "../../core-v3/calendar-date";
 
 import { fromCalendarDateTime } from "../../core-v3/timezone-boundary";
 import { useLabels } from "../../react-v3/labels-context";
+import { UIButton } from "../../react-v3/ui/button";
 import { useCalendarActions, useCalendarStore } from "../../react-v3/provider";
 import { useStoreSelector } from "../../react-v3/use-store-selector";
 import { getGridSlotStyle } from "../../utils/get-grid-slot-style";
@@ -152,15 +153,16 @@ export function CalendarSelectedDates({
           );
         })}
         {allowClear && (
-          <button
-            type="button"
+          <UIButton
+            variant="ghost"
+            size="sm"
             className={styles.clearBtn}
             aria-label={t("clear")}
             onClick={() => clear()}
             disabled={config.readOnly}
           >
             {t("clear")}
-          </button>
+          </UIButton>
         )}
       </div>
     );
@@ -227,15 +229,16 @@ export function CalendarSelectedDates({
         );
       })}
       {allowClear && (
-        <button
-          type="button"
+        <UIButton
+          variant="ghost"
+          size="sm"
           className={styles.clearBtn}
           aria-label={t("clear")}
           onClick={() => clear()}
           disabled={config.readOnly}
         >
           {t("clear")}
-        </button>
+        </UIButton>
       )}
     </div>
   );

@@ -7,8 +7,10 @@ import {
 } from "../../core-v3/public-value";
 import { today as getToday } from "../../core-v3/timezone-boundary";
 import { useToday } from "../../hooks/use-today";
+import { ClearIcon, HomeIcon } from "../../react-v3/icons";
 import { useLabels } from "../../react-v3/labels-context";
 import { useCalendarActions, useCalendarStore } from "../../react-v3/provider";
+import { UIButton } from "../../react-v3/ui/button";
 import { useStoreSelector } from "../../react-v3/use-store-selector";
 import { getGridSlotStyle } from "../../utils/get-grid-slot-style";
 import styles from "./info.module.css";
@@ -351,42 +353,28 @@ export function CalendarInfo({
         {hasActionGroup && (
           <div className={styles.actions} onKeyDown={onActionsKeyDown}>
             {showHome && (
-              <button
+              <UIButton
                 ref={homeBtnRef}
-                type="button"
-                className={styles.actionBtn}
+                variant="ghost"
+                size="sm"
                 aria-label={t("home", undefined, homeLabel)}
                 disabled={!todayCal || isCurrentMonth}
                 onClick={() => navigateTo(getToday(config.timeZone))}
               >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                  focusable="false"
-                >
-                  <path d="M3 10.5 12 3l9 7.5" />
-                  <path d="M5 9.5V21h14V9.5" />
-                </svg>
-              </button>
+                <HomeIcon />
+              </UIButton>
             )}
             {hasClearBtn && (
-              <button
+              <UIButton
                 ref={clearBtnRef}
-                type="button"
-                className={styles.actionBtn}
+                variant="ghost"
+                size="sm"
                 aria-label={t("clear", undefined, clearLabel)}
                 disabled={config.readOnly}
                 onClick={onClear}
               >
-                ×
-              </button>
+                <ClearIcon size={12} />
+              </UIButton>
             )}
           </div>
         )}

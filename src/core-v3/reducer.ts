@@ -1,5 +1,6 @@
 import type { CalendarAction } from "./actions";
 import {
+  addDays,
   addMonths,
   addYears,
   type CalendarDate,
@@ -32,9 +33,11 @@ export function reduce(
     case "navigateBy": {
       const { viewDate } = state.view;
       const next =
-        action.step === "month"
-          ? addMonths(viewDate, action.amount)
-          : addYears(viewDate, action.amount);
+        action.step === "day"
+          ? addDays(viewDate, action.amount)
+          : action.step === "month"
+            ? addMonths(viewDate, action.amount)
+            : addYears(viewDate, action.amount);
       return navigate(state, next);
     }
 

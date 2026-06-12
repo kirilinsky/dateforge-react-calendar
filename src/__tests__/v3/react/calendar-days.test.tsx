@@ -254,6 +254,21 @@ describe("CalendarDays props (v2-parity surface)", () => {
     expect(cell?.getAttribute("aria-label")).toMatch(/June 15, 2026/);
   });
 
+  it("renderDay turns the today dot off unless explicitly re-enabled", () => {
+    const render = (d: { day: number }) => String(d.day);
+    const { container, unmount } = mount({ renderDay: render });
+    expect(
+      container
+        .querySelector("[data-dateforge-days]")
+        ?.hasAttribute("data-today-dot"),
+    ).toBe(false);
+    unmount();
+    const { container: c2 } = mount({ renderDay: render, todayDot: true });
+    expect(
+      c2.querySelector("[data-dateforge-days]")?.hasAttribute("data-today-dot"),
+    ).toBe(true);
+  });
+
   it("offset grid shows the next month and does not steal view on select", () => {
     const { container } = mount({ offset: 1 });
     const grid = container.querySelector("[role=grid]");

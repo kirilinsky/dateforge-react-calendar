@@ -3,43 +3,97 @@
    * Toolbar primitives. Tokens from --c-* with fallbacks; no !important
    * (enforced by scripts/check-css-important.mjs).
    */
+  /* Smart overflow wrap (v2 parity): the toolbar wraps as a whole, and groups
+     are atomic flex items — a group never breaks internally, it flows to the
+     next row intact. Row gap keeps wrapped rows breathing. The container name
+     lets modules adapt via @container queries. */
   .toolbar {
+    container-type: inline-size;
+    container-name: cal-toolbar;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: var(--c-gap, 8px);
+    gap: 0.4em var(--c-gap, 8px);
+  }
+
+  /* `cols` set: the toolbar becomes its own grid (template via inline style). */
+  .toolbar[data-cols] {
+    display: grid;
   }
 
   .group {
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    flex: 0 0 auto;
     gap: 4px;
   }
 
-  .nav {
-    appearance: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-inline-size: 2em;
-    padding: 0.3em 0.7em;
-    border: 1px solid var(--c-stroke, #d0d3d9);
-    border-radius: var(--c-day-radius, 8px);
-    background: transparent;
-    color: var(--c-text, #222);
-    font: inherit;
-    line-height: 1;
-    cursor: pointer;
-    transition: background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
+  .grow {
+    flex: 1;
   }
 
-  .nav:hover {
-    background: var(--c-tone, #eef1f7);
+  /* Screen-reader-only text (label aria companions). */
+  .srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
+
+  /* Action buttons and picker cells come from the shared UIButton/UITile
+     primitives (react-v3/ui, cal-base layer) — no per-module button styles. */
 
   .label {
     font-weight: 600;
     color: var(--c-text, #222);
+  }
+
+  /* Month label width sizer: the longest month name sits invisible under the
+     live one, so stepping months never shifts the toolbar layout. */
+  .slot {
+    display: inline-grid;
+    text-align: center;
+  }
+
+  .slot > * {
+    grid-area: 1 / 1;
+  }
+
+  .sizer {
+    visibility: hidden;
+  }
+
+  .clock {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    font-variant-numeric: tabular-nums;
+    color: var(--c-mutedText, #999);
+  }
+
+  .clockDot {
+    inline-size: 0.45em;
+    block-size: 0.45em;
+    border-radius: 50%;
+    background: var(--c-accent, #3b6cff);
+    animation: clock-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes clock-pulse {
+    50% {
+      opacity: 0.35;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .clockDot {
+      animation: none;
+    }
   }
 
   .pickerHead {
@@ -57,25 +111,26 @@
     min-inline-size: 12em;
   }
 
-  .pickerCell {
-    appearance: none;
-    padding: 0.4em 0.6em;
-    border: 1px solid transparent;
-    border-radius: var(--c-day-radius, 8px);
-    background: transparent;
-    color: var(--c-text, #222);
-    font: inherit;
-    line-height: 1;
-    cursor: pointer;
-    transition: background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
+  /* Custom `picker` body (e.g. wheels). Wheel modules are size containers
+     (container-type: inline-size + width: 100%): they report ZERO intrinsic
+     width, and the popup shell sizes to content — without a definite inline
+     size here the popup collapses and the drum never shows. Override the
+     default via --cal-picker-size (cal-user layer). */
+  .pickerBody {
+    display: flex;
+    flex-direction: column;
+    inline-size: var(--cal-picker-size, 14em);
+    max-inline-size: 80vw;
   }
 
-  .pickerCell:hover {
-    background: var(--c-tone, #eef1f7);
+  /* Custom-picker footer: "now" reset + confirm (check) share one row. */
+  .pickerFooter {
+    display: flex;
+    gap: 0.4em;
+    margin-block-start: 0.5em;
   }
 
-  .pickerCell[data-selected] {
-    background: var(--c-accent, #3b6cff);
-    color: var(--c-activeText, #fff);
+  .pickerFooter > * {
+    flex: 1;
   }
 }

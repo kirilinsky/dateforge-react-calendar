@@ -25,32 +25,13 @@
     min-width: 0;
   }
 
+  /* Position only — the button itself is the shared UIButton (ghost/sm). */
   .clearBtn {
-    appearance: none;
-    border: none;
-    background: transparent;
     position: absolute;
     inset-block: 0;
     inset-inline-end: 0.25em;
     margin-block: auto;
     height: 1.6em;
-    padding: 0 0.35em;
-    font: inherit;
-    font-size: 0.9em;
-    line-height: 1;
-    color: var(--c-mutedText, #888);
-    border-radius: var(--c-day-radius, 6px);
-    cursor: pointer;
-    transition:
-      background var(--cal-paint-transition, var(--cal-transition, 0.2s))
-        var(--cal-paint-easing, linear),
-      color var(--cal-paint-transition, var(--cal-transition, 0.2s))
-        var(--cal-paint-easing, linear);
-  }
-
-  .clearBtn:hover {
-    background: var(--c-tone, #eef1f7);
-    color: var(--c-text, #222);
   }
 
   .input {

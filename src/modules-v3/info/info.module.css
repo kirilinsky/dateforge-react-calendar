@@ -64,40 +64,11 @@
     color: var(--c-mutedText, #999);
   }
 
+  /* Action buttons are the shared UIButton (ghost/sm) primitive. */
   .actions {
     display: flex;
     align-items: center;
     gap: 0.25em;
     flex-shrink: 0;
-  }
-
-  .actionBtn {
-    appearance: none;
-    border: none;
-    background: transparent;
-    color: var(--c-mutedText, #999);
-    font: inherit;
-    font-size: 0.85em;
-    padding: 0.25em 0.5em;
-    border-radius: var(--c-day-radius, 6px);
-    cursor: pointer;
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    transition:
-      background var(--cal-paint-transition, var(--cal-transition, 0.2s))
-        var(--cal-paint-easing, linear),
-      color var(--cal-paint-transition, var(--cal-transition, 0.2s))
-        var(--cal-paint-easing, linear);
-  }
-
-  .actionBtn:hover:not([disabled]) {
-    background: var(--c-tone, #eef1f7);
-    color: var(--c-text, #222);
-  }
-
-  .actionBtn[disabled] {
-    opacity: 0.4;
-    cursor: default;
   }
 }
