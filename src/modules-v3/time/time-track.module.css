@@ -24,11 +24,11 @@
     flex-shrink: 0;
     cursor: pointer;
     font: inherit;
-    color: var(--c-muted, #888);
+    color: var(--c-mutedText, #888);
   }
 
   .period:focus-visible {
-    outline: 2px solid var(--c-accent, #1a73e8);
+    outline: 2px solid var(--c-focusRing, var(--c-accent, #1a73e8));
     outline-offset: 2px;
   }
 
@@ -44,7 +44,7 @@
     left: 4px;
     width: calc(50% - 4px);
     border-radius: 999px;
-    background: var(--c-highlight, color-mix(in srgb, var(--c-accent, #1a73e8) 16%, transparent));
+    background: var(--c-tone, color-mix(in srgb, var(--c-accent, #1a73e8) 16%, transparent));
     transition: transform 0.2s ease;
     pointer-events: none;
   }
@@ -66,7 +66,7 @@
 
   .period[data-period="AM"] .periodLabel[data-value="AM"],
   .period[data-period="PM"] .periodLabel[data-value="PM"] {
-    color: var(--c-active, var(--c-text, #222));
+    color: var(--c-accent, var(--c-text, #222));
   }
 
   .drums {
@@ -98,7 +98,7 @@
     text-align: center;
     font-size: 0.7em;
     font-weight: 600;
-    color: var(--c-muted, #888);
+    color: var(--c-mutedText, #888);
     line-height: 1.2;
     padding-bottom: 0.25em;
     text-transform: uppercase;
@@ -108,7 +108,7 @@
 
   .colon {
     font-size: 1em;
-    color: var(--c-muted, #888);
+    color: var(--c-mutedText, #888);
     flex-shrink: 0;
     align-self: center;
     flex: 1;

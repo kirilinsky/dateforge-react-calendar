@@ -35,7 +35,16 @@ import { Calendar as CalendarRoot } from "@/react-v3/calendar";
 const UNITS: SelectionUnit[] = ["day", "week", "month"];
 const MODES: SelectionMode[] = ["single", "multiple", "range", "multi-range"];
 const WEEKDAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const THEMES = ["noir", "meadow", "crimson", "ocean"];
+const THEMES = [
+  "noir",
+  "meadow",
+  "crimson",
+  "fjord",
+  "velvet",
+  "aurora",
+  "riso",
+  "cyber",
+];
 const SCHEMES = ["auto", "light", "dark"] as const;
 
 type Options = {

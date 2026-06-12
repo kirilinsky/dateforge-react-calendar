@@ -14,7 +14,8 @@
      live outside the root in document.body but re-declare data-theme/scheme. */
   [data-dateforge-root],
   [data-dateforge-popup] {
-    /* Neutral token defaults; a theme overrides these in cal-themes. */
+    /* Neutral token defaults; a theme overrides these in cal-themes.
+       Full 16-token contract — see styles-v3/theme-tokens.ts. */
     --c-accent: #1a73e8;
     --c-range: #1a73e8;
     --c-activeText: #ffffff;
@@ -22,11 +23,15 @@
     --c-mutedText: #8a8f98;
     --c-disabledText: #c4c7cc;
     --c-backdrop: #ffffff;
-    --c-highlight: #eef1f7;
+    --c-tone: #eef1f7;
     --c-stroke: #d0d3d9;
-    --c-weekend: #f6f7fa;
+    --c-shadow: #1f202414;
+    --c-disabled: #a0a0a2;
+    --c-weekend: #c62828;
+    --c-error: #dc2626;
     --c-outOfMonth: #b9bdc4;
     --c-todayDot: #b06000;
+    --c-focusRing: #1a73e8;
 
     /* Drives CSS light-dark() in themes; `scheme` prop narrows it below. */
     color-scheme: light dark;
@@ -55,6 +60,16 @@
     border: 1px solid var(--c-stroke);
     border-radius: var(--c-radius, 12px);
     background: var(--c-backdrop);
+    /* Theme/scheme switches crossfade: tokens are typed <color> properties
+       (tokens.css), so background/border/text repaint smoothly here and on
+       every surface that declares the same paint transition. */
+    transition:
+      background var(--cal-paint-transition, var(--cal-transition, 0.2s))
+        var(--cal-paint-easing, linear),
+      border-color var(--cal-paint-transition, var(--cal-transition, 0.2s))
+        var(--cal-paint-easing, linear),
+      color var(--cal-paint-transition, var(--cal-transition, 0.2s))
+        var(--cal-paint-easing, linear);
   }
 
   [data-dateforge-root] *,
@@ -65,6 +80,14 @@
 
   [data-dateforge-root][data-readonly] {
     cursor: default;
+  }
+
+  /* Themed focus ring everywhere by default (UA outline is not themable).
+     Lives in cal-base, so any module rule in cal-modules can override it. */
+  [data-dateforge-root] :focus-visible,
+  [data-dateforge-popup] :focus-visible {
+    outline: 2px solid var(--c-focusRing, var(--c-accent, #1a73e8));
+    outline-offset: 1px;
   }
 
   /* Portalled popup shell: floats above everything, never clipped. */

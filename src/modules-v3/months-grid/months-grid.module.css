@@ -21,12 +21,12 @@
     padding: 0.5em 0.3em;
     border-radius: var(--c-day-radius, 8px);
     cursor: pointer;
-    transition: background 120ms ease;
+    transition: background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
     min-height: 2.6em;
   }
 
   .item:hover:not([aria-disabled="true"]):not([disabled]) {
-    background: var(--c-highlight, #eef1f7);
+    background: var(--c-tone, #eef1f7);
   }
 
   .item[data-current] {

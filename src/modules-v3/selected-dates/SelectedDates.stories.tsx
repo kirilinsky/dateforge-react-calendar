@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { buildConfig, D } from "../../__tests__/v3/fixtures/builders";
 import { Calendar } from "../../react-v3/calendar";
+import { storyThemeProps } from "../_lab/story-globals";
 import { CalendarDays } from "../days/CalendarDays";
 import { CalendarSelectedDates } from "./CalendarSelectedDates";
 
@@ -13,8 +14,9 @@ export default meta;
 type Story = StoryObj;
 
 export const SingleMode: Story = {
-  render: () => (
+  render: (_, ctx) => (
     <Calendar
+      {...storyThemeProps(ctx.globals)}
       config={buildConfig({ mode: "single" })}
       initialView={D(2026, 6, 1)}
     >
@@ -25,8 +27,9 @@ export const SingleMode: Story = {
 };
 
 export const MultipleMode: Story = {
-  render: () => (
+  render: (_, ctx) => (
     <Calendar
+      {...storyThemeProps(ctx.globals)}
       config={buildConfig({ mode: "multiple" })}
       initialView={D(2026, 6, 1)}
     >
@@ -37,8 +40,9 @@ export const MultipleMode: Story = {
 };
 
 export const RangeMode: Story = {
-  render: () => (
+  render: (_, ctx) => (
     <Calendar
+      {...storyThemeProps(ctx.globals)}
       config={buildConfig({ mode: "range" })}
       initialView={D(2026, 6, 1)}
     >
@@ -50,8 +54,9 @@ export const RangeMode: Story = {
 
 export const WithRemovePerChip: Story = {
   name: "Per-chip remove (multiple)",
-  render: () => (
+  render: (_, ctx) => (
     <Calendar
+      {...storyThemeProps(ctx.globals)}
       config={buildConfig({ mode: "multiple" })}
       initialView={D(2026, 6, 1)}
     >

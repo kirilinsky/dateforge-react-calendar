@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { buildConfig, D } from "../../__tests__/v3/fixtures/builders";
 import { Calendar } from "../../react-v3/calendar";
+import { storyThemeProps } from "../_lab/story-globals";
 import { CalendarMonthsGrid } from "./CalendarMonthsGrid";
 
 const meta: Meta = {
@@ -12,8 +13,9 @@ export default meta;
 type Story = StoryObj;
 
 export const Default: Story = {
-  render: () => (
+  render: (_, ctx) => (
     <Calendar
+      {...storyThemeProps(ctx.globals)}
       config={buildConfig({ mode: "single" })}
       initialView={D(2026, 6, 1)}
     >
@@ -23,8 +25,9 @@ export const Default: Story = {
 };
 
 export const ShortLabels: Story = {
-  render: () => (
+  render: (_, ctx) => (
     <Calendar
+      {...storyThemeProps(ctx.globals)}
       config={buildConfig({ mode: "single" })}
       initialView={D(2026, 6, 1)}
     >
@@ -34,8 +37,9 @@ export const ShortLabels: Story = {
 };
 
 export const RangeMode: Story = {
-  render: () => (
+  render: (_, ctx) => (
     <Calendar
+      {...storyThemeProps(ctx.globals)}
       config={buildConfig({ mode: "range" })}
       initialView={D(2026, 6, 1)}
     >

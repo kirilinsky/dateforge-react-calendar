@@ -397,7 +397,7 @@
     "check:exports": "publint && attw --pack . --profile node16",
     "size": "size-limit",
     "size:why": "size-limit --why",
-    "build": "tsdown --dts && npx tsx scripts/generate-theme.ts && npx tsx scripts/generate-appearance.ts",
+    "build": "tsdown --dts && npx tsx scripts/generate-theme.ts && npx tsx scripts/generate-appearance.ts && npx tsx scripts/generate-theme-v3.ts",
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",

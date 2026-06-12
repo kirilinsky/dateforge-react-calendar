@@ -5,6 +5,7 @@ import type { CalendarConfig } from "@/core-v3/state";
 import { today } from "@/core-v3/timezone-boundary";
 import { CalendarDays } from "@/modules-v3/days/CalendarDays";
 import { Calendar as CalendarRoot } from "@/react-v3/calendar";
+import { storyThemeProps, type V3StoryThemeProps } from "../_lab/story-globals";
 import {
   CalendarToolbar,
   CalendarToolbarClear,
@@ -39,13 +40,20 @@ function buildConfig(): CalendarConfig {
   };
 }
 
-function Frame({ children }: { children: React.ReactNode }) {
+function Frame({
+  children,
+  theme,
+  scheme,
+}: {
+  children: React.ReactNode;
+} & V3StoryThemeProps) {
   const config = buildConfig();
   return (
     <CalendarRoot
       config={config}
       initialView={today(config.timeZone)}
-      theme="noir"
+      theme={theme}
+      scheme={scheme}
     >
       {children}
       <CalendarDays />
@@ -67,8 +75,8 @@ type Story = StoryObj;
  * for `<CalendarNav>`.
  */
 export const ReadyNav: Story = {
-  render: () => (
-    <Frame>
+  render: (_, ctx) => (
+    <Frame {...storyThemeProps(ctx.globals)}>
       <CalendarToolbar>
         <CalendarToolbarGroup>
           <CalendarToolbarPrev />
@@ -89,8 +97,8 @@ export const ReadyNav: Story = {
  * with no popups.
  */
 export const MinimalLabel: Story = {
-  render: () => (
-    <Frame>
+  render: (_, ctx) => (
+    <Frame {...storyThemeProps(ctx.globals)}>
       <CalendarToolbar>
         <CalendarToolbarPrev />
         <CalendarToolbarLabel />
@@ -105,8 +113,8 @@ export const MinimalLabel: Story = {
  * primitive can sit anywhere in the toolbar.
  */
 export const YearStepAndClear: Story = {
-  render: () => (
-    <Frame>
+  render: (_, ctx) => (
+    <Frame {...storyThemeProps(ctx.globals)}>
       <CalendarToolbar>
         <CalendarToolbarGroup>
           <CalendarToolbarPrev step="year" label="Previous year" />
