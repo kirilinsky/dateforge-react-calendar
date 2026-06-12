@@ -37,7 +37,10 @@ function selectDay(ctx: SelectionContext, date: CalendarDate): ReduceResult {
   const existing = indexOfDay(sel.dates, date);
   if (existing !== -1) {
     // Toggle off — removal is always allowed, even for disabled/out-of-range
-    // days that became invalid after selection.
+    // days that became invalid after selection. `deselectOnReclick: false`
+    // (same config field the single strategy reads — no new flag) turns
+    // re-clicks into no-ops; explicit removeDate/clear still work.
+    if (ctx.config.deselectOnReclick === false) return noChange(ctx.state);
     const next = sel.dates.filter((_, i) => i !== existing);
     return commitPoint(ctx.state, next);
   }

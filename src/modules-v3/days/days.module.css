@@ -9,11 +9,53 @@
   .grid {
     display: grid;
     gap: var(--c-day-gap, 2px);
+    /* Range fills, v2 recipe: committed band = 28% of the range color over
+       the backdrop; hover preview = a lighter 16% tint of the SAME color, so
+       the draft reads as "this will become the range", not as a gray hover. */
+    --rng-bg: color-mix(
+      in srgb,
+      var(--c-range, var(--c-accent, #1a73e8)) 28%,
+      var(--c-backdrop, #fff)
+    );
+    --rng-prev: color-mix(
+      in srgb,
+      var(--c-range, var(--c-accent, #1a73e8)) 16%,
+      transparent
+    );
   }
 
   .row {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
+  }
+
+  [data-week-numbers] .row {
+    grid-template-columns: 2em repeat(7, 1fr);
+  }
+
+  /* Screen-reader-only text (week column header). */
+  .srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .weekNumber {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7em;
+    font-variant-numeric: tabular-nums;
+    color: var(--c-mutedText, #999);
+  }
+
+  .cellEmpty {
+    min-block-size: 2.4em;
   }
 
   .weekday {
@@ -25,7 +67,7 @@
 
   .cell {
     appearance: none;
-    border: 2px solid transparent;
+    border: none;
     background: transparent;
     color: var(--c-text, #222);
     font: inherit;
@@ -33,6 +75,7 @@
     border-radius: var(--c-day-radius, 8px);
     padding: 0;
     min-block-size: 2.4em;
+    position: relative;
     transition:
       background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
       border-radius 120ms ease,
@@ -63,36 +106,54 @@
      `--c-weekendSurface`. Out-of-month cells stay untinted: they are already
      de-emphasized via `--c-outOfMonth`, and muted ink on the tint can dip
      below the 4.5:1 contrast bar. */
-  .cell[data-weekend]:not([data-in-range]):not([data-selected]):not(
-      [data-preview]
-    ):not([data-outside]) {
+  [data-weekend-tint] .cell[data-weekend]:not([data-in-range]):not(
+      [data-selected]
+    ):not([data-preview]):not([data-outside]) {
     background: var(
       --c-weekendSurface,
       color-mix(in srgb, var(--c-weekend, #c62828) 7%, transparent)
     );
   }
 
-  /* Preview (hover draft) sits under the committed range visually. */
-  .cell[data-preview] {
-    background: var(--c-tone, #bcd4f7);
-    border-radius: 0;
+  [data-bold-weekends] .cell[data-weekend] {
+    font-weight: 600;
   }
-  .cell[data-preview-start] {
-    border-radius: var(--c-day-radius, 8px) 0 0 var(--c-day-radius, 8px);
-  }
-  .cell[data-preview-end] {
-    border-radius: 0 var(--c-day-radius, 8px) var(--c-day-radius, 8px) 0;
+  [data-bold-weekends]
+    .cell[data-weekend]:not([data-selected]):not([data-in-range]):not(
+      [data-range-start]
+    ):not([data-range-end]) {
+    color: var(--c-weekend, #c62828);
   }
 
-  /* Range middle: soft fill (a light tint of the accent), readable text. */
+  /* Preview (hover draft) sits under the committed range visually. */
+  .cell[data-preview] {
+    background: var(--rng-prev);
+  }
+
+  /* Range middle: soft fill (v2 weight), readable text. */
   .cell[data-in-range] {
-    background: color-mix(
-      in srgb,
-      var(--c-range, var(--c-accent, #1a73e8)) 18%,
-      var(--c-backdrop, #fff)
-    );
+    background: var(--rng-bg);
     color: var(--c-text, #222);
+  }
+
+  /* ── Band corner geometry ─────────────────────────────────────────────
+     Flatten every cell inside a band (committed or preview), then round the
+     band's leading/trailing edge back with LOGICAL corners — start/end follow
+     text direction, so an RTL calendar rounds the correct sides (v2 used
+     physical corners). The armed anchor and a one-day range need no special
+     rules: a cell that is both band-start and band-end gets both edges
+     rounded = a full pill; a lone anchor never enters a band, so it keeps the
+     base .cell radius. */
+  .cell:is([data-in-range], [data-preview]) {
     border-radius: 0;
+  }
+  .cell:is([data-range-start], [data-preview-start]) {
+    border-start-start-radius: var(--c-day-radius, 8px);
+    border-end-start-radius: var(--c-day-radius, 8px);
+  }
+  .cell:is([data-range-end], [data-preview-end]) {
+    border-start-end-radius: var(--c-day-radius, 8px);
+    border-end-end-radius: var(--c-day-radius, 8px);
   }
 
   /* Range endpoints + selected point: full accent, inverted text. They sit
@@ -105,20 +166,35 @@
     background: var(--c-accent, #1a73e8);
     color: var(--c-activeText, #fff);
   }
-  .cell[data-range-start] {
-    border-radius: var(--c-day-radius, 8px) 0 0 var(--c-day-radius, 8px);
-  }
-  .cell[data-range-end] {
-    border-radius: 0 var(--c-day-radius, 8px) var(--c-day-radius, 8px) 0;
-  }
-  .cell[data-selected],
-  .cell[data-range-start][data-range-end] {
-    border-radius: var(--c-day-radius, 8px);
+
+  /* Today marker, two independent layers (v2 parity):
+     - dot: a small disc under the number; lives INSIDE the cell, so it never
+       fights the range band geometry. On filled cells it inherits the
+       inverted ink via currentColor.
+     - outline: subtle inset ring at 50% accent. `:not(:focus-visible)` keeps
+       the base focus ring (cal-base) intact on today. */
+  [data-today-dot] .cell[data-today]::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0.28em;
+    width: 0.26em;
+    height: 0.26em;
+    border-radius: 50%;
+    background: var(--c-todayDot, var(--c-accent, currentColor));
+    transform: translateX(-50%);
+    pointer-events: none;
   }
 
-  /* Today marker. */
-  .cell[data-today] {
-    border-color: var(--c-todayDot, #b06000);
+  [data-today-dot]
+    .cell[data-today]:is([data-selected], [data-range-start], [data-range-end])::after {
+    background: currentColor;
+  }
+
+  [data-today-outline] .cell[data-today]:not(:focus-visible) {
+    outline: 1px solid
+      color-mix(in srgb, var(--c-accent, #1a73e8) 50%, transparent);
+    outline-offset: -1px;
   }
 
   /* Excluded days: struck-through holes inside a span, never filled. */

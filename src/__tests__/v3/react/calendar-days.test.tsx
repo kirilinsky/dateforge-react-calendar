@@ -127,3 +127,170 @@ describe("CalendarDays accessible names (Intl)", () => {
     expect(grid?.getAttribute("aria-label")).toMatch(/июнь 2026/i);
   });
 });
+
+describe("range drafting visuals", () => {
+  it("the armed anchor renders as a selected day (visible range start)", () => {
+    render(
+      <CalendarProvider
+        config={config("day", "range")}
+        initialView={D(2026, 6, 1)}
+      >
+        <CalendarDays />
+      </CalendarProvider>,
+    );
+    const cell = document.querySelector(
+      '[data-date="20260610"]',
+    ) as HTMLElement;
+    fireEvent.click(cell);
+    expect(cell.hasAttribute("data-selected")).toBe(true);
+  });
+
+  it("clicking a day over a complete range clears the band immediately", () => {
+    render(
+      <CalendarProvider
+        config={config("day", "range")}
+        initialView={D(2026, 6, 1)}
+      >
+        <CalendarDays />
+      </CalendarProvider>,
+    );
+    fireEvent.click(
+      document.querySelector('[data-date="20260610"]') as HTMLElement,
+    );
+    fireEvent.click(
+      document.querySelector('[data-date="20260615"]') as HTMLElement,
+    );
+    expect(document.querySelectorAll("[data-in-range]").length).toBe(6);
+
+    fireEvent.click(
+      document.querySelector('[data-date="20260620"]') as HTMLElement,
+    );
+    expect(document.querySelectorAll("[data-in-range]").length).toBe(0);
+    expect(
+      document
+        .querySelector('[data-date="20260620"]')
+        ?.hasAttribute("data-selected"),
+    ).toBe(true);
+  });
+});
+
+describe("CalendarDays props (v2-parity surface)", () => {
+  const mount = (props: Record<string, unknown> = {}, cfg = {}) =>
+    render(
+      <CalendarProvider
+        config={config("day", "single", cfg)}
+        initialView={D(2026, 6, 1)}
+      >
+        <CalendarDays {...props} />
+      </CalendarProvider>,
+    );
+
+  it("today: dot on by default, outline off by default; both removable", () => {
+    const { container, unmount } = mount();
+    const grid = container.querySelector("[data-dateforge-days]");
+    expect(grid?.hasAttribute("data-today-dot")).toBe(true);
+    expect(grid?.hasAttribute("data-today-outline")).toBe(false);
+    unmount();
+    const { container: c2 } = mount({ highlightToday: true });
+    const g2 = c2.querySelector("[data-dateforge-days]");
+    expect(g2?.hasAttribute("data-today-outline")).toBe(true);
+    const { container: c3 } = mount({ todayDot: false });
+    const g3 = c3.querySelector("[data-dateforge-days]");
+    expect(g3?.hasAttribute("data-today-dot")).toBe(false);
+  });
+
+  it("weekNumbers renders ISO rowheaders (June 2026 starts week 23)", () => {
+    const { container } = mount({ weekNumbers: true });
+    const headers = container.querySelectorAll("[role=rowheader]");
+    expect(headers.length).toBeGreaterThanOrEqual(5);
+    expect(headers[0].textContent).toBe("23");
+  });
+
+  it("hideWeekdays drops the header row", () => {
+    const { container } = mount({ hideWeekdays: true });
+    expect(container.querySelector("[data-weekdays]")).toBeNull();
+  });
+
+  it("weekdayFormat narrow + long aria on columnheaders", () => {
+    const { container } = mount({ weekdayFormat: "narrow" });
+    const head = container.querySelector("[role=columnheader]");
+    expect(head?.textContent?.length).toBe(1);
+    expect(head?.getAttribute("aria-label")).toMatch(/day$/);
+  });
+
+  it("showOutsideDays=false renders inert placeholders", () => {
+    const { container } = mount({ showOutsideDays: false });
+    expect(container.querySelector('[data-date="20260531"]')).toBeNull();
+    const placeholders = container.querySelectorAll(
+      "[aria-hidden][role=gridcell]",
+    );
+    expect(placeholders.length).toBeGreaterThan(0);
+  });
+
+  it("fixedWeeks=false shrinks June 2026 to 5 week rows", () => {
+    const { container } = mount({ fixedWeeks: false });
+    // 1 weekday row + 5 week rows
+    expect(container.querySelectorAll("[role=row]").length).toBe(6);
+  });
+
+  it("boldWeekends / highlightWeekends toggle grid attrs", () => {
+    const { container } = mount({
+      boldWeekends: true,
+      highlightWeekends: false,
+    });
+    const grid = container.querySelector("[data-dateforge-days]");
+    expect(grid?.hasAttribute("data-bold-weekends")).toBe(true);
+    expect(grid?.hasAttribute("data-weekend-tint")).toBe(false);
+  });
+
+  it("renderDay replaces content, shell attrs stay ours", () => {
+    const { container } = mount({
+      renderDay: (d: { day: number }, s: { today: boolean }) =>
+        `${d.day}${s.today ? "!" : ""}*`,
+    });
+    const cell = container.querySelector('[data-date="20260615"]');
+    expect(cell?.textContent).toBe("15*");
+    expect(cell?.getAttribute("role")).toBe("gridcell");
+    expect(cell?.getAttribute("aria-label")).toMatch(/June 15, 2026/);
+  });
+
+  it("offset grid shows the next month and does not steal view on select", () => {
+    const { container } = mount({ offset: 1 });
+    const grid = container.querySelector("[role=grid]");
+    expect(grid?.getAttribute("aria-label")).toMatch(/July 2026/);
+    fireEvent.click(
+      container.querySelector('[data-date="20260715"]') as HTMLElement,
+    );
+    //
+
+    expect(grid?.getAttribute("aria-label")).toMatch(/July 2026/);
+  });
+
+  it("per-module theme + col land on the grid", () => {
+    const { container } = mount({ theme: "velvet", scheme: "dark", col: 2 });
+    const grid = container.querySelector(
+      "[data-dateforge-days]",
+    ) as HTMLElement;
+    expect(grid.getAttribute("data-theme")).toBe("velvet");
+    expect(grid.style.gridColumn).toBe("span 2");
+  });
+});
+
+describe("deselectOnReclick=false in multiple mode (core)", () => {
+  it("re-click keeps the date selected", () => {
+    render(
+      <CalendarProvider
+        config={config("day", "multiple", { deselectOnReclick: false })}
+        initialView={D(2026, 6, 1)}
+      >
+        <CalendarDays />
+      </CalendarProvider>,
+    );
+    const cell = document.querySelector(
+      '[data-date="20260610"]',
+    ) as HTMLElement;
+    fireEvent.click(cell);
+    fireEvent.click(cell);
+    expect(cell.hasAttribute("data-selected")).toBe(true);
+  });
+});

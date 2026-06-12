@@ -11,7 +11,6 @@
   [data-theme="abyss"] {
     --c-accent: #d400f0;
     --c-activeText: light-dark(#111111, #060009);
-    --c-todayDot: light-dark(#111111, #060009);
     --c-backdrop: light-dark(#f8fafc, #060009);
     --c-tone: light-dark(#eef2f6, #1c0030);
     --c-text: light-dark(#101820, #f0d0ff);
@@ -30,7 +29,6 @@
   [data-theme="aurora"] {
     --c-accent: #3de0a0;
     --c-activeText: light-dark(#111111, #07091a);
-    --c-todayDot: light-dark(#111111, #07091a);
     --c-backdrop: light-dark(#f8fafc, #0b0e24);
     --c-tone: light-dark(#eef2f6, #131838);
     --c-text: light-dark(#101820, #e0f9f0);
@@ -49,7 +47,6 @@
   [data-theme="bauhaus"] {
     --c-accent: light-dark(#1a1c2a, #d8d1b8);
     --c-activeText: light-dark(#ede2c2, #161420);
-    --c-todayDot: light-dark(#ede2c2, #161420);
     --c-backdrop: light-dark(#ede2c2, #161420);
     --c-tone: light-dark(#e2d4ad, #21202e);
     --c-text: light-dark(#1a1c2a, #d8d1b8);
@@ -68,7 +65,6 @@
   [data-theme="chalk"] {
     --c-accent: #2a2e5c;
     --c-activeText: #ffffff;
-    --c-todayDot: #ffffff;
     --c-backdrop: light-dark(#f0f0f3, #0b1014);
     --c-tone: light-dark(#e2e2e8, #151c22);
     --c-text: light-dark(#0e1028, #eef4f2);
@@ -87,7 +83,6 @@
   [data-theme="crimson"] {
     --c-accent: light-dark(#d92121, #f92f2f);
     --c-activeText: light-dark(#ffffff, #0d0909);
-    --c-todayDot: light-dark(#ffffff, #0d0909);
     --c-backdrop: light-dark(#fff5f5, #0d0909);
     --c-tone: light-dark(#ffe4e4, #3a1616);
     --c-text: light-dark(#1c0808, #ffffff);
@@ -106,7 +101,6 @@
   [data-theme="cyber"] {
     --c-accent: #00f3ff;
     --c-activeText: light-dark(#111111, #07070b);
-    --c-todayDot: light-dark(#111111, #07070b);
     --c-backdrop: light-dark(#f8fafc, #07070b);
     --c-tone: light-dark(#eef2f6, #301649);
     --c-text: light-dark(#101820, #ffffff);
@@ -125,7 +119,6 @@
   [data-theme="dracula"] {
     --c-accent: #ff5e5e;
     --c-activeText: #111111;
-    --c-todayDot: #111111;
     --c-backdrop: light-dark(#f8fafc, #1c1111);
     --c-tone: light-dark(#eef2f6, #341d1d);
     --c-text: light-dark(#101820, #ffffff);
@@ -144,7 +137,6 @@
   [data-theme="eclipse"] {
     --c-accent: #b7e000;
     --c-activeText: light-dark(#111111, #080d09);
-    --c-todayDot: light-dark(#111111, #080d09);
     --c-backdrop: light-dark(#f8fafc, #080d09);
     --c-tone: light-dark(#eef2f6, #141a12);
     --c-text: light-dark(#101820, #e9f2c7);
@@ -163,7 +155,6 @@
   [data-theme="espresso"] {
     --c-accent: light-dark(#6f3d18, #a05878);
     --c-activeText: #ffffff;
-    --c-todayDot: #ffffff;
     --c-backdrop: light-dark(#faf8f4, #0c0608);
     --c-tone: light-dark(#f2eddf, #1e0e14);
     --c-text: light-dark(#1a1208, #e8c8d4);
@@ -182,7 +173,6 @@
   [data-theme="fjord"] {
     --c-accent: light-dark(#14b8a6, #2fa39b);
     --c-activeText: light-dark(#062b2f, #091113);
-    --c-todayDot: light-dark(#062b2f, #091113);
     --c-backdrop: light-dark(#f0fdff, #0e1416);
     --c-tone: light-dark(#dff7f8, #131c1f);
     --c-text: light-dark(#082f36, #eaf3f2);
@@ -201,7 +191,6 @@
   [data-theme="graphite"] {
     --c-accent: #f1a01d;
     --c-activeText: #111111;
-    --c-todayDot: #111111;
     --c-backdrop: light-dark(#f7f8f9, #0b1014);
     --c-tone: light-dark(#eeeff1, #151c22);
     --c-text: light-dark(#1a1a1a, #eef4f2);
@@ -220,7 +209,6 @@
   [data-theme="industrial"] {
     --c-accent: #e85d00;
     --c-activeText: #111111;
-    --c-todayDot: #111111;
     --c-backdrop: light-dark(#f8fafc, #111111);
     --c-tone: light-dark(#eef2f6, #1c1c1c);
     --c-text: light-dark(#101820, #d4d4d4);
@@ -239,7 +227,6 @@
   [data-theme="meadow"] {
     --c-accent: light-dark(#059669, #4ade80);
     --c-activeText: #111111;
-    --c-todayDot: #111111;
     --c-backdrop: light-dark(#f2faf7, #0f2016);
     --c-tone: light-dark(#d1fae5, #162b1e);
     --c-text: light-dark(#052e16, #e2f5e8);
@@ -258,7 +245,6 @@
   [data-theme="mint"] {
     --c-accent: #60d276;
     --c-activeText: #111111;
-    --c-todayDot: #111111;
     --c-backdrop: light-dark(#f8f9fc, #0b1014);
     --c-tone: light-dark(#eaedf4, #151c22);
     --c-text: light-dark(#171827, #eef4f2);
@@ -277,7 +263,6 @@
   [data-theme="monsoon"] {
     --c-accent: #244a3d;
     --c-activeText: #ffffff;
-    --c-todayDot: #ffffff;
     --c-backdrop: light-dark(#d5ded9, #0b1014);
     --c-tone: light-dark(#bfcdc5, #151c22);
     --c-text: light-dark(#0a1a14, #eef4f2);
@@ -296,7 +281,6 @@
   [data-theme="nebula"] {
     --c-accent: light-dark(#681c9e, #b388ff);
     --c-activeText: light-dark(#ffffff, #090812);
-    --c-todayDot: light-dark(#ffffff, #090812);
     --c-backdrop: light-dark(#f5f3f7, #0b0a16);
     --c-tone: light-dark(#ebdff4, #18103a);
     --c-text: light-dark(#2b2533, #ede7f6);
@@ -315,7 +299,6 @@
   [data-theme="neon"] {
     --c-accent: light-dark(#80ec27, #76ff03);
     --c-activeText: light-dark(#111111, #010401);
-    --c-todayDot: light-dark(#111111, #010401);
     --c-backdrop: light-dark(#f7f8f9, #010401);
     --c-tone: light-dark(#e9f3eb, #1a1f1a);
     --c-text: light-dark(#1f2937, #00e676);
@@ -334,7 +317,6 @@
   [data-theme="noir"] {
     --c-accent: light-dark(#111111, #ffffff);
     --c-activeText: light-dark(#ffffff, #111111);
-    --c-todayDot: light-dark(#ffffff, #111111);
     --c-backdrop: light-dark(#ffffff, #111111);
     --c-tone: light-dark(#f5f5f5, #1c1c1c);
     --c-text: light-dark(#111111, #e8e8e8);
@@ -353,7 +335,6 @@
   [data-theme="pearl"] {
     --c-accent: light-dark(#3a2a42, #8a8a92);
     --c-activeText: light-dark(#ffffff, #0e0e10);
-    --c-todayDot: light-dark(#ffffff, #0e0e10);
     --c-backdrop: light-dark(#ecebed, #141417);
     --c-tone: light-dark(#dedce0, #1e1e22);
     --c-text: light-dark(#1f1624, #e8e8ec);
@@ -372,7 +353,6 @@
   [data-theme="prism"] {
     --c-accent: light-dark(#0ea5e9, #2563eb);
     --c-activeText: light-dark(#111111, #ffffff);
-    --c-todayDot: light-dark(#111111, #ffffff);
     --c-backdrop: light-dark(#f0f9ff, #061323);
     --c-tone: light-dark(#e0f2fe, #0d1f3a);
     --c-text: light-dark(#0c2340, #d8e8ff);
@@ -391,7 +371,6 @@
   [data-theme="riso"] {
     --c-accent: light-dark(#2b3fe0, #4f63ff);
     --c-activeText: #ffffff;
-    --c-todayDot: #ffffff;
     --c-backdrop: light-dark(#fef7e8, #17120b);
     --c-tone: light-dark(#fdebf3, #261827);
     --c-text: light-dark(#1a1205, #f8ecd8);
@@ -410,7 +389,6 @@
   [data-theme="sandstone"] {
     --c-accent: light-dark(#c04e2f, #e3ae5c);
     --c-activeText: light-dark(#ffffff, #111111);
-    --c-todayDot: light-dark(#ffffff, #111111);
     --c-backdrop: light-dark(#f2e8e0, #1f1c18);
     --c-tone: light-dark(#fdddd0, #2f2b24);
     --c-text: light-dark(#6e4531, #fdfbf7);
@@ -429,7 +407,6 @@
   [data-theme="slate"] {
     --c-accent: light-dark(#475569, #3559e0);
     --c-activeText: #ffffff;
-    --c-todayDot: #ffffff;
     --c-backdrop: light-dark(#f1f5f9, #1a1e2b);
     --c-tone: light-dark(#e2e8f0, #212638);
     --c-text: light-dark(#0f172a, #ffffff);
@@ -448,7 +425,6 @@
   [data-theme="snow"] {
     --c-accent: #3a60d6;
     --c-activeText: #ffffff;
-    --c-todayDot: #ffffff;
     --c-backdrop: light-dark(#e2e5e9, #0b1014);
     --c-tone: light-dark(#eceff4, #151c22);
     --c-text: light-dark(#212630, #eef4f2);
@@ -467,7 +443,6 @@
   [data-theme="solar"] {
     --c-accent: light-dark(#e67e22, #c89020);
     --c-activeText: light-dark(#111111, #0e0b04);
-    --c-todayDot: light-dark(#111111, #0e0b04);
     --c-backdrop: light-dark(#fffbe8, #0e0b04);
     --c-tone: light-dark(#fff3c4, #1e1808);
     --c-text: light-dark(#1e1a08, #f0d878);
@@ -486,7 +461,6 @@
   [data-theme="split"] {
     --c-accent: #e8c43d;
     --c-activeText: #111111;
-    --c-todayDot: #111111;
     --c-backdrop: light-dark(#fafaf6, #0b1014);
     --c-tone: light-dark(#f2f0ea, #151c22);
     --c-text: light-dark(#1a1f2a, #eef4f2);
@@ -505,7 +479,6 @@
   [data-theme="temporal"] {
     --c-accent: #27d1f4;
     --c-activeText: #111111;
-    --c-todayDot: #111111;
     --c-backdrop: light-dark(#f8fafc, #14252e);
     --c-tone: light-dark(#eef2f6, #242f52);
     --c-text: light-dark(#101820, #f1f5f9);
@@ -524,7 +497,6 @@
   [data-theme="velvet"] {
     --c-accent: light-dark(#d64c7f, #ff4da6);
     --c-activeText: light-dark(#111111, #120711);
-    --c-todayDot: light-dark(#111111, #120711);
     --c-backdrop: light-dark(#fef0f4, #120711);
     --c-tone: light-dark(#fce4ed, #261127);
     --c-text: light-dark(#2a1520, #f9d8ea);

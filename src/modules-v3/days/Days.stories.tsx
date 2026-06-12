@@ -1,0 +1,120 @@
+import type { Meta, StoryObj } from "@storybook/react";
+import { buildConfig, D } from "../../__tests__/v3/fixtures/builders";
+import type { CalendarDate } from "../../core-v3/calendar-date";
+import { Calendar } from "../../react-v3/calendar";
+import { storyThemeProps } from "../_lab/story-globals";
+import { CalendarDays, type DayRenderState } from "./CalendarDays";
+
+const meta: Meta = {
+  title: "v3/Days",
+  parameters: { layout: "centered" },
+};
+export default meta;
+
+type Story = StoryObj;
+
+export const Default: Story = {
+  render: (_, ctx) => (
+    <Calendar
+      {...storyThemeProps(ctx.globals)}
+      config={buildConfig({ mode: "range" })}
+      initialView={D(2026, 6, 1)}
+    >
+      <CalendarDays />
+    </Calendar>
+  ),
+};
+
+/** Today layers: dot only / outline only / bare. */
+export const TodayMarkers: Story = {
+  render: (_, ctx) => (
+    <div style={{ display: "grid", gap: 16 }}>
+      <Calendar
+        {...storyThemeProps(ctx.globals)}
+        config={buildConfig({ mode: "single" })}
+      >
+        <CalendarDays highlightToday={false} />
+      </Calendar>
+      <Calendar
+        {...storyThemeProps(ctx.globals)}
+        config={buildConfig({ mode: "single" })}
+      >
+        <CalendarDays todayDot={false} />
+      </Calendar>
+    </div>
+  ),
+};
+
+export const WeekNumbersAndBoldWeekends: Story = {
+  render: (_, ctx) => (
+    <Calendar
+      {...storyThemeProps(ctx.globals)}
+      config={buildConfig({ mode: "single" })}
+      initialView={D(2026, 6, 1)}
+    >
+      <CalendarDays weekNumbers boldWeekends weekdayFormat="narrow" />
+    </Calendar>
+  ),
+};
+
+export const CompactNoOutside: Story = {
+  render: (_, ctx) => (
+    <Calendar
+      {...storyThemeProps(ctx.globals)}
+      config={buildConfig({ mode: "single" })}
+      initialView={D(2026, 6, 1)}
+    >
+      <CalendarDays
+        showOutsideDays={false}
+        fixedWeeks={false}
+        hideWeekdays
+        highlightWeekends={false}
+      />
+    </Calendar>
+  ),
+};
+
+/** Two months side by side: primary grid + offset grid. */
+export const TwoMonths: Story = {
+  render: (_, ctx) => (
+    <div style={{ width: 560 }}>
+      <Calendar
+        {...storyThemeProps(ctx.globals)}
+        config={buildConfig({ mode: "range" })}
+        initialView={D(2026, 6, 1)}
+      >
+        <div
+          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}
+        >
+          <CalendarDays />
+          <CalendarDays offset={1} />
+        </div>
+      </Calendar>
+    </div>
+  ),
+};
+
+// Module-level renderer — stable reference, cells stay memoized.
+const priceDay = (date: CalendarDate, state: DayRenderState) => (
+  <span style={{ display: "grid", lineHeight: 1.2, padding: "0.15em 0" }}>
+    <span>{date.day}</span>
+    {!state.outside && (
+      <span style={{ fontSize: "0.6em", opacity: 0.7 }}>
+        ${90 + ((date.day * 7) % 60)}
+      </span>
+    )}
+  </span>
+);
+
+/** Custom cell content (prices) — shell, keyboard and aria stay built-in. */
+export const RenderDayPrices: Story = {
+  render: (_, ctx) => (
+    <Calendar
+      {...storyThemeProps(ctx.globals)}
+      config={buildConfig({ mode: "range" })}
+      initialView={D(2026, 6, 1)}
+    >
+      <CalendarDays renderDay={priceDay} />
+    </Calendar>
+  ),
+};

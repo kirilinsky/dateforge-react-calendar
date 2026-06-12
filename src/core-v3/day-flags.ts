@@ -49,7 +49,13 @@ export const DayFlag = {
  */
 export type DayLookup =
   | { readonly shape: "point"; readonly pointKeys: ReadonlySet<number> }
-  | { readonly shape: "span"; readonly ranges: readonly CalendarRange[] };
+  | {
+      readonly shape: "span";
+      readonly ranges: readonly CalendarRange[];
+      /** Pending first click of a two-click range — rendered as a solid
+          selected day so the range START is visible while drafting. */
+      readonly anchorKey?: number;
+    };
 
 /**
  * Build the per-cell lookup from a selection. Call on selection change only.
@@ -65,10 +71,11 @@ export function buildDayLookup(
     for (const dt of sel.dates) pointKeys.add(dateKey(dt.date));
     return { shape: "point", pointKeys };
   }
-  if (!config) return { shape: "span", ranges: sel.ranges };
+  const anchorKey = sel.draftAnchor ? dateKey(sel.draftAnchor) : undefined;
+  if (!config) return { shape: "span", ranges: sel.ranges, anchorKey };
   const cut = combineCuts(config.exclude, config.disabled);
   const ranges = cut.isEmpty ? sel.ranges : applyExclusionAll(sel.ranges, cut);
-  return { shape: "span", ranges };
+  return { shape: "span", ranges, anchorKey };
 }
 
 /**
@@ -124,6 +131,10 @@ export function dayFlags(
       if (isEnd) f |= DayFlag.RangeEnd;
       // A one-day span reads as a plain selected day to the UI.
       if (isStart && isEnd) f |= DayFlag.Selected;
+    }
+    // The armed anchor is the visible range START while drafting.
+    if (lookup.anchorKey !== undefined && lookup.anchorKey === dateKey(date)) {
+      f |= DayFlag.Selected;
     }
   }
 

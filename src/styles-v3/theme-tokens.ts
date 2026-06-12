@@ -224,9 +224,9 @@ function deriveSeedTokens(
   if (commonTokens.activeText == null && variantTokens.activeText == null) {
     derived.activeText = bestTextOn(accent, base.activeText);
   }
-  if (commonTokens.todayDot == null && variantTokens.todayDot == null) {
-    derived.todayDot = derived.activeText ?? bestTextOn(accent, base.todayDot);
-  }
+  // todayDot is NOT derived here — the CSS defaults to `var(--c-accent)`, which
+  // contrasts against the backdrop. Deriving it as activeText (contrast vs accent)
+  // is wrong: the dot lives on the cell background, not on the accent fill.
   if (commonTokens.shadow == null && variantTokens.shadow == null) {
     derived.shadow = shadowFrom(accent, base.shadow);
   }
