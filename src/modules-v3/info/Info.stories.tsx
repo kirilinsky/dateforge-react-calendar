@@ -51,3 +51,67 @@ export const MultipleMode: Story = {
     </Calendar>
   ),
 };
+
+/** Relative line ("in 5 days") + prefix node, localized via Intl. */
+export const RelativeAndPrefix: Story = {
+  render: (_, ctx) => (
+    <Calendar
+      {...storyThemeProps(ctx.globals)}
+      config={buildConfig({ mode: "single" })}
+      initialView={D(2026, 6, 1)}
+    >
+      <CalendarDays />
+      <CalendarInfo showRelative prefix="📅" emptyLabel="Pick a date" />
+    </Calendar>
+  ),
+};
+
+/** Duration-style range summary (days + hours + minutes when times exist). */
+export const DurationRange: Story = {
+  render: (_, ctx) => (
+    <Calendar
+      {...storyThemeProps(ctx.globals)}
+      config={buildConfig({ mode: "range" })}
+      initialView={D(2026, 6, 1)}
+    >
+      <CalendarDays />
+      <CalendarInfo rangeStyle="duration" emptyLabel="Select a range" />
+    </Calendar>
+  ),
+};
+
+/** Custom formatter — receives the v3 public value (same shape as onChange). */
+export const CustomFormatter: Story = {
+  render: (_, ctx) => (
+    <Calendar
+      {...storyThemeProps(ctx.globals)}
+      config={buildConfig({ mode: "single" })}
+      initialView={D(2026, 6, 1)}
+    >
+      <CalendarDays />
+      <CalendarInfo
+        emptyLabel="Pick a date"
+        formatter={(value) =>
+          value instanceof Date
+            ? `→ ISO ${value.toISOString().slice(0, 10)}`
+            : null
+        }
+      />
+    </Calendar>
+  ),
+};
+
+/** Height animation: select/clear to watch the bar collapse and expand.
+ *  CSS-only (grid-template-rows 0fr→1fr), reduced-motion disables. */
+export const AnimatedCollapse: Story = {
+  render: (_, ctx) => (
+    <Calendar
+      {...storyThemeProps(ctx.globals)}
+      config={buildConfig({ mode: "single" })}
+      initialView={D(2026, 6, 1)}
+    >
+      <CalendarDays />
+      <CalendarInfo allowClear align="center" />
+    </Calendar>
+  ),
+};

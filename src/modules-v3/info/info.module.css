@@ -1,21 +1,63 @@
 @layer cal-modules {
+  /* Height animation transitions to the MEASURED content height (v2 parity:
+     ResizeObserver + a CSS var) — covers show/hide AND content reflow (a
+     wrapped relative line, a longer summary), where 0fr/1fr grid tricks only
+     animate show/hide and snap on reflow. `--cal-info-h` is set inline by the
+     component; before the first measure it falls back to `auto` (no jump on
+     hydration). Non-animated containers are plain blocks (unmount when empty). */
   .container {
+    min-width: 0;
+  }
+
+  .inner {
+    min-height: 0;
     display: flex;
     align-items: center;
     gap: 0.5em;
     padding: 0.5em 0.75em;
+  }
+
+  .animated .inner {
+    overflow: hidden;
+    height: var(--cal-info-h, auto);
+    transition: height
+      var(--cal-info-transition, 0.25s)
+      var(--cal-info-easing, cubic-bezier(0.4, 0, 0.2, 1));
+  }
+
+  .animated[data-collapsed] .inner {
+    padding-block: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animated .inner {
+      transition: none;
+    }
+  }
+
+  /* Text block: summary line + optional relative line, wrapping as a row. */
+  .contentGroup {
+    flex: 1;
+    display: flex;
+    align-items: baseline;
+    column-gap: 0.6em;
+    row-gap: 0.15em;
+    flex-wrap: wrap;
     min-width: 0;
-    min-height: 2.5em;
   }
 
   .summary {
-    flex: 1;
     font-size: 0.875em;
     color: var(--c-text, #222);
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .prefix {
+    margin-inline-end: 0.35em;
+    color: var(--c-mutedText, #999);
   }
 
   .empty {
@@ -40,7 +82,13 @@
     border-radius: var(--c-day-radius, 6px);
     cursor: pointer;
     line-height: 1;
-    transition: background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear), color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
+    display: inline-flex;
+    align-items: center;
+    transition:
+      background var(--cal-paint-transition, var(--cal-transition, 0.2s))
+        var(--cal-paint-easing, linear),
+      color var(--cal-paint-transition, var(--cal-transition, 0.2s))
+        var(--cal-paint-easing, linear);
   }
 
   .actionBtn:hover:not([disabled]) {
