@@ -1,0 +1,55 @@
+@layer cal-modules {
+  .container {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.5em 0.75em;
+    min-width: 0;
+    min-height: 2.5em;
+  }
+
+  .summary {
+    flex: 1;
+    font-size: 0.875em;
+    color: var(--c-text, #222);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .empty {
+    color: var(--c-mutedText, #999);
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25em;
+    flex-shrink: 0;
+  }
+
+  .actionBtn {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: var(--c-mutedText, #999);
+    font: inherit;
+    font-size: 0.85em;
+    padding: 0.25em 0.5em;
+    border-radius: var(--c-day-radius, 6px);
+    cursor: pointer;
+    line-height: 1;
+    transition: background 120ms ease, color 120ms ease;
+  }
+
+  .actionBtn:hover:not([disabled]) {
+    background: var(--c-highlight, #eef1f7);
+    color: var(--c-text, #222);
+  }
+
+  .actionBtn[disabled] {
+    opacity: 0.4;
+    cursor: default;
+  }
+}
