@@ -86,3 +86,207 @@ describe("CalendarManualInput", () => {
     expect(input).toBeTruthy();
   });
 });
+
+describe("CalendarManualInput v2-parity surface", () => {
+  it("input has a registry aria-label when no visible label", () => {
+    setup();
+    expect(screen.getByRole("textbox").getAttribute("aria-label")).toBe("Date");
+  });
+
+  it("visible label is wired via htmlFor and drops aria-label", () => {
+    render(
+      <Calendar
+        config={buildConfig({ mode: "single" })}
+        initialView={D(2026, 6, 1)}
+      >
+        <CalendarManualInput label="Departure" />
+      </Calendar>,
+    );
+    const input = screen.getByLabelText("Departure");
+    expect(input.getAttribute("aria-label")).toBeNull();
+  });
+
+  it("allowClear shows x when text exists and clears selection", async () => {
+    const onChange = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <Calendar
+        config={buildConfig({ mode: "single" })}
+        initialView={D(2026, 6, 1)}
+        onChange={onChange}
+      >
+        <CalendarManualInput allowClear />
+      </Calendar>,
+    );
+    const input = screen.getByRole("textbox");
+    expect(screen.queryByLabelText("Clear")).toBeNull();
+    await user.type(input, "15062026");
+    await user.click(screen.getByLabelText("Clear"));
+    expect((input as HTMLInputElement).value).toBe("");
+    expect(onChange.mock.calls.at(-1)?.[0]).toBeNull();
+  });
+
+  it("bound inputs edit their side of an existing range", async () => {
+    const user = userEvent.setup();
+    render(
+      <Calendar
+        config={buildConfig({ mode: "range" })}
+        initialView={D(2026, 6, 1)}
+      >
+        <CalendarDays />
+        <CalendarManualInput bound="from" label="From" />
+        <CalendarManualInput bound="to" label="To" />
+      </Calendar>,
+    );
+    await user.click(
+      document.querySelector('[data-date="20260610"]') as HTMLElement,
+    );
+    await user.click(
+      document.querySelector('[data-date="20260615"]') as HTMLElement,
+    );
+    const from = screen.getByLabelText("From") as HTMLInputElement;
+    const to = screen.getByLabelText("To") as HTMLInputElement;
+    expect(from.value).toBe("10.06.2026");
+    expect(to.value).toBe("15.06.2026");
+
+    await user.clear(to);
+    await user.type(to, "20062026");
+    expect(
+      document
+        .querySelector('[data-date="20260620"]')
+        ?.hasAttribute("data-range-end"),
+    ).toBe(true);
+    expect(from.value).toBe("10.06.2026");
+  });
+
+  it("inverted bound edit flags the input invalid, range untouched", async () => {
+    const user = userEvent.setup();
+    render(
+      <Calendar
+        config={buildConfig({ mode: "range" })}
+        initialView={D(2026, 6, 1)}
+      >
+        <CalendarDays />
+        <CalendarManualInput bound="from" label="From" />
+      </Calendar>,
+    );
+    await user.click(
+      document.querySelector('[data-date="20260610"]') as HTMLElement,
+    );
+    await user.click(
+      document.querySelector('[data-date="20260615"]') as HTMLElement,
+    );
+    const from = screen.getByLabelText("From") as HTMLInputElement;
+    await user.clear(from);
+    await user.type(from, "20062026");
+    expect(from.getAttribute("aria-invalid")).toBe("true");
+    expect(
+      document
+        .querySelector('[data-date="20260615"]')
+        ?.hasAttribute("data-range-end"),
+    ).toBe(true);
+  });
+
+  it("ArrowUp increments the segment under the caret and commits", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <Calendar
+        config={buildConfig({ mode: "single" })}
+        initialView={D(2026, 6, 1)}
+        onChange={onChange}
+      >
+        <CalendarManualInput />
+      </Calendar>,
+    );
+    const input = screen.getByRole("textbox") as HTMLInputElement;
+    await user.type(input, "15062026");
+    input.setSelectionRange(1, 1); // caret in DD
+    await user.keyboard("{ArrowUp}");
+    expect(input.value).toBe("16.06.2026");
+    const last = onChange.mock.calls.at(-1)?.[0] as Date;
+    expect(last.getDate()).toBe(16);
+  });
+
+  it("ArrowDown wraps the month segment", async () => {
+    const user = userEvent.setup();
+    render(
+      <Calendar
+        config={buildConfig({ mode: "single" })}
+        initialView={D(2026, 6, 1)}
+      >
+        <CalendarManualInput />
+      </Calendar>,
+    );
+    const input = screen.getByRole("textbox") as HTMLInputElement;
+    await user.type(input, "15012026");
+    input.setSelectionRange(4, 4); // caret in MM
+    await user.keyboard("{ArrowDown}");
+    expect(input.value).toBe("15.12.2026");
+  });
+
+  it("ArrowUp on an empty input seeds from today/selected", async () => {
+    const user = userEvent.setup();
+    render(
+      <Calendar
+        config={buildConfig({ mode: "single" })}
+        initialView={D(2026, 6, 1)}
+      >
+        <CalendarManualInput />
+      </Calendar>,
+    );
+    const input = screen.getByRole("textbox") as HTMLInputElement;
+    input.focus();
+    input.setSelectionRange(0, 0);
+    await user.keyboard("{ArrowUp}");
+    expect(input.value).toMatch(/^\d{2}\.\d{2}\.\d{4}$/);
+  });
+
+  it("per-module theme + align land on the container", () => {
+    render(
+      <Calendar
+        config={buildConfig({ mode: "single" })}
+        initialView={D(2026, 6, 1)}
+      >
+        <CalendarManualInput theme="velvet" scheme="dark" align="right" />
+      </Calendar>,
+    );
+    const box = document.querySelector(
+      "[data-dateforge-manual-input]",
+    ) as HTMLElement;
+    expect(box.getAttribute("data-theme")).toBe("velvet");
+    expect(box.getAttribute("data-scheme")).toBe("dark");
+    expect(box.style.alignItems).toBe("flex-end");
+  });
+});
+
+describe("CalendarManualInput localization (registry)", () => {
+  it("bound inputs get per-bound registry aria-labels", () => {
+    render(
+      <Calendar
+        config={buildConfig({ mode: "range" })}
+        initialView={D(2026, 6, 1)}
+      >
+        <CalendarManualInput bound="from" />
+        <CalendarManualInput bound="to" />
+      </Calendar>,
+    );
+    expect(screen.getByLabelText("Start date")).toBeTruthy();
+    expect(screen.getByLabelText("End date")).toBeTruthy();
+  });
+
+  it("root labels prop localizes the bound aria-labels", () => {
+    render(
+      <Calendar
+        config={buildConfig({ mode: "range" })}
+        initialView={D(2026, 6, 1)}
+        labels={{ rangeFrom: "Дата начала", rangeTo: "Дата конца" }}
+      >
+        <CalendarManualInput bound="from" />
+        <CalendarManualInput bound="to" />
+      </Calendar>,
+    );
+    expect(screen.getByLabelText("Дата начала")).toBeTruthy();
+    expect(screen.getByLabelText("Дата конца")).toBeTruthy();
+  });
+});

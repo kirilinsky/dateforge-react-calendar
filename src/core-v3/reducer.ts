@@ -50,6 +50,7 @@ export function reduce(
 
     case "selectDay":
     case "setTime":
+    case "setBoundDate":
     case "clear":
     case "applyPreset":
     case "removeDate":
@@ -99,6 +100,7 @@ function mutateSelection(
       type:
         | "selectDay"
         | "setTime"
+        | "setBoundDate"
         | "clear"
         | "applyPreset"
         | "removeDate"
@@ -121,6 +123,11 @@ function mutateSelection(
       return strategy.selectDay(ctx, action.date);
     case "setTime":
       return strategy.setTime(ctx, action.time, action.bound);
+    case "setBoundDate":
+      return (
+        strategy.setBoundDate?.(ctx, action.date, action.bound) ??
+        noChange(state)
+      );
     case "clear":
       return strategy.clear(ctx);
     case "applyPreset":

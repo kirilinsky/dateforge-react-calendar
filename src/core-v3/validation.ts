@@ -28,6 +28,7 @@ export type ValidationReason =
   | "ambiguous-time"
   | "nonexistent-time"
   | "time-out-of-order"
+  | "range-out-of-order"
   | "empty-after-exclude"
   | "read-only";
 

@@ -29,6 +29,12 @@ export type SelectionStrategy = {
   ): ReduceResult;
   clear(ctx: SelectionContext): ReduceResult;
   applyPreset(ctx: SelectionContext, preset: PresetResult): ReduceResult;
+  /** Span modes: move one bound's date. Optional — defaults to no-op. */
+  setBoundDate?(
+    ctx: SelectionContext,
+    date: CalendarDate,
+    bound: "from" | "to",
+  ): ReduceResult;
   /** Multiple mode: drop one point. Optional — defaults to no-op. */
   removeDate?(ctx: SelectionContext, date: CalendarDate): ReduceResult;
   /** Multi-range mode: drop one span by index. Optional — defaults to no-op. */

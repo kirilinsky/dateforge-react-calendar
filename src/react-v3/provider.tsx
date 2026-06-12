@@ -181,6 +181,7 @@ export function useCalendarStore(): CalendarStore {
 export type CalendarActions = {
   selectDay(date: CalendarDate): void;
   setTime(time: CalendarTime, bound?: "from" | "to"): void;
+  setBoundDate(date: CalendarDate, bound: "from" | "to"): void;
   navigateTo(date: CalendarDate): void;
   navigateBy(step: "month" | "year", amount: number): void;
   hover(date?: CalendarDate): void;
@@ -203,6 +204,8 @@ export function useCalendarActions(): CalendarActions {
       selectDay: (date) => store.dispatch({ type: "selectDay", date }),
       setTime: (time, bound) =>
         store.dispatch({ type: "setTime", time, bound }),
+      setBoundDate: (date, bound) =>
+        store.dispatch({ type: "setBoundDate", date, bound }),
       navigateTo: (date) => store.dispatch({ type: "navigateTo", date }),
       navigateBy: (step, amount) =>
         store.dispatch({ type: "navigateBy", step, amount }),

@@ -14,6 +14,8 @@ export type CalendarAction =
   | { type: "selectDay"; date: CalendarDate }
   /** Edit time of the active selection or a range bound. */
   | { type: "setTime"; time: CalendarTime; bound?: "from" | "to" }
+  /** Edit the date of one bound of a span selection (manual input, wheels). */
+  | { type: "setBoundDate"; date: CalendarDate; bound: "from" | "to" }
   /** Move the view anchor to an explicit date. */
   | { type: "navigateTo"; date: CalendarDate }
   /** Step the view by whole months/years (prev/next controls). */

@@ -3,6 +3,7 @@ import { buildConfig, D } from "../../__tests__/v3/fixtures/builders";
 import { Calendar } from "../../react-v3/calendar";
 import { storyThemeProps } from "../_lab/story-globals";
 import { CalendarDays } from "../days/CalendarDays";
+import { CalendarSelectedDates } from "../selected-dates/CalendarSelectedDates";
 import { CalendarManualInput } from "./CalendarManualInput";
 
 const meta: Meta = {
@@ -48,6 +49,53 @@ export const ReadOnly: Story = {
     >
       <CalendarManualInput />
       <CalendarDays />
+    </Calendar>
+  ),
+};
+
+/** Label + clear (×) + ArrowUp/Down segment stepping (MUI DateField model):
+ *  put the caret in a segment and press the arrows. */
+export const LabelAndClear: Story = {
+  render: (_, ctx) => (
+    <Calendar
+      {...storyThemeProps(ctx.globals)}
+      config={buildConfig({ mode: "single" })}
+      initialView={D(2026, 6, 1)}
+    >
+      <CalendarManualInput label="Date" allowClear />
+      <CalendarDays />
+    </Calendar>
+  ),
+};
+
+/** Range via two bound inputs — the v3 take on v2's from—to slots. Typing an
+ *  inverted bound flags the input instead of silently swapping. */
+export const RangeBounds: Story = {
+  render: (_, ctx) => (
+    <Calendar
+      {...storyThemeProps(ctx.globals)}
+      config={buildConfig({ mode: "range" })}
+      initialView={D(2026, 6, 1)}
+    >
+      <CalendarManualInput bound="from" label="From" />
+      <CalendarManualInput bound="to" label="To" />
+      <CalendarDays />
+    </Calendar>
+  ),
+};
+
+/** Multiple mode recipe replacing v2's chip editor: the input ADDS dates
+ *  (live commit), CalendarSelectedDates lists and removes them. */
+export const MultipleRecipe: Story = {
+  render: (_, ctx) => (
+    <Calendar
+      {...storyThemeProps(ctx.globals)}
+      config={buildConfig({ mode: "multiple" })}
+      initialView={D(2026, 6, 1)}
+    >
+      <CalendarManualInput label="Add date" />
+      <CalendarDays />
+      <CalendarSelectedDates allowClear allowClearPerChip />
     </Calendar>
   ),
 };

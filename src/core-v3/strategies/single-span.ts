@@ -7,6 +7,7 @@ import {
   rangesEqual,
   rejected,
   spanClear,
+  spanSetBoundDate,
   spanSetTime,
   unitSnap,
   validateDay,
@@ -57,6 +58,8 @@ function applyPreset(
 
 export const singleSpanStrategy: SelectionStrategy = {
   selectDay,
+  setBoundDate: (ctx, date, bound) =>
+    spanSetBoundDate(ctx.state, ctx.config, date, bound),
   setTime: (ctx, time, bound) =>
     spanSetTime(ctx.state, ctx.config, time, bound),
   clear: (ctx) => spanClear(ctx.state, ctx.config),
