@@ -36,12 +36,13 @@ import {
   ChevronRightIcon,
   ClearIcon,
   HomeIcon,
+  ThemeToggleIcon,
 } from "../../react-v3/icons";
 import { useLabels } from "../../react-v3/labels-context";
 import { useCalendarActions, useCalendarStore } from "../../react-v3/provider";
 import { UIButton } from "../../react-v3/ui/button";
 import { UITile } from "../../react-v3/ui/tile";
-import { useUI } from "../../react-v3/ui-context";
+import { type SchemeMode, useUI } from "../../react-v3/ui-context";
 import { useStoreSelector } from "../../react-v3/use-store-selector";
 import { getGridSlotStyle } from "../../utils/get-grid-slot-style";
 import styles from "./toolbar.module.css";
@@ -992,5 +993,60 @@ export function CalendarToolbarClock({
       <span className={styles.clockDot} />
       {text}
     </span>
+  );
+}
+
+// ── Theme toggle ──────────────────────────────────────────────────────────────
+
+/**
+ * Resolve whether the calendar is currently dark, tracking both the explicit
+ * scheme and — for `"auto"` — the OS preference (subscribed, so a system flip
+ * updates the `aria-pressed` state live). `false` until mounted, matching the
+ * server's CSS-native first paint.
+ */
+function useResolvedDark(scheme: SchemeMode): boolean {
+  const [systemDark, setSystemDark] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    setSystemDark(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setSystemDark(e.matches);
+    mq.addEventListener?.("change", onChange);
+    return () => mq.removeEventListener?.("change", onChange);
+  }, []);
+  if (scheme === "dark") return true;
+  if (scheme === "light") return false;
+  return systemDark;
+}
+
+/**
+ * Light/dark toggle. Flips the root `data-scheme` (resolving `"auto"` against
+ * the OS on the first flip); `aria-pressed` reflects the resolved dark state.
+ * Uncontrolled by default — under a controlled `<Calendar scheme onSchemeChange>`
+ * the flip calls the host instead (see `Calendar`).
+ */
+export function CalendarToolbarThemeToggle({
+  label,
+  col,
+  className,
+  children,
+}: WithClass & { label?: string; col?: number | string }) {
+  const ui = useUI();
+  const t = useLabels();
+  const isDark = useResolvedDark(ui.scheme);
+  const aria = isDark
+    ? t("themeSwitchToLight", undefined, label)
+    : t("themeSwitchToDark", undefined, label);
+  return (
+    <UIButton
+      aria-label={aria}
+      aria-pressed={isDark}
+      data-toolbar-theme-toggle=""
+      className={className}
+      style={getGridSlotStyle(col)}
+      onClick={ui.toggleScheme}
+    >
+      {children ?? <ThemeToggleIcon />}
+    </UIButton>
   );
 }

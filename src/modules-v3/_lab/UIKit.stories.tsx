@@ -11,6 +11,7 @@ import {
   ChevronRightIcon,
   ClearIcon,
   HomeIcon,
+  ThemeToggleIcon,
 } from "@/react-v3/icons";
 import { UIButton } from "@/react-v3/ui/button";
 import { UITile } from "@/react-v3/ui/tile";
@@ -138,6 +139,7 @@ export const Buttons: Story = {
           <HomeIcon size={18} />
           <ClearIcon size={18} />
           <CheckIcon size={18} />
+          <ThemeToggleIcon size={18} />
         </Row>
       </div>
     </Frame>

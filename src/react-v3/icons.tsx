@@ -75,3 +75,13 @@ export function CheckIcon({ size }: { size?: number }) {
     </Icon>
   );
 }
+
+/** Contrast/half-moon — the light/dark scheme toggle. */
+export function ThemeToggleIcon({ size }: { size?: number }) {
+  return (
+    <Icon size={size}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none" />
+    </Icon>
+  );
+}
