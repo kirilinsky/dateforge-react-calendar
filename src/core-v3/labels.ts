@@ -28,6 +28,7 @@ export const LABEL_DEFAULTS = {
   minutes: "Minutes",
   monthGrid: "Select month, {year}",
   monthPicker: "Month picker",
+  monthSelected: "{month}, selected",
   monthTrack: "Month",
   nextDay: "Next day",
   nextMonth: "Next month",

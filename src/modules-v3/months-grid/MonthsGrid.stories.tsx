@@ -36,6 +36,18 @@ export const ShortLabels: Story = {
   ),
 };
 
+export const LongLabels: Story = {
+  render: (_, ctx) => (
+    <Calendar
+      {...storyThemeProps(ctx.globals)}
+      config={buildConfig({ mode: "single" })}
+      initialView={D(2026, 6, 1)}
+    >
+      <CalendarMonthsGrid short={false} />
+    </Calendar>
+  ),
+};
+
 export const RangeMode: Story = {
   render: (_, ctx) => (
     <Calendar
@@ -44,6 +56,49 @@ export const RangeMode: Story = {
       initialView={D(2026, 6, 1)}
     >
       <CalendarMonthsGrid />
+    </Calendar>
+  ),
+};
+
+export const OutOfRangeDisabled: Story = {
+  render: (_, ctx) => (
+    <Calendar
+      {...storyThemeProps(ctx.globals)}
+      config={buildConfig({
+        mode: "single",
+        min: D(2026, 4, 1),
+        max: D(2026, 9, 30),
+      })}
+      initialView={D(2026, 6, 1)}
+    >
+      <CalendarMonthsGrid outOfRangeBehavior="disable" />
+    </Calendar>
+  ),
+};
+
+export const OutOfRangeHidden: Story = {
+  render: (_, ctx) => (
+    <Calendar
+      {...storyThemeProps(ctx.globals)}
+      config={buildConfig({
+        mode: "single",
+        min: D(2026, 4, 1),
+        max: D(2026, 9, 30),
+      })}
+      initialView={D(2026, 6, 1)}
+    >
+      <CalendarMonthsGrid outOfRangeBehavior="hide" />
+    </Calendar>
+  ),
+};
+
+export const PerModuleTheme: Story = {
+  render: () => (
+    <Calendar
+      config={buildConfig({ mode: "single" })}
+      initialView={D(2026, 6, 1)}
+    >
+      <CalendarMonthsGrid theme="espresso" scheme="dark" />
     </Calendar>
   ),
 };

@@ -11,6 +11,13 @@
     padding: 0.6em 0.5em;
   }
 
+  /* 12 months read better as 4×3 once the container has room. */
+  @container cal-months-grid (min-width: 18em) {
+    .grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
   /* Cells are the shared UITile primitive; only grid-specific metrics here. */
   .item {
     font-size: 0.875em;
