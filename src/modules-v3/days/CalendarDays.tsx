@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { memo, useEffect, useMemo, useRef } from "react";
 import type { CalendarDate } from "../../core-v3/calendar-date";
 import {
@@ -15,6 +15,7 @@ import {
 } from "../../core-v3/day-flags";
 import { dayKeyboardTarget } from "../../core-v3/day-keyboard";
 import { buildMonthGrid } from "../../core-v3/month-grid";
+import { DEFAULT_WEEKEND_DAYS } from "../../core-v3/state";
 import { today } from "../../core-v3/timezone-boundary";
 import { usePageSlide } from "../../hooks/use-page-slide";
 import { dayDataAttrs } from "../../react-v3/day-attrs";
@@ -77,8 +78,18 @@ export type CalendarDaysProps = {
   hideWeekdays?: boolean;
   /** Weekday header style. Default "short" ("Mon"); narrow = "M". */
   weekdayFormat?: "short" | "narrow" | "long";
-  /** Weekend surface tint (derived from the `weekend` ink). Default true. */
+  /**
+   * Weekend column BACKGROUND tint — a soft continuous strip down the weekend
+   * columns (derived from the `weekend` ink). Opt-in: default false. The lighter
+   * weekend cue (tinted headers) is `weekendHeaders`, on by default.
+   */
   highlightWeekends?: boolean;
+  /**
+   * Tint the weekend weekday HEADERS (the "Sat"/"Sun" labels) with the
+   * `weekend` ink + bold — the v2 look. Independent of `highlightWeekends`
+   * (the column tint). Default true.
+   */
+  weekendHeaders?: boolean;
   /** Bold + weekend-ink weekday numbers (v2 look). Default false. */
   boldWeekends?: boolean;
   /**
@@ -206,7 +217,8 @@ export function CalendarDays({
   weekLabel,
   hideWeekdays = false,
   weekdayFormat = "short",
-  highlightWeekends = true,
+  highlightWeekends = false,
+  weekendHeaders = true,
   boldWeekends = false,
   todayDot,
   highlightToday = false,
@@ -252,6 +264,29 @@ export function CalendarDays({
       }),
     [shownDate.year, shownDate.month, config.firstDayOfWeek, fixedWeeks],
   );
+
+  // Weekend tint as continuous column strips behind the cells (not a rounded
+  // box per cell). The two weekend days (Sat=6, Sun=0) are grouped into
+  // contiguous runs: adjacent (Mon-start: cols 5-6) → ONE strip spanning both,
+  // rounded only on its outer edges; non-adjacent (Sun-start: cols 0 and 6) →
+  // two single-column strips. `*-span: 0` hides the second strip.
+  const weekendDays = config.weekendDays ?? DEFAULT_WEEKEND_DAYS;
+  const weekendStrips = useMemo(() => {
+    const cols: number[] = [];
+    grid.weekdayOrder.forEach((wd, i) => {
+      if (weekendDays.includes(wd)) cols.push(i);
+    });
+    cols.sort((a, b) => a - b);
+    const segments: { start: number; span: number }[] = [];
+    for (const c of cols) {
+      const last = segments[segments.length - 1];
+      if (last && c === last.start + last.span) last.span += 1;
+      else segments.push({ start: c, span: 1 });
+    }
+    const a = segments[0] ?? { start: 5, span: 2 };
+    const b = segments[1] ?? { start: 0, span: 0 };
+    return { aStart: a.start, aSpan: a.span, bStart: b.start, bSpan: b.span };
+  }, [grid.weekdayOrder, weekendDays]);
 
   // Heavy-but-rare: rebuilt on commit. Cheap-and-hot dayFlags reads it per cell.
   const lookup = useMemo(
@@ -365,11 +400,20 @@ export function CalendarDays({
       data-scheme={scheme}
       data-week-numbers={weekNumbers ? "" : undefined}
       data-weekend-tint={highlightWeekends ? "" : undefined}
+      data-weekend-headers={weekendHeaders ? "" : undefined}
       data-bold-weekends={boldWeekends ? "" : undefined}
       data-today-dot={(todayDot ?? !renderDay) ? "" : undefined}
       data-today-outline={highlightToday ? "" : undefined}
       className={[styles.grid, className].filter(Boolean).join(" ")}
-      style={getGridSlotStyle(col)}
+      style={
+        {
+          ...getGridSlotStyle(col),
+          "--wknd-a-start": weekendStrips.aStart,
+          "--wknd-a-span": weekendStrips.aSpan,
+          "--wknd-b-start": weekendStrips.bStart,
+          "--wknd-b-span": weekendStrips.bSpan,
+        } as CSSProperties
+      }
       onKeyDown={onKeyDown}
       onMouseLeave={() => hover(undefined)}
     >
@@ -391,6 +435,7 @@ export function CalendarDays({
               key={w}
               role="columnheader"
               data-weekday=""
+              data-weekend={weekendDays.includes(w) ? "" : undefined}
               className={styles.weekday}
               aria-label={weekdayLabels.long[i]}
             >

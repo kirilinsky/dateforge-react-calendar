@@ -3,8 +3,9 @@ import { calendarDate } from "../../core-v3/calendar-date";
 import { toCalendarDateTime } from "../../core-v3/timezone-boundary";
 import { useToday } from "../../hooks/use-today";
 import { useLabels } from "../../react-v3/labels-context";
-import { UIButton } from "../../react-v3/ui/button";
+import { usePickerDraft } from "../../react-v3/picker-draft";
 import { useCalendarActions, useCalendarStore } from "../../react-v3/provider";
+import { UIButton } from "../../react-v3/ui/button";
 import { useStoreSelector } from "../../react-v3/use-store-selector";
 import { getGridSlotStyle } from "../../utils/get-grid-slot-style";
 import { StepDrum } from "../time/step-drum";
@@ -73,8 +74,11 @@ export function CalendarYearsWheel({
   const t = useLabels();
   const { navigateTo } = useCalendarActions();
   const today = useToday();
+  // Staged inside a confirm trigger popup; live against the store otherwise.
+  const draft = usePickerDraft();
 
-  const viewDate = useStoreSelector(store, (s) => s.view.viewDate);
+  const storeView = useStoreSelector(store, (s) => s.view.viewDate);
+  const viewDate = draft ? draft.date : storeView;
 
   const locale = config.locale ?? "en";
   const localizedLabel = getLocalizedYearLabel(locale);
@@ -91,8 +95,13 @@ export function CalendarYearsWheel({
 
   const handleDrumChange = (nextOffset: number): boolean | undefined => {
     const nextYear = minYear + nextOffset;
-    navigateTo(calendarDate(nextYear, viewDate.month, 1));
-    onYearSelect?.(nextYear);
+    const next = calendarDate(nextYear, viewDate.month, 1);
+    if (draft) {
+      draft.setDate(next);
+    } else {
+      navigateTo(next);
+      onYearSelect?.(nextYear);
+    }
     return undefined;
   };
 
@@ -105,8 +114,13 @@ export function CalendarYearsWheel({
   const canReset = showReset && todayYear !== null;
   const handleReset = () => {
     if (todayYear === null) return;
-    navigateTo(calendarDate(todayYear, viewDate.month, 1));
-    onYearSelect?.(todayYear);
+    const next = calendarDate(todayYear, viewDate.month, 1);
+    if (draft) {
+      draft.setDate(next);
+    } else {
+      navigateTo(next);
+      onYearSelect?.(todayYear);
+    }
   };
 
   const gridSlot = getGridSlotStyle(col);

@@ -1,10 +1,12 @@
 import { fireEvent, render } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { calendarDate } from "@/core-v3/calendar-date";
 import { MIDNIGHT } from "@/core-v3/calendar-time";
 import { compileDateRules } from "@/core-v3/date-rule-engine";
 import type { CalendarConfig } from "@/core-v3/state";
+import { CalendarMonthsWheel } from "@/modules-v3/months-wheel/CalendarMonthsWheel";
 import {
   CalendarToolbar,
   CalendarToolbarApply,
@@ -349,6 +351,27 @@ describe("Toolbar month/year triggers", () => {
     expect(queryByText("2016")).toBeNull(); // default paged grid is gone
   });
 
+  it("wheel picker stages on spin and commits only on Confirm", async () => {
+    const onViewChange = vi.fn();
+    const user = userEvent.setup();
+    const { getByLabelText } = setup(
+      <CalendarToolbarMonthTrigger picker={<CalendarMonthsWheel />} />,
+      { onViewChange },
+    );
+    fireEvent.click(getByLabelText(/Change month/));
+    const drum = document.querySelector("[role=spinbutton]") as HTMLElement;
+    expect(drum.getAttribute("aria-valuenow")).toBe("5"); // June, 0-based
+    drum.focus();
+    await user.keyboard("{ArrowDown}");
+    // Spinning only STAGES the draft — the real view has NOT moved.
+    expect(onViewChange).not.toHaveBeenCalled();
+    expect(drum.getAttribute("aria-valuenow")).toBe("6"); // draft → July
+    // Confirm applies the staged month.
+    fireEvent.click(getByLabelText("Confirm"));
+    const [view] = onViewChange.mock.calls.at(-1) ?? [];
+    expect((view as { month: number }).month).toBe(7);
+  });
+
   it("custom picker footer: Confirm (check) closes and refocuses the trigger", () => {
     const { getByLabelText, queryByRole } = setup(
       <CalendarToolbarMonthTrigger picker={<div>wheel</div>} />,
@@ -360,7 +383,7 @@ describe("Toolbar month/year triggers", () => {
     expect(document.activeElement).toBe(trigger);
   });
 
-  it("custom picker footer: the now-reset jumps to the current month, popup stays", () => {
+  it("custom picker footer: now-reset STAGES the month, Confirm commits it", () => {
     const onViewChange = vi.fn();
     const now = new Date();
     const { getByLabelText, queryByRole } = setup(
@@ -373,11 +396,16 @@ describe("Toolbar month/year triggers", () => {
     const reset = getByLabelText(/Reset to/);
     expect(reset).toHaveProperty("disabled", false);
     fireEvent.click(reset);
+    // Reset only STAGES the draft — the view has not moved and the popup stays.
+    expect(onViewChange).not.toHaveBeenCalled();
+    expect(queryByRole("dialog")).not.toBeNull();
+    expect(reset).toHaveProperty("disabled", true); // draft now at current month
+    // Confirm applies the staged month to the real view and closes.
+    fireEvent.click(getByLabelText("Confirm"));
     expect(onViewChange).toHaveBeenLastCalledWith(
       D(now.getFullYear(), now.getMonth() + 1, 1),
     );
-    expect(queryByRole("dialog")).not.toBeNull(); // confirm closes, reset doesn't
-    expect(reset).toHaveProperty("disabled", true); // already at current now
+    expect(queryByRole("dialog")).toBeNull();
   });
 
   it("pickerConfirm/pickerReset={false} drop the footer; the grid never has it", () => {
@@ -495,5 +523,90 @@ describe("Toolbar month/year triggers", () => {
     const btn = getByLabelText("Change year, currently 2026");
     expect(btn).toHaveProperty("disabled", true);
     expect(btn.getAttribute("aria-haspopup")).toBeNull();
+  });
+});
+
+describe("Toolbar day stepper (target=selection)", () => {
+  const pointSel = (y: number, m: number, d: number) => ({
+    shape: "point" as const,
+    dates: [{ date: D(y, m, d), time: MIDNIGHT }],
+  });
+
+  function renderStepper(
+    ui: ReactNode,
+    selection: ReturnType<typeof pointSel> | undefined,
+    onChange?: (v: unknown) => void,
+    over: Partial<CalendarConfig> = {},
+  ) {
+    return render(
+      <CalendarProvider
+        config={config(over)}
+        initialView={D(2026, 6, 1)}
+        defaultSelection={selection}
+        onChange={onChange}
+      >
+        <UIProvider>{ui}</UIProvider>
+      </CalendarProvider>,
+    );
+  }
+
+  it("steps the selected date by a day and commits it", () => {
+    const onChange = vi.fn();
+    const { container } = renderStepper(
+      <CalendarToolbarNext unit="day" target="selection" />,
+      pointSel(2026, 6, 15),
+      onChange,
+    );
+    fireEvent.click(container.querySelector("[data-toolbar-next]")!);
+    const value = onChange.mock.calls.at(-1)?.[0] as Date;
+    expect(value.getMonth()).toBe(5); // June
+    expect(value.getDate()).toBe(16); // 15 → 16
+  });
+
+  it("disables the step at the min/max bound", () => {
+    const { container } = renderStepper(
+      <CalendarToolbarNext unit="day" target="selection" />,
+      pointSel(2026, 6, 15),
+      undefined,
+      { max: D(2026, 6, 15) },
+    );
+    expect(container.querySelector("[data-toolbar-next]")).toHaveProperty(
+      "disabled",
+      true,
+    );
+  });
+
+  it("DayLabel source=selection shows the selected date, not the view", () => {
+    const { container } = renderStepper(
+      <CalendarToolbarDayLabel format="long" source="selection" />,
+      pointSel(2026, 6, 15),
+    );
+    const visible = container.querySelector(
+      "[data-toolbar-day-label] [aria-hidden='true']",
+    );
+    expect(visible?.textContent).toBe("June 15, 2026");
+  });
+
+  it("DayLabel source=selection shows a placeholder when nothing is picked", () => {
+    const { container } = renderStepper(
+      <CalendarToolbarDayLabel source="selection" />,
+      undefined,
+    );
+    const label = container.querySelector("[data-toolbar-day-label]");
+    expect(label?.getAttribute("data-empty")).toBe("");
+    expect(label?.querySelector("[aria-hidden='true']")?.textContent).toBe("—");
+  });
+
+  it("disables the arrows when nothing is selected", () => {
+    const onChange = vi.fn();
+    const { container } = renderStepper(
+      <CalendarToolbarNext unit="day" target="selection" />,
+      undefined,
+      onChange,
+    );
+    const next = container.querySelector("[data-toolbar-next]");
+    expect(next).toHaveProperty("disabled", true);
+    fireEvent.click(next!); // no-op even if forced
+    expect(onChange).not.toHaveBeenCalled();
   });
 });

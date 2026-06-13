@@ -57,6 +57,49 @@ export const WeekNumbersAndBoldWeekends: Story = {
   ),
 };
 
+/**
+ * Weekend styling axes:
+ * 1. Default — tinted weekday HEADERS only (`weekendHeaders`, on by default);
+ *    no cell background.
+ * 2. `highlightWeekends` — opt-in column BACKGROUND strip down the weekend days.
+ * 3. `weekendDays: [5, 6]` + background — a Fri/Sat (MENA-style) week.
+ * 4. `weekendHeaders={false}` — no weekend cue at all.
+ */
+export const WeekendStyling: Story = {
+  render: (_, ctx) => (
+    <div style={{ display: "grid", gap: 16 }}>
+      <Calendar
+        {...storyThemeProps(ctx.globals)}
+        config={buildConfig({ mode: "single" })}
+        initialView={D(2026, 6, 1)}
+      >
+        <CalendarDays />
+      </Calendar>
+      <Calendar
+        {...storyThemeProps(ctx.globals)}
+        config={buildConfig({ mode: "single" })}
+        initialView={D(2026, 6, 1)}
+      >
+        <CalendarDays highlightWeekends />
+      </Calendar>
+      <Calendar
+        {...storyThemeProps(ctx.globals)}
+        config={buildConfig({ mode: "single", weekendDays: [5, 6] })}
+        initialView={D(2026, 6, 1)}
+      >
+        <CalendarDays highlightWeekends />
+      </Calendar>
+      <Calendar
+        {...storyThemeProps(ctx.globals)}
+        config={buildConfig({ mode: "single" })}
+        initialView={D(2026, 6, 1)}
+      >
+        <CalendarDays weekendHeaders={false} />
+      </Calendar>
+    </div>
+  ),
+};
+
 export const CompactNoOutside: Story = {
   render: (_, ctx) => (
     <Calendar
