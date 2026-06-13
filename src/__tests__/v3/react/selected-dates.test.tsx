@@ -31,6 +31,17 @@ describe("CalendarSelectedDates", () => {
     ).toBeNull();
   });
 
+  it("applies a per-module theme/scheme override on the container", async () => {
+    const user = userEvent.setup();
+    setup("single", { theme: "espresso", scheme: "dark" });
+    await user.click(
+      document.querySelector('[data-date="20260615"]') as HTMLElement,
+    );
+    const root = document.querySelector("[data-dateforge-selected-dates]");
+    expect(root?.getAttribute("data-theme")).toBe("espresso");
+    expect(root?.getAttribute("data-scheme")).toBe("dark");
+  });
+
   it("shows a chip after selecting a day (single mode)", async () => {
     const user = userEvent.setup();
     setup("single");
