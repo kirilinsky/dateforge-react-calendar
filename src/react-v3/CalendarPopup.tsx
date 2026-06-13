@@ -6,6 +6,7 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
+import { resolveAppearance } from "../styles-v3/appearance-tokens";
 import { resolveThemeScope, useThemeScope } from "./theme-scope";
 
 /**
@@ -53,8 +54,10 @@ export function CalendarPopup({
   label,
 }: CalendarPopupProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const { theme, scheme } = useThemeScope();
+  const { theme, scheme, appearance } = useThemeScope();
   const { dataTheme, style: themeStyle } = resolveThemeScope(theme);
+  const { dataAppearance, style: appearanceStyle } =
+    resolveAppearance(appearance);
   const [mounted, setMounted] = useState(false);
   const [pos, setPos] = useState<Pos | null>(null);
 
@@ -148,10 +151,12 @@ export function CalendarPopup({
       tabIndex={-1}
       data-dateforge-popup=""
       data-theme={dataTheme}
+      data-appearance={dataAppearance}
       data-scheme={scheme}
       data-placement={pos?.placement}
       style={{
         ...themeStyle,
+        ...appearanceStyle,
         position: "fixed",
         top: pos?.top ?? 0,
         left: pos?.left ?? 0,

@@ -1,7 +1,10 @@
 import type { Preview } from "@storybook/react-vite";
 import { useLayoutEffect } from "react";
-import * as appearances from "../appearances/index";
 import { STORY_LOCALES } from "../src/stories/_helpers/resolve-globals";
+// v3 appearance registry — the dropdown lists exactly the v3 appearances
+// (zenith + the ported v2 set), the same way `themes/index` drives the theme
+// dropdown. Names overlap v2's, so legacy stories keep working too.
+import { APPEARANCES } from "../src/styles-v3/appearances";
 import * as themes from "../themes/index";
 import "../dist/style.css";
 
@@ -31,7 +34,9 @@ function useStoryBackground(mode: string) {
 }
 
 const themeNames = ["default", ...Object.keys(themes)];
-const appearanceNames = ["default", ...Object.keys(appearances)];
+// `default` keeps the story's own (v3 default) look; the rest are the v3
+// appearances (zenith + the ported v2 set).
+const appearanceNames = ["default", ...Object.keys(APPEARANCES)];
 const localeNames = [...STORY_LOCALES];
 const toToolbarItems = (label: string, values: readonly string[]) =>
   values.map((value) => ({

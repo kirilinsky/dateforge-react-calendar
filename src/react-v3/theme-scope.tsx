@@ -1,4 +1,5 @@
 import { createContext, useContext } from "react";
+import type { CalendarAppearance } from "../styles-v3/appearance-tokens";
 import {
   isThemeFamily,
   type ThemeFamily,
@@ -15,6 +16,8 @@ export type ThemeScope = {
   /** Built-in family name, or a `createTheme` token object. */
   theme: string | ThemeFamily;
   scheme: "light" | "dark" | "auto";
+  /** Built-in appearance name, or a `createAppearance` object. */
+  appearance?: CalendarAppearance;
 };
 
 export type ResolvedThemeScope = {

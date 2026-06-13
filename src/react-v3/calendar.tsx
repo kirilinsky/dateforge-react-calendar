@@ -1,9 +1,14 @@
 import "../styles-v3/tokens.css";
 import "../styles-v3/layers.css";
 import "../styles-v3/themes.css";
+import "../styles-v3/appearances.css";
 import { useCallback, useMemo, useRef, useState } from "react";
 import type { LabelOverrides } from "../core-v3/labels";
 import { today } from "../core-v3/timezone-boundary";
+import {
+  type CalendarAppearance,
+  resolveAppearance,
+} from "../styles-v3/appearance-tokens";
 import type { ThemeFamily } from "../styles-v3/theme-tokens";
 import { resolveInitialFocus, useFirstFocus } from "./focus-manager";
 import { LabelsProvider } from "./labels-context";
@@ -28,6 +33,13 @@ export type CalendarProps = CalendarProviderProps & {
    * a `createTheme` token object (applied as inline light-dark() CSS vars).
    */
   theme?: string | ThemeFamily;
+  /**
+   * Appearance — the non-color visual axis (shape, spacing, motion). A built-in
+   * name (e.g. `"zenith"`, rendered as `data-appearance`) or a
+   * `createAppearance` token object (inline `--cal-*` vars). Omit for the v3
+   * default look. Independent of `theme` (colors).
+   */
+  appearance?: CalendarAppearance;
   /** Light/dark choice. `"auto"` (default) follows the OS via `color-scheme`. */
   scheme?: SchemeMode;
   /**
@@ -47,6 +59,7 @@ export type CalendarProps = CalendarProviderProps & {
 
 export function Calendar({
   theme = "noir",
+  appearance,
   scheme = "auto",
   onSchemeChange,
   className,
@@ -78,15 +91,24 @@ export function Calendar({
     else setInternalScheme(next);
   }, [activeScheme, onSchemeChange]);
 
-  // The dynamic scheme rides on ThemeScope too, so portalled popups re-declaring
-  // `data-scheme` follow the toggle instead of pinning the mount-time value.
+  // The dynamic scheme + appearance ride on ThemeScope too, so portalled popups
+  // re-declaring `data-scheme`/`data-appearance` follow the root instead of
+  // pinning the mount-time value.
   const themeScope = useMemo(
-    () => ({ theme, scheme: activeScheme }),
-    [theme, activeScheme],
+    () => ({ theme, scheme: activeScheme, appearance }),
+    [theme, activeScheme, appearance],
   );
   const { dataTheme, style: themeStyle } = useMemo(
     () => resolveThemeScope(theme),
     [theme],
+  );
+  const { dataAppearance, style: appearanceStyle } = useMemo(
+    () => resolveAppearance(appearance),
+    [appearance],
+  );
+  const rootStyle = useMemo(
+    () => ({ ...themeStyle, ...appearanceStyle }),
+    [themeStyle, appearanceStyle],
   );
 
   // First focus (Focus Manager): resolve once, perform from the root after the
@@ -107,11 +129,12 @@ export function Calendar({
               ref={rootRef}
               data-dateforge-root=""
               data-theme={dataTheme}
+              data-appearance={dataAppearance}
               data-scheme={activeScheme}
               data-readonly={readOnly ? "" : undefined}
               data-testid={testId}
               className={className}
-              style={themeStyle}
+              style={rootStyle}
             >
               {children}
             </div>
