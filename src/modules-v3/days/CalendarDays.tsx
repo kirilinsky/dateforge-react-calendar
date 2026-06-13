@@ -16,6 +16,7 @@ import {
 import { dayKeyboardTarget } from "../../core-v3/day-keyboard";
 import { buildMonthGrid } from "../../core-v3/month-grid";
 import { today } from "../../core-v3/timezone-boundary";
+import { usePageSlide } from "../../hooks/use-page-slide";
 import { dayDataAttrs } from "../../react-v3/day-attrs";
 import { useLabels } from "../../react-v3/labels-context";
 import { useCalendarActions, useCalendarStore } from "../../react-v3/provider";
@@ -235,6 +236,12 @@ export function CalendarDays({
   );
   const effectiveSync = syncViewOnSelect ?? offset === 0;
 
+  // Page-turn slide: month changes animate the grid into place. Direction is
+  // inferred from the month ordinal (next → right, prev → left); keyboard
+  // Up/Down crossing a month boundary seeds the vertical axis instead.
+  const monthOrdinal = shownDate.year * 12 + (shownDate.month - 1);
+  const { setDirection } = usePageSlide(gridRef, monthOrdinal);
+
   const grid = useMemo(
     () =>
       buildMonthGrid({
@@ -339,6 +346,9 @@ export function CalendarDays({
       result.date.month !== shownDate.month ||
       result.date.year !== shownDate.year
     ) {
+      // Match the slide axis to the keystroke: vertical arrows slide vertically.
+      if (e.key === "ArrowUp") setDirection("up");
+      else if (e.key === "ArrowDown") setDirection("down");
       navigateTo(addMonths(result.date, -offset));
     }
   };

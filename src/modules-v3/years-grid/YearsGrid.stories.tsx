@@ -49,3 +49,23 @@ export const WithMinMax: Story = {
     </Calendar>
   ),
 };
+
+export const OutOfRangeHidden: Story = {
+  render: (_, ctx) => (
+    <Calendar
+      {...storyThemeProps(ctx.globals)}
+      config={buildConfig({ min: D(2024, 1, 1), max: D(2030, 12, 31) })}
+      initialView={D(2026, 6, 1)}
+    >
+      <CalendarYearsGrid outOfRangeBehavior="hide" />
+    </Calendar>
+  ),
+};
+
+export const PerModuleTheme: Story = {
+  render: () => (
+    <Calendar config={buildConfig()} initialView={D(2026, 6, 1)}>
+      <CalendarYearsGrid theme="espresso" scheme="dark" />
+    </Calendar>
+  ),
+};

@@ -61,6 +61,7 @@ export const LABEL_DEFAULTS = {
   week: "Week",
   yearGrid: "Select year, showing {from} to {to}",
   yearPageNavigation: "Year page navigation",
+  yearSelected: "{year}, selected",
   yearPicker: "Year picker",
   yearTrack: "Year",
 } as const;
