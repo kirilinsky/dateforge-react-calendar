@@ -34,6 +34,7 @@ export const LABEL_DEFAULTS = {
   nextMonth: "Next month",
   nextYear: "Next year",
   nextYears: "Next years",
+  noDate: "No date selected",
   previousDay: "Previous day",
   previousMonth: "Previous month",
   previousYear: "Previous year",

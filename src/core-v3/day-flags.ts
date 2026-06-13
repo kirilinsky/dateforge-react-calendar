@@ -6,7 +6,11 @@ import {
 } from "./calendar-date";
 import { type CalendarRange, rangeIndexOf } from "./calendar-range";
 import { applyExclusionAll, combineCuts } from "./segment";
-import type { CalendarConfig, SelectionState } from "./state";
+import {
+  type CalendarConfig,
+  DEFAULT_WEEKEND_DAYS,
+  type SelectionState,
+} from "./state";
 import { outerRange, unitSnap } from "./strategies/shared";
 
 /**
@@ -155,7 +159,9 @@ export function dayFlags(
   if (!config.exclude.isEmpty && config.exclude.matches(date, wd)) {
     f |= DayFlag.Excluded;
   }
-  if (wd === 0 || wd === 6) f |= DayFlag.Weekend;
+  if ((config.weekendDays ?? DEFAULT_WEEKEND_DAYS).includes(wd)) {
+    f |= DayFlag.Weekend;
+  }
 
   if (today && datesEqual(date, today)) f |= DayFlag.Today;
   if (!inMonth) f |= DayFlag.OutOfMonth;

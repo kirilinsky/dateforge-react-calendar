@@ -10,9 +10,12 @@ import {
   useState,
 } from "react";
 import {
+  addDays,
   addMonths,
+  addYears,
   type CalendarDate,
   calendarDate,
+  compareDate,
 } from "../../core-v3/calendar-date";
 import {
   type AnyCalendarValue,
@@ -39,6 +42,7 @@ import {
   ThemeToggleIcon,
 } from "../../react-v3/icons";
 import { useLabels } from "../../react-v3/labels-context";
+import { PickerDraftProvider } from "../../react-v3/picker-draft";
 import { useCalendarActions, useCalendarStore } from "../../react-v3/provider";
 import { UIButton } from "../../react-v3/ui/button";
 import { UITile } from "../../react-v3/ui/tile";
@@ -210,6 +214,14 @@ export function CalendarToolbarGroup({
 type StepProps = WithClass & {
   /** Navigate by whole days, months (default), or years. */
   unit?: ViewNavUnit;
+  /**
+   * What a step moves. `"view"` (default) pages the calendar view by `unit`.
+   * `"selection"` steps the SELECTED date itself by `unit` (a date spinner):
+   * commits via `selectDay` and follows it into view, gated by `readOnly` and
+   * min/max. Pair with `<CalendarToolbarDayLabel source="selection" />`. Single
+   * (point) selection only; from today when nothing is selected yet.
+   */
+  target?: "view" | "selection";
   /** Accessible label override (else resolves from the label registry). */
   label?: string;
   col?: number | string;
@@ -220,23 +232,63 @@ const STEP_LABEL_KEY = {
   "1": { day: "nextDay", month: "nextMonth", year: "nextYear" },
 } as const;
 
+function addByUnit(
+  d: CalendarDate,
+  unit: ViewNavUnit,
+  n: number,
+): CalendarDate {
+  return unit === "day"
+    ? addDays(d, n)
+    : unit === "year"
+      ? addYears(d, n)
+      : addMonths(d, n);
+}
+
+function inBounds(d: CalendarDate, min?: CalendarDate, max?: CalendarDate) {
+  return (
+    (!min || compareDate(d, min) >= 0) && (!max || compareDate(d, max) <= 0)
+  );
+}
+
 function StepButton({
   dir,
   attr,
   unit = "month",
+  target = "view",
   label,
   col,
   className,
   children,
 }: StepProps & { dir: -1 | 1; attr: string }) {
   const store = useCalendarStore();
-  const { navigateBy } = useCalendarActions();
+  const { navigateBy, navigateTo, selectDay } = useCalendarActions();
   const t = useLabels();
   const date = useDisplayDate();
-  const { min, max } = store.getConfig();
-  // Gate on the DISPLAYED month: in an offset pair the trailing toolbar must
-  // stop while its own month is at the edge, not the root view's.
-  const canGo = canStepView(date, unit, dir, min, max);
+  const { min, max, readOnly } = store.getConfig();
+  const selectedDate = useStoreSelector(store, (s) =>
+    s.selection.shape === "point" ? s.selection.dates.at(-1)?.date : undefined,
+  );
+
+  let canGo: boolean;
+  let onClick: () => void;
+  if (target === "selection") {
+    // Step an EXISTING selected date, then follow it into view so any grid keeps
+    // the stepped day visible. With nothing picked there's nothing to step — the
+    // arrows disable (pick a day first), rather than both pointing at today.
+    const next = selectedDate ? addByUnit(selectedDate, unit, dir) : undefined;
+    canGo = !readOnly && next !== undefined && inBounds(next, min, max);
+    onClick = () => {
+      if (!next) return;
+      selectDay(next);
+      navigateTo(next);
+    };
+  } else {
+    // Gate on the DISPLAYED month: in an offset pair the trailing toolbar must
+    // stop while its own month is at the edge, not the root view's.
+    canGo = canStepView(date, unit, dir, min, max);
+    onClick = () => navigateBy(unit, dir);
+  }
+
   return (
     <UIButton
       disabled={!canGo}
@@ -244,7 +296,7 @@ function StepButton({
       {...{ [attr]: "" }}
       className={className}
       style={getGridSlotStyle(col)}
-      onClick={() => navigateBy(unit, dir)}
+      onClick={onClick}
     >
       {children ?? (dir < 0 ? <ChevronLeftIcon /> : <ChevronRightIcon />)}
     </UIButton>
@@ -480,18 +532,36 @@ export function CalendarToolbarYearLabel({
 /** Day label — pairs with `unit="day"` prev/next for day-stepper toolbars. */
 export function CalendarToolbarDayLabel({
   format = "numeric",
+  source = "view",
+  emptyText = "—",
   col,
   offset,
   className,
 }: WithClass & {
   format?: "numeric" | "2-digit" | "long";
+  /**
+   * Which date to show. `"view"` (default) = the toolbar's view day;
+   * `"selection"` = the selected date (single/point), so a `target="selection"`
+   * day stepper reads back the value it edits. When `"selection"` and nothing
+   * is picked yet it shows `emptyText` instead of a misleading view date.
+   */
+  source?: "view" | "selection";
+  /** Placeholder for `source="selection"` with no selection. Default `"—"`. */
+  emptyText?: string;
   col?: number | string;
   offset?: number;
 }) {
   const store = useCalendarStore();
   const t = useLabels();
   const locale = store.getConfig().locale;
-  const date = useDisplayDate(offset);
+  const viewDate = useDisplayDate(offset);
+  const selectedDate = useStoreSelector(store, (s) =>
+    s.selection.shape === "point" ? s.selection.dates.at(-1)?.date : undefined,
+  );
+  // In selection mode with nothing picked, show a placeholder — never a stand-in
+  // view date that reads as if it were the value.
+  const empty = source === "selection" && !selectedDate;
+  const date = source === "selection" ? (selectedDate ?? viewDate) : viewDate;
   const { longText, text } = useMemo(() => {
     const jsDate = new Date(date.year, date.month - 1, date.day);
     const longText = new Intl.DateTimeFormat(locale, {
@@ -508,13 +578,14 @@ export function CalendarToolbarDayLabel({
   return (
     <span
       data-toolbar-day-label=""
+      data-empty={empty ? "" : undefined}
       className={cx(styles.label, className)}
       style={getGridSlotStyle(col)}
     >
       <span className={styles.srOnly}>
-        {t("currentDay", { day: longText })}
+        {empty ? t("noDate") : t("currentDay", { day: longText })}
       </span>
-      <span aria-hidden="true">{text}</span>
+      <span aria-hidden="true">{empty ? emptyText : text}</span>
     </span>
   );
 }
@@ -537,19 +608,21 @@ type TriggerProps = WithClass & {
    */
   picker?: ReactNode;
   /**
-   * "Confirm" footer button under a custom `picker` (default true). NOT a
-   * commit — the picker's value is already live (v3 has no popup staging,
-   * unlike v2); it's the explicit "done" affordance: closes the popup and
-   * returns focus to the trigger. Registry key `confirm`.
+   * "Confirm" footer button under a custom `picker` (default true). COMMITS the
+   * staged pick: a picker inside the popup mutates a draft (via
+   * `PickerDraftContext`), and Confirm applies it to the view before closing and
+   * refocusing the trigger — so spinning a wheel previews in the popup without
+   * lurching the calendar until the user confirms. Registry key `confirm`.
    */
   pickerConfirm?: boolean;
   /** aria-label override for the confirm footer button (visible = check icon). */
   confirmLabel?: string;
   /**
    * "Now" reset in the custom-picker footer (default true): one row with
-   * Confirm, jumps the view to the current month/year (registry keys
-   * `resetMonth`/`resetYear`), disabled while already there. Prefer this over
-   * the wheel's own `showReset` inside a trigger — one footer row, no stack.
+   * Confirm, STAGES the current month/year into the draft (registry keys
+   * `resetMonth`/`resetYear`), disabled while already there. Applied on Confirm
+   * like any other staged pick. Prefer this over the wheel's own `showReset`
+   * inside a trigger — one footer row, no stack.
    */
   pickerReset?: boolean;
 };
@@ -598,10 +671,22 @@ export function CalendarToolbarMonthTrigger({
   });
 
   const todayJs = useToday();
+
+  // Staged month while the popup is open: a custom picker (wheel/grid) mutates
+  // this draft via PickerDraftContext instead of the store, and the view only
+  // moves when Confirm applies it. Re-seeded from the live view on each open.
+  const [draft, setDraft] = useState<CalendarDate>(date);
+  useEffect(() => {
+    if (open) setDraft(date);
+  }, [open, date]);
+  const draftValue = useMemo(
+    () => ({ date: draft, setDate: setDraft }),
+    [draft],
+  );
   const atCurrentMonth =
     !!todayJs &&
-    date.year === todayJs.getFullYear() &&
-    date.month === todayJs.getMonth() + 1;
+    draft.year === todayJs.getFullYear() &&
+    draft.month === todayJs.getMonth() + 1;
 
   return (
     <>
@@ -635,45 +720,56 @@ export function CalendarToolbarMonthTrigger({
         label={t("monthPicker")}
       >
         {picker ? (
-          <div className={styles.pickerBody}>
-            {picker}
-            {(pickerReset || pickerConfirm) && (
-              <div className={styles.pickerFooter}>
-                {pickerReset && (
-                  <UIButton
-                    size="sm"
-                    disabled={atCurrentMonth || !todayJs}
-                    aria-label={t("resetMonth", {
-                      month: todayJs ? longNames[todayJs.getMonth()] : "",
-                    })}
-                    onClick={() => {
-                      if (!todayJs) return;
-                      const target = calendarDate(
-                        todayJs.getFullYear(),
-                        todayJs.getMonth() + 1,
-                        1,
-                      );
-                      navigateTo(eff === 0 ? target : addMonths(target, -eff));
-                    }}
-                  >
-                    {todayJs ? longNames[todayJs.getMonth()] : ""}
-                  </UIButton>
-                )}
-                {pickerConfirm && (
-                  <UIButton
-                    size="sm"
-                    aria-label={t("confirm", undefined, confirmLabel)}
-                    onClick={() => {
-                      ui.close();
-                      ref.current?.focus();
-                    }}
-                  >
-                    <CheckIcon />
-                  </UIButton>
-                )}
-              </div>
-            )}
-          </div>
+          // Staging needs a Confirm to apply it; without one the picker stays
+          // live (commits straight to the view, the pre-staging behavior).
+          <PickerDraftProvider value={pickerConfirm ? draftValue : null}>
+            <div className={styles.pickerBody}>
+              {picker}
+              {(pickerReset || pickerConfirm) && (
+                <div className={styles.pickerFooter}>
+                  {pickerReset && (
+                    <UIButton
+                      size="sm"
+                      disabled={atCurrentMonth || !todayJs}
+                      aria-label={t("resetMonth", {
+                        month: todayJs ? longNames[todayJs.getMonth()] : "",
+                      })}
+                      onClick={() => {
+                        if (!todayJs) return;
+                        const target = calendarDate(
+                          todayJs.getFullYear(),
+                          todayJs.getMonth() + 1,
+                          1,
+                        );
+                        // Stage when confirming; commit live otherwise.
+                        if (pickerConfirm) setDraft(target);
+                        else
+                          navigateTo(
+                            eff === 0 ? target : addMonths(target, -eff),
+                          );
+                      }}
+                    >
+                      {todayJs ? longNames[todayJs.getMonth()] : ""}
+                    </UIButton>
+                  )}
+                  {pickerConfirm && (
+                    <UIButton
+                      size="sm"
+                      aria-label={t("confirm", undefined, confirmLabel)}
+                      onClick={() => {
+                        // Apply the staged draft to the real view, then close.
+                        navigateTo(eff === 0 ? draft : addMonths(draft, -eff));
+                        ui.close();
+                        ref.current?.focus();
+                      }}
+                    >
+                      <CheckIcon />
+                    </UIButton>
+                  )}
+                </div>
+              )}
+            </div>
+          </PickerDraftProvider>
         ) : (
           <div
             ref={roving.containerRef}
@@ -758,6 +854,17 @@ export function CalendarToolbarYearTrigger({
 
   const todayJs = useToday();
 
+  // Staged year while the popup is open (see MonthTrigger): a custom picker
+  // mutates this draft, applied to the view only on Confirm.
+  const [draft, setDraft] = useState<CalendarDate>(date);
+  useEffect(() => {
+    if (open) setDraft(date);
+  }, [open, date]);
+  const draftValue = useMemo(
+    () => ({ date: draft, setDate: setDraft }),
+    [draft],
+  );
+
   return (
     <>
       <UIButton
@@ -781,45 +888,55 @@ export function CalendarToolbarYearTrigger({
         label={t("yearPicker")}
       >
         {picker ? (
-          <div className={styles.pickerBody}>
-            {picker}
-            {(pickerReset || pickerConfirm) && (
-              <div className={styles.pickerFooter}>
-                {pickerReset && (
-                  <UIButton
-                    size="sm"
-                    disabled={!todayJs || date.year === todayJs.getFullYear()}
-                    aria-label={t("resetYear", {
-                      year: todayJs ? todayJs.getFullYear() : "",
-                    })}
-                    onClick={() => {
-                      if (!todayJs) return;
-                      const target = calendarDate(
-                        todayJs.getFullYear(),
-                        date.month,
-                        1,
-                      );
-                      navigateTo(eff === 0 ? target : addMonths(target, -eff));
-                    }}
-                  >
-                    {todayJs ? todayJs.getFullYear() : ""}
-                  </UIButton>
-                )}
-                {pickerConfirm && (
-                  <UIButton
-                    size="sm"
-                    aria-label={t("confirm", undefined, confirmLabel)}
-                    onClick={() => {
-                      ui.close();
-                      ref.current?.focus();
-                    }}
-                  >
-                    <CheckIcon />
-                  </UIButton>
-                )}
-              </div>
-            )}
-          </div>
+          <PickerDraftProvider value={pickerConfirm ? draftValue : null}>
+            <div className={styles.pickerBody}>
+              {picker}
+              {(pickerReset || pickerConfirm) && (
+                <div className={styles.pickerFooter}>
+                  {pickerReset && (
+                    <UIButton
+                      size="sm"
+                      disabled={
+                        !todayJs || draft.year === todayJs.getFullYear()
+                      }
+                      aria-label={t("resetYear", {
+                        year: todayJs ? todayJs.getFullYear() : "",
+                      })}
+                      onClick={() => {
+                        if (!todayJs) return;
+                        const target = calendarDate(
+                          todayJs.getFullYear(),
+                          draft.month,
+                          1,
+                        );
+                        // Stage when confirming; commit live otherwise.
+                        if (pickerConfirm) setDraft(target);
+                        else
+                          navigateTo(
+                            eff === 0 ? target : addMonths(target, -eff),
+                          );
+                      }}
+                    >
+                      {todayJs ? todayJs.getFullYear() : ""}
+                    </UIButton>
+                  )}
+                  {pickerConfirm && (
+                    <UIButton
+                      size="sm"
+                      aria-label={t("confirm", undefined, confirmLabel)}
+                      onClick={() => {
+                        navigateTo(eff === 0 ? draft : addMonths(draft, -eff));
+                        ui.close();
+                        ref.current?.focus();
+                      }}
+                    >
+                      <CheckIcon />
+                    </UIButton>
+                  )}
+                </div>
+              )}
+            </div>
+          </PickerDraftProvider>
         ) : (
           <>
             <div className={styles.pickerHead}>

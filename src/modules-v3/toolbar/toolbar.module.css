@@ -53,6 +53,12 @@
     color: var(--c-text, #222);
   }
 
+  /* Day-label placeholder (selection stepper with nothing picked yet). */
+  .label[data-empty] {
+    color: var(--c-mutedText, #999);
+    font-weight: 500;
+  }
+
   /* Month label width sizer: the longest month name sits invisible under the
      live one, so stepping months never shifts the toolbar layout. */
   .slot {

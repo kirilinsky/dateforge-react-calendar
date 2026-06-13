@@ -59,6 +59,63 @@ describe("CalendarDays", () => {
     expect(within(container).getAllByRole("columnheader")).toHaveLength(7);
   });
 
+  it("merges an adjacent weekend into one strip (Monday-start)", () => {
+    // Order Mon..Sun → Sat col 5, Sun col 6: one strip from col 5 spanning 2,
+    // no second strip — so no rounded notch between Sat and Sun.
+    const { container } = setup(config("day", "single", { firstDayOfWeek: 1 }));
+    const grid = within(container).getByRole("grid");
+    expect(grid.style.getPropertyValue("--wknd-a-start")).toBe("5");
+    expect(grid.style.getPropertyValue("--wknd-a-span")).toBe("2");
+    expect(grid.style.getPropertyValue("--wknd-b-span")).toBe("0");
+  });
+
+  it("splits the weekend into two strips on a Sunday-start week", () => {
+    // Order Sun..Sat → Sun col 0, Sat col 6 (non-adjacent): two 1-col strips.
+    const { container } = setup(config("day", "single", { firstDayOfWeek: 0 }));
+    const grid = within(container).getByRole("grid");
+    expect(grid.style.getPropertyValue("--wknd-a-start")).toBe("0");
+    expect(grid.style.getPropertyValue("--wknd-a-span")).toBe("1");
+    expect(grid.style.getPropertyValue("--wknd-b-start")).toBe("6");
+    expect(grid.style.getPropertyValue("--wknd-b-span")).toBe("1");
+  });
+
+  it("tints the weekend weekday headers by default", () => {
+    const { container } = setup(config("day", "single", { firstDayOfWeek: 1 }));
+    const grid = within(container).getByRole("grid");
+    expect(grid.getAttribute("data-weekend-headers")).toBe("");
+    const tinted = within(container)
+      .getAllByRole("columnheader")
+      .filter((h) => h.getAttribute("data-weekend") === "");
+    expect(tinted).toHaveLength(2); // Sat + Sun
+  });
+
+  it("weekendHeaders={false} drops the header tint flag", () => {
+    const { container } = render(
+      <CalendarProvider
+        config={config("day", "single")}
+        initialView={D(2026, 6, 1)}
+      >
+        <CalendarDays weekendHeaders={false} />
+      </CalendarProvider>,
+    );
+    expect(
+      within(container).getByRole("grid").getAttribute("data-weekend-headers"),
+    ).toBeNull();
+  });
+
+  it("honors a custom weekendDays config (Fri/Sat)", () => {
+    // Monday-start order Mon..Sun: Fri col 4, Sat col 5 → one strip from col 4.
+    const { container } = setup(
+      config("day", "single", { firstDayOfWeek: 1, weekendDays: [5, 6] }),
+    );
+    const grid = within(container).getByRole("grid");
+    expect(grid.style.getPropertyValue("--wknd-a-start")).toBe("4");
+    expect(grid.style.getPropertyValue("--wknd-a-span")).toBe("2");
+    // June 2026: the 5th is a Friday → tagged weekend; the 7th (Sunday) is not.
+    expect(dayButton(container, 5).getAttribute("data-weekend")).toBe("");
+    expect(dayButton(container, 7).getAttribute("data-weekend")).toBeNull();
+  });
+
   it("selects a day on click and emits the value", () => {
     const onChange = vi.fn();
     const { container } = setup(config("day", "single"), { onChange });
@@ -241,6 +298,21 @@ describe("CalendarDays props (v2-parity surface)", () => {
     const grid = container.querySelector("[data-dateforge-days]");
     expect(grid?.hasAttribute("data-bold-weekends")).toBe(true);
     expect(grid?.hasAttribute("data-weekend-tint")).toBe(false);
+  });
+
+  it("weekend background tint is opt-in (default off, on via highlightWeekends)", () => {
+    const off = mount({});
+    expect(
+      off.container
+        .querySelector("[data-dateforge-days]")
+        ?.hasAttribute("data-weekend-tint"),
+    ).toBe(false);
+    const on = mount({ highlightWeekends: true });
+    expect(
+      on.container
+        .querySelector("[data-dateforge-days]")
+        ?.hasAttribute("data-weekend-tint"),
+    ).toBe(true);
   });
 
   it("renderDay replaces content, shell attrs stay ours", () => {

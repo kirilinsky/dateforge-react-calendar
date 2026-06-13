@@ -9,6 +9,10 @@
   .grid {
     display: grid;
     gap: var(--c-day-gap, 2px);
+    position: relative;
+    /* Leading offset before the 7 day columns (the week-number gutter, if any).
+       Lets the weekend strips align to the actual day columns. */
+    --cal-grid-lead: 0px;
     /* Range fills, v2 recipe: committed band = 28% of the range color over
        the backdrop; hover preview = a lighter 16% tint of the SAME color, so
        the draft reads as "this will become the range", not as a gray hover. */
@@ -27,10 +31,17 @@
   .row {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
+    /* Lift every row above the weekend column strips (grid ::before/::after). */
+    position: relative;
+    z-index: 1;
   }
 
   [data-week-numbers] .row {
     grid-template-columns: 2em repeat(7, 1fr);
+  }
+
+  .grid[data-week-numbers] {
+    --cal-grid-lead: 2em;
   }
 
   /* Screen-reader-only text (week column header). */
@@ -63,6 +74,14 @@
     font-size: 0.75em;
     line-height: 2;
     color: var(--c-mutedText, #999);
+  }
+
+  /* Weekend weekday headers ("Sat"/"Sun") in the weekend ink + bold (v2 look).
+     Gated by the root `data-weekend-headers`; weekend columns are marked with
+     `data-weekend`, honoring the configured `weekendDays`. */
+  .grid[data-weekend-headers] .weekday[data-weekend] {
+    color: var(--c-weekend, #c62828);
+    font-weight: 600;
   }
 
   .cell {
@@ -101,17 +120,46 @@
     color: var(--c-outOfMonth, #bbb);
   }
 
-  /* `--c-weekend` is an ink (v2 token semantics — themes ship reds/oranges);
-     the cell surface is a soft tint derived from it, overridable via
-     `--c-weekendSurface`. Out-of-month cells stay untinted: they are already
-     de-emphasized via `--c-outOfMonth`, and muted ink on the tint can dip
-     below the 4.5:1 contrast bar. */
-  [data-weekend-tint] .cell[data-weekend]:not([data-in-range]):not(
-      [data-selected]
-    ):not([data-preview]):not([data-outside]) {
+  /* Weekend tint as a CONTINUOUS COLUMN, not a rounded box per cell. Two
+     absolutely-positioned strips (one per weekend day — they can be
+     non-adjacent in a Sunday-start week) sit BEHIND the rows, spanning the full
+     grid height including the row gaps, so Sat/Sun read as one clean band with
+     a single rounded top/bottom rather than a stack of floating pills. Filled
+     cells (selected/range) paint over the strip via the row's z-index.
+     `--c-weekend` stays an ink token (v2 semantics); the strip is a soft tint
+     derived from it, overridable via `--c-weekendSurface`. */
+  .grid[data-weekend-tint]::before,
+  .grid[data-weekend-tint]::after {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    z-index: 0;
     background: var(
       --c-weekendSurface,
       color-mix(in srgb, var(--c-weekend, #c62828) 7%, transparent)
+    );
+    border-radius: var(--c-day-radius, 8px);
+    pointer-events: none;
+  }
+  /* Strip A: the first contiguous weekend run (spans 1 or 2 columns). */
+  .grid[data-weekend-tint]::before {
+    width: calc(
+      var(--wknd-a-span, 2) * (100% - var(--cal-grid-lead, 0px)) / 7
+    );
+    inset-inline-start: calc(
+      var(--cal-grid-lead, 0px) + var(--wknd-a-start, 5) *
+        (100% - var(--cal-grid-lead, 0px)) / 7
+    );
+  }
+  /* Strip B: a second run only when the weekend is split (Sunday-start);
+     `--wknd-b-span: 0` collapses it to nothing otherwise. */
+  .grid[data-weekend-tint]::after {
+    width: calc(
+      var(--wknd-b-span, 0) * (100% - var(--cal-grid-lead, 0px)) / 7
+    );
+    inset-inline-start: calc(
+      var(--cal-grid-lead, 0px) + var(--wknd-b-start, 0) *
+        (100% - var(--cal-grid-lead, 0px)) / 7
     );
   }
 

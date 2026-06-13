@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { addMonths } from "@/core-v3/calendar-date";
+import { addMonths, calendarDate } from "@/core-v3/calendar-date";
 import { MIDNIGHT } from "@/core-v3/calendar-time";
 import { compileDateRules } from "@/core-v3/date-rule-engine";
 import type { CalendarConfig } from "@/core-v3/state";
@@ -150,18 +150,33 @@ export const YearStepAndClear: Story = {
 };
 
 /**
- * The toolbar is not a header: a DAY stepper — `unit="day"` arrows around a
- * full-date label. The view follows the stepped day across month boundaries.
+ * The toolbar is not a header: a DAY stepper that edits the VALUE. With
+ * `target="selection"` the arrows step the selected date itself (a date spinner)
+ * and `source="selection"` reads it back; the grid follows the stepped day. The
+ * arrows sit at the edges (`space-between`) with the full date centered. Seeded
+ * with a selection here — with nothing picked the label shows "—" and the arrows
+ * disable until a day is chosen (in the grid).
  */
 export const DayStepper: Story = {
   render: (_, ctx) => (
-    <Frame {...storyThemeProps(ctx.globals)}>
-      <CalendarToolbar justify="center">
-        <CalendarToolbarPrev unit="day" />
-        <CalendarToolbarDayLabel format="long" />
-        <CalendarToolbarNext unit="day" />
-      </CalendarToolbar>
-    </Frame>
+    <div style={{ width: 340 }}>
+      <CalendarRoot
+        {...storyThemeProps(ctx.globals)}
+        config={buildConfig()}
+        initialView={calendarDate(2026, 6, 15)}
+        defaultSelection={{
+          shape: "point",
+          dates: [{ date: calendarDate(2026, 6, 15), time: MIDNIGHT }],
+        }}
+      >
+        <CalendarToolbar justify="space-between">
+          <CalendarToolbarPrev unit="day" target="selection" />
+          <CalendarToolbarDayLabel format="long" source="selection" />
+          <CalendarToolbarNext unit="day" target="selection" />
+        </CalendarToolbar>
+        <CalendarDays />
+      </CalendarRoot>
+    </div>
   ),
 };
 

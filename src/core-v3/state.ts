@@ -15,6 +15,9 @@ import { EMPTY_VALIDATION_STATE, type ValidationState } from "./validation";
  * disabled blocks selection entirely; exclude is skipped inside a span and
  * splits it into segments.
  */
+/** Default weekend (Sat + Sun) when `CalendarConfig.weekendDays` is unset. */
+export const DEFAULT_WEEKEND_DAYS: readonly number[] = [0, 6];
+
 export type CalendarConfig = {
   unit: SelectionUnit;
   mode: SelectionMode;
@@ -22,6 +25,14 @@ export type CalendarConfig = {
   locale?: string;
   /** Resolved week start (0=Sun..6=Sat), from locale or explicit prop. */
   firstDayOfWeek: number;
+  /**
+   * Which weekdays count as the weekend for highlighting (`data-weekend` +
+   * the Days weekend column tint). `0=Sun..6=Sat`. Defaults to `[0, 6]`
+   * (Sat/Sun) — override for regions like Fri/Sat (`[5, 6]`) or a single-day
+   * weekend. Purely presentational: it does NOT disable those days (use
+   * `createDisabled({ weekdays })` for that).
+   */
+  weekendDays?: readonly number[];
   readOnly: boolean;
   /**
    * Clicking the already-selected day deselects it. Default behavior is `true`

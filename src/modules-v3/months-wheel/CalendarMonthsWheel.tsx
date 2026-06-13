@@ -3,8 +3,9 @@ import { calendarDate } from "../../core-v3/calendar-date";
 import { toCalendarDateTime } from "../../core-v3/timezone-boundary";
 import { useToday } from "../../hooks/use-today";
 import { useLabels } from "../../react-v3/labels-context";
-import { UIButton } from "../../react-v3/ui/button";
+import { usePickerDraft } from "../../react-v3/picker-draft";
 import { useCalendarActions, useCalendarStore } from "../../react-v3/provider";
+import { UIButton } from "../../react-v3/ui/button";
 import { useStoreSelector } from "../../react-v3/use-store-selector";
 import { getGridSlotStyle } from "../../utils/get-grid-slot-style";
 import { StepDrum } from "../time/step-drum";
@@ -71,8 +72,12 @@ export function CalendarMonthsWheel({
   const t = useLabels();
   const { navigateTo } = useCalendarActions();
   const today = useToday();
+  // Inside a confirm-staged trigger popup the wheel mutates the draft, not the
+  // store: the view only moves when the trigger's Confirm applies the draft.
+  const draft = usePickerDraft();
 
-  const viewDate = useStoreSelector(store, (s) => s.view.viewDate);
+  const storeView = useStoreSelector(store, (s) => s.view.viewDate);
+  const viewDate = draft ? draft.date : storeView;
 
   const locale = config.locale ?? "en";
   const localizedLabel = getLocalizedMonthLabel(locale);
@@ -90,8 +95,13 @@ export function CalendarMonthsWheel({
   const value = viewDate.month - 1;
 
   const handleDrumChange = (nextMonth: number): boolean | undefined => {
-    navigateTo(calendarDate(viewDate.year, nextMonth + 1, 1));
-    onMonthSelect?.(viewDate.year, nextMonth + 1);
+    const next = calendarDate(viewDate.year, nextMonth + 1, 1);
+    if (draft) {
+      draft.setDate(next);
+    } else {
+      navigateTo(next);
+      onMonthSelect?.(viewDate.year, nextMonth + 1);
+    }
     return undefined;
   };
 
@@ -108,8 +118,13 @@ export function CalendarMonthsWheel({
       : "";
   const handleReset = () => {
     if (todayMonth === null) return;
-    navigateTo(calendarDate(viewDate.year, todayMonth, 1));
-    onMonthSelect?.(viewDate.year, todayMonth);
+    const next = calendarDate(viewDate.year, todayMonth, 1);
+    if (draft) {
+      draft.setDate(next);
+    } else {
+      navigateTo(next);
+      onMonthSelect?.(viewDate.year, todayMonth);
+    }
   };
 
   const gridSlot = getGridSlotStyle(col);
