@@ -14,6 +14,9 @@ import {
  */
 export type PopupKind = "month" | "year" | "time";
 
+/** Light/dark choice. `"auto"` follows the OS via `prefers-color-scheme`. */
+export type SchemeMode = "light" | "dark" | "auto";
+
 export type UIContextValue = {
   popup: PopupKind | null;
   anchor: HTMLElement | null;
@@ -21,11 +24,25 @@ export type UIContextValue = {
   open: (kind: PopupKind, anchor: HTMLElement) => void;
   close: () => void;
   toggle: (kind: PopupKind, anchor: HTMLElement) => void;
+  /** Active scheme on the root (`data-scheme`); `"auto"` defers to the OS. */
+  scheme: SchemeMode;
+  /** Flip light↔dark, resolving `"auto"` against the OS at flip time. */
+  toggleScheme: () => void;
 };
 
 const UIContext = createContext<UIContextValue | null>(null);
 
-export function UIProvider({ children }: { children: ReactNode }) {
+const noop = () => {};
+
+export function UIProvider({
+  scheme = "auto",
+  toggleScheme = noop,
+  children,
+}: {
+  scheme?: SchemeMode;
+  toggleScheme?: () => void;
+  children: ReactNode;
+}) {
   const [popup, setPopup] = useState<PopupKind | null>(null);
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
 
@@ -51,8 +68,10 @@ export function UIProvider({ children }: { children: ReactNode }) {
           setAnchor(el);
         }
       },
+      scheme,
+      toggleScheme,
     }),
-    [popup, anchor],
+    [popup, anchor, scheme, toggleScheme],
   );
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>;

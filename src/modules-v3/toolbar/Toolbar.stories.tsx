@@ -22,6 +22,7 @@ import {
   CalendarToolbarMonthTrigger,
   CalendarToolbarNext,
   CalendarToolbarPrev,
+  CalendarToolbarThemeToggle,
   CalendarToolbarYearLabel,
   CalendarToolbarYearTrigger,
 } from "./CalendarToolbar";
@@ -281,6 +282,27 @@ export const CompactAndLabels: Story = {
         <CalendarToolbarGroup>
           <CalendarToolbarMonthLabel short />
           <CalendarToolbarYearLabel />
+        </CalendarToolbarGroup>
+      </CalendarToolbar>
+    </Frame>
+  ),
+};
+
+/**
+ * Theme toggle in the toolbar: flips the root `data-scheme` (light ⇄ dark),
+ * resolving `"auto"` against the OS on the first press. `aria-pressed` tracks
+ * the resolved dark state. Uncontrolled here — pass `<Calendar scheme
+ * onSchemeChange>` to let the host own the choice.
+ */
+export const WithThemeToggle: Story = {
+  render: (_, ctx) => (
+    <Frame {...storyThemeProps(ctx.globals)}>
+      <CalendarToolbar>
+        <CalendarToolbarPrev />
+        <CalendarToolbarLabel />
+        <CalendarToolbarGroup>
+          <CalendarToolbarNext />
+          <CalendarToolbarThemeToggle />
         </CalendarToolbarGroup>
       </CalendarToolbar>
     </Frame>

@@ -1,7 +1,7 @@
 import "../styles-v3/tokens.css";
 import "../styles-v3/layers.css";
 import "../styles-v3/themes.css";
-import { useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import type { LabelOverrides } from "../core-v3/labels";
 import { today } from "../core-v3/timezone-boundary";
 import type { ThemeFamily } from "../styles-v3/theme-tokens";
@@ -9,7 +9,7 @@ import { resolveInitialFocus, useFirstFocus } from "./focus-manager";
 import { LabelsProvider } from "./labels-context";
 import { CalendarProvider, type CalendarProviderProps } from "./provider";
 import { resolveThemeScope, ThemeScopeProvider } from "./theme-scope";
-import { UIProvider } from "./ui-context";
+import { type SchemeMode, UIProvider } from "./ui-context";
 
 /**
  * The v3 root: the visual shell plus the store provider. It renders the single
@@ -29,7 +29,14 @@ export type CalendarProps = CalendarProviderProps & {
    */
   theme?: string | ThemeFamily;
   /** Light/dark choice. `"auto"` (default) follows the OS via `color-scheme`. */
-  scheme?: "light" | "dark" | "auto";
+  scheme?: SchemeMode;
+  /**
+   * Controlled scheme. Provide together with `scheme` to own the light/dark
+   * choice: the toolbar theme toggle calls this with the next resolved scheme
+   * instead of flipping internal state. Omit for uncontrolled (the toggle owns
+   * the flip, seeded from `scheme`).
+   */
+  onSchemeChange?: (scheme: "light" | "dark") => void;
   /** Extra class on the root shell (user escape hatch). */
   className?: string;
   /** Test handle on the root. Default `"dateforge-calendar"`. */
@@ -41,6 +48,7 @@ export type CalendarProps = CalendarProviderProps & {
 export function Calendar({
   theme = "noir",
   scheme = "auto",
+  onSchemeChange,
   className,
   "data-testid": testId = "dateforge-calendar",
   labels,
@@ -49,7 +57,33 @@ export function Calendar({
 }: CalendarProps) {
   const { config, initialView, initialFocus } = providerProps;
   const readOnly = config.readOnly;
-  const themeScope = useMemo(() => ({ theme, scheme }), [theme, scheme]);
+
+  // Runtime light/dark. Controlled when `onSchemeChange` is given (the host owns
+  // `scheme`); otherwise uncontrolled, seeded from the prop and flipped here.
+  // `"auto"` keeps the CSS-native first paint — only an explicit toggle pins a
+  // concrete value, so dark systems never flash light.
+  const controlled = onSchemeChange !== undefined;
+  const [internalScheme, setInternalScheme] = useState<SchemeMode>(scheme);
+  const activeScheme = controlled ? scheme : internalScheme;
+  const toggleScheme = useCallback(() => {
+    const resolved =
+      activeScheme === "auto"
+        ? typeof window !== "undefined" &&
+          window.matchMedia?.("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light"
+        : activeScheme;
+    const next = resolved === "dark" ? "light" : "dark";
+    if (onSchemeChange) onSchemeChange(next);
+    else setInternalScheme(next);
+  }, [activeScheme, onSchemeChange]);
+
+  // The dynamic scheme rides on ThemeScope too, so portalled popups re-declaring
+  // `data-scheme` follow the toggle instead of pinning the mount-time value.
+  const themeScope = useMemo(
+    () => ({ theme, scheme: activeScheme }),
+    [theme, activeScheme],
+  );
   const { dataTheme, style: themeStyle } = useMemo(
     () => resolveThemeScope(theme),
     [theme],
@@ -68,12 +102,12 @@ export function Calendar({
     <CalendarProvider {...providerProps}>
       <ThemeScopeProvider value={themeScope}>
         <LabelsProvider labels={labels}>
-          <UIProvider>
+          <UIProvider scheme={activeScheme} toggleScheme={toggleScheme}>
             <div
               ref={rootRef}
               data-dateforge-root=""
               data-theme={dataTheme}
-              data-scheme={scheme}
+              data-scheme={activeScheme}
               data-readonly={readOnly ? "" : undefined}
               data-testid={testId}
               className={className}
