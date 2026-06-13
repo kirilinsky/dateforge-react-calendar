@@ -110,8 +110,17 @@ const preview: Preview = {
       const style: React.CSSProperties = viewportActive
         ? { padding: 8, width: "100%", boxSizing: "border-box" }
         : { padding: 20, width: ctx.parameters.storyWidth ?? 305 };
+      // `data-appearance` on the wrapper: the appearance `--cal-*` vars inherit
+      // into EVERY Calendar inside (the cal-base bridge reads them), so the top
+      // toolbar switches the look for all v3 stories — not just the ones that
+      // thread `storyThemeProps`. A story's own `appearance` prop still wins
+      // (it sets the vars directly on its root).
+      const appearance = (ctx.globals.appearance as string) ?? "default";
       return (
-        <div style={style}>
+        <div
+          style={style}
+          data-appearance={appearance !== "default" ? appearance : undefined}
+        >
           <Story
             key={`${ctx.globals.theme}-${ctx.globals.themeMode}-${ctx.globals.appearance}-${ctx.globals.locale}-${ctx.globals.gradient}`}
           />
