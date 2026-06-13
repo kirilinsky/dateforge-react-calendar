@@ -10,8 +10,10 @@
     background: transparent;
     color: var(--c-text, #222);
     font: inherit;
+    font-weight: var(--cal-control-weight, inherit);
     min-width: 0;
-    padding: 0.4em 0.6em;
+    /* Appearance-driven (fallbacks = v3 default). */
+    padding: var(--cal-tile-padding, 0.4em 0.6em);
     border-radius: var(--c-day-radius, 8px);
     cursor: pointer;
     transition:
@@ -40,7 +42,7 @@
   .tile[aria-disabled="true"] {
     color: var(--c-disabledText, #ccc);
     cursor: not-allowed;
-    opacity: 0.55;
+    opacity: var(--cal-opacity-disabled, 0.55);
     background: transparent;
   }
 }

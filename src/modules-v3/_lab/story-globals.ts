@@ -8,6 +8,7 @@
  */
 export type V3StoryThemeProps = {
   theme?: string;
+  appearance?: string;
   scheme: "light" | "dark";
 };
 
@@ -18,8 +19,13 @@ export function storyThemeProps(
     typeof globals.theme === "string" && globals.theme !== "default"
       ? globals.theme
       : undefined;
+  const appearance =
+    typeof globals.appearance === "string" && globals.appearance !== "default"
+      ? globals.appearance
+      : undefined;
   return {
     theme,
+    appearance,
     scheme: globals.themeMode === "dark" ? "dark" : "light",
   };
 }

@@ -9,6 +9,8 @@
   .grid {
     display: grid;
     gap: var(--c-day-gap, 2px);
+    /* Appearance-driven inset (fallback 0 = v3 default). */
+    padding: var(--cal-days-padding, 0);
     position: relative;
     /* Leading offset before the 7 day columns (the week-number gutter, if any).
        Lets the weekend strips align to the actual day columns. */
@@ -90,6 +92,8 @@
     background: transparent;
     color: var(--c-text, #222);
     font: inherit;
+    /* Appearance day-number size (fallback 1em = v3 default). */
+    font-size: var(--cal-text-day, 1em);
     cursor: pointer;
     border-radius: var(--c-day-radius, 8px);
     padding: 0;
