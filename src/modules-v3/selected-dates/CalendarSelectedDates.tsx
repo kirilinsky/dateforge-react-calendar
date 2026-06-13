@@ -4,8 +4,8 @@ import { dateKey } from "../../core-v3/calendar-date";
 
 import { fromCalendarDateTime } from "../../core-v3/timezone-boundary";
 import { useLabels } from "../../react-v3/labels-context";
-import { UIButton } from "../../react-v3/ui/button";
 import { useCalendarActions, useCalendarStore } from "../../react-v3/provider";
+import { UIButton } from "../../react-v3/ui/button";
 import { useStoreSelector } from "../../react-v3/use-store-selector";
 import { getGridSlotStyle } from "../../utils/get-grid-slot-style";
 import styles from "./selected-dates.module.css";
@@ -17,6 +17,10 @@ export type CalendarSelectedDatesProps = {
   showTime?: boolean;
   col?: number | string;
   className?: string;
+  /** Per-module theme override (`data-theme` on the module container). */
+  theme?: string;
+  /** Per-module scheme override (`data-scheme` on the module container). */
+  scheme?: "light" | "dark" | "auto";
 };
 
 function formatDate(
@@ -105,6 +109,8 @@ export function CalendarSelectedDates({
   showTime = false,
   col,
   className,
+  theme,
+  scheme,
 }: CalendarSelectedDatesProps) {
   const store = useCalendarStore();
   const config = store.getConfig();
@@ -131,6 +137,8 @@ export function CalendarSelectedDates({
       <div
         data-dateforge-selected-dates=""
         data-area="selected-dates"
+        data-theme={theme}
+        data-scheme={scheme}
         className={[styles.container, className].filter(Boolean).join(" ")}
         style={gridSlot}
       >

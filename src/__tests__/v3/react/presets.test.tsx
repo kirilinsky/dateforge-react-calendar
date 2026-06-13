@@ -41,6 +41,24 @@ describe("CalendarPresets", () => {
     expect(container.querySelector("[data-dateforge-presets]")).toBeNull();
   });
 
+  it("applies a per-module theme/scheme override on the container", () => {
+    const { container } = render(
+      <Calendar
+        config={buildConfig({ mode: "single" })}
+        initialView={D(2026, 6, 1)}
+      >
+        <CalendarPresets
+          presets={commonPresets}
+          theme="espresso"
+          scheme="dark"
+        />
+      </Calendar>,
+    );
+    const root = container.querySelector("[data-dateforge-presets]");
+    expect(root?.getAttribute("data-theme")).toBe("espresso");
+    expect(root?.getAttribute("data-scheme")).toBe("dark");
+  });
+
   it("clicking preset commits selection and calls onChange", async () => {
     const onChange = vi.fn();
     const user = userEvent.setup();

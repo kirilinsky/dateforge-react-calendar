@@ -47,12 +47,18 @@ export type CalendarPresetsProps = {
   presets?: Preset[];
   col?: number | string;
   className?: string;
+  /** Per-module theme override (`data-theme` on the module container). */
+  theme?: string;
+  /** Per-module scheme override (`data-scheme` on the module container). */
+  scheme?: "light" | "dark" | "auto";
 };
 
 export function CalendarPresets({
   presets: presetsProp = [],
   col,
   className,
+  theme,
+  scheme,
 }: CalendarPresetsProps) {
   const store = useCalendarStore();
   const config = store.getConfig();
@@ -99,6 +105,8 @@ export function CalendarPresets({
     <div
       data-dateforge-presets=""
       data-area="presets"
+      data-theme={theme}
+      data-scheme={scheme}
       className={[styles.container, className].filter(Boolean).join(" ")}
       style={gridSlot}
     >
