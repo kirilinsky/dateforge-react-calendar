@@ -41,6 +41,12 @@ export type CalendarConfig = {
   deselectOnReclick?: boolean;
   /** Whether selected values carry a time-of-day. */
   withTime: boolean;
+  /**
+   * 12-hour clock with an AM/PM period. Root-level so the toolbar time trigger,
+   * ManualInput and the TimeWheel can't desync (a 12h display over a 24h
+   * picker). Default `false` (24h). Time modules read this unless overridden.
+   */
+  hour12?: boolean;
   /** Time applied to a freshly picked day when `withTime` (default time). */
   defaultTime: CalendarTime;
   min?: CalendarDate;

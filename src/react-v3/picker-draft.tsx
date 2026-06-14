@@ -1,5 +1,6 @@
 import { createContext, useContext } from "react";
 import type { CalendarDate } from "../core-v3/calendar-date";
+import type { CalendarTime } from "../core-v3/calendar-time";
 
 /**
  * Staging channel for a picker rendered inside a toolbar trigger popup.
@@ -25,4 +26,23 @@ export const PickerDraftProvider = PickerDraftContext.Provider;
 /** Non-null only inside a confirm-staged trigger popup. */
 export function usePickerDraft(): PickerDraft | null {
   return useContext(PickerDraftContext);
+}
+
+/**
+ * Same idea for TIME: a TimeWheel inside a confirm-staged time popup writes the
+ * staged time here instead of committing to the selection via `setTime`. The
+ * trigger applies it on Confirm and discards it on dismiss.
+ */
+export type TimePickerDraft = {
+  time: CalendarTime;
+  setTime: (time: CalendarTime) => void;
+};
+
+const TimePickerDraftContext = createContext<TimePickerDraft | null>(null);
+
+export const TimePickerDraftProvider = TimePickerDraftContext.Provider;
+
+/** Non-null only inside a confirm-staged time trigger popup. */
+export function useTimePickerDraft(): TimePickerDraft | null {
+  return useContext(TimePickerDraftContext);
 }

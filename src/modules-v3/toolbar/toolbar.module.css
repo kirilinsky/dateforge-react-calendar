@@ -139,4 +139,57 @@
   .pickerFooter > * {
     flex: 1;
   }
+
+  /* Built-in time stepper popup. */
+  .timePicker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15em;
+    padding: 0.2em 0.1em;
+  }
+
+  .timeUnit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.05em;
+  }
+
+  /* Mouse-only +/- affordance (the spinbutton value owns keyboard + a11y). */
+  .timeStep {
+    display: inline-flex;
+    color: var(--c-mutedText, #999);
+    cursor: pointer;
+    border-radius: var(--c-day-radius, 6px);
+    padding: 0.05em 0.2em;
+    transition: color var(--cal-transition, 0.2s) ease,
+      background var(--cal-transition, 0.2s) ease;
+  }
+
+  .timeStep:hover {
+    color: var(--c-text, #222);
+    background: var(--c-tone, #eef1f7);
+  }
+
+  .timeValue {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    min-inline-size: 1.6em;
+    text-align: center;
+    line-height: 1.4;
+    border-radius: var(--c-day-radius, 6px);
+    cursor: ns-resize;
+    user-select: none;
+  }
+
+  .timeColon {
+    font-weight: 600;
+    padding-block-end: 0.1em;
+  }
+
+  .timePeriod {
+    margin-inline-start: 0.3em;
+    align-self: center;
+  }
 }

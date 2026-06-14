@@ -50,6 +50,14 @@ export function ChevronDownIcon({ size }: { size?: number }) {
   );
 }
 
+export function ChevronUpIcon({ size }: { size?: number }) {
+  return (
+    <Icon size={size}>
+      <path d="m6 15 6-6 6 6" />
+    </Icon>
+  );
+}
+
 export function HomeIcon({ size }: { size?: number }) {
   return (
     <Icon size={size}>
@@ -72,6 +80,16 @@ export function CheckIcon({ size }: { size?: number }) {
   return (
     <Icon size={size}>
       <path d="M20 6 9 17l-5-5" />
+    </Icon>
+  );
+}
+
+/** Clock face — the compact time trigger. */
+export function ClockIcon({ size }: { size?: number }) {
+  return (
+    <Icon size={size}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
     </Icon>
   );
 }

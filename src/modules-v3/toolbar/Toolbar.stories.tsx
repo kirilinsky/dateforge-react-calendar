@@ -6,6 +6,7 @@ import type { CalendarConfig } from "@/core-v3/state";
 import { today } from "@/core-v3/timezone-boundary";
 import { CalendarDays } from "@/modules-v3/days/CalendarDays";
 import { CalendarMonthsWheel } from "@/modules-v3/months-wheel/CalendarMonthsWheel";
+import { CalendarTimeWheel } from "@/modules-v3/time/CalendarTimeWheel";
 import { CalendarYearsWheel } from "@/modules-v3/years-wheel/CalendarYearsWheel";
 import { Calendar as CalendarRoot } from "@/react-v3/calendar";
 import { storyThemeProps, type V3StoryThemeProps } from "../_lab/story-globals";
@@ -23,6 +24,7 @@ import {
   CalendarToolbarNext,
   CalendarToolbarPrev,
   CalendarToolbarThemeToggle,
+  CalendarToolbarTime,
   CalendarToolbarYearLabel,
   CalendarToolbarYearTrigger,
 } from "./CalendarToolbar";
@@ -345,5 +347,69 @@ export const WheelPickerTriggers: Story = {
         <CalendarToolbarNext />
       </CalendarToolbar>
     </Frame>
+  ),
+};
+
+// Shared frame for the time-trigger stories: a withTime calendar seeded with a
+// selection (the trigger is disabled until a day is picked) and a header.
+function TimeFrame({
+  globals,
+  hour12 = false,
+  children,
+}: {
+  globals: Record<string, unknown>;
+  hour12?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div style={{ width: 340 }}>
+      <CalendarRoot
+        {...storyThemeProps(globals)}
+        config={buildConfig({ withTime: true, hour12 })}
+        initialView={calendarDate(2026, 6, 15)}
+        defaultSelection={{
+          shape: "point",
+          dates: [
+            {
+              date: calendarDate(2026, 6, 15),
+              time: { hour: 14, minute: 30, second: 0, ms: 0 },
+            },
+          ],
+        }}
+      >
+        <CalendarToolbar justify="space-between">
+          <CalendarToolbarPrev />
+          <CalendarToolbarLabel />
+          {children}
+        </CalendarToolbar>
+        <CalendarDays />
+      </CalendarRoot>
+    </div>
+  );
+}
+
+/**
+ * Time trigger with the BUILT-IN stepper picker (the default popup body): each
+ * unit is a spinbutton (Arrow/Home/End), with an AM/PM toggle here via the root
+ * `hour12` config. No drum import — grid-only apps stay light.
+ */
+export const TimeTriggerSteppers: Story = {
+  render: (_, ctx) => (
+    <TimeFrame globals={ctx.globals} hour12>
+      <CalendarToolbarTime />
+    </TimeFrame>
+  ),
+};
+
+/**
+ * Time trigger with the DRUM picker: `compact` (clock icon) opens the
+ * `CalendarTimeWheel` (with seconds) via the `picker` prop. The wheel import is
+ * the consumer's; the trigger and the drum share `hour12` from root config.
+ */
+export const TimeTriggerWheel: Story = {
+  render: (_, ctx) => (
+    <TimeFrame globals={ctx.globals}>
+      <CalendarToolbarTime compact picker={<CalendarTimeWheel seconds />} />
+    </TimeFrame>
   ),
 };

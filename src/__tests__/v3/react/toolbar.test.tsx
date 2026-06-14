@@ -7,6 +7,7 @@ import { MIDNIGHT } from "@/core-v3/calendar-time";
 import { compileDateRules } from "@/core-v3/date-rule-engine";
 import type { CalendarConfig } from "@/core-v3/state";
 import { CalendarMonthsWheel } from "@/modules-v3/months-wheel/CalendarMonthsWheel";
+import { CalendarTimeWheel } from "@/modules-v3/time/CalendarTimeWheel";
 import {
   CalendarToolbar,
   CalendarToolbarApply,
@@ -19,6 +20,7 @@ import {
   CalendarToolbarMonthTrigger,
   CalendarToolbarNext,
   CalendarToolbarPrev,
+  CalendarToolbarTime,
   CalendarToolbarYearLabel,
   CalendarToolbarYearTrigger,
 } from "@/modules-v3/toolbar/CalendarToolbar";
@@ -608,5 +610,118 @@ describe("Toolbar day stepper (target=selection)", () => {
     expect(next).toHaveProperty("disabled", true);
     fireEvent.click(next!); // no-op even if forced
     expect(onChange).not.toHaveBeenCalled();
+  });
+});
+
+describe("Toolbar time trigger (CalendarToolbarTime)", () => {
+  const timeSel = (h: number, m: number, s = 0) => ({
+    shape: "point" as const,
+    dates: [
+      { date: D(2026, 6, 15), time: { hour: h, minute: m, second: s, ms: 0 } },
+    ],
+  });
+
+  function setupTime(
+    props: Parameters<typeof CalendarToolbarTime>[0] = {},
+    selection?: ReturnType<typeof timeSel>,
+    over: Partial<CalendarConfig> = {},
+  ) {
+    return render(
+      <CalendarProvider
+        config={config({ withTime: true, ...over })}
+        initialView={D(2026, 6, 15)}
+        defaultSelection={selection}
+      >
+        <UIProvider>
+          <CalendarToolbarTime {...props} />
+        </UIProvider>
+      </CalendarProvider>,
+    );
+  }
+
+  it("is disabled until a date is selected", () => {
+    const { container } = setupTime({}, undefined);
+    expect(container.querySelector("[data-toolbar-time]")).toHaveProperty(
+      "disabled",
+      true,
+    );
+  });
+
+  it("shows the selected time (24h default)", () => {
+    const { container } = setupTime({}, timeSel(14, 30));
+    expect(container.querySelector("[data-toolbar-time]")?.textContent).toBe(
+      "14:30",
+    );
+  });
+
+  it("compact renders a clock icon instead of the text", () => {
+    const { container } = setupTime({ compact: true }, timeSel(14, 30));
+    const btn = container.querySelector("[data-toolbar-time]");
+    expect(btn?.textContent).not.toMatch(/14/);
+    expect(btn?.querySelector("svg")).toBeTruthy();
+  });
+
+  it("units are spinbuttons; ArrowUp steps and commits the time", () => {
+    const onTimeSelect = vi.fn();
+    const { container, getByLabelText } = setupTime(
+      { onTimeSelect },
+      timeSel(14, 30),
+    );
+    fireEvent.click(container.querySelector("[data-toolbar-time]")!); // open
+    const minute = getByLabelText("Minutes");
+    expect(minute.getAttribute("role")).toBe("spinbutton");
+    expect(minute.getAttribute("aria-valuenow")).toBe("30");
+    expect(minute.getAttribute("aria-valuemax")).toBe("59");
+    fireEvent.keyDown(minute, { key: "ArrowUp" });
+    expect(onTimeSelect).toHaveBeenLastCalledWith(
+      expect.objectContaining({ hour: 14, minute: 31 }),
+    );
+  });
+
+  it("hour12 config formats the trigger with AM/PM", () => {
+    const { container } = setupTime({}, timeSel(14, 30), { hour12: true });
+    expect(container.querySelector("[data-toolbar-time]")?.textContent).toMatch(
+      /PM/,
+    );
+  });
+
+  it("wheel picker stages the time and commits only on Confirm", () => {
+    const onChange = vi.fn();
+    const { container, getByLabelText } = render(
+      <CalendarProvider
+        config={config({ withTime: true })}
+        initialView={D(2026, 6, 15)}
+        defaultSelection={timeSel(14, 30)}
+        onChange={onChange}
+      >
+        <UIProvider>
+          <CalendarToolbarTime picker={<CalendarTimeWheel />} />
+        </UIProvider>
+      </CalendarProvider>,
+    );
+    fireEvent.click(container.querySelector("[data-toolbar-time]")!); // open
+    // Spin the hours drum — stages into the draft, no commit yet.
+    fireEvent.keyDown(getByLabelText("Hours"), { key: "ArrowDown" });
+    expect(onChange).not.toHaveBeenCalled();
+    // Confirm applies the staged time.
+    fireEvent.click(getByLabelText("Confirm"));
+    expect(onChange).toHaveBeenCalled();
+  });
+
+  it("two time triggers don't both open (anchor-gated)", () => {
+    const { container, queryAllByRole } = render(
+      <CalendarProvider
+        config={config({ withTime: true })}
+        initialView={D(2026, 6, 15)}
+        defaultSelection={timeSel(14, 30)}
+      >
+        <UIProvider>
+          <CalendarToolbarTime />
+          <CalendarToolbarTime compact />
+        </UIProvider>
+      </CalendarProvider>,
+    );
+    fireEvent.click(container.querySelectorAll("[data-toolbar-time]")[0]!);
+    expect(queryAllByRole("dialog")).toHaveLength(1);
   });
 });

@@ -18,6 +18,11 @@ import {
   compareDate,
 } from "../../core-v3/calendar-date";
 import {
+  type CalendarTime,
+  MIDNIGHT,
+  timesEqual,
+} from "../../core-v3/calendar-time";
+import {
   type AnyCalendarValue,
   toPublicValue,
 } from "../../core-v3/public-value";
@@ -37,12 +42,17 @@ import {
   ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  ChevronUpIcon,
   ClearIcon,
+  ClockIcon,
   HomeIcon,
   ThemeToggleIcon,
 } from "../../react-v3/icons";
 import { useLabels } from "../../react-v3/labels-context";
-import { PickerDraftProvider } from "../../react-v3/picker-draft";
+import {
+  PickerDraftProvider,
+  TimePickerDraftProvider,
+} from "../../react-v3/picker-draft";
 import { useCalendarActions, useCalendarStore } from "../../react-v3/provider";
 import { UIButton } from "../../react-v3/ui/button";
 import { UITile } from "../../react-v3/ui/tile";
@@ -652,7 +662,10 @@ export function CalendarToolbarMonthTrigger({
   const { locale, min, max } = store.getConfig();
   const date = useDisplayDate(offset);
   const eff = useEffectiveOffset(offset);
-  const open = ui.isOpen("month");
+  // Gate on the anchor too: two triggers of the same kind share the popup
+  // state, so only the one that actually opened it (its button === the popup
+  // anchor) renders open.
+  const open = ui.isOpen("month") && ui.anchor === ref.current;
   const fixed = isMonthFixed(min, max);
 
   const names = useMemo(() => monthNames(locale, "short"), [locale]);
@@ -832,7 +845,7 @@ export function CalendarToolbarYearTrigger({
   const { min, max } = store.getConfig();
   const date = useDisplayDate(offset);
   const eff = useEffectiveOffset(offset);
-  const open = ui.isOpen("year");
+  const open = ui.isOpen("year") && ui.anchor === ref.current;
   const fixed = isYearFixed(min, max);
   const [page, setPage] = useState(0);
 
@@ -1110,6 +1123,306 @@ export function CalendarToolbarClock({
       <span className={styles.clockDot} />
       {text}
     </span>
+  );
+}
+
+// ── Time trigger ──────────────────────────────────────────────────────────────
+
+const wrap = (n: number, mod: number) => ((n % mod) + mod) % mod;
+
+/**
+ * One time unit as a WAI-ARIA `spinbutton` (mirrors the TimeWheel drum): the
+ * value is the single focusable control, announced via `aria-valuenow`/`-text`
+ * and stepped with Arrow/Home/End. The chevron buttons are mouse-only
+ * affordances — hidden from assistive tech and out of the tab order so they
+ * don't double up the spinbutton.
+ */
+function TimeUnit({
+  label,
+  value,
+  min,
+  max,
+  valueText,
+  onStep,
+  onSet,
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  valueText: string;
+  onStep: (dir: -1 | 1) => void;
+  onSet: (value: number) => void;
+}) {
+  const stepBtn = (dir: -1 | 1, icon: ReactNode) => (
+    <span
+      className={styles.timeStep}
+      aria-hidden="true"
+      onMouseDown={(e) => {
+        e.preventDefault(); // keep focus on the spinbutton
+        onStep(dir);
+      }}
+    >
+      {icon}
+    </span>
+  );
+  return (
+    <span className={styles.timeUnit}>
+      {stepBtn(1, <ChevronUpIcon />)}
+      <span
+        className={styles.timeValue}
+        role="spinbutton"
+        tabIndex={0}
+        aria-label={label}
+        aria-valuenow={value}
+        aria-valuemin={min}
+        aria-valuemax={max}
+        aria-valuetext={valueText}
+        onKeyDown={(e) => {
+          if (e.key === "ArrowUp") {
+            e.preventDefault();
+            onStep(1);
+          } else if (e.key === "ArrowDown") {
+            e.preventDefault();
+            onStep(-1);
+          } else if (e.key === "Home") {
+            e.preventDefault();
+            onSet(min);
+          } else if (e.key === "End") {
+            e.preventDefault();
+            onSet(max);
+          }
+        }}
+      >
+        {valueText}
+      </span>
+      {stepBtn(-1, <ChevronDownIcon />)}
+    </span>
+  );
+}
+
+/**
+ * Built-in compact time picker: an up/down stepper per unit (+ an AM/PM toggle
+ * for 12h). Commits live via `onChange` — the lightweight default body when no
+ * `picker` (e.g. a drum wheel) is supplied.
+ */
+function TimeSteppers({
+  value,
+  hour12,
+  seconds,
+  step,
+  onChange,
+  t,
+}: {
+  value: CalendarTime;
+  hour12: boolean;
+  seconds: boolean;
+  step: number;
+  onChange: (next: CalendarTime) => void;
+  t: ReturnType<typeof useLabels>;
+}) {
+  const set = (patch: Partial<CalendarTime>) =>
+    onChange({ ...value, ...patch });
+  const hour = hour12
+    ? String(((value.hour + 11) % 12) + 1).padStart(2, "0")
+    : String(value.hour).padStart(2, "0");
+  const isPm = value.hour >= 12;
+  return (
+    <div
+      className={styles.timePicker}
+      role="group"
+      aria-label={t("timePicker")}
+    >
+      <TimeUnit
+        label={t("hours")}
+        value={value.hour}
+        min={0}
+        max={23}
+        valueText={hour}
+        onStep={(dir) => set({ hour: wrap(value.hour + dir, 24) })}
+        onSet={(v) => set({ hour: v })}
+      />
+      <span className={styles.timeColon} aria-hidden="true">
+        :
+      </span>
+      <TimeUnit
+        label={t("minutes")}
+        value={value.minute}
+        min={0}
+        max={59}
+        valueText={String(value.minute).padStart(2, "0")}
+        onStep={(dir) => set({ minute: wrap(value.minute + dir * step, 60) })}
+        onSet={(v) => set({ minute: v })}
+      />
+      {seconds && (
+        <>
+          <span className={styles.timeColon} aria-hidden="true">
+            :
+          </span>
+          <TimeUnit
+            label={t("seconds")}
+            value={value.second}
+            min={0}
+            max={59}
+            valueText={String(value.second).padStart(2, "0")}
+            onStep={(dir) => set({ second: wrap(value.second + dir, 60) })}
+            onSet={(v) => set({ second: v })}
+          />
+        </>
+      )}
+      {hour12 && (
+        <UIButton
+          size="sm"
+          className={styles.timePeriod}
+          aria-label={t("timePeriod", { period: isPm ? "PM" : "AM" })}
+          onClick={() => set({ hour: wrap(value.hour + 12, 24) })}
+        >
+          {isPm ? "PM" : "AM"}
+        </UIButton>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Time trigger: a button showing the selected time that opens a time picker.
+ * `compact` shows a clock icon instead of the text. The built-in popup is a
+ * compact stepper UI; swap it for a drum via `picker={<CalendarTimeWheel/>}`
+ * (the wheel import stays on the consumer, like the month/year triggers).
+ * `hour12` comes from the ROOT config so the display and any picker never
+ * desync. Disabled until a date is selected — there is no time to edit yet.
+ */
+export function CalendarToolbarTime({
+  compact = false,
+  seconds = false,
+  step = 1,
+  label,
+  col,
+  className,
+  picker,
+  pickerConfirm = true,
+  confirmLabel,
+  onTimeSelect,
+}: WithClass & {
+  compact?: boolean;
+  seconds?: boolean;
+  step?: number;
+  label?: string;
+  col?: number | string;
+  picker?: ReactNode;
+  pickerConfirm?: boolean;
+  confirmLabel?: string;
+  onTimeSelect?: (time: CalendarTime) => void;
+}) {
+  const store = useCalendarStore();
+  const ui = useUI();
+  const t = useLabels();
+  const ref = useRef<HTMLButtonElement>(null);
+  const { locale, hour12 = false, readOnly, defaultTime } = store.getConfig();
+  const { setTime } = useCalendarActions();
+  const selection = useStoreSelector(store, (s) => s.selection);
+
+  const value: CalendarTime =
+    selection.shape === "span"
+      ? (selection.fromTime ?? defaultTime ?? MIDNIGHT)
+      : (selection.dates.at(-1)?.time ?? defaultTime ?? MIDNIGHT);
+  const hasTarget =
+    selection.shape === "span"
+      ? selection.ranges.length > 0
+      : selection.dates.length > 0;
+  const disabled = readOnly || !hasTarget;
+  const open = ui.isOpen("time") && ui.anchor === ref.current;
+
+  const text = useMemo(
+    () =>
+      new Intl.DateTimeFormat(locale, {
+        hour: "2-digit",
+        minute: "2-digit",
+        ...(seconds ? { second: "2-digit" } : undefined),
+        hour12,
+      }).format(new Date(2000, 0, 1, value.hour, value.minute, value.second)),
+    [locale, seconds, hour12, value.hour, value.minute, value.second],
+  );
+
+  // Dispatch is synchronous; read the committed time back so `onTimeSelect`
+  // only fires for changes that actually landed (validation may reject).
+  const commit = (next: CalendarTime) => {
+    setTime(next);
+    const after = store.getState().selection;
+    const committed =
+      after.shape === "span" ? after.fromTime : after.dates.at(-1)?.time;
+    if (committed && timesEqual(committed, next)) onTimeSelect?.(next);
+  };
+
+  // Confirm-staging for a wheel picker: it writes the draft; Confirm applies it.
+  // Re-seeded from the committed time on each open. The built-in steppers commit
+  // live (no Confirm), so they ignore this.
+  const [draftTime, setDraftTime] = useState<CalendarTime>(value);
+  useEffect(() => {
+    if (open) setDraftTime(value);
+  }, [open, value.hour, value.minute, value.second]);
+  const timeDraft = useMemo(
+    () => ({ time: draftTime, setTime: setDraftTime }),
+    [draftTime],
+  );
+
+  return (
+    <>
+      <UIButton
+        ref={ref}
+        disabled={disabled}
+        aria-haspopup={disabled ? undefined : "dialog"}
+        aria-expanded={disabled ? undefined : open}
+        aria-label={t("changeTime", { time: text }, label)}
+        data-toolbar-time=""
+        className={className}
+        style={getGridSlotStyle(col)}
+        onClick={() => ref.current && ui.toggle("time", ref.current)}
+      >
+        {compact ? <ClockIcon /> : text}
+      </UIButton>
+      <CalendarPopup
+        open={open}
+        anchor={ref.current}
+        onClose={ui.close}
+        label={t("timePicker")}
+      >
+        {picker ? (
+          // Staging needs a Confirm to apply it; without one the picker stays
+          // live (commits straight to the selection, the pre-staging behavior).
+          <TimePickerDraftProvider value={pickerConfirm ? timeDraft : null}>
+            <div className={styles.pickerBody}>
+              {picker}
+              {pickerConfirm && (
+                <div className={styles.pickerFooter}>
+                  <UIButton
+                    size="sm"
+                    aria-label={t("confirm", undefined, confirmLabel)}
+                    onClick={() => {
+                      // Apply the staged time to the selection, then close.
+                      commit(draftTime);
+                      ui.close();
+                      ref.current?.focus();
+                    }}
+                  >
+                    <CheckIcon />
+                  </UIButton>
+                </div>
+              )}
+            </div>
+          </TimePickerDraftProvider>
+        ) : (
+          <TimeSteppers
+            value={value}
+            hour12={hour12}
+            seconds={seconds}
+            step={step}
+            onChange={commit}
+            t={t}
+          />
+        )}
+      </CalendarPopup>
+    </>
   );
 }
 

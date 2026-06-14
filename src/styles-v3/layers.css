@@ -83,8 +83,10 @@
     display: grid;
     gap: var(--c-gap, 8px);
     inline-size: 100%;
-    /* Appearance-driven (fallbacks = v3 default look). */
-    font-size: var(--cal-font-size, 1em);
+    /* Appearance-driven (fallbacks = v3 default look). NOTE: `--cal-font-size`
+       is deliberately NOT applied to the root — inflating the base font blew up
+       the toolbar (gigantic label/time, the next button overflowed). Type scale
+       is opt-in per surface (e.g. day numbers via `--cal-text-day`). */
     letter-spacing: var(--cal-letter-spacing, normal);
     padding: var(--c-pad, 12px);
     border: var(--cal-border, 1px) solid var(--c-stroke);
