@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { calendarDate } from "../../core-v3/calendar-date";
+import { boundDateOf } from "../../core-v3/bound";
+import { calendarDate, daysInMonth } from "../../core-v3/calendar-date";
 import { toCalendarDateTime } from "../../core-v3/timezone-boundary";
 import { useToday } from "../../hooks/use-today";
 import { useLabels } from "../../react-v3/labels-context";
@@ -46,6 +47,11 @@ export type CalendarYearsWheelProps = {
   yearsLabel?: string;
   /** aria-label for the group wrapper (registry key `yearPicker`). */
   yearPickerLabel?: string;
+  /**
+   * Span modes: edit a range bound (`"from"`/`"to"`)'s year instead of the view.
+   * Commits via `setBoundDate` (core owns ordering/clamping).
+   */
+  bound?: "from" | "to";
   /** Per-module theme override (`data-theme` on the module container). */
   theme?: string;
   /** Per-module scheme override (`data-scheme` on the module container). */
@@ -63,6 +69,7 @@ export function CalendarYearsWheel({
   resetYearLabel,
   yearsLabel,
   yearPickerLabel,
+  bound,
   theme,
   scheme,
   col,
@@ -72,13 +79,15 @@ export function CalendarYearsWheel({
   const store = useCalendarStore();
   const config = store.getConfig();
   const t = useLabels();
-  const { navigateTo } = useCalendarActions();
+  const { navigateTo, setBoundDate } = useCalendarActions();
   const today = useToday();
   // Staged inside a confirm trigger popup; live against the store otherwise.
   const draft = usePickerDraft();
 
   const storeView = useStoreSelector(store, (s) => s.view.viewDate);
-  const viewDate = draft ? draft.date : storeView;
+  const selection = useStoreSelector(store, (s) => s.selection);
+  const boundDate = boundDateOf(selection, bound);
+  const viewDate = draft ? draft.date : (boundDate ?? storeView);
 
   const locale = config.locale ?? "en";
   const localizedLabel = getLocalizedYearLabel(locale);
@@ -95,11 +104,18 @@ export function CalendarYearsWheel({
 
   const handleDrumChange = (nextOffset: number): boolean | undefined => {
     const nextYear = minYear + nextOffset;
-    const next = calendarDate(nextYear, viewDate.month, 1);
     if (draft) {
-      draft.setDate(next);
+      draft.setDate(calendarDate(nextYear, viewDate.month, 1));
+    } else if (boundDate) {
+      // Edit the bound: keep its month/day (day clamped); core orders.
+      const day = Math.min(
+        boundDate.day,
+        daysInMonth(nextYear, boundDate.month),
+      );
+      setBoundDate(calendarDate(nextYear, boundDate.month, day), bound!);
+      onYearSelect?.(nextYear);
     } else {
-      navigateTo(next);
+      navigateTo(calendarDate(nextYear, viewDate.month, 1));
       onYearSelect?.(nextYear);
     }
     return undefined;
