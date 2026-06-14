@@ -7,8 +7,9 @@ import {
 import { toCalendarDateTime } from "../../core-v3/timezone-boundary";
 import { useToday } from "../../hooks/use-today";
 import { useLabels } from "../../react-v3/labels-context";
-import { UIButton } from "../../react-v3/ui/button";
+import { useTimePickerDraft } from "../../react-v3/picker-draft";
 import { useCalendarActions, useCalendarStore } from "../../react-v3/provider";
+import { UIButton } from "../../react-v3/ui/button";
 import { useStoreSelector } from "../../react-v3/use-store-selector";
 import { getGridSlotStyle } from "../../utils/get-grid-slot-style";
 import styles from "./time.module.css";
@@ -88,12 +89,16 @@ export function CalendarTimeWheel({
   const t = useLabels();
   const { setTime } = useCalendarActions();
   const today = useToday();
+  // Inside a confirm-staged time popup the wheel edits the draft, not the
+  // selection: the time only lands when the trigger's Confirm applies it.
+  const draft = useTimePickerDraft();
 
   const selection = useStoreSelector(store, (s) => s.selection);
 
-  // Resolve the time this wheel edits. Span bounds read from/to; point shape
-  // reads the single date's time; both fall back to the configured default.
+  // Resolve the time this wheel edits. Staged → the draft; otherwise span bounds
+  // read from/to, point reads the single date's time; both fall back to default.
   const value: CalendarTime = (() => {
+    if (draft) return draft.time;
     if (selection.shape === "span") {
       const bt = bound === "to" ? selection.toTime : selection.fromTime;
       return bt ?? config.defaultTime ?? MIDNIGHT;
@@ -112,7 +117,8 @@ export function CalendarTimeWheel({
     selection.shape === "span"
       ? selection.ranges.length > 0
       : selection.dates.length > 0;
-  const readOnly = config.readOnly || !hasTarget;
+  // Staged: the draft IS the target, so the wheel is live (only readOnly gates).
+  const readOnly = draft ? config.readOnly : config.readOnly || !hasTarget;
 
   // Physical drum walls for a same-day range: the from-wheel cannot pass the
   // to-time and vice versa. Mirrors the strategy's `time-out-of-order` check
@@ -154,6 +160,10 @@ export function CalendarTimeWheel({
     : null;
 
   const commit = (next: CalendarTime) => {
+    if (draft) {
+      draft.setTime(next);
+      return;
+    }
     setTime(next, bound);
     // Dispatch is synchronous: read back the committed time and only report
     // changes that actually landed (walls/validation may have rejected).
