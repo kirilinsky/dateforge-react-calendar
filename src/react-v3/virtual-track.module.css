@@ -1,0 +1,144 @@
+@layer cal-base {
+  /*
+   * VirtualTrack — shared physics-track shell. cal-base so module rules
+   * (cal-modules) can override without !important. Size from appearance tokens
+   * (`--cal-size-track-item`, `--cal-track-height`, `--cal-radius`), color from
+   * `--c-*` theme tokens.
+   */
+  .container {
+    position: relative;
+    /* Clip the scrolling strip HORIZONTALLY only (left/right at the edges);
+       leave the vertical axis free so the centred pill's box-shadow isn't cut
+       off at the track's top/bottom. `overflow: hidden` would clip both axes. */
+    clip-path: inset(-100% 0 -100% 0);
+    height: var(--cal-track-height, 4em);
+    cursor: grab;
+    touch-action: pan-y;
+    z-index: 3;
+    isolation: isolate;
+    perspective: 28em;
+  }
+
+  /* Edge fades — the strip dissolves into the backdrop at both ends. */
+  .container::before,
+  .container::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 30%;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .container::before {
+    left: 0;
+    background: linear-gradient(to right, var(--c-backdrop, #fff) 5%, transparent);
+  }
+  .container::after {
+    right: 0;
+    background: linear-gradient(to left, var(--c-backdrop, #fff) 5%, transparent);
+  }
+
+  .container:active {
+    cursor: grabbing;
+  }
+
+  .container:focus-visible {
+    outline: 2px solid var(--c-focusRing, var(--c-accent, #1a73e8));
+    outline-offset: -2px;
+  }
+
+  /* Centred selection pill: the committed value sits here. */
+  .highlight {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--cal-size-track-item, 4em);
+    height: 2.6em;
+    transform: translate(-50%, -50%);
+    background: var(--c-accent, #1a73e8);
+    border-radius: var(--c-day-radius, 8px);
+    box-shadow: var(--cal-shadow-md, 0 0.2em 0.6em var(--c-shadow, #0002));
+    pointer-events: none;
+    z-index: 0;
+    transition:
+      background var(--cal-paint-transition, var(--cal-transition, 0.2s))
+        var(--cal-paint-easing, linear),
+      box-shadow var(--cal-paint-transition, var(--cal-transition, 0.2s))
+        var(--cal-paint-easing, linear);
+  }
+
+  .strip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    z-index: 1;
+    will-change: transform;
+    transform-style: preserve-3d;
+  }
+
+  .item {
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    width: var(--cal-size-track-item, 4em);
+    height: 2.6em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    user-select: none;
+    opacity: var(--track-item-opacity, 1);
+    transform: translateY(var(--track-item-y, 0))
+      rotateY(var(--track-item-tilt, 0deg)) scale(var(--track-item-scale, 1));
+    transform-style: preserve-3d;
+    will-change: transform, opacity;
+    transition:
+      opacity calc(var(--cal-transition, 0.2s) * 0.5) linear,
+      transform var(--cal-transition, 0.2s) cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* Ink crossfades to the active (on-accent) color as an item nears the centre. */
+  .itemText {
+    position: relative;
+    z-index: 2;
+    color: color-mix(
+      in srgb,
+      var(--c-activeText, #fff) var(--track-item-active, 0%),
+      var(--c-text, #222)
+    );
+    pointer-events: none;
+    transition: color 0.08s linear;
+  }
+
+  .active {
+    font-weight: var(--cal-control-weight, 600);
+    cursor: default;
+  }
+
+  /* Active item with a secondary label (month/year context), stacked. */
+  .activeLabel {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.05;
+  }
+  .subLabel {
+    font-size: 0.62em;
+    font-weight: 400;
+    color: var(--c-activeText, #fff);
+    opacity: 0.8;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .item {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+}
