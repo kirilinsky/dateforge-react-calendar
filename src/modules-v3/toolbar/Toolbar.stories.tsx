@@ -413,3 +413,49 @@ export const TimeTriggerWheel: Story = {
     </TimeFrame>
   ),
 };
+
+/**
+ * Bound mode: in a range layout each toolbar drives ONE edge of the span. A
+ * `<CalendarToolbar bound="from">` titles and steps the FROM date, `bound="to"`
+ * the TO date — prev/next/triggers commit via the core's `setBoundDate`, which
+ * owns ordering (the arrows wall at the opposite edge, never cross it). No view
+ * juggling in the modules. Seeded with a June→August range; try stepping FROM
+ * toward August or TO toward June and watch the arrows disable at the boundary.
+ */
+export const BoundSplit: Story = {
+  render: (_, ctx) => (
+    <div style={{ width: 460 }}>
+      <CalendarRoot
+        {...storyThemeProps(ctx.globals)}
+        config={buildConfig({ mode: "range" })}
+        initialView={calendarDate(2026, 6, 1)}
+        defaultSelection={{
+          shape: "span",
+          ranges: [
+            {
+              start: calendarDate(2026, 6, 10),
+              end: calendarDate(2026, 8, 20),
+            },
+          ],
+          fromTime: MIDNIGHT,
+          toTime: MIDNIGHT,
+        }}
+      >
+        <div style={{ display: "flex", gap: 16 }}>
+          <CalendarToolbar bound="from">
+            <CalendarToolbarPrev />
+            <CalendarToolbarMonthTrigger compact />
+            <CalendarToolbarYearTrigger compact />
+            <CalendarToolbarNext />
+          </CalendarToolbar>
+          <CalendarToolbar bound="to">
+            <CalendarToolbarPrev />
+            <CalendarToolbarMonthTrigger compact />
+            <CalendarToolbarYearTrigger compact />
+            <CalendarToolbarNext />
+          </CalendarToolbar>
+        </div>
+      </CalendarRoot>
+    </div>
+  ),
+};

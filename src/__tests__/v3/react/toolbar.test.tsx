@@ -725,3 +725,126 @@ describe("Toolbar time trigger (CalendarToolbarTime)", () => {
     expect(queryAllByRole("dialog")).toHaveLength(1);
   });
 });
+
+describe("Toolbar bound mode (range edges)", () => {
+  function spanSel(from: ReturnType<typeof D>, to: ReturnType<typeof D>) {
+    return {
+      shape: "span" as const,
+      ranges: [{ start: from, end: to }],
+      fromTime: MIDNIGHT,
+      toTime: MIDNIGHT,
+    };
+  }
+
+  function boundSetup(
+    ui: ReactNode,
+    {
+      from = D(2026, 6, 10),
+      to = D(2026, 8, 20),
+      over = {},
+    }: {
+      from?: ReturnType<typeof D>;
+      to?: ReturnType<typeof D>;
+      over?: Partial<CalendarConfig>;
+    } = {},
+  ) {
+    const onChange = vi.fn();
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <CalendarProvider
+        config={config({ mode: "range", ...over })}
+        initialView={D(2026, 1, 1)}
+        defaultSelection={spanSel(from, to)}
+        onChange={onChange}
+      >
+        <UIProvider>{children}</UIProvider>
+      </CalendarProvider>
+    );
+    return { ...render(ui, { wrapper }), onChange };
+  }
+
+  it("a bound toolbar titles its range edge, not the view", () => {
+    const { getByText } = boundSetup(
+      <>
+        <CalendarToolbar bound="from">
+          <CalendarToolbarLabel />
+        </CalendarToolbar>
+        <CalendarToolbar bound="to">
+          <CalendarToolbarLabel />
+        </CalendarToolbar>
+      </>,
+    );
+    // View is January; the labels follow the from/to edges instead.
+    expect(getByText("June 2026")).toBeTruthy();
+    expect(getByText("August 2026")).toBeTruthy();
+  });
+
+  it("per-part bound overrides the container", () => {
+    const { getByText } = boundSetup(
+      <CalendarToolbar bound="from">
+        <CalendarToolbarMonthLabel />
+        <CalendarToolbarMonthLabel bound="to" />
+      </CalendarToolbar>,
+    );
+    expect(getByText("June")).toBeTruthy();
+    expect(getByText("August")).toBeTruthy();
+  });
+
+  it("prev/next step the bound's date (commits, label follows)", () => {
+    const { getByLabelText, getByText, onChange } = boundSetup(
+      <CalendarToolbar bound="from">
+        <CalendarToolbarPrev />
+        <CalendarToolbarLabel />
+        <CalendarToolbarNext />
+      </CalendarToolbar>,
+    );
+    fireEvent.click(getByLabelText("Next month"));
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(getByText("July 2026")).toBeTruthy();
+  });
+
+  it("the opposite edge walls the step (no crossing)", () => {
+    // from=June, to=July 5 → stepping FROM forward to July 10 crosses to.
+    const { getByLabelText } = boundSetup(
+      <CalendarToolbar bound="from">
+        <CalendarToolbarNext />
+      </CalendarToolbar>,
+      { from: D(2026, 6, 10), to: D(2026, 7, 5) },
+    );
+    expect(getByLabelText("Next month")).toHaveProperty("disabled", true);
+  });
+
+  it("bound steps are blocked under readOnly", () => {
+    const { getByLabelText } = boundSetup(
+      <CalendarToolbar bound="from">
+        <CalendarToolbarNext />
+      </CalendarToolbar>,
+      { over: { readOnly: true } },
+    );
+    expect(getByLabelText("Next month")).toHaveProperty("disabled", true);
+  });
+
+  it("month trigger commits the pick to the bound (day kept in-month)", () => {
+    const { getByLabelText, getByText, onChange } = boundSetup(
+      <CalendarToolbar bound="from">
+        <CalendarToolbarMonthTrigger picker={null} pickerConfirm={false} />
+      </CalendarToolbar>,
+    );
+    fireEvent.click(getByLabelText(/change month/i));
+    fireEvent.click(getByLabelText("July"));
+    expect(onChange).toHaveBeenCalledTimes(1);
+    // Trigger label now reads the moved bound month.
+    expect(getByText("July")).toBeTruthy();
+  });
+
+  it("time trigger edits the chosen edge's time", () => {
+    const { getByLabelText, onChange } = boundSetup(
+      <CalendarToolbar bound="to">
+        <CalendarToolbarTime />
+      </CalendarToolbar>,
+      { over: { withTime: true } },
+    );
+    fireEvent.click(getByLabelText(/change time/i));
+    fireEvent.keyDown(getByLabelText("Hours"), { key: "ArrowUp" });
+    expect(onChange).toHaveBeenCalled();
+  });
+});

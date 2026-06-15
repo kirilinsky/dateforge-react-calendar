@@ -3,12 +3,14 @@ import {
   createContext,
   type KeyboardEvent,
   type ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
+import { boundDateOf } from "../../core-v3/bound";
 import {
   addDays,
   addMonths,
@@ -16,6 +18,7 @@ import {
   type CalendarDate,
   calendarDate,
   compareDate,
+  daysInMonth,
 } from "../../core-v3/calendar-date";
 import {
   type CalendarTime,
@@ -81,11 +84,15 @@ function cx(...parts: (string | undefined)[]): string {
   return parts.filter(Boolean).join(" ");
 }
 
-// ── Toolbar context: the month offset this toolbar's parts display ──────────
-// Minimal by design (one field) — primitives stay usable standalone, where the
-// context simply defaults to offset 0.
+// ── Toolbar context: the month offset + range bound this toolbar's parts use ──
+// Minimal by design — primitives stay usable standalone, where the context
+// defaults to offset 0 and no bound.
 
-const ToolbarContext = createContext<{ offset: number }>({ offset: 0 });
+type Bound = "from" | "to";
+
+const ToolbarContext = createContext<{ offset: number; bound?: Bound }>({
+  offset: 0,
+});
 
 /** Effective month offset: container offset + per-part override. */
 function useEffectiveOffset(own?: number): number {
@@ -93,14 +100,37 @@ function useEffectiveOffset(own?: number): number {
   return base + (own ?? 0);
 }
 
-/** The date this toolbar part displays: root view shifted by the offset. */
-function useDisplayDate(own?: number): CalendarDate {
+/**
+ * Effective range bound: per-part override wins, else the container's. A bound
+ * is a MODE (which range edge this part displays/edits), not additive like the
+ * offset — so a part's own `bound` replaces, never combines with, the context.
+ */
+function useEffectiveBound(own?: Bound): Bound | undefined {
+  const base = useContext(ToolbarContext).bound;
+  return own ?? base;
+}
+
+/** The first range's `bound` edge, or `undefined` (point shape / empty span). */
+function useBoundDate(bound: Bound | undefined): CalendarDate | undefined {
+  const store = useCalendarStore();
+  return useStoreSelector(store, (s) => boundDateOf(s.selection, bound));
+}
+
+/**
+ * The date this toolbar part displays. In bound mode it's the range edge itself
+ * (so a `<CalendarToolbar bound="from">` titles/steps the FROM date); with no
+ * range yet it falls back to the view. Otherwise it's the root view shifted by
+ * the offset. `ownBound` lets a single part (e.g. a paired from/to label) pin a
+ * bound regardless of the container.
+ */
+function useDisplayDate(own?: number, ownBound?: Bound): CalendarDate {
   const store = useCalendarStore();
   const view = useStoreSelector(store, (s) => s.view.viewDate);
   const offset = useEffectiveOffset(own);
+  const boundDate = useBoundDate(useEffectiveBound(ownBound));
   return useMemo(
-    () => (offset === 0 ? view : addMonths(view, offset)),
-    [view, offset],
+    () => boundDate ?? (offset === 0 ? view : addMonths(view, offset)),
+    [boundDate, view, offset],
   );
 }
 
@@ -120,6 +150,15 @@ export type CalendarToolbarProps = WithClass & {
    * Pair with `<CalendarDays offset={1} />` in multi-month layouts.
    */
   offset?: number;
+  /**
+   * Span mode: every part inside displays and EDITS this range edge
+   * (`"from"`/`"to"`) instead of the view — labels title the bound date,
+   * prev/next/home/triggers commit via `setBoundDate` (the core owns
+   * ordering/clamping). Pair with `<CalendarDaysTrack bound="from" />` for a
+   * split from/to layout. No effect on point selections. Per-part `bound`
+   * overrides this (e.g. a from-label and to-label in one toolbar).
+   */
+  bound?: Bound;
   /** Per-module theme override (`data-theme` on the container). */
   theme?: string;
   /** Per-module scheme override (`data-scheme` on the container). */
@@ -166,13 +205,14 @@ export function CalendarToolbar({
   justify,
   label,
   offset = 0,
+  bound,
   theme,
   scheme,
   className,
   children,
 }: CalendarToolbarProps) {
   const t = useLabels();
-  const ctx = useMemo(() => ({ offset }), [offset]);
+  const ctx = useMemo(() => ({ offset, bound }), [offset, bound]);
   const gridTemplateColumns =
     cols === undefined
       ? undefined
@@ -234,6 +274,8 @@ type StepProps = WithClass & {
   target?: "view" | "selection";
   /** Accessible label override (else resolves from the label registry). */
   label?: string;
+  /** Edit this range edge instead of paging the view (overrides container). */
+  bound?: Bound;
   col?: number | string;
 };
 
@@ -266,22 +308,41 @@ function StepButton({
   unit = "month",
   target = "view",
   label,
+  bound,
   col,
   className,
   children,
 }: StepProps & { dir: -1 | 1; attr: string }) {
   const store = useCalendarStore();
-  const { navigateBy, navigateTo, selectDay } = useCalendarActions();
+  const { navigateBy, navigateTo, selectDay, setBoundDate } =
+    useCalendarActions();
   const t = useLabels();
   const date = useDisplayDate();
   const { min, max, readOnly } = store.getConfig();
   const selectedDate = useStoreSelector(store, (s) =>
     s.selection.shape === "point" ? s.selection.dates.at(-1)?.date : undefined,
   );
+  const effBound = useEffectiveBound(bound);
+  const range0 = useStoreSelector(store, (s) =>
+    s.selection.shape === "span" ? s.selection.ranges[0] : undefined,
+  );
 
   let canGo: boolean;
   let onClick: () => void;
-  if (target === "selection") {
+  if (effBound && range0) {
+    // Step the range EDGE; the opposite edge is the ordering wall (the core
+    // strategy also rejects an out-of-order step — this gate just disables the
+    // arrow there so it doesn't no-op silently). Editing the value, so gated by
+    // readOnly (unlike view paging, which stays enabled).
+    const editing = effBound === "from" ? range0.start : range0.end;
+    const next = addByUnit(editing, unit, dir);
+    const ordered =
+      effBound === "from"
+        ? compareDate(next, range0.end) <= 0
+        : compareDate(next, range0.start) >= 0;
+    canGo = !readOnly && inBounds(next, min, max) && ordered;
+    onClick = () => setBoundDate(next, effBound);
+  } else if (target === "selection") {
     // Step an EXISTING selected date, then follow it into view so any grid keeps
     // the stepped day visible. With nothing picked there's nothing to step — the
     // arrows disable (pick a day first), rather than both pointing at today.
@@ -325,19 +386,71 @@ export function CalendarToolbarNext(props: StepProps) {
 
 // ── Home ─────────────────────────────────────────────────────────────────────
 
-/** Jump the view to today. Disabled while today's month is already shown. */
+/**
+ * Jump the view to today (disabled while today's month is already shown). In a
+ * bound toolbar it resets THIS range edge to today instead — gated by readOnly,
+ * the min/max window, and range ordering (the core is the final guard).
+ */
 export function CalendarToolbarHome({
   label,
   col,
   offset,
+  bound,
   className,
   children,
-}: WithClass & { label?: string; col?: number | string; offset?: number }) {
-  const { navigateTo } = useCalendarActions();
+}: WithClass & {
+  label?: string;
+  col?: number | string;
+  offset?: number;
+  bound?: Bound;
+}) {
+  const store = useCalendarStore();
+  const { navigateTo, setBoundDate } = useCalendarActions();
   const t = useLabels();
   const date = useDisplayDate(offset);
   const eff = useEffectiveOffset(offset);
+  const effBound = useEffectiveBound(bound);
+  const range0 = useStoreSelector(store, (s) =>
+    s.selection.shape === "span" ? s.selection.ranges[0] : undefined,
+  );
+  const { min, max, readOnly } = store.getConfig();
   const todayJs = useToday(); // null until mounted — SSR-safe disabled state
+
+  if (effBound && range0) {
+    const todayDate = todayJs
+      ? calendarDate(
+          todayJs.getFullYear(),
+          todayJs.getMonth() + 1,
+          todayJs.getDate(),
+        )
+      : undefined;
+    const editing = effBound === "from" ? range0.start : range0.end;
+    const ordered =
+      !todayDate ||
+      (effBound === "from"
+        ? compareDate(todayDate, range0.end) <= 0
+        : compareDate(todayDate, range0.start) >= 0);
+    const atToday = !!todayDate && compareDate(editing, todayDate) === 0;
+    const can =
+      !readOnly &&
+      !!todayDate &&
+      !atToday &&
+      inBounds(todayDate, min, max) &&
+      ordered;
+    return (
+      <UIButton
+        disabled={!can}
+        aria-label={t("home", undefined, label)}
+        data-toolbar-home=""
+        className={className}
+        style={getGridSlotStyle(col)}
+        onClick={() => todayDate && setBoundDate(todayDate, effBound)}
+      >
+        {children ?? <HomeIcon />}
+      </UIButton>
+    );
+  }
+
   const atToday =
     !!todayJs &&
     date.year === todayJs.getFullYear() &&
@@ -373,6 +486,8 @@ type LabelProps = WithClass & {
   col?: number | string;
   /** Months ahead of the toolbar's date (adds to the container offset). */
   offset?: number;
+  /** Title this range edge instead of the view (overrides the container). */
+  bound?: Bound;
 };
 
 const FULL_LABEL: Intl.DateTimeFormatOptions = {
@@ -383,10 +498,11 @@ const FULL_LABEL: Intl.DateTimeFormatOptions = {
 function useViewText(
   options: Intl.DateTimeFormatOptions,
   offset?: number,
+  bound?: Bound,
 ): { date: CalendarDate; text: string } {
   const store = useCalendarStore();
   const locale = store.getConfig().locale;
-  const date = useDisplayDate(offset);
+  const date = useDisplayDate(offset, bound);
   const text = useMemo(
     () =>
       new Intl.DateTimeFormat(locale, options).format(
@@ -412,13 +528,14 @@ export function CalendarToolbarLabel({
   level = 2,
   col,
   offset,
+  bound,
   className,
   children,
 }: LabelProps & { level?: 1 | 2 | 3 | 4 | 5 | 6 }) {
   const store = useCalendarStore();
   const locale = store.getConfig().locale;
   const opts = options ?? FULL_LABEL;
-  const { date, text } = useViewText(opts, offset);
+  const { date, text } = useViewText(opts, offset, bound);
   // Longest of the 12 month renderings for the displayed year/day — covers the
   // month-name variance that dominates the width (day digits vary by at most
   // one character and only in day-bearing formats).
@@ -472,11 +589,13 @@ export function CalendarToolbarMonthLabel({
   short = false,
   col,
   offset,
+  bound,
   className,
 }: WithClass & {
   short?: boolean;
   col?: number | string;
   offset?: number;
+  bound?: Bound;
 }) {
   const store = useCalendarStore();
   const t = useLabels();
@@ -485,6 +604,7 @@ export function CalendarToolbarMonthLabel({
   const { date, text } = useViewText(
     useMemo(() => ({ month: format }), [format]),
     offset,
+    bound,
   );
   const sizer = useMemo(
     () => longest(monthNames(locale, format)),
@@ -521,10 +641,11 @@ export function CalendarToolbarYearLabel({
   options,
   col,
   offset,
+  bound,
   className,
 }: LabelProps) {
   const t = useLabels();
-  const { date, text } = useViewText(options ?? YEAR_ONLY, offset);
+  const { date, text } = useViewText(options ?? YEAR_ONLY, offset, bound);
   return (
     <span
       data-toolbar-year-label=""
@@ -546,6 +667,7 @@ export function CalendarToolbarDayLabel({
   emptyText = "—",
   col,
   offset,
+  bound,
   className,
 }: WithClass & {
   format?: "numeric" | "2-digit" | "long";
@@ -560,11 +682,13 @@ export function CalendarToolbarDayLabel({
   emptyText?: string;
   col?: number | string;
   offset?: number;
+  /** Show this range edge's day (with `source="view"`; overrides container). */
+  bound?: Bound;
 }) {
   const store = useCalendarStore();
   const t = useLabels();
   const locale = store.getConfig().locale;
-  const viewDate = useDisplayDate(offset);
+  const viewDate = useDisplayDate(offset, bound);
   const selectedDate = useStoreSelector(store, (s) =>
     s.selection.shape === "point" ? s.selection.dates.at(-1)?.date : undefined,
   );
@@ -607,6 +731,13 @@ type TriggerProps = WithClass & {
   label?: string;
   /** Icon-sized trigger: chevron + short text. */
   compact?: boolean;
+  /**
+   * Edit this range edge (`"from"`/`"to"`) instead of the view: the trigger
+   * shows the bound's month/year and picking commits via `setBoundDate` (the
+   * core keeps the day in-month and owns ordering). Overrides the container
+   * `bound`. No effect on point selections or before a range exists.
+   */
+  bound?: Bound;
   col?: number | string;
   offset?: number;
   /**
@@ -648,6 +779,7 @@ export function CalendarToolbarMonthTrigger({
   compact = false,
   col,
   offset,
+  bound,
   picker,
   pickerConfirm = true,
   confirmLabel,
@@ -655,18 +787,39 @@ export function CalendarToolbarMonthTrigger({
   className,
 }: TriggerProps) {
   const store = useCalendarStore();
-  const { navigateTo } = useCalendarActions();
+  const { navigateTo, setBoundDate } = useCalendarActions();
   const ui = useUI();
   const t = useLabels();
   const ref = useRef<HTMLButtonElement>(null);
-  const { locale, min, max } = store.getConfig();
-  const date = useDisplayDate(offset);
+  const { locale, min, max, readOnly } = store.getConfig();
+  const date = useDisplayDate(offset, bound);
   const eff = useEffectiveOffset(offset);
+  const effBound = useEffectiveBound(bound);
+  const boundDate = useBoundDate(effBound);
+  // Bound mode commits the pick to the range edge (keeping its day in-month);
+  // view mode navigates. The core owns ordering — a cross-over pick is its
+  // no-op, so the grid only gates min/max (like the wheel does).
+  const commitDate = useCallback(
+    (target: CalendarDate) => {
+      if (effBound && boundDate) {
+        const day = Math.min(
+          boundDate.day,
+          daysInMonth(target.year, target.month),
+        );
+        setBoundDate(calendarDate(target.year, target.month, day), effBound);
+      } else {
+        navigateTo(eff === 0 ? target : addMonths(target, -eff));
+      }
+    },
+    [effBound, boundDate, eff, navigateTo, setBoundDate],
+  );
   // Gate on the anchor too: two triggers of the same kind share the popup
   // state, so only the one that actually opened it (its button === the popup
   // anchor) renders open.
   const open = ui.isOpen("month") && ui.anchor === ref.current;
-  const fixed = isMonthFixed(min, max);
+  // In bound mode the trigger mutates the value → also blocked by readOnly.
+  const fixed =
+    isMonthFixed(min, max) || (!!effBound && !!boundDate && readOnly);
 
   const names = useMemo(() => monthNames(locale, "short"), [locale]);
   const longNames = useMemo(() => monthNames(locale, "long"), [locale]);
@@ -756,10 +909,7 @@ export function CalendarToolbarMonthTrigger({
                         );
                         // Stage when confirming; commit live otherwise.
                         if (pickerConfirm) setDraft(target);
-                        else
-                          navigateTo(
-                            eff === 0 ? target : addMonths(target, -eff),
-                          );
+                        else commitDate(target);
                       }}
                     >
                       {todayJs ? longNames[todayJs.getMonth()] : ""}
@@ -770,8 +920,8 @@ export function CalendarToolbarMonthTrigger({
                       size="sm"
                       aria-label={t("confirm", undefined, confirmLabel)}
                       onClick={() => {
-                        // Apply the staged draft to the real view, then close.
-                        navigateTo(eff === 0 ? draft : addMonths(draft, -eff));
+                        // Apply the staged draft (view or bound), then close.
+                        commitDate(draft);
                         ui.close();
                         ref.current?.focus();
                       }}
@@ -803,8 +953,7 @@ export function CalendarToolbarMonthTrigger({
                   aria-current={selected ? "true" : undefined}
                   aria-label={longNames[i]}
                   onClick={() => {
-                    const target = calendarDate(date.year, m, 1);
-                    navigateTo(eff === 0 ? target : addMonths(target, -eff));
+                    commitDate(calendarDate(date.year, m, 1));
                     ui.close();
                   }}
                 >
@@ -831,6 +980,7 @@ export function CalendarToolbarYearTrigger({
   compact = false,
   col,
   offset,
+  bound,
   picker,
   pickerConfirm = true,
   confirmLabel,
@@ -838,15 +988,34 @@ export function CalendarToolbarYearTrigger({
   className,
 }: TriggerProps) {
   const store = useCalendarStore();
-  const { navigateTo } = useCalendarActions();
+  const { navigateTo, setBoundDate } = useCalendarActions();
   const ui = useUI();
   const t = useLabels();
   const ref = useRef<HTMLButtonElement>(null);
-  const { min, max } = store.getConfig();
-  const date = useDisplayDate(offset);
+  const { min, max, readOnly } = store.getConfig();
+  const date = useDisplayDate(offset, bound);
   const eff = useEffectiveOffset(offset);
+  const effBound = useEffectiveBound(bound);
+  const boundDate = useBoundDate(effBound);
+  // Bound mode commits the picked year to the range edge (day kept in-month);
+  // view mode navigates. Core owns ordering (cross-over = its no-op).
+  const commitDate = useCallback(
+    (target: CalendarDate) => {
+      if (effBound && boundDate) {
+        const day = Math.min(
+          boundDate.day,
+          daysInMonth(target.year, target.month),
+        );
+        setBoundDate(calendarDate(target.year, target.month, day), effBound);
+      } else {
+        navigateTo(eff === 0 ? target : addMonths(target, -eff));
+      }
+    },
+    [effBound, boundDate, eff, navigateTo, setBoundDate],
+  );
   const open = ui.isOpen("year") && ui.anchor === ref.current;
-  const fixed = isYearFixed(min, max);
+  const fixed =
+    isYearFixed(min, max) || (!!effBound && !!boundDate && readOnly);
   const [page, setPage] = useState(0);
 
   // Re-anchor the window on every open — a stale page from the last session
@@ -924,10 +1093,7 @@ export function CalendarToolbarYearTrigger({
                         );
                         // Stage when confirming; commit live otherwise.
                         if (pickerConfirm) setDraft(target);
-                        else
-                          navigateTo(
-                            eff === 0 ? target : addMonths(target, -eff),
-                          );
+                        else commitDate(target);
                       }}
                     >
                       {todayJs ? todayJs.getFullYear() : ""}
@@ -938,7 +1104,7 @@ export function CalendarToolbarYearTrigger({
                       size="sm"
                       aria-label={t("confirm", undefined, confirmLabel)}
                       onClick={() => {
-                        navigateTo(eff === 0 ? draft : addMonths(draft, -eff));
+                        commitDate(draft);
                         ui.close();
                         ref.current?.focus();
                       }}
@@ -988,8 +1154,7 @@ export function CalendarToolbarYearTrigger({
                     selected={selected}
                     aria-current={selected ? "true" : undefined}
                     onClick={() => {
-                      const target = calendarDate(y, date.month, 1);
-                      navigateTo(eff === 0 ? target : addMonths(target, -eff));
+                      commitDate(calendarDate(y, date.month, 1));
                       ui.close();
                     }}
                   >
@@ -1298,6 +1463,7 @@ export function CalendarToolbarTime({
   step = 1,
   label,
   col,
+  bound,
   className,
   picker,
   pickerConfirm = true,
@@ -1309,6 +1475,11 @@ export function CalendarToolbarTime({
   step?: number;
   label?: string;
   col?: number | string;
+  /**
+   * Edit this range edge's time (`"from"`/`"to"`) instead of the from-time
+   * default. Overrides the container `bound`. Span selections only.
+   */
+  bound?: Bound;
   picker?: ReactNode;
   pickerConfirm?: boolean;
   confirmLabel?: string;
@@ -1321,10 +1492,15 @@ export function CalendarToolbarTime({
   const { locale, hour12 = false, readOnly, defaultTime } = store.getConfig();
   const { setTime } = useCalendarActions();
   const selection = useStoreSelector(store, (s) => s.selection);
+  // In a bound toolbar default to that edge's time; an explicit `to` shows the
+  // end time. Falls back to `from` when no bound is in play.
+  const effBound = useEffectiveBound(bound);
 
   const value: CalendarTime =
     selection.shape === "span"
-      ? (selection.fromTime ?? defaultTime ?? MIDNIGHT)
+      ? ((effBound === "to" ? selection.toTime : selection.fromTime) ??
+        defaultTime ??
+        MIDNIGHT)
       : (selection.dates.at(-1)?.time ?? defaultTime ?? MIDNIGHT);
   const hasTarget =
     selection.shape === "span"
@@ -1345,12 +1521,17 @@ export function CalendarToolbarTime({
   );
 
   // Dispatch is synchronous; read the committed time back so `onTimeSelect`
-  // only fires for changes that actually landed (validation may reject).
+  // only fires for changes that actually landed (validation may reject). Bound
+  // mode targets that edge's time; the core keeps from/to ordered.
   const commit = (next: CalendarTime) => {
-    setTime(next);
+    setTime(next, effBound);
     const after = store.getState().selection;
     const committed =
-      after.shape === "span" ? after.fromTime : after.dates.at(-1)?.time;
+      after.shape === "span"
+        ? effBound === "to"
+          ? after.toTime
+          : after.fromTime
+        : after.dates.at(-1)?.time;
     if (committed && timesEqual(committed, next)) onTimeSelect?.(next);
   };
 
