@@ -27,6 +27,12 @@ export type AppearanceTokens = {
   fontSize: string;
   dayFontSize: string;
   dayWeight: string;
+  /**
+   * Day cell HEIGHT floor (`min-block-size`), e.g. `"3em"` (roomy) or `"2em"`
+   * (tight). Safe — height only; width stays grid-driven so columns never
+   * drift from the weekday headers (unlike a per-cell `aspect-ratio`).
+   */
+  dayHeight: string;
   daysGap: string;
   daysPadding: string;
   popupPadding: string;
@@ -61,6 +67,7 @@ export const APPEARANCE_TOKEN_TO_VAR: Record<keyof AppearanceTokens, string> = {
   fontSize: "--cal-font-size",
   dayFontSize: "--cal-text-day",
   dayWeight: "--cal-day-weight",
+  dayHeight: "--cal-day-height",
   daysGap: "--cal-days-gap",
   daysPadding: "--cal-days-padding",
   popupPadding: "--cal-popup-padding",

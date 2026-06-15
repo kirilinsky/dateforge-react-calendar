@@ -104,6 +104,18 @@ describe("appearance system", () => {
     expect(el.style.getPropertyValue("--cal-control-border")).toBe("0px"); // buttons
   });
 
+  it("appearances drive day weight + height (not width)", () => {
+    const wide = root(mount(loft).container);
+    expect(wide.style.getPropertyValue("--cal-day-weight")).toBe("500");
+    expect(wide.style.getPropertyValue("--cal-day-height")).toBe("3em");
+    // No --cal-day-ratio anymore (it skewed cell width vs the headers).
+    expect(wide.style.getPropertyValue("--cal-day-ratio")).toBe("");
+    // Default sets none — day cells keep the v3 floor/weight.
+    const def = root(mount().container);
+    expect(def.style.getPropertyValue("--cal-day-weight")).toBe("");
+    expect(def.style.getPropertyValue("--cal-day-height")).toBe("");
+  });
+
   it("default (no appearance) sets no control vars — buttons unchanged", () => {
     const { container } = mount();
     const el = root(container);
