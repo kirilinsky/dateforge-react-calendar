@@ -8,6 +8,11 @@
 
   .grid {
     display: grid;
+    /* Explicit single full-width column. Without it the implicit `auto` column
+       sizes to max-content, which an appearance `aspect-ratio` on the cells
+       inflates — making the weekday-header row a different width than the day
+       rows (columns stop lining up). `minmax(0, 1fr)` pins every row to 100%. */
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--c-day-gap, 2px);
     /* Appearance-driven inset (fallback 0 = v3 default). */
     padding: var(--cal-days-padding, 0);
@@ -32,14 +37,20 @@
 
   .row {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    /* `minmax(0, 1fr)` (not `1fr`): the columns must be free to shrink below
+       their content's min-size, or a wide cell (e.g. an appearance `aspect-ratio`
+       hitting the min-block-size floor and pushing width up) blows the grid past
+       the container. */
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    /* Always full width so header + day rows share identical column tracks. */
+    inline-size: 100%;
     /* Lift every row above the weekend column strips (grid ::before/::after). */
     position: relative;
     z-index: 1;
   }
 
   [data-week-numbers] .row {
-    grid-template-columns: 2em repeat(7, 1fr);
+    grid-template-columns: 2em repeat(7, minmax(0, 1fr));
   }
 
   .grid[data-week-numbers] {
@@ -91,13 +102,22 @@
     border: none;
     background: transparent;
     color: var(--c-text, #222);
+    /* Centre the number; the cell fills its grid column (square via the grid,
+       not a per-cell aspect-ratio — that contaminated the grid's intrinsic
+       sizing and made the weekday header a different width than the day rows). */
+    display: grid;
+    place-items: center;
+    inline-size: 100%;
     font: inherit;
-    /* Appearance day-number size (fallback 1em = v3 default). */
+    /* Appearance day-number size/weight (fallback = v3 default). */
     font-size: var(--cal-text-day, 1em);
+    font-weight: var(--cal-day-weight, inherit);
     cursor: pointer;
     border-radius: var(--c-day-radius, 8px);
     padding: 0;
-    min-block-size: 2.4em;
+    /* Appearance height floor (height only — width stays grid-driven so the
+       weekday headers always line up). Fallback = v3 default. */
+    min-block-size: var(--cal-day-height, 2.4em);
     position: relative;
     transition:
       background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),

@@ -316,14 +316,24 @@ describe("CalendarDays props (v2-parity surface)", () => {
   });
 
   it("renderDay replaces content, shell attrs stay ours", () => {
-    const { container } = mount({
-      renderDay: (d: { day: number }, s: { today: boolean }) =>
-        `${d.day}${s.today ? "!" : ""}*`,
-    });
-    const cell = container.querySelector('[data-date="20260615"]');
+    // Fixed past view (2020) so no cell is ever "today" — keeps the assertion
+    // date-independent regardless of when the suite runs.
+    const { container } = render(
+      <CalendarProvider
+        config={config("day", "single")}
+        initialView={D(2020, 6, 1)}
+      >
+        <CalendarDays
+          renderDay={(d: { day: number }, s: { today: boolean }) =>
+            `${d.day}${s.today ? "!" : ""}*`
+          }
+        />
+      </CalendarProvider>,
+    );
+    const cell = container.querySelector('[data-date="20200615"]');
     expect(cell?.textContent).toBe("15*");
     expect(cell?.getAttribute("role")).toBe("gridcell");
-    expect(cell?.getAttribute("aria-label")).toMatch(/June 15, 2026/);
+    expect(cell?.getAttribute("aria-label")).toMatch(/June 15, 2020/);
   });
 
   it("renderDay turns the today dot off unless explicitly re-enabled", () => {

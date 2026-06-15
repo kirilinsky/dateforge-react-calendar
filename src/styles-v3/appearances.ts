@@ -22,6 +22,7 @@ type Tokens = Partial<AppearanceTokens>;
 /** v2-default look ported as an opt-in appearance. */
 export const ZENITH_TOKENS: Tokens = {
   controlPadding: "0.3em 0.7em",
+  dayHeight: "2.4em",
   controlBorder: "0px",
   controlWeight: "500",
   tilePadding: "0.4em 0.6em",
@@ -44,6 +45,9 @@ export const ZENITH_TOKENS: Tokens = {
 
 export const AIRY_TOKENS: Tokens = {
   controlPadding: "0.5em 1em",
+  dayHeight: "3.2em",
+  daysGap: "0.5em",
+  dayWeight: "300",
   controlBorder: "0px",
   controlWeight: "300",
   tilePadding: "0.6em 0.85em",
@@ -68,6 +72,8 @@ export const AIRY_TOKENS: Tokens = {
 
 export const BUBBLE_TOKENS: Tokens = {
   controlPadding: "0.5em 1.1em",
+  dayHeight: "3em",
+  daysGap: "0.4em",
   controlBorder: "0px",
   controlWeight: "500",
   tilePadding: "0.55em 0.85em",
@@ -91,6 +97,8 @@ export const BUBBLE_TOKENS: Tokens = {
 
 export const COMPACT_TOKENS: Tokens = {
   controlPadding: "0.2em 0.45em",
+  dayHeight: "2em",
+  daysGap: "1px",
   controlBorder: "1px",
   controlWeight: "500",
   tilePadding: "0.25em 0.4em",
@@ -113,6 +121,9 @@ export const COMPACT_TOKENS: Tokens = {
 
 export const LOFT_TOKENS: Tokens = {
   controlPadding: "0.5em 0.95em",
+  dayHeight: "3em",
+  daysGap: "0.4em",
+  dayWeight: "500",
   controlBorder: "0px",
   controlWeight: "600",
   tilePadding: "0.5em 0.75em",
@@ -136,6 +147,8 @@ export const LOFT_TOKENS: Tokens = {
 
 export const PRESS_TOKENS: Tokens = {
   controlPadding: "0.3em 0.65em",
+  dayHeight: "2.8em",
+  daysGap: "2px",
   controlBorder: "1px",
   controlWeight: "400",
   tilePadding: "0.35em 0.55em",
@@ -161,6 +174,8 @@ export const PRESS_TOKENS: Tokens = {
 
 export const SOFT_TOKENS: Tokens = {
   controlPadding: "0.4em 0.85em",
+  dayHeight: "2.8em",
+  daysGap: "0.3em",
   controlBorder: "0px",
   controlWeight: "500",
   tilePadding: "0.45em 0.7em",
@@ -182,6 +197,8 @@ export const SOFT_TOKENS: Tokens = {
 
 export const SQUARE_TOKENS: Tokens = {
   controlPadding: "0.3em 0.6em",
+  dayHeight: "2.6em",
+  daysGap: "0",
   controlBorder: "1px",
   controlWeight: "500",
   tilePadding: "0.3em 0.5em",
