@@ -1,4 +1,4 @@
-import { fireEvent, render } from "@testing-library/react";
+import { fireEvent, render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
@@ -179,6 +179,36 @@ describe("Toolbar primitives", () => {
     ).toBeTruthy();
   });
 
+  it("cols: number → equal tracks; string → raw grid-template (data-cols)", () => {
+    const { getByRole, rerender } = setup(
+      <CalendarToolbar cols={3}>
+        <CalendarToolbarPrev />
+        <CalendarToolbarLabel />
+        <CalendarToolbarNext />
+      </CalendarToolbar>,
+    );
+    const bar = getByRole("toolbar");
+    expect(bar.getAttribute("data-cols")).toBe("");
+    expect(bar.style.gridTemplateColumns).toBe("repeat(3, minmax(0, 1fr))");
+    rerender(
+      <CalendarToolbar cols="auto minmax(0, 1fr) auto">
+        <CalendarToolbarPrev />
+        <CalendarToolbarLabel />
+        <CalendarToolbarNext />
+      </CalendarToolbar>,
+    );
+    expect(getByRole("toolbar").style.gridTemplateColumns).toBe(
+      "auto minmax(0, 1fr) auto",
+    );
+    // No cols → no data-cols (default content-sized auto-flow grid).
+    rerender(
+      <CalendarToolbar>
+        <CalendarToolbarLabel />
+      </CalendarToolbar>,
+    );
+    expect(getByRole("toolbar").getAttribute("data-cols")).toBeNull();
+  });
+
   it("arrow keys move focus between enabled toolbar buttons", () => {
     const { getByLabelText } = setup(
       <CalendarToolbar>
@@ -323,19 +353,19 @@ describe("Toolbar month/year triggers", () => {
       <CalendarToolbarMonthTrigger />,
     );
     const btn = getByLabelText("Change month, currently June");
+    // Both variants render (CSS shows one): the long name and the short name a
+    // narrow toolbar / the `short` prop swaps in (v2 parity).
     expect(btn.textContent).toContain("June");
-    // Width sizer: the longest month name is reserved invisibly, so stepping
-    // months never resizes the trigger.
-    expect(btn.textContent).toContain("September");
+    expect(btn.textContent).toContain("Jun");
     expect(btn.getAttribute("aria-expanded")).toBe("false");
     expect(queryByRole("dialog")).toBeNull();
   });
 
-  it("compact trigger renders the short month name", () => {
-    const { getByLabelText } = setup(<CalendarToolbarMonthTrigger compact />);
-    expect(
-      getByLabelText("Change month, currently June").textContent,
-    ).toContain("Jun");
+  it("short prop forces the short month name (data-short)", () => {
+    const { getByLabelText } = setup(<CalendarToolbarMonthTrigger short />);
+    const btn = getByLabelText("Change month, currently June");
+    expect(btn.getAttribute("data-short")).toBe("");
+    expect(btn.textContent).toContain("Jun");
   });
 
   it("picker prop swaps the popup body for custom content", () => {
@@ -441,11 +471,16 @@ describe("Toolbar month/year triggers", () => {
   });
 
   it("marks the current month as selected", () => {
-    const { getByLabelText, getByText } = setup(
+    const { getByLabelText, getByRole } = setup(
       <CalendarToolbarMonthTrigger />,
     );
     fireEvent.click(getByLabelText("Change month, currently June"));
-    expect(getByText("Jun").getAttribute("aria-current")).toBe("true");
+    // Scope to the popup: the trigger now also carries a hidden short "Jun"
+    // variant (v2-parity auto-shorten), so query the grid tile inside the dialog.
+    const dialog = getByRole("dialog");
+    expect(within(dialog).getByText("Jun").getAttribute("aria-current")).toBe(
+      "true",
+    );
   });
 
   it("disables months outside the min/max window", () => {
@@ -683,6 +718,32 @@ describe("Toolbar time trigger (CalendarToolbarTime)", () => {
     expect(container.querySelector("[data-toolbar-time]")?.textContent).toMatch(
       /PM/,
     );
+  });
+
+  it("ampmLabels localizes the stepper period button", () => {
+    const { container, getByText } = setupTime({}, timeSel(14, 30), {
+      hour12: true,
+      ampmLabels: { am: "дп", pm: "пп" },
+    });
+    fireEvent.click(container.querySelector("[data-toolbar-time]")!); // open
+    // 14:30 is PM → the localized PM label.
+    expect(getByText("пп")).toBeTruthy();
+  });
+
+  it("minTime/maxTime window: a step past the bound is rejected (core)", () => {
+    const onTimeSelect = vi.fn();
+    const { container, getByLabelText } = setupTime(
+      { onTimeSelect },
+      timeSel(17, 0),
+      { maxTime: { hour: 17, minute: 0, second: 0, ms: 0 } },
+    );
+    fireEvent.click(container.querySelector("[data-toolbar-time]")!); // open
+    const hours = getByLabelText("Hours");
+    expect(hours.getAttribute("aria-valuenow")).toBe("17");
+    // 18:00 is past maxTime → core rejects, value stays, no commit fires.
+    fireEvent.keyDown(hours, { key: "ArrowUp" });
+    expect(onTimeSelect).not.toHaveBeenCalled();
+    expect(hours.getAttribute("aria-valuenow")).toBe("17");
   });
 
   it("wheel picker stages the time and commits only on Confirm", () => {

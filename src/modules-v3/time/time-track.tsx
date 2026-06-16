@@ -40,6 +40,8 @@ export interface TimeTrackProps {
    */
   boundMin?: CalendarTime;
   boundMax?: CalendarTime;
+  /** Localized AM/PM display labels (12h period switch). Default AM/PM. */
+  ampmLabels?: { am: string; pm: string };
   onChange: (next: CalendarTime) => void;
 }
 
@@ -92,6 +94,7 @@ export function TimeTrack({
   timePickerLabel = "Time picker",
   boundMin,
   boundMax,
+  ampmLabels,
   onChange,
 }: TimeTrackProps) {
   const resolveLabel = (field: "hour" | "minute" | "second") => {
@@ -178,10 +181,10 @@ export function TimeTrack({
         >
           <span className={styles.periodThumb} aria-hidden />
           <span className={styles.periodLabel} data-value="AM" aria-hidden>
-            AM
+            {ampmLabels?.am ?? "AM"}
           </span>
           <span className={styles.periodLabel} data-value="PM" aria-hidden>
-            PM
+            {ampmLabels?.pm ?? "PM"}
           </span>
         </button>
       )}

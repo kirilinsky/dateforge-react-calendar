@@ -40,6 +40,14 @@ export type CalendarProps = CalendarProviderProps & {
    * default look. Independent of `theme` (colors).
    */
   appearance?: CalendarAppearance;
+  /**
+   * Root grid columns. A number → that many equal `minmax(0, 1fr)` tracks; a
+   * string → a raw `grid-template-columns` value. Modules place themselves with
+   * their `col` prop (`col={2}` spans 2, `col="1 / 3"` raw). Omit for the
+   * default single column (modules stack). Parent declares `cols`, children get
+   * `col` — same mental model as CSS Grid.
+   */
+  cols?: number | string;
   /** Light/dark choice. `"auto"` (default) follows the OS via `color-scheme`. */
   scheme?: SchemeMode;
   /**
@@ -60,6 +68,7 @@ export type CalendarProps = CalendarProviderProps & {
 export function Calendar({
   theme = "noir",
   appearance,
+  cols,
   scheme = "auto",
   onSchemeChange,
   className,
@@ -106,9 +115,23 @@ export function Calendar({
     () => resolveAppearance(appearance),
     [appearance],
   );
+  // `cols`: a number → N equal `minmax(0, 1fr)` tracks (the `0` floor lets cells
+  // shrink so wide content can't blow the grid past the container); a string is
+  // a raw `grid-template-columns`. Omitted → the root keeps its single implicit
+  // column (modules stack vertically). Mirrors the toolbar's own `cols`.
+  const gridTemplateColumns =
+    cols === undefined
+      ? undefined
+      : typeof cols === "number"
+        ? `repeat(${cols}, minmax(0, 1fr))`
+        : cols;
   const rootStyle = useMemo(
-    () => ({ ...themeStyle, ...appearanceStyle }),
-    [themeStyle, appearanceStyle],
+    () => ({
+      ...themeStyle,
+      ...appearanceStyle,
+      ...(gridTemplateColumns ? { gridTemplateColumns } : undefined),
+    }),
+    [themeStyle, appearanceStyle, gridTemplateColumns],
   );
 
   // First focus (Focus Manager): resolve once, perform from the root after the

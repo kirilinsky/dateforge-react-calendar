@@ -86,6 +86,62 @@ export function timesEqual(a: CalendarTime, b: CalendarTime): boolean {
 }
 
 /**
+ * Where a time sits relative to an inclusive `[min, max]` wall-clock window:
+ * `-1` below `min`, `1` above `max`, `0` inside (or no bound on that side).
+ * Either bound may be omitted.
+ */
+export function timeWindowSide(
+  t: CalendarTime,
+  min?: CalendarTime,
+  max?: CalendarTime,
+): -1 | 0 | 1 {
+  if (min && compareTime(t, min) < 0) return -1;
+  if (max && compareTime(t, max) > 0) return 1;
+  return 0;
+}
+
+/** True when `t` is within the inclusive `[min, max]` window (open sides ok). */
+export function timeInWindow(
+  t: CalendarTime,
+  min?: CalendarTime,
+  max?: CalendarTime,
+): boolean {
+  return timeWindowSide(t, min, max) === 0;
+}
+
+/** Clamp `t` into the inclusive `[min, max]` window. Returns `t` when inside. */
+export function clampTime(
+  t: CalendarTime,
+  min?: CalendarTime,
+  max?: CalendarTime,
+): CalendarTime {
+  const side = timeWindowSide(t, min, max);
+  if (side < 0 && min) return min;
+  if (side > 0 && max) return max;
+  return t;
+}
+
+/** The later of two optional times (the tighter LOWER bound). `undefined` = open. */
+export function laterTime(
+  a?: CalendarTime,
+  b?: CalendarTime,
+): CalendarTime | undefined {
+  if (!a) return b;
+  if (!b) return a;
+  return compareTime(a, b) >= 0 ? a : b;
+}
+
+/** The earlier of two optional times (the tighter UPPER bound). `undefined` = open. */
+export function earlierTime(
+  a?: CalendarTime,
+  b?: CalendarTime,
+): CalendarTime | undefined {
+  if (!a) return b;
+  if (!b) return a;
+  return compareTime(a, b) <= 0 ? a : b;
+}
+
+/**
  * Normalize a possibly-overflowing time into a canonical time plus a whole-day
  * carry. "25:00" becomes `{ time: 01:00, dayOffset: 1 }`; "-0:30" becomes
  * `{ time: 23:30, dayOffset: -1 }`.

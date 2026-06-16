@@ -1,12 +1,17 @@
 import { describe, expect, it } from "vitest";
 import {
   calendarTime,
+  clampTime,
   compareTime,
+  earlierTime,
   isValidTime,
+  laterTime,
   MIDNIGHT,
   msOfDay,
   normalizeTime,
+  timeInWindow,
   timesEqual,
+  timeWindowSide,
 } from "@/core-v3/calendar-time";
 
 describe("isValidTime", () => {
@@ -84,5 +89,38 @@ describe("normalizeTime", () => {
     ]) {
       expect(isValidTime(normalizeTime(t).time)).toBe(true);
     }
+  });
+});
+
+describe("time window helpers", () => {
+  const min = calendarTime(9, 0);
+  const max = calendarTime(17, 0);
+
+  it("timeWindowSide / timeInWindow respect inclusive bounds", () => {
+    expect(timeWindowSide(calendarTime(8, 59), min, max)).toBe(-1);
+    expect(timeWindowSide(calendarTime(17, 1), min, max)).toBe(1);
+    expect(timeWindowSide(min, min, max)).toBe(0); // inclusive low
+    expect(timeWindowSide(max, min, max)).toBe(0); // inclusive high
+    expect(timeInWindow(calendarTime(12, 0), min, max)).toBe(true);
+    expect(timeInWindow(calendarTime(7, 0), min, max)).toBe(false);
+    // Open-ended sides.
+    expect(timeInWindow(calendarTime(2, 0), undefined, max)).toBe(true);
+    expect(timeInWindow(calendarTime(23, 0), min, undefined)).toBe(true);
+  });
+
+  it("clampTime pins to the nearer bound, returns the input when inside", () => {
+    expect(clampTime(calendarTime(6, 0), min, max)).toEqual(min);
+    expect(clampTime(calendarTime(20, 0), min, max)).toEqual(max);
+    const inside = calendarTime(10, 30);
+    expect(clampTime(inside, min, max)).toBe(inside);
+  });
+
+  it("laterTime / earlierTime fold optional bounds (undefined = open)", () => {
+    expect(laterTime(min, max)).toBe(max); // tighter LOWER bound = later
+    expect(laterTime(min, undefined)).toBe(min);
+    expect(laterTime(undefined, max)).toBe(max);
+    expect(earlierTime(min, max)).toBe(min); // tighter UPPER bound = earlier
+    expect(earlierTime(undefined, max)).toBe(max);
+    expect(laterTime(undefined, undefined)).toBeUndefined();
   });
 });

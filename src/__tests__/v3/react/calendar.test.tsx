@@ -85,6 +85,39 @@ describe("Calendar root", () => {
     );
   });
 
+  it("cols: a number sets equal grid tracks; omitted leaves none", () => {
+    const { getByTestId, rerender } = render(
+      <Calendar config={config()} initialView={D(2026, 6, 1)} cols={3}>
+        <CalendarDays />
+      </Calendar>,
+    );
+    const root = getByTestId("dateforge-calendar");
+    expect(root.style.gridTemplateColumns).toBe("repeat(3, minmax(0, 1fr))");
+    rerender(
+      <Calendar config={config()} initialView={D(2026, 6, 1)}>
+        <CalendarDays />
+      </Calendar>,
+    );
+    expect(getByTestId("dateforge-calendar").style.gridTemplateColumns).toBe(
+      "",
+    );
+  });
+
+  it("cols: a string is used as a raw grid-template-columns", () => {
+    const { getByTestId } = render(
+      <Calendar config={config()} initialView={D(2026, 6, 1)} cols="1fr 2fr">
+        <CalendarDays col="1 / 3" />
+      </Calendar>,
+    );
+    const root = getByTestId("dateforge-calendar");
+    expect(root.style.gridTemplateColumns).toBe("1fr 2fr");
+    // The module places itself with `col` (raw string → verbatim grid-column).
+    const placed = root.querySelector(
+      "[data-dateforge-days]",
+    ) as HTMLElement | null;
+    expect(placed?.style.gridColumn).toBe("1 / 3");
+  });
+
   it("marks data-readonly for a read-only config", () => {
     const { getByTestId } = render(
       <Calendar

@@ -5,6 +5,7 @@ import { compileDateRules } from "@/core-v3/date-rule-engine";
 import type { CalendarConfig } from "@/core-v3/state";
 import { today } from "@/core-v3/timezone-boundary";
 import { CalendarDays } from "@/modules-v3/days/CalendarDays";
+import { CalendarDaysTrack } from "@/modules-v3/days-track/CalendarDaysTrack";
 import { CalendarMonthsWheel } from "@/modules-v3/months-wheel/CalendarMonthsWheel";
 import { CalendarTimeWheel } from "@/modules-v3/time/CalendarTimeWheel";
 import { CalendarYearsWheel } from "@/modules-v3/years-wheel/CalendarYearsWheel";
@@ -110,6 +111,26 @@ export const ReadyNav: Story = {
           <CalendarToolbarMonthTrigger />
           <CalendarToolbarYearTrigger />
         </CalendarToolbarGroup>
+        <CalendarToolbarNext />
+      </CalendarToolbar>
+    </Frame>
+  ),
+};
+
+/**
+ * Grid cells: `<CalendarToolbar cols>` lays the parts on explicit column tracks
+ * instead of the default content-sized auto-flow. A raw template
+ * `"auto minmax(0, 1fr) auto"` is the canonical robust nav — the arrows stay
+ * content-sized on the edges, the label fills the middle and truncates there
+ * (never overflows, never collapses the arrows). A number like `cols={2}` would
+ * give equal halves instead. Children can span with `col`.
+ */
+export const GridCells: Story = {
+  render: (_, ctx) => (
+    <Frame {...storyThemeProps(ctx.globals)}>
+      <CalendarToolbar cols="auto minmax(0, 1fr) auto">
+        <CalendarToolbarPrev />
+        <CalendarToolbarLabel />
         <CalendarToolbarNext />
       </CalendarToolbar>
     </Frame>
@@ -415,16 +436,18 @@ export const TimeTriggerWheel: Story = {
 };
 
 /**
- * Bound mode: in a range layout each toolbar drives ONE edge of the span. A
- * `<CalendarToolbar bound="from">` titles and steps the FROM date, `bound="to"`
- * the TO date — prev/next/triggers commit via the core's `setBoundDate`, which
- * owns ordering (the arrows wall at the opposite edge, never cross it). No view
- * juggling in the modules. Seeded with a June→August range; try stepping FROM
- * toward August or TO toward June and watch the arrows disable at the boundary.
+ * Bound mode, as a real from→to split. The root is a 2-column grid (`cols={2}`):
+ * each column pairs a bound toolbar (`bound="from"` / `bound="to"`) with a days
+ * track on the SAME bound, so a column is a self-contained edge editor — its
+ * header titles/steps that edge and its track scrolls it, both committing via
+ * the core's `setBoundDate` (which owns ordering: the arrows/scroll wall at the
+ * opposite edge, never cross it). Seeded June→August. The header uses
+ * `cols="auto 1fr auto"` so the month label sits centered between the arrows and
+ * the columns stay aligned.
  */
 export const BoundSplit: Story = {
   render: (_, ctx) => (
-    <div style={{ width: 460 }}>
+    <div style={{ width: 520 }}>
       <CalendarRoot
         {...storyThemeProps(ctx.globals)}
         config={buildConfig({ mode: "range" })}
@@ -440,21 +463,20 @@ export const BoundSplit: Story = {
           fromTime: MIDNIGHT,
           toTime: MIDNIGHT,
         }}
+        cols={2}
       >
-        <div style={{ display: "flex", gap: 16 }}>
-          <CalendarToolbar bound="from">
-            <CalendarToolbarPrev />
-            <CalendarToolbarMonthTrigger compact />
-            <CalendarToolbarYearTrigger compact />
-            <CalendarToolbarNext />
-          </CalendarToolbar>
-          <CalendarToolbar bound="to">
-            <CalendarToolbarPrev />
-            <CalendarToolbarMonthTrigger compact />
-            <CalendarToolbarYearTrigger compact />
-            <CalendarToolbarNext />
-          </CalendarToolbar>
-        </div>
+        <CalendarToolbar bound="from" col={1} cols="auto 1fr auto">
+          <CalendarToolbarPrev />
+          <CalendarToolbarMonthLabel short />
+          <CalendarToolbarNext />
+        </CalendarToolbar>
+        <CalendarToolbar bound="to" col={1} cols="auto 1fr auto">
+          <CalendarToolbarPrev />
+          <CalendarToolbarMonthLabel short />
+          <CalendarToolbarNext />
+        </CalendarToolbar>
+        <CalendarDaysTrack bound="from" col={1} showMonthLabel />
+        <CalendarDaysTrack bound="to" col={1} showMonthLabel />
       </CalendarRoot>
     </div>
   ),

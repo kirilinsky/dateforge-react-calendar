@@ -13,7 +13,12 @@ import {
   rangeLengthDays,
   weekRange,
 } from "../calendar-range";
-import { type CalendarTime, compareTime, isValidTime } from "../calendar-time";
+import {
+  type CalendarTime,
+  compareTime,
+  isValidTime,
+  timeWindowSide,
+} from "../calendar-time";
 import { noChange, type ReduceResult, result } from "../effects";
 import { applyExclusion } from "../segment";
 import type {
@@ -40,6 +45,23 @@ export function validateDay(
     return invalid("before-min");
   if (config.max && compareDate(date, config.max) > 0)
     return invalid("after-max");
+  return null;
+}
+
+/**
+ * Time-of-day validation: a malformed field first, then the inclusive
+ * `[minTime, maxTime]` window. Returns the rejection reason, or `null` when the
+ * time is selectable. Shared by every `setTime` path so the window is enforced
+ * once in the core — modules only gate their affordances on top.
+ */
+export function validateTime(
+  time: CalendarTime,
+  config: CalendarConfig,
+): ValidationResult | null {
+  if (!isValidTime(time)) return invalid("malformed-input");
+  const side = timeWindowSide(time, config.minTime, config.maxTime);
+  if (side < 0) return invalid("time-before-min");
+  if (side > 0) return invalid("time-after-max");
   return null;
 }
 
@@ -229,7 +251,8 @@ export function spanSetTime(
   if (!config.withTime || sel.shape !== "span" || sel.ranges.length === 0) {
     return noChange(state);
   }
-  if (!isValidTime(time)) return rejected(state, invalid("malformed-input"));
+  const timeInvalid = validateTime(time, config);
+  if (timeInvalid) return rejected(state, timeInvalid);
   const from = bound === "to" ? sel.fromTime : time;
   const to = bound === "from" ? sel.toTime : time;
   // Same-day span: the from-time may not pass the to-time, otherwise the

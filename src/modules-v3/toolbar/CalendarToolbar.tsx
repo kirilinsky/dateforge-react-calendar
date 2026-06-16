@@ -777,6 +777,7 @@ type TriggerProps = WithClass & {
 export function CalendarToolbarMonthTrigger({
   label,
   compact = false,
+  short = false,
   col,
   offset,
   bound,
@@ -785,7 +786,14 @@ export function CalendarToolbarMonthTrigger({
   confirmLabel,
   pickerReset = true,
   className,
-}: TriggerProps) {
+}: TriggerProps & {
+  /**
+   * Force the localized SHORT month name ("Jun"). Independent of `compact`
+   * (which only adds the chevron). Omit for the full name, which a too-narrow
+   * toolbar auto-shortens anyway (`@container cal-toolbar`, v2 parity).
+   */
+  short?: boolean;
+}) {
   const store = useCalendarStore();
   const { navigateTo, setBoundDate } = useCalendarActions();
   const ui = useUI();
@@ -823,13 +831,8 @@ export function CalendarToolbarMonthTrigger({
 
   const names = useMemo(() => monthNames(locale, "short"), [locale]);
   const longNames = useMemo(() => monthNames(locale, "long"), [locale]);
-  const text = compact ? names[date.month - 1] : longNames[date.month - 1];
-  // Width sizer (same as the labels): the trigger reserves the longest month
-  // name, so stepping months never resizes the button or shifts the toolbar.
-  const sizer = useMemo(
-    () => longest(compact ? names : longNames),
-    [compact, names, longNames],
-  );
+  const longText = longNames[date.month - 1];
+  const shortText = names[date.month - 1];
 
   const roving = useRovingTileFocus({
     itemCount: 12,
@@ -867,17 +870,18 @@ export function CalendarToolbarMonthTrigger({
           label,
         )}
         data-toolbar-month-trigger=""
+        data-short={short ? "" : undefined}
         className={className}
         style={getGridSlotStyle(col)}
         onClick={() => ref.current && ui.toggle("month", ref.current)}
       >
         {compact && <ChevronDownIcon />}
-        <span className={styles.slot}>
-          <span className={styles.sizer} aria-hidden="true">
-            {sizer}
-          </span>
-          <span>{text}</span>
-        </span>
+        {/* Long + short month both render; CSS shows one (forced by the `short`
+            prop or auto-swapped by a narrow toolbar container, v2 parity). The
+            accessible name is the aria-label above, so the hidden variant adds
+            no SR noise. */}
+        <span className={styles.variantLong}>{longText}</span>
+        <span className={styles.variantShort}>{shortText}</span>
       </UIButton>
       <CalendarPopup
         open={open}
@@ -1376,6 +1380,7 @@ function TimeSteppers({
   hour12,
   seconds,
   step,
+  ampmLabels,
   onChange,
   t,
 }: {
@@ -1383,6 +1388,7 @@ function TimeSteppers({
   hour12: boolean;
   seconds: boolean;
   step: number;
+  ampmLabels?: { am: string; pm: string };
   onChange: (next: CalendarTime) => void;
   t: ReturnType<typeof useLabels>;
 }) {
@@ -1392,6 +1398,7 @@ function TimeSteppers({
     ? String(((value.hour + 11) % 12) + 1).padStart(2, "0")
     : String(value.hour).padStart(2, "0");
   const isPm = value.hour >= 12;
+  const periodText = isPm ? (ampmLabels?.pm ?? "PM") : (ampmLabels?.am ?? "AM");
   return (
     <div
       className={styles.timePicker}
@@ -1439,10 +1446,10 @@ function TimeSteppers({
         <UIButton
           size="sm"
           className={styles.timePeriod}
-          aria-label={t("timePeriod", { period: isPm ? "PM" : "AM" })}
+          aria-label={t("timePeriod", { period: periodText })}
           onClick={() => set({ hour: wrap(value.hour + 12, 24) })}
         >
-          {isPm ? "PM" : "AM"}
+          {periodText}
         </UIButton>
       )}
     </div>
@@ -1489,7 +1496,13 @@ export function CalendarToolbarTime({
   const ui = useUI();
   const t = useLabels();
   const ref = useRef<HTMLButtonElement>(null);
-  const { locale, hour12 = false, readOnly, defaultTime } = store.getConfig();
+  const {
+    locale,
+    hour12 = false,
+    readOnly,
+    defaultTime,
+    ampmLabels,
+  } = store.getConfig();
   const { setTime } = useCalendarActions();
   const selection = useStoreSelector(store, (s) => s.selection);
   // In a bound toolbar default to that edge's time; an explicit `to` shows the
@@ -1598,6 +1611,7 @@ export function CalendarToolbarTime({
             hour12={hour12}
             seconds={seconds}
             step={step}
+            ampmLabels={ampmLabels}
             onChange={commit}
             t={t}
           />
