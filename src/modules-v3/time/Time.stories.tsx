@@ -6,7 +6,7 @@ import {
   span,
 } from "../../__tests__/v3/fixtures/builders";
 import { Calendar } from "../../react-v3/calendar";
-import { storyThemeProps } from "../_lab/story-globals";
+import { storyLocale, storyThemeProps } from "../_lab/story-globals";
 import { CalendarDays } from "../days/CalendarDays";
 import { CalendarTimeWheel } from "./CalendarTimeWheel";
 
@@ -25,7 +25,11 @@ export const Default: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "single", withTime: true })}
+      config={buildConfig({
+        ...storyLocale(ctx.globals),
+        mode: "single",
+        withTime: true,
+      })}
       initialView={D(2026, 6, 1)}
       defaultSelection={point({ d: D(2026, 6, 10) })}
     >
@@ -39,7 +43,11 @@ export const WithSeconds: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "single", withTime: true })}
+      config={buildConfig({
+        ...storyLocale(ctx.globals),
+        mode: "single",
+        withTime: true,
+      })}
       initialView={D(2026, 6, 1)}
       defaultSelection={point({ d: D(2026, 6, 10) })}
     >
@@ -53,7 +61,11 @@ export const TwelveHour: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "single", withTime: true })}
+      config={buildConfig({
+        ...storyLocale(ctx.globals),
+        mode: "single",
+        withTime: true,
+      })}
       initialView={D(2026, 6, 1)}
       defaultSelection={point({ d: D(2026, 6, 10) })}
     >
@@ -67,7 +79,11 @@ export const RangeBounds: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "range", withTime: true })}
+      config={buildConfig({
+        ...storyLocale(ctx.globals),
+        mode: "range",
+        withTime: true,
+      })}
       initialView={D(2026, 6, 1)}
       defaultSelection={span([[D(2026, 6, 8), D(2026, 6, 14)]])}
     >
@@ -82,7 +98,11 @@ export const WithReset: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "single", withTime: true })}
+      config={buildConfig({
+        ...storyLocale(ctx.globals),
+        mode: "single",
+        withTime: true,
+      })}
       initialView={D(2026, 6, 1)}
       defaultSelection={point({ d: D(2026, 6, 10) })}
     >
@@ -96,7 +116,11 @@ export const InertWithoutSelection: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "single", withTime: true })}
+      config={buildConfig({
+        ...storyLocale(ctx.globals),
+        mode: "single",
+        withTime: true,
+      })}
       initialView={D(2026, 6, 1)}
     >
       <CalendarDays />

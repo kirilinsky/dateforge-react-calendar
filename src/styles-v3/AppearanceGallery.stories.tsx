@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { buildConfig, D } from "../__tests__/v3/fixtures/builders";
-import { storyThemeProps } from "../modules-v3/_lab/story-globals";
+import { storyLocale, storyThemeProps } from "../modules-v3/_lab/story-globals";
 import { CalendarDays } from "../modules-v3/days/CalendarDays";
 import {
   CalendarToolbar,
@@ -48,7 +48,7 @@ function Panel({
       <Calendar
         {...storyThemeProps(globals)}
         appearance={appearance}
-        config={buildConfig({ mode: "single" })}
+        config={buildConfig({ ...storyLocale(globals), mode: "single" })}
         initialView={D(2026, 6, 1)}
       >
         <CalendarToolbar>

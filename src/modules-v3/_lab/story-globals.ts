@@ -29,3 +29,36 @@ export function storyThemeProps(
     scheme: globals.themeMode === "dark" ? "dark" : "light",
   };
 }
+
+/**
+ * Resolve the Storybook `locale` global into `CalendarConfig` overrides. Spread
+ * into a story's `buildConfig({ ...storyLocale(ctx.globals), … })` so the header
+ * Locale dropdown drives every v3 story's Intl formatting (month/weekday names,
+ * digits, direction). `"default"` (or an unset global) returns `undefined` — the
+ * story keeps its own locale.
+ *
+ * Also re-derives `firstDayOfWeek` from the locale via `Intl.Locale.getWeekInfo`
+ * (where supported), so switching to e.g. `en-US` moves the week start to Sunday
+ * — not just the labels. Falls back to leaving `firstDayOfWeek` to the story.
+ */
+export function storyLocale(
+  globals: Record<string, unknown>,
+): { locale: string; firstDayOfWeek?: number } | undefined {
+  const value = globals.locale;
+  if (typeof value !== "string" || value === "default") return undefined;
+  let firstDayOfWeek: number | undefined;
+  try {
+    // getWeekInfo().firstDay is 1=Mon‥7=Sun; our config is 0=Sun‥6=Sat.
+    // Not in the TS lib types yet, so reach for it defensively.
+    const loc = new Intl.Locale(value) as Intl.Locale & {
+      getWeekInfo?: () => { firstDay: number };
+    };
+    const info = loc.getWeekInfo?.();
+    if (info) firstDayOfWeek = info.firstDay % 7;
+  } catch {
+    // Older engines: leave the week start to the story's config.
+  }
+  return firstDayOfWeek === undefined
+    ? { locale: value }
+    : { locale: value, firstDayOfWeek };
+}

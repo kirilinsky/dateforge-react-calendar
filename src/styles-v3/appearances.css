@@ -27,6 +27,7 @@
     --cal-control-padding: 0.5em 1em;
     --cal-control-border: 0px;
     --cal-control-weight: 300;
+    --cal-press-scale: 0.98;
     --cal-tile-padding: 0.6em 0.85em;
     --cal-opacity-disabled: 0.3;
     --cal-opacity-muted: 0.4;
@@ -53,6 +54,7 @@
     --cal-control-padding: 0.5em 1.1em;
     --cal-control-border: 0px;
     --cal-control-weight: 500;
+    --cal-press-scale: 0.93;
     --cal-tile-padding: 0.55em 0.85em;
     --cal-opacity-disabled: 0.45;
     --cal-opacity-muted: 0.65;
@@ -77,6 +79,7 @@
     --cal-control-padding: 0.2em 0.45em;
     --cal-control-border: 1px;
     --cal-control-weight: 500;
+    --cal-press-scale: 0.96;
     --cal-tile-padding: 0.25em 0.4em;
     --cal-opacity-disabled: 0.4;
     --cal-opacity-muted: 0.55;
@@ -103,6 +106,7 @@
     --cal-control-padding: 0.5em 0.95em;
     --cal-control-border: 0px;
     --cal-control-weight: 600;
+    --cal-press-scale: 0.97;
     --cal-tile-padding: 0.5em 0.75em;
     --cal-opacity-disabled: 0.35;
     --cal-opacity-muted: 0.6;
@@ -129,6 +133,7 @@
     --cal-control-padding: 0.3em 0.65em;
     --cal-control-border: 1px;
     --cal-control-weight: 400;
+    --cal-press-scale: 0.92;
     --cal-tile-padding: 0.35em 0.55em;
     --cal-opacity-disabled: 0.25;
     --cal-opacity-muted: 0.55;
@@ -153,6 +158,7 @@
     --cal-control-padding: 0.4em 0.85em;
     --cal-control-border: 0px;
     --cal-control-weight: 500;
+    --cal-press-scale: 0.96;
     --cal-tile-padding: 0.45em 0.7em;
     --cal-opacity-disabled: 0.45;
     --cal-opacity-muted: 0.65;
@@ -172,6 +178,7 @@
     --cal-control-padding: 0.3em 0.6em;
     --cal-control-border: 1px;
     --cal-control-weight: 500;
+    --cal-press-scale: 1;
     --cal-tile-padding: 0.3em 0.5em;
     --cal-opacity-disabled: 0.3;
     --cal-opacity-muted: 0.5;
@@ -195,6 +202,7 @@
     --cal-control-padding: 0.3em 0.7em;
     --cal-control-border: 0px;
     --cal-control-weight: 500;
+    --cal-press-scale: 0.95;
     --cal-tile-padding: 0.4em 0.6em;
     --cal-opacity-disabled: 0.4;
     --cal-opacity-muted: 0.6;

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { buildConfig, D } from "../../__tests__/v3/fixtures/builders";
 import { Calendar } from "../../react-v3/calendar";
-import { storyThemeProps } from "../_lab/story-globals";
+import { storyLocale, storyThemeProps } from "../_lab/story-globals";
 import { CalendarMonthsGrid } from "./CalendarMonthsGrid";
 
 const meta: Meta = {
@@ -16,7 +16,7 @@ export const Default: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "single" })}
+      config={buildConfig({ ...storyLocale(ctx.globals), mode: "single" })}
       initialView={D(2026, 6, 1)}
     >
       <CalendarMonthsGrid />
@@ -28,7 +28,7 @@ export const ShortLabels: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "single" })}
+      config={buildConfig({ ...storyLocale(ctx.globals), mode: "single" })}
       initialView={D(2026, 6, 1)}
     >
       <CalendarMonthsGrid short />
@@ -40,7 +40,7 @@ export const LongLabels: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "single" })}
+      config={buildConfig({ ...storyLocale(ctx.globals), mode: "single" })}
       initialView={D(2026, 6, 1)}
     >
       <CalendarMonthsGrid short={false} />
@@ -52,7 +52,7 @@ export const RangeMode: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "range" })}
+      config={buildConfig({ ...storyLocale(ctx.globals), mode: "range" })}
       initialView={D(2026, 6, 1)}
     >
       <CalendarMonthsGrid />
@@ -65,6 +65,7 @@ export const OutOfRangeDisabled: Story = {
     <Calendar
       {...storyThemeProps(ctx.globals)}
       config={buildConfig({
+        ...storyLocale(ctx.globals),
         mode: "single",
         min: D(2026, 4, 1),
         max: D(2026, 9, 30),
@@ -81,6 +82,7 @@ export const OutOfRangeHidden: Story = {
     <Calendar
       {...storyThemeProps(ctx.globals)}
       config={buildConfig({
+        ...storyLocale(ctx.globals),
         mode: "single",
         min: D(2026, 4, 1),
         max: D(2026, 9, 30),
@@ -93,9 +95,9 @@ export const OutOfRangeHidden: Story = {
 };
 
 export const PerModuleTheme: Story = {
-  render: () => (
+  render: (_, ctx) => (
     <Calendar
-      config={buildConfig({ mode: "single" })}
+      config={buildConfig({ ...storyLocale(ctx.globals), mode: "single" })}
       initialView={D(2026, 6, 1)}
     >
       <CalendarMonthsGrid theme="espresso" scheme="dark" />

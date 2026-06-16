@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { buildConfig, D } from "../../__tests__/v3/fixtures/builders";
 import { Calendar } from "../../react-v3/calendar";
-import { storyThemeProps } from "../_lab/story-globals";
+import { storyLocale, storyThemeProps } from "../_lab/story-globals";
 import { CalendarDays } from "../days/CalendarDays";
 import { CalendarYearsWheel } from "./CalendarYearsWheel";
 
@@ -17,7 +17,7 @@ export const Default: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig()}
+      config={buildConfig({ ...storyLocale(ctx.globals) })}
       initialView={D(2026, 6, 1)}
     >
       <CalendarYearsWheel showLabel />
@@ -30,7 +30,11 @@ export const Bounded: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ min: D(2020, 1, 1), max: D(2030, 12, 31) })}
+      config={buildConfig({
+        ...storyLocale(ctx.globals),
+        min: D(2020, 1, 1),
+        max: D(2030, 12, 31),
+      })}
       initialView={D(2026, 6, 1)}
     >
       <CalendarYearsWheel showLabel />
@@ -43,7 +47,7 @@ export const WithReset: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig()}
+      config={buildConfig({ ...storyLocale(ctx.globals) })}
       initialView={D(2020, 6, 1)}
     >
       <CalendarYearsWheel showReset />

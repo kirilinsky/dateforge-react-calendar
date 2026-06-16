@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
 import { buildConfig, D } from "../__tests__/v3/fixtures/builders";
+import { storyLocale } from "../modules-v3/_lab/story-globals";
 import { CalendarDays } from "../modules-v3/days/CalendarDays";
 import { CalendarLunar } from "../modules-v3/lunar/CalendarLunar";
 import {
@@ -56,13 +57,18 @@ type Story = StoryObj;
 function Sample({
   theme,
   scheme,
+  globals,
 }: {
   theme: string | ReturnType<typeof createTheme>;
   scheme: "light" | "dark" | "auto";
+  globals?: Record<string, unknown>;
 }) {
   return (
     <Calendar
-      config={buildConfig({ mode: "range" })}
+      config={buildConfig({
+        ...(globals ? storyLocale(globals) : undefined),
+        mode: "range",
+      })}
       initialView={D(2026, 6, 1)}
       theme={theme}
       scheme={scheme}
@@ -84,7 +90,7 @@ function Sample({
 
 /** One card per family — eyeball the whole set per scheme. */
 export const AllFamilies: Story = {
-  render: () => {
+  render: (_, ctx) => {
     const [scheme, setScheme] = useState<"light" | "dark">("light");
     return (
       <div>
@@ -107,7 +113,7 @@ export const AllFamilies: Story = {
               <figcaption style={{ fontFamily: "monospace", marginBottom: 4 }}>
                 {name}
               </figcaption>
-              <Sample theme={name} scheme={scheme} />
+              <Sample theme={name} scheme={scheme} globals={ctx.globals} />
             </figure>
           ))}
         </div>
@@ -120,7 +126,7 @@ export const AllFamilies: Story = {
  *  tokens are typed <color> properties, so switching theme or scheme must
  *  smoothly repaint, never snap. */
 export const SwitcherCrossfade: Story = {
-  render: () => {
+  render: (_, ctx) => {
     const [theme, setTheme] = useState("noir");
     const [scheme, setScheme] = useState<"light" | "dark" | "auto">("auto");
     return (
@@ -147,7 +153,7 @@ export const SwitcherCrossfade: Story = {
             <option>dark</option>
           </select>
         </div>
-        <Sample theme={theme} scheme={scheme} />
+        <Sample theme={theme} scheme={scheme} globals={ctx.globals} />
       </div>
     );
   },
@@ -164,7 +170,7 @@ const teal = createTheme({
 /** createTheme token object: applied as inline light-dark() vars, follows the
  *  same color-scheme mechanism as built-ins (flip the scheme to verify). */
 export const CustomCreateTheme: Story = {
-  render: () => {
+  render: (_, ctx) => {
     const [scheme, setScheme] = useState<"light" | "dark">("light");
     return (
       <div style={{ maxWidth: 360 }}>
@@ -175,7 +181,7 @@ export const CustomCreateTheme: Story = {
           scheme: {scheme}
         </button>
         <div style={{ marginTop: 12 }}>
-          <Sample theme={teal} scheme={scheme} />
+          <Sample theme={teal} scheme={scheme} globals={ctx.globals} />
         </div>
       </div>
     );
@@ -184,12 +190,12 @@ export const CustomCreateTheme: Story = {
 
 /** Lunar strip under each scheme — verifies module tokens follow the family. */
 export const WithLunar: Story = {
-  render: () => (
+  render: (_, ctx) => (
     <div style={{ display: "grid", gap: 16, maxWidth: 420 }}>
       {(["light", "dark"] as const).map((scheme) => (
         <Calendar
           key={scheme}
-          config={buildConfig({ mode: "single" })}
+          config={buildConfig({ ...storyLocale(ctx.globals), mode: "single" })}
           initialView={D(2026, 6, 1)}
           theme="velvet"
           scheme={scheme}

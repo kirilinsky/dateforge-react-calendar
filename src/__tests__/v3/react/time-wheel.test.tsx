@@ -169,6 +169,71 @@ describe("CalendarTimeWheel", () => {
     expect(hourDrum?.getAttribute("aria-valuemax")).toBe("9");
   });
 
+  it("12h walls: a period flip out of the window clamps to the boundary", async () => {
+    const onTimeSelect = vi.fn();
+    const user = userEvent.setup();
+    const { container } = render(
+      <Calendar
+        config={buildConfig({
+          mode: "single",
+          withTime: true,
+          minTime: { hour: 9, minute: 0, second: 0, ms: 0 },
+          maxTime: { hour: 17, minute: 0, second: 0, ms: 0 },
+        })}
+        initialView={D(2026, 6, 1)}
+        defaultSelection={{
+          shape: "point",
+          dates: [
+            {
+              date: D(2026, 6, 10),
+              time: { hour: 14, minute: 0, second: 0, ms: 0 },
+            },
+          ],
+        }}
+      >
+        <CalendarTimeWheel hour12 onTimeSelect={onTimeSelect} />
+      </Calendar>,
+    );
+    // 14:00 is PM. Flipping to AM would be 02:00 — below the 09:00 floor — so
+    // the commit clamps to 09:00 (the 12h wall, since per-drum walls can't span
+    // the AM/PM split).
+    const sw = container.querySelector("[role=switch]") as HTMLElement;
+    await user.click(sw);
+    expect(onTimeSelect).toHaveBeenLastCalledWith(
+      expect.objectContaining({ hour: 9, minute: 0 }),
+    );
+  });
+
+  it("12h hour drum stays circular under a window (no finite valuemax wall)", () => {
+    const { container } = render(
+      <Calendar
+        config={buildConfig({
+          mode: "single",
+          withTime: true,
+          maxTime: { hour: 17, minute: 0, second: 0, ms: 0 },
+        })}
+        initialView={D(2026, 6, 1)}
+        defaultSelection={{
+          shape: "point",
+          dates: [
+            {
+              date: D(2026, 6, 10),
+              time: { hour: 14, minute: 0, second: 0, ms: 0 },
+            },
+          ],
+        }}
+      >
+        <CalendarTimeWheel hour12 />
+      </Calendar>,
+    );
+    // Circular (clamp-gated) → the drum spans the full 12 hours, not a finite
+    // window track. aria-valuemax is the last drum value (11), not the 17:00 cap.
+    const hourDrum = container.querySelector(
+      "[data-dateforge-time] [role=spinbutton]",
+    );
+    expect(hourDrum?.getAttribute("aria-valuemax")).toBe("11");
+  });
+
   it("bound wheel renders the bound date header", () => {
     const { container } = render(
       <Calendar

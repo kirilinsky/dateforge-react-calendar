@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { buildConfig, D } from "../../__tests__/v3/fixtures/builders";
 import { Calendar } from "../../react-v3/calendar";
-import { storyThemeProps } from "../_lab/story-globals";
+import { storyLocale, storyThemeProps } from "../_lab/story-globals";
 import { CalendarDays } from "../days/CalendarDays";
 import { CalendarSelectedDates } from "../selected-dates/CalendarSelectedDates";
 import { CalendarManualInput } from "./CalendarManualInput";
@@ -18,7 +18,7 @@ export const Default: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "single" })}
+      config={buildConfig({ ...storyLocale(ctx.globals), mode: "single" })}
       initialView={D(2026, 6, 1)}
     >
       <CalendarManualInput />
@@ -31,7 +31,7 @@ export const CustomFormat: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "single" })}
+      config={buildConfig({ ...storyLocale(ctx.globals), mode: "single" })}
       initialView={D(2026, 6, 1)}
     >
       <CalendarManualInput format="MM/DD/YYYY" />
@@ -44,7 +44,11 @@ export const ReadOnly: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "single", readOnly: true })}
+      config={buildConfig({
+        ...storyLocale(ctx.globals),
+        mode: "single",
+        readOnly: true,
+      })}
       initialView={D(2026, 6, 1)}
     >
       <CalendarManualInput />
@@ -59,7 +63,7 @@ export const LabelAndClear: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "single" })}
+      config={buildConfig({ ...storyLocale(ctx.globals), mode: "single" })}
       initialView={D(2026, 6, 1)}
     >
       <CalendarManualInput label="Date" allowClear />
@@ -74,7 +78,7 @@ export const RangeBounds: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "range" })}
+      config={buildConfig({ ...storyLocale(ctx.globals), mode: "range" })}
       initialView={D(2026, 6, 1)}
     >
       <CalendarManualInput bound="from" label="From" />
@@ -90,7 +94,7 @@ export const MultipleRecipe: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "multiple" })}
+      config={buildConfig({ ...storyLocale(ctx.globals), mode: "multiple" })}
       initialView={D(2026, 6, 1)}
     >
       <CalendarManualInput label="Add date" />

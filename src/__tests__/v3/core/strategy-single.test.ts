@@ -138,6 +138,37 @@ describe("time", () => {
     expect(points(r.state)[0].time).toEqual(calendarTime(9, 0));
   });
 
+  it("clamps an out-of-window default time onto a newly picked day", () => {
+    // defaultTime 06:00 is below the 09:00 floor → the picked day commits 09:00,
+    // not an un-nudgeable out-of-window value.
+    const below = config({
+      withTime: true,
+      defaultTime: calendarTime(6, 0),
+      minTime: calendarTime(9, 0),
+      maxTime: calendarTime(17, 0),
+    });
+    expect(
+      points(
+        reduce(start(below), { type: "selectDay", date: D(2026, 6, 5) }, below)
+          .state,
+      )[0].time,
+    ).toEqual(calendarTime(9, 0));
+
+    // 20:00 default above the 17:00 ceiling → clamps down to 17:00.
+    const above = config({
+      withTime: true,
+      defaultTime: calendarTime(20, 0),
+      minTime: calendarTime(9, 0),
+      maxTime: calendarTime(17, 0),
+    });
+    expect(
+      points(
+        reduce(start(above), { type: "selectDay", date: D(2026, 6, 5) }, above)
+          .state,
+      )[0].time,
+    ).toEqual(calendarTime(17, 0));
+  });
+
   it("carries the chosen time onto a newly picked day", () => {
     const cfg = config({ withTime: true });
     let s = reduce(

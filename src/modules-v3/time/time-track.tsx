@@ -1,4 +1,8 @@
-import { type CalendarTime, calendarTime } from "../../core-v3/calendar-time";
+import {
+  type CalendarTime,
+  calendarTime,
+  clampTime,
+} from "../../core-v3/calendar-time";
 import { padTime } from "../../utils/time-utils";
 import { StepDrum } from "./step-drum";
 import styles from "./time-track.module.css";
@@ -34,9 +38,11 @@ export interface TimeTrackProps {
   timePeriodLabel?: string;
   timePickerLabel?: string;
   /**
-   * Physical drum walls (24h mode only — the AM/PM split makes per-drum
-   * min/max ambiguous). Cross-drum: the minute wall applies only while the
-   * hour sits on the wall hour, the second wall only while hour+minute match.
+   * Inclusive time window the drums may not leave. In 24h these become physical
+   * per-drum walls (cross-drum: the minute wall applies only while the hour sits
+   * on the wall hour, the second only while hour+minute match). In 12h — where
+   * the AM/PM split + 12→1 wrap make per-drum min/max non-contiguous — each
+   * commit is instead clamped into `[boundMin, boundMax]` (see `emit`).
    */
   boundMin?: CalendarTime;
   boundMax?: CalendarTime;
@@ -129,7 +135,13 @@ export function TimeTrack({
   ): boolean | undefined => {
     if (readOnly) return false;
     const h24 = hour12 ? (p === "AM" ? h % 12 : (h % 12) + 12) : h;
-    onChange(calendarTime(h24, m, s, value.ms));
+    const candidate = calendarTime(h24, m, s, value.ms);
+    // 12h walls: the AM/PM split + the 12→1 display wrap make the window
+    // non-contiguous in drum-value space (e.g. PM 12,1‥5 → values 11,0‥4), so a
+    // monotonic per-drum min/max can't express it (24h uses those, below).
+    // Instead clamp the whole candidate into the window — out-of-window drags,
+    // steps and period flips land on the boundary and the drum re-snaps there.
+    onChange(hour12 ? clampTime(candidate, boundMin, boundMax) : candidate);
     return undefined;
   };
 

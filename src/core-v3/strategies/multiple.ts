@@ -3,6 +3,7 @@ import { type CalendarDateTime, calendarDateTime } from "../calendar-date-time";
 import { MIDNIGHT } from "../calendar-time";
 import { noChange, type ReduceResult } from "../effects";
 import type { PresetResult } from "../preset-engine";
+import { resolveDefaultTime } from "../state";
 import type { SelectionContext, SelectionStrategy } from "../strategy";
 import { invalid } from "../validation";
 import { commitPoint, rejected, validateDay } from "./shared";
@@ -27,7 +28,7 @@ function indexOfDay(
 }
 
 function timeForNewDay(ctx: SelectionContext) {
-  return ctx.config.withTime ? ctx.config.defaultTime : MIDNIGHT;
+  return ctx.config.withTime ? resolveDefaultTime(ctx.config) : MIDNIGHT;
 }
 
 function selectDay(ctx: SelectionContext, date: CalendarDate): ReduceResult {
@@ -83,8 +84,8 @@ function applyPreset(
   if (preset.kind !== "dates") return noChange(ctx.state);
 
   // Replace with the valid, capped, sorted set of preset days.
-  const { maxDates, withTime, defaultTime } = ctx.config;
-  const time = withTime ? defaultTime : MIDNIGHT;
+  const { maxDates, withTime } = ctx.config;
+  const time = withTime ? resolveDefaultTime(ctx.config) : MIDNIGHT;
   const seen = new Set<number>();
   const picked: CalendarDateTime[] = [];
   for (const d of preset.dates) {

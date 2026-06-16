@@ -10,7 +10,11 @@ import { CalendarMonthsWheel } from "@/modules-v3/months-wheel/CalendarMonthsWhe
 import { CalendarTimeWheel } from "@/modules-v3/time/CalendarTimeWheel";
 import { CalendarYearsWheel } from "@/modules-v3/years-wheel/CalendarYearsWheel";
 import { Calendar as CalendarRoot } from "@/react-v3/calendar";
-import { storyThemeProps, type V3StoryThemeProps } from "../_lab/story-globals";
+import {
+  storyLocale,
+  storyThemeProps,
+  type V3StoryThemeProps,
+} from "../_lab/story-globals";
 import {
   CalendarToolbar,
   CalendarToolbarApply,
@@ -60,16 +64,20 @@ function Frame({
   theme,
   scheme,
   config,
+  globals,
   days = true,
   width = 340,
 }: {
   children: React.ReactNode;
   config?: CalendarConfig;
+  /** Storybook globals — drives the locale of the fallback config. */
+  globals?: Record<string, unknown>;
   days?: boolean;
   /** Fixed widget width — keeps every story looking like a real picker. */
   width?: number;
 } & V3StoryThemeProps) {
-  const resolved = config ?? buildConfig();
+  const resolved =
+    config ?? buildConfig({ ...(globals ? storyLocale(globals) : undefined) });
   return (
     <div style={{ width }}>
       <CalendarRoot
@@ -101,7 +109,7 @@ type Story = StoryObj;
  */
 export const ReadyNav: Story = {
   render: (_, ctx) => (
-    <Frame {...storyThemeProps(ctx.globals)}>
+    <Frame {...storyThemeProps(ctx.globals)} globals={ctx.globals}>
       <CalendarToolbar>
         <CalendarToolbarGroup>
           <CalendarToolbarPrev />
@@ -127,7 +135,7 @@ export const ReadyNav: Story = {
  */
 export const GridCells: Story = {
   render: (_, ctx) => (
-    <Frame {...storyThemeProps(ctx.globals)}>
+    <Frame {...storyThemeProps(ctx.globals)} globals={ctx.globals}>
       <CalendarToolbar cols="auto minmax(0, 1fr) auto">
         <CalendarToolbarPrev />
         <CalendarToolbarLabel />
@@ -143,7 +151,7 @@ export const GridCells: Story = {
  */
 export const MinimalLabel: Story = {
   render: (_, ctx) => (
-    <Frame {...storyThemeProps(ctx.globals)}>
+    <Frame {...storyThemeProps(ctx.globals)} globals={ctx.globals}>
       <CalendarToolbar>
         <CalendarToolbarPrev />
         <CalendarToolbarLabel />
@@ -159,7 +167,7 @@ export const MinimalLabel: Story = {
  */
 export const YearStepAndClear: Story = {
   render: (_, ctx) => (
-    <Frame {...storyThemeProps(ctx.globals)}>
+    <Frame {...storyThemeProps(ctx.globals)} globals={ctx.globals}>
       <CalendarToolbar>
         <CalendarToolbarGroup>
           <CalendarToolbarPrev unit="year" />
@@ -185,7 +193,7 @@ export const DayStepper: Story = {
     <div style={{ width: 340 }}>
       <CalendarRoot
         {...storyThemeProps(ctx.globals)}
-        config={buildConfig()}
+        config={buildConfig({ ...storyLocale(ctx.globals) })}
         initialView={calendarDate(2026, 6, 15)}
         defaultSelection={{
           shape: "point",
@@ -212,7 +220,7 @@ export const FooterClockAndApply: Story = {
   render: (_, ctx) => (
     <Frame
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "range" })}
+      config={buildConfig({ ...storyLocale(ctx.globals), mode: "range" })}
       days={false}
     >
       <CalendarToolbar>
@@ -243,7 +251,7 @@ export const TwoMonthsOffset: Story = {
   render: (_, ctx) => (
     <Frame
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "range" })}
+      config={buildConfig({ ...storyLocale(ctx.globals), mode: "range" })}
       days={false}
       width={620}
     >
@@ -276,11 +284,16 @@ export const MinMaxGated: Story = {
   render: (_, ctx) => {
     const now = today(undefined);
     const config = buildConfig({
+      ...storyLocale(ctx.globals),
       min: addMonths(now, -1),
       max: addMonths(now, 1),
     });
     return (
-      <Frame {...storyThemeProps(ctx.globals)} config={config}>
+      <Frame
+        {...storyThemeProps(ctx.globals)}
+        globals={ctx.globals}
+        config={config}
+      >
         <CalendarToolbar>
           <CalendarToolbarGroup>
             <CalendarToolbarPrev />
@@ -304,7 +317,7 @@ export const MinMaxGated: Story = {
  */
 export const CompactAndLabels: Story = {
   render: (_, ctx) => (
-    <Frame {...storyThemeProps(ctx.globals)} days={false}>
+    <Frame {...storyThemeProps(ctx.globals)} globals={ctx.globals} days={false}>
       <CalendarToolbar>
         <CalendarToolbarGroup>
           <CalendarToolbarMonthTrigger compact />
@@ -334,7 +347,7 @@ export const CompactAndLabels: Story = {
  */
 export const WithThemeToggle: Story = {
   render: (_, ctx) => (
-    <Frame {...storyThemeProps(ctx.globals)}>
+    <Frame {...storyThemeProps(ctx.globals)} globals={ctx.globals}>
       <CalendarToolbar>
         <CalendarToolbarPrev />
         <CalendarToolbarLabel />
@@ -358,7 +371,7 @@ export const WithThemeToggle: Story = {
  */
 export const WheelPickerTriggers: Story = {
   render: (_, ctx) => (
-    <Frame {...storyThemeProps(ctx.globals)}>
+    <Frame {...storyThemeProps(ctx.globals)} globals={ctx.globals}>
       <CalendarToolbar>
         <CalendarToolbarPrev />
         <CalendarToolbarGroup>
@@ -386,7 +399,11 @@ function TimeFrame({
     <div style={{ width: 340 }}>
       <CalendarRoot
         {...storyThemeProps(globals)}
-        config={buildConfig({ withTime: true, hour12 })}
+        config={buildConfig({
+          ...storyLocale(globals),
+          withTime: true,
+          hour12,
+        })}
         initialView={calendarDate(2026, 6, 15)}
         defaultSelection={{
           shape: "point",
@@ -450,7 +467,7 @@ export const BoundSplit: Story = {
     <div style={{ width: 520 }}>
       <CalendarRoot
         {...storyThemeProps(ctx.globals)}
-        config={buildConfig({ mode: "range" })}
+        config={buildConfig({ ...storyLocale(ctx.globals), mode: "range" })}
         initialView={calendarDate(2026, 6, 1)}
         defaultSelection={{
           shape: "span",
