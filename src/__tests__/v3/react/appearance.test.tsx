@@ -116,6 +116,16 @@ describe("appearance system", () => {
     expect(def.style.getPropertyValue("--cal-day-height")).toBe("");
   });
 
+  it("appearances drive the non-color press scale (button/tile active state)", () => {
+    // loft squishes a touch on press; default leaves it to the CSS fallback (1).
+    expect(
+      root(mount(loft).container).style.getPropertyValue("--cal-press-scale"),
+    ).toBe("0.97");
+    expect(
+      root(mount().container).style.getPropertyValue("--cal-press-scale"),
+    ).toBe("");
+  });
+
   it("default (no appearance) sets no control vars — buttons unchanged", () => {
     const { container } = mount();
     const el = root(container);

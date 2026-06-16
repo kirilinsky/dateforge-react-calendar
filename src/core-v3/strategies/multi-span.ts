@@ -11,6 +11,7 @@ import {
 } from "../calendar-range";
 import { noChange, type ReduceResult } from "../effects";
 import type { PresetResult } from "../preset-engine";
+import { resolveDefaultTime } from "../state";
 import type { SelectionContext, SelectionStrategy } from "../strategy";
 import { invalid } from "../validation";
 import {
@@ -37,9 +38,9 @@ import {
  */
 
 function timesFor(ctx: SelectionContext) {
-  return ctx.config.withTime
-    ? { from: ctx.config.defaultTime, to: ctx.config.defaultTime }
-    : undefined;
+  if (!ctx.config.withTime) return undefined;
+  const t = resolveDefaultTime(ctx.config);
+  return { from: t, to: t };
 }
 
 function countRejection(

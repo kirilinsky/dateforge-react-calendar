@@ -18,17 +18,34 @@
     cursor: pointer;
     transition:
       background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
-      color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
+      color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      transform 80ms ease;
   }
 
   .tile:hover:not(:disabled):not([aria-disabled="true"]) {
     background: var(--c-tone, #eef1f7);
   }
 
+  /* Press squish — the appearance-driven, non-color `--cal-press-scale` (shared
+     with UIButton; default 1 = none). */
+  .tile:active:not(:disabled):not([aria-disabled="true"]) {
+    transform: scale(var(--cal-press-scale, 1));
+  }
+
   /* Committed pick. */
   .tile[data-selected] {
     background: var(--c-accent, #1a73e8);
     color: var(--c-activeText, #fff);
+  }
+
+  /* Hover on a SELECTED tile: keep the accent fill + inverted ink, just darken
+     it (the days-cell recipe). The generic hover above is more specific than the
+     bare `[data-selected]`, so without this it would swap the fill to `--c-tone`
+     while the inverted `--c-activeText` text stays — unreadable, especially in
+     dark themes. */
+  .tile[data-selected]:hover:not(:disabled):not([aria-disabled="true"]) {
+    background: var(--c-accent, #1a73e8);
+    filter: brightness(0.93);
   }
 
   /* "Current" (today's month/year): same subtle accent outline language as

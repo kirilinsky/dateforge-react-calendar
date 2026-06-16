@@ -7,6 +7,7 @@ import {
 import { type CalendarTime, MIDNIGHT } from "../calendar-time";
 import { noChange, type ReduceResult } from "../effects";
 import type { PresetResult } from "../preset-engine";
+import { resolveDefaultTime } from "../state";
 import type { SelectionContext, SelectionStrategy } from "../strategy";
 import { commitPoint, rejected, validateDay, validateTime } from "./shared";
 
@@ -19,8 +20,9 @@ import { commitPoint, rejected, validateDay, validateTime } from "./shared";
 
 function timeForNewDay(ctx: SelectionContext, current?: CalendarDateTime) {
   if (!ctx.config.withTime) return MIDNIGHT;
-  // Carry the previously chosen time, else the configured default.
-  return current?.time ?? ctx.config.defaultTime;
+  // Carry the previously chosen time, else the configured default (clamped to
+  // the time window).
+  return current?.time ?? resolveDefaultTime(ctx.config);
 }
 
 function selectDay(ctx: SelectionContext, date: CalendarDate): ReduceResult {

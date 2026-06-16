@@ -20,15 +20,12 @@ import {
   compareDate,
   daysInMonth,
 } from "../../core-v3/calendar-date";
-import {
-  type CalendarTime,
-  MIDNIGHT,
-  timesEqual,
-} from "../../core-v3/calendar-time";
+import { type CalendarTime, timesEqual } from "../../core-v3/calendar-time";
 import {
   type AnyCalendarValue,
   toPublicValue,
 } from "../../core-v3/public-value";
+import { resolveDefaultTime } from "../../core-v3/state";
 import {
   canStepView,
   isMonthFixed,
@@ -1496,25 +1493,21 @@ export function CalendarToolbarTime({
   const ui = useUI();
   const t = useLabels();
   const ref = useRef<HTMLButtonElement>(null);
-  const {
-    locale,
-    hour12 = false,
-    readOnly,
-    defaultTime,
-    ampmLabels,
-  } = store.getConfig();
+  const { locale, hour12 = false, readOnly, ampmLabels } = store.getConfig();
   const { setTime } = useCalendarActions();
   const selection = useStoreSelector(store, (s) => s.selection);
   // In a bound toolbar default to that edge's time; an explicit `to` shows the
   // end time. Falls back to `from` when no bound is in play.
   const effBound = useEffectiveBound(bound);
+  // Seed display from the configured default, clamped into the time window so a
+  // window never shows an out-of-range default before the first edit.
+  const fallbackTime = resolveDefaultTime(store.getConfig());
 
   const value: CalendarTime =
     selection.shape === "span"
       ? ((effBound === "to" ? selection.toTime : selection.fromTime) ??
-        defaultTime ??
-        MIDNIGHT)
-      : (selection.dates.at(-1)?.time ?? defaultTime ?? MIDNIGHT);
+        fallbackTime)
+      : (selection.dates.at(-1)?.time ?? fallbackTime);
   const hasTarget =
     selection.shape === "span"
       ? selection.ranges.length > 0

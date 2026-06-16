@@ -1,7 +1,7 @@
 import type { CalendarDate } from "./calendar-date";
 import type { CalendarDateTime } from "./calendar-date-time";
 import type { CalendarRange } from "./calendar-range";
-import type { CalendarTime } from "./calendar-time";
+import { type CalendarTime, clampTime } from "./calendar-time";
 import type { DateRuleEngine } from "./date-rule-engine";
 import type { SelectionMode, SelectionUnit } from "./selection-types";
 import { EMPTY_VALIDATION_STATE, type ValidationState } from "./validation";
@@ -76,6 +76,18 @@ export type CalendarConfig = {
   exclude: DateRuleEngine;
   excludedEndpointPolicy: "snap-inward" | "reject";
 };
+
+/**
+ * The default time to apply to a freshly picked day, clamped into the
+ * `[minTime, maxTime]` window. A `defaultTime` outside the window would commit
+ * an out-of-window value (then sit there un-nudgeable, since `setTime` walls at
+ * the window) and seed the time modules' display out of range — so every
+ * consumer resolves through here. Returns `config.defaultTime` unchanged when
+ * it already fits (or no window is set).
+ */
+export function resolveDefaultTime(config: CalendarConfig): CalendarTime {
+  return clampTime(config.defaultTime, config.minTime, config.maxTime);
+}
 
 /**
  * Selection storage collapses the unit × mode matrix into two shapes:

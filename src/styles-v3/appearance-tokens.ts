@@ -43,6 +43,13 @@ export type AppearanceTokens = {
   controlBorder: string;
   /** UIButton / UITile font-weight. */
   controlWeight: string;
+  /**
+   * Press feedback: the scale a button/tile shrinks to while `:active`
+   * (pressed), e.g. `"0.95"` (a tactile squish) or `"1"` (none). Non-color —
+   * shape/motion only. The pressed background is theme-driven and always on; an
+   * appearance varies how much it squishes. Mirrors v2's `--cal-press-scale`.
+   */
+  pressScale: string;
   /** UITile padding (months/years/preset cells, popup picker tiles). */
   tilePadding: string;
   opacityDisabled: string;
@@ -75,6 +82,7 @@ export const APPEARANCE_TOKEN_TO_VAR: Record<keyof AppearanceTokens, string> = {
   controlPadding: "--cal-control-padding",
   controlBorder: "--cal-control-border",
   controlWeight: "--cal-control-weight",
+  pressScale: "--cal-press-scale",
   tilePadding: "--cal-tile-padding",
   opacityDisabled: "--cal-opacity-disabled",
   opacityMuted: "--cal-opacity-muted",

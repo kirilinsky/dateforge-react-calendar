@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { buildConfig, D } from "../../__tests__/v3/fixtures/builders";
 import type { CalendarDate } from "../../core-v3/calendar-date";
 import { Calendar } from "../../react-v3/calendar";
-import { storyThemeProps } from "../_lab/story-globals";
+import { storyLocale, storyThemeProps } from "../_lab/story-globals";
 import { CalendarDays, type DayRenderState } from "./CalendarDays";
 
 const meta: Meta = {
@@ -17,7 +17,7 @@ export const Default: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "range" })}
+      config={buildConfig({ ...storyLocale(ctx.globals), mode: "range" })}
       initialView={D(2026, 6, 1)}
     >
       <CalendarDays />
@@ -31,13 +31,13 @@ export const TodayMarkers: Story = {
     <div style={{ display: "grid", gap: 16 }}>
       <Calendar
         {...storyThemeProps(ctx.globals)}
-        config={buildConfig({ mode: "single" })}
+        config={buildConfig({ ...storyLocale(ctx.globals), mode: "single" })}
       >
         <CalendarDays highlightToday={false} />
       </Calendar>
       <Calendar
         {...storyThemeProps(ctx.globals)}
-        config={buildConfig({ mode: "single" })}
+        config={buildConfig({ ...storyLocale(ctx.globals), mode: "single" })}
       >
         <CalendarDays todayDot={false} />
       </Calendar>
@@ -49,7 +49,7 @@ export const WeekNumbersAndBoldWeekends: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "single" })}
+      config={buildConfig({ ...storyLocale(ctx.globals), mode: "single" })}
       initialView={D(2026, 6, 1)}
     >
       <CalendarDays weekNumbers boldWeekends weekdayFormat="narrow" />
@@ -70,28 +70,32 @@ export const WeekendStyling: Story = {
     <div style={{ display: "grid", gap: 16 }}>
       <Calendar
         {...storyThemeProps(ctx.globals)}
-        config={buildConfig({ mode: "single" })}
+        config={buildConfig({ ...storyLocale(ctx.globals), mode: "single" })}
         initialView={D(2026, 6, 1)}
       >
         <CalendarDays />
       </Calendar>
       <Calendar
         {...storyThemeProps(ctx.globals)}
-        config={buildConfig({ mode: "single" })}
+        config={buildConfig({ ...storyLocale(ctx.globals), mode: "single" })}
         initialView={D(2026, 6, 1)}
       >
         <CalendarDays highlightWeekends />
       </Calendar>
       <Calendar
         {...storyThemeProps(ctx.globals)}
-        config={buildConfig({ mode: "single", weekendDays: [5, 6] })}
+        config={buildConfig({
+          ...storyLocale(ctx.globals),
+          mode: "single",
+          weekendDays: [5, 6],
+        })}
         initialView={D(2026, 6, 1)}
       >
         <CalendarDays highlightWeekends />
       </Calendar>
       <Calendar
         {...storyThemeProps(ctx.globals)}
-        config={buildConfig({ mode: "single" })}
+        config={buildConfig({ ...storyLocale(ctx.globals), mode: "single" })}
         initialView={D(2026, 6, 1)}
       >
         <CalendarDays weekendHeaders={false} />
@@ -104,7 +108,7 @@ export const CompactNoOutside: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "single" })}
+      config={buildConfig({ ...storyLocale(ctx.globals), mode: "single" })}
       initialView={D(2026, 6, 1)}
     >
       <CalendarDays
@@ -123,7 +127,7 @@ export const TwoMonths: Story = {
     <div style={{ width: 560 }}>
       <Calendar
         {...storyThemeProps(ctx.globals)}
-        config={buildConfig({ mode: "range" })}
+        config={buildConfig({ ...storyLocale(ctx.globals), mode: "range" })}
         initialView={D(2026, 6, 1)}
       >
         <div
@@ -154,7 +158,7 @@ export const RenderDayPrices: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "range" })}
+      config={buildConfig({ ...storyLocale(ctx.globals), mode: "range" })}
       initialView={D(2026, 6, 1)}
     >
       <CalendarDays renderDay={priceDay} />

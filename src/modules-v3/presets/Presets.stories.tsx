@@ -9,7 +9,7 @@ import {
   presetToday,
 } from "../../core-v3/preset-engine";
 import { Calendar } from "../../react-v3/calendar";
-import { storyThemeProps } from "../_lab/story-globals";
+import { storyLocale, storyThemeProps } from "../_lab/story-globals";
 import { CalendarDays } from "../days/CalendarDays";
 import { CalendarPresets } from "./CalendarPresets";
 
@@ -28,7 +28,7 @@ export const SingleMode: Story = {
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         <Calendar
           {...storyThemeProps(ctx.globals)}
-          config={buildConfig({ mode: "single" })}
+          config={buildConfig({ ...storyLocale(ctx.globals), mode: "single" })}
           initialView={D(2026, 6, 1)}
           onChange={(v) => setValue(v)}
         >
@@ -50,7 +50,7 @@ export const RangeMode: Story = {
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         <Calendar
           {...storyThemeProps(ctx.globals)}
-          config={buildConfig({ mode: "range" })}
+          config={buildConfig({ ...storyLocale(ctx.globals), mode: "range" })}
           initialView={D(2026, 6, 1)}
           onChange={(v) => setValue(v)}
         >
@@ -70,7 +70,7 @@ export const AllCommonPresets: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "single" })}
+      config={buildConfig({ ...storyLocale(ctx.globals), mode: "single" })}
       initialView={D(2026, 6, 1)}
     >
       <CalendarDays />
@@ -84,7 +84,7 @@ export const MixedCompatibility: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "single" })}
+      config={buildConfig({ ...storyLocale(ctx.globals), mode: "single" })}
       initialView={D(2026, 6, 1)}
     >
       <CalendarDays />
@@ -99,7 +99,11 @@ export const ReadOnly: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}
-      config={buildConfig({ mode: "single", readOnly: true })}
+      config={buildConfig({
+        ...storyLocale(ctx.globals),
+        mode: "single",
+        readOnly: true,
+      })}
       initialView={D(2026, 6, 1)}
     >
       <CalendarDays />

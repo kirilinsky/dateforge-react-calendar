@@ -3,9 +3,9 @@ import {
   type CalendarTime,
   earlierTime,
   laterTime,
-  MIDNIGHT,
   timesEqual,
 } from "../../core-v3/calendar-time";
+import { resolveDefaultTime } from "../../core-v3/state";
 import { toCalendarDateTime } from "../../core-v3/timezone-boundary";
 import { useToday } from "../../hooks/use-today";
 import { useLabels } from "../../react-v3/labels-context";
@@ -98,14 +98,16 @@ export function CalendarTimeWheel({
   const selection = useStoreSelector(store, (s) => s.selection);
 
   // Resolve the time this wheel edits. Staged → the draft; otherwise span bounds
-  // read from/to, point reads the single date's time; both fall back to default.
+  // read from/to, point reads the single date's time; both fall back to the
+  // default time clamped into the [minTime, maxTime] window.
+  const fallbackTime = resolveDefaultTime(config);
   const value: CalendarTime = (() => {
     if (draft) return draft.time;
     if (selection.shape === "span") {
       const bt = bound === "to" ? selection.toTime : selection.fromTime;
-      return bt ?? config.defaultTime ?? MIDNIGHT;
+      return bt ?? fallbackTime;
     }
-    return selection.dates[0]?.time ?? config.defaultTime ?? MIDNIGHT;
+    return selection.dates[0]?.time ?? fallbackTime;
   })();
 
   // Range bounds are finite (non-circular); a point wheel spins freely.
@@ -235,7 +237,10 @@ export function CalendarTimeWheel({
         showSeconds={seconds}
         readOnly={readOnly}
         step={step}
-        circular={!isBound && !hasWindow}
+        // 24h gates via finite per-drum walls (needs a non-circular drum). 12h
+        // can't (the AM/PM + 12→1 wrap breaks contiguity) so it stays circular
+        // and TimeTrack clamps each commit into the window instead.
+        circular={hour12 || (!isBound && !hasWindow)}
         ampmLabels={config.ampmLabels}
         snapKey={snapKey}
         labels={labels}

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { buildConfig, D, span } from "../../__tests__/v3/fixtures/builders";
 import { CalendarDays } from "../../modules-v3/days/CalendarDays";
 import { Calendar } from "../../react-v3/calendar";
-import { storyThemeProps } from "../_lab/story-globals";
+import { storyLocale, storyThemeProps } from "../_lab/story-globals";
 import { CalendarMonthsTrack } from "../months-track/CalendarMonthsTrack";
 import { CalendarYearsTrack } from "../years-track/CalendarYearsTrack";
 import { CalendarDaysTrack } from "./CalendarDaysTrack";
@@ -26,7 +26,7 @@ export const All: Story = {
     <div style={{ width: 320 }}>
       <Calendar
         {...storyThemeProps(ctx.globals)}
-        config={buildConfig({ mode: "single" })}
+        config={buildConfig({ ...storyLocale(ctx.globals), mode: "single" })}
         initialView={D(2026, 6, 15)}
       >
         <CalendarMonthsTrack showYearLabel />
@@ -43,7 +43,7 @@ export const DayPicker: Story = {
     <div style={{ width: 320 }}>
       <Calendar
         {...storyThemeProps(ctx.globals)}
-        config={buildConfig({ mode: "single" })}
+        config={buildConfig({ ...storyLocale(ctx.globals), mode: "single" })}
         initialView={D(2026, 6, 15)}
       >
         <CalendarDaysTrack showMonthLabel />
@@ -59,6 +59,7 @@ export const LongMonthsClamped: Story = {
       <Calendar
         {...storyThemeProps(ctx.globals)}
         config={buildConfig({
+          ...storyLocale(ctx.globals),
           mode: "single",
           min: D(2026, 3, 1),
           max: D(2026, 9, 30),
@@ -82,7 +83,7 @@ export const BoundRange: Story = {
     <div style={{ width: 320, display: "grid", gap: 6 }}>
       <Calendar
         {...storyThemeProps(ctx.globals)}
-        config={buildConfig({ mode: "range" })}
+        config={buildConfig({ ...storyLocale(ctx.globals), mode: "range" })}
         initialView={D(2026, 6, 1)}
         defaultSelection={span([[D(2026, 3, 10), D(2026, 6, 20)]])}
       >

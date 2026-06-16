@@ -28,11 +28,27 @@
     cursor: pointer;
     transition:
       background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
-      color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
+      color var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear),
+      transform 80ms ease;
   }
 
   .button:hover:not(:disabled) {
     background: var(--c-tone, #eef1f7);
+  }
+
+  /* Active state: pressed (`:active`) or an open trigger (`aria-expanded`) read
+     as "active" with a filled background — the v3 default had none, so an
+     open/pressed button looked idle. Both are transient. (A persistent toggle
+     state like the theme switch's `aria-pressed` is left to the module, to avoid
+     a stuck-filled look.) The fill is theme-driven; the press SQUISH is the
+     appearance-driven, NON-color `--cal-press-scale` (default 1; v2 ~0.95). */
+  .button:active:not(:disabled),
+  .button[aria-expanded="true"]:not(:disabled) {
+    background: var(--c-tone, #eef1f7);
+  }
+
+  .button:active:not(:disabled) {
+    transform: scale(var(--cal-press-scale, 1));
   }
 
   .button:disabled {
