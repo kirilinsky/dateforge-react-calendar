@@ -49,6 +49,20 @@ export type CalendarConfig = {
   hour12?: boolean;
   /** Time applied to a freshly picked day when `withTime` (default time). */
   defaultTime: CalendarTime;
+  /**
+   * Earliest selectable time-of-day when `withTime`. An inclusive wall-clock
+   * floor applied to EVERY day's time (it is not a date-time, so it gates the
+   * time independent of which day is picked). A `setTime` below it is rejected
+   * (`time-before-min`); the time modules also gate their steppers/drums to it.
+   */
+  minTime?: CalendarTime;
+  /** Latest selectable time-of-day when `withTime` (inclusive). See {@link minTime}. */
+  maxTime?: CalendarTime;
+  /**
+   * Localized AM/PM labels for `hour12` surfaces (toolbar time, wheels). Default
+   * `{ am: "AM", pm: "PM" }`. Root-level so every time module reads the same.
+   */
+  ampmLabels?: { am: string; pm: string };
   min?: CalendarDate;
   max?: CalendarDate;
   /** Min/max span length, expressed in `unit`s (range/multi-range). */

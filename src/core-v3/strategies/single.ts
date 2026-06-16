@@ -4,12 +4,11 @@ import {
   calendarDateTime,
   withTime,
 } from "../calendar-date-time";
-import { type CalendarTime, isValidTime, MIDNIGHT } from "../calendar-time";
+import { type CalendarTime, MIDNIGHT } from "../calendar-time";
 import { noChange, type ReduceResult } from "../effects";
 import type { PresetResult } from "../preset-engine";
 import type { SelectionContext, SelectionStrategy } from "../strategy";
-import { invalid } from "../validation";
-import { commitPoint, rejected, validateDay } from "./shared";
+import { commitPoint, rejected, validateDay, validateTime } from "./shared";
 
 /**
  * Single-date selection. Exactly one day is held (point shape). Clicking a new
@@ -51,8 +50,8 @@ function setTime(ctx: SelectionContext, time: CalendarTime): ReduceResult {
   if (!ctx.config.withTime || sel.shape !== "point" || !sel.dates[0]) {
     return noChange(ctx.state);
   }
-  if (!isValidTime(time))
-    return rejected(ctx.state, invalid("malformed-input"));
+  const timeInvalid = validateTime(time, ctx.config);
+  if (timeInvalid) return rejected(ctx.state, timeInvalid);
   return commitPoint(ctx.state, [withTime(sel.dates[0], time)]);
 }
 

@@ -298,6 +298,36 @@ describe("range time", () => {
     );
   });
 
+  it("rejects a bound time outside the [minTime, maxTime] window", () => {
+    const cfg = config("day", "range", {
+      withTime: true,
+      minTime: { ...MIDNIGHT, hour: 9 },
+      maxTime: { ...MIDNIGHT, hour: 17 },
+    });
+    let s = reduce(
+      start(cfg),
+      { type: "selectDay", date: D(2026, 6, 5) },
+      cfg,
+    ).state;
+    s = reduce(s, { type: "selectDay", date: D(2026, 6, 9) }, cfg).state;
+    const before = reduce(
+      s,
+      { type: "setTime", time: { ...MIDNIGHT, hour: 8 }, bound: "from" },
+      cfg,
+    );
+    expect(before.state).toBe(s);
+    expect(
+      (before.effects[0] as { result: { reason: string } }).result.reason,
+    ).toBe("time-before-min");
+    // Interior bound time commits.
+    const ok = reduce(
+      s,
+      { type: "setTime", time: { ...MIDNIGHT, hour: 12 }, bound: "from" },
+      cfg,
+    );
+    expect(ok.state).not.toBe(s);
+  });
+
   it("same-day range rejects from-time after to-time", () => {
     const cfg = config("day", "range", { withTime: true });
     // Same-day range: 2026-06-05 .. 2026-06-05.

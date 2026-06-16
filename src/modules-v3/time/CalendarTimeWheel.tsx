@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import {
   type CalendarTime,
+  earlierTime,
+  laterTime,
   MIDNIGHT,
   timesEqual,
 } from "../../core-v3/calendar-time";
@@ -123,8 +125,8 @@ export function CalendarTimeWheel({
   // Physical drum walls for a same-day range: the from-wheel cannot pass the
   // to-time and vice versa. Mirrors the strategy's `time-out-of-order` check
   // so the drum hits a wall instead of snapping back after a rejection.
-  let boundMin: CalendarTime | undefined;
-  let boundMax: CalendarTime | undefined;
+  let sameDayMin: CalendarTime | undefined;
+  let sameDayMax: CalendarTime | undefined;
   if (isBound && selection.shape === "span" && selection.ranges.length > 0) {
     const first = selection.ranges[0].start;
     const last = selection.ranges[selection.ranges.length - 1].end;
@@ -133,10 +135,20 @@ export function CalendarTimeWheel({
       first.month === last.month &&
       first.day === last.day;
     if (sameDay) {
-      if (bound === "from") boundMax = selection.toTime;
-      else boundMin = selection.fromTime;
+      if (bound === "from") sameDayMax = selection.toTime;
+      else sameDayMin = selection.fromTime;
     }
   }
+
+  // Fold the config `[minTime, maxTime]` window into the walls (the tighter of
+  // the two on each side). The window gates EVERY wheel — point or bound — so a
+  // point wheel under a window also turns finite. The core validates regardless;
+  // walls are the affordance so the drum stops at the bound instead of spinning
+  // past and snapping back. (24h only — TimeTrack drops walls in 12h.)
+  const boundMin = laterTime(config.minTime, sameDayMin);
+  const boundMax = earlierTime(config.maxTime, sameDayMax);
+  const hasWindow =
+    config.minTime !== undefined || config.maxTime !== undefined;
 
   // Bound date header: the wall-clock date of the edited boundary.
   const boundHeaderDate =
@@ -223,7 +235,8 @@ export function CalendarTimeWheel({
         showSeconds={seconds}
         readOnly={readOnly}
         step={step}
-        circular={!isBound}
+        circular={!isBound && !hasWindow}
+        ampmLabels={config.ampmLabels}
         snapKey={snapKey}
         labels={labels}
         hoursLabel={t("hours", undefined, hoursLabel)}

@@ -27,6 +27,8 @@ export type ValidationReason =
   | "malformed-input"
   | "ambiguous-time"
   | "nonexistent-time"
+  | "time-before-min"
+  | "time-after-max"
   | "time-out-of-order"
   | "range-out-of-order"
   | "empty-after-exclude"

@@ -172,6 +172,47 @@ describe("time", () => {
       "malformed-input",
     );
   });
+
+  it("rejects a time outside the [minTime, maxTime] window", () => {
+    const cfg = config({
+      withTime: true,
+      minTime: calendarTime(9, 0),
+      maxTime: calendarTime(17, 0),
+    });
+    const s = reduce(
+      start(cfg),
+      { type: "selectDay", date: D(2026, 6, 5) },
+      cfg,
+    ).state;
+    const reason = (r: ReturnType<typeof reduce>) =>
+      (r.effects[0] as { result: { reason: string } }).result.reason;
+
+    const tooEarly = reduce(
+      s,
+      { type: "setTime", time: calendarTime(8, 30) },
+      cfg,
+    );
+    expect(tooEarly.state).toBe(s);
+    expect(reason(tooEarly)).toBe("time-before-min");
+
+    const tooLate = reduce(
+      s,
+      { type: "setTime", time: calendarTime(17, 1) },
+      cfg,
+    );
+    expect(tooLate.state).toBe(s);
+    expect(reason(tooLate)).toBe("time-after-max");
+
+    // Inclusive bounds + an interior time commit.
+    expect(
+      reduce(s, { type: "setTime", time: calendarTime(9, 0) }, cfg).state,
+    ).not.toBe(s);
+    expect(
+      reduce(s, { type: "setTime", time: calendarTime(17, 0) }, cfg).state,
+    ).not.toBe(s);
+    const ok = reduce(s, { type: "setTime", time: calendarTime(12, 0) }, cfg);
+    expect(points(ok.state)[0].time).toEqual(calendarTime(12, 0));
+  });
 });
 
 describe("clear / preset", () => {
