@@ -418,9 +418,9 @@
     "react-dom": "^18.0.0 || ^19.0.0"
   },
   "devDependencies": {
-    "@arethetypeswrong/cli": "0.18.2",
-    "@biomejs/biome": "2.4.15",
-    "@changesets/changelog-github": "0.6.0",
+    "@arethetypeswrong/cli": "0.18.3",
+    "@biomejs/biome": "2.5.0",
+    "@changesets/changelog-github": "0.7.0",
     "@changesets/cli": "2.31.0",
     "@chromatic-com/storybook": "^5.1.2",
     "@codecov/rollup-plugin": "^2.0.1",
@@ -435,7 +435,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
-    "@tsdown/css": "^0.21.4",
+    "@tsdown/css": "^0.22.3",
     "@types/jest-axe": "^3.5.9",
     "@types/node": "^25.9.0",
     "@types/react": "^19.2.14",
@@ -454,7 +454,7 @@
     "react-dom": "^19",
     "size-limit": "12.1.0",
     "storybook": "^10.4.0",
-    "tsdown": "^0.21.4",
+    "tsdown": "^0.22.3",
     "tsx": "^4.22.2",
     "typescript": "^5.9.3",
     "vitest": "^4.1.6"
