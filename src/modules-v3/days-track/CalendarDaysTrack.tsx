@@ -1,6 +1,12 @@
 import { useMemo } from "react";
 import { boundDateOf } from "../../core-v3/bound";
-import { calendarDate, daysInMonth } from "../../core-v3/calendar-date";
+import {
+  type CalendarDate,
+  calendarDate,
+  datesEqual,
+  daysInMonth,
+} from "../../core-v3/calendar-date";
+import { CheckIcon, ClearIcon } from "../../react-v3/icons";
 import { useLabels } from "../../react-v3/labels-context";
 import { useCalendarActions, useCalendarStore } from "../../react-v3/provider";
 import { useStoreSelector } from "../../react-v3/use-store-selector";
@@ -55,8 +61,11 @@ export function CalendarDaysTrack({
   const days = daysInMonth(year, month);
 
   // Start on the bound's day, the selected day in this month, else the view day.
+  // NOT in multiselect: there the track is a cursor, so following the (changing)
+  // first-selected day would make it JUMP every time you toggle a day — let it
+  // stay where the user scrolled (the view, which `onChange` keeps in sync).
   const selectedDay =
-    !boundDate && selection.shape === "point"
+    !boundDate && selection.shape === "point" && config.mode !== "multiple"
       ? selection.dates.find(
           (d) => d.date.year === year && d.date.month === month,
         )?.date.day
@@ -65,8 +74,21 @@ export function CalendarDaysTrack({
 
   const inMonth = (d?: { year: number; month: number }) =>
     !!d && d.year === year && d.month === month;
-  const minIndex = inMonth(config.min) ? config.min!.day - 1 : undefined;
-  const maxIndex = inMonth(config.max) ? config.max!.day - 1 : undefined;
+  let minIndex = inMonth(config.min) ? config.min!.day - 1 : undefined;
+  let maxIndex = inMonth(config.max) ? config.max!.day - 1 : undefined;
+
+  // Drum walls for bound mode: the OPPOSITE bound walls this track within the
+  // same month, so the from-day can't scroll past the to-day (and vice versa).
+  // The physical wall replaces a scroll-past-then-reject-then-snap-back — the
+  // core still owns ordering, this is just the affordance (cf. the TimeWheel).
+  const oppositeBound = boundDate
+    ? boundDateOf(selection, bound === "from" ? "to" : "from")
+    : undefined;
+  if (oppositeBound && inMonth(oppositeBound)) {
+    const wall = oppositeBound.day - 1;
+    if (bound === "from") maxIndex = Math.min(maxIndex ?? days - 1, wall);
+    else if (bound === "to") minIndex = Math.max(minIndex ?? 0, wall);
+  }
   const minIdx = minIndex ?? 0;
   const maxIdx = maxIndex ?? days - 1;
 
@@ -90,6 +112,13 @@ export function CalendarDaysTrack({
   );
 
   const isSingle = selection.shape === "point" && config.mode === "single";
+  // Multiselect (multiple mode): the track only MOVES the cursor; a confirm
+  // overlay on the centred day toggles it into the selection — auto-committing
+  // each landed day while scrolling would carpet the month.
+  const isMulti = selection.shape === "point" && config.mode === "multiple";
+  const pointDates = selection.shape === "point" ? selection.dates : [];
+  const isSelectedDay = (d: CalendarDate) =>
+    pointDates.some((p) => datesEqual(p.date, d));
 
   return (
     <VirtualTrack
@@ -130,6 +159,33 @@ export function CalendarDaysTrack({
         ) : (
           idx + 1
         )
+      }
+      renderOverlay={
+        isMulti
+          ? ({ activeIndex }) => {
+              const date = calendarDate(year, month, activeIndex + 1);
+              const selected = isSelectedDay(date);
+              return (
+                <button
+                  type="button"
+                  data-track-confirm=""
+                  data-selected={selected ? "" : undefined}
+                  className={track.confirm}
+                  disabled={config.readOnly}
+                  aria-label={t(
+                    selected ? "removeSelectedDate" : "saveSelectedDate",
+                  )}
+                  // Don't let the press start a track drag.
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onClick={() => {
+                    if (!config.readOnly) selectDay(date);
+                  }}
+                >
+                  {selected ? <ClearIcon /> : <CheckIcon />}
+                </button>
+              );
+            }
+          : undefined
       }
     />
   );

@@ -82,6 +82,53 @@ describe("Calendar tracks", () => {
     expect(sb?.getAttribute("data-scheme")).toBe("dark");
   });
 
+  it("single mode: days track has no confirm overlay", () => {
+    const { container } = setup(<CalendarDaysTrack />);
+    expect(container.querySelector("[data-track-confirm]")).toBeNull();
+  });
+
+  it("multiselect: confirm overlay toggles the centred day in/out", () => {
+    const { container } = render(
+      <Calendar
+        config={buildConfig({ mode: "multiple" })}
+        initialView={D(2026, 6, 15)}
+      >
+        <CalendarDaysTrack />
+      </Calendar>,
+    );
+    const btn = () =>
+      container.querySelector("[data-track-confirm]") as HTMLElement;
+    // Centred day (June 15) not yet selected → "save" affordance.
+    expect(btn()).toBeTruthy();
+    expect(btn().getAttribute("aria-label")).toMatch(/save/i);
+    expect(btn().getAttribute("data-selected")).toBeNull();
+    // Confirm adds it → flips to the "remove" affordance.
+    fireEvent.click(btn());
+    expect(btn().getAttribute("aria-label")).toMatch(/remove/i);
+    expect(btn().getAttribute("data-selected")).toBe("");
+    // Confirm again removes it.
+    fireEvent.click(btn());
+    expect(btn().getAttribute("aria-label")).toMatch(/save/i);
+  });
+
+  it("bound drum-wall: the from-track stops at the to-day in the same month", () => {
+    const { container } = render(
+      <Calendar
+        config={buildConfig({ mode: "range" })}
+        initialView={D(2026, 6, 1)}
+        defaultSelection={{
+          shape: "span",
+          ranges: [{ start: D(2026, 6, 10), end: D(2026, 6, 20) }],
+        }}
+      >
+        <CalendarDaysTrack bound="from" />
+      </Calendar>,
+    );
+    const sb = trackEl(container, "days-track");
+    // From-day can't pass the to-day (20) within June → walled at 20.
+    expect(sb?.getAttribute("aria-valuemax")).toBe("20");
+  });
+
   it("RTL marks the strip (native direction mirrors it; no transform)", () => {
     document.documentElement.setAttribute("dir", "rtl");
     try {
