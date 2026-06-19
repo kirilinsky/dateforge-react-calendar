@@ -1,4 +1,10 @@
-import { type CSSProperties, type ReactNode, useRef } from "react";
+import {
+  type CSSProperties,
+  type ReactNode,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { useItemSize } from "../hooks/use-item-size";
 import { useTrack } from "../hooks/use-track";
 import { getGridSlotStyle } from "../utils/get-grid-slot-style";
@@ -60,14 +66,19 @@ const cx = (...parts: (string | undefined)[]) =>
   parts.filter(Boolean).join(" ");
 
 // Depth-of-field: items further from the centre fade, shrink, tilt and drop —
-// the v2 "carousel" feel. Pure function of signed distance from centre.
-function getTrackItemStyle(signedDistance: number): TrackItemStyle {
+// the v2 "carousel" feel. Pure function of signed distance from centre. `rtl`
+// flips the tilt direction so the mirrored (row-reversed) strip leans the right
+// way (the fade/scale/drop are symmetric and need no flip).
+function getTrackItemStyle(
+  signedDistance: number,
+  rtl: boolean,
+): TrackItemStyle {
   const distance = Math.abs(signedDistance);
   const activeMix = Math.max(0, Math.min(1, 1 - distance * 0.85));
   const opacity = Math.max(0.22, 1 - distance * 0.2);
   const scale = Math.max(0.68, 1 - distance * 0.075);
   const y = Math.min(distance * 0.1, 0.24);
-  const tilt = Math.max(-18, Math.min(18, signedDistance * -7));
+  const tilt = Math.max(-18, Math.min(18, signedDistance * (rtl ? 7 : -7)));
   return {
     "--track-item-active": `${Math.round(activeMix * 100)}%`,
     "--track-item-opacity": opacity,
@@ -105,6 +116,34 @@ export function VirtualTrack({
   const containerRef = useRef<HTMLDivElement>(null);
   const itemWidth = useItemSize(containerRef, "width", initialItemWidth);
 
+  // RTL: the months run right-to-left. The spatial mirroring is FREE — the
+  // inherited `direction: rtl` already reverses the flex row on the strip (do
+  // NOT add `flex-direction: row-reverse`; it cancels that back to LTR). All the
+  // JS does on top is fix the two PHYSICAL pieces the cascade can't flip: the
+  // strip's `translateX` drag-centring shift (negated fractional term) and the
+  // item `rotateY` tilt sign. The swipe physics are untouched, so the
+  // gesture→month mapping matches LTR (drag left = next month). Detect via the
+  // `dir` ATTRIBUTE of the nearest ancestor (works in tests, unlike computed
+  // `direction`); a MutationObserver on <html> catches a dir flip that lands
+  // AFTER mount — the Storybook toolbar sets `html[dir]` in an effect that runs
+  // after this one (effects fire child-first), so a one-shot read would miss it.
+  const [rtl, setRtl] = useState(false);
+  useLayoutEffect(() => {
+    const read = () => {
+      const dir =
+        containerRef.current?.closest("[dir]")?.getAttribute("dir") ??
+        document.documentElement.getAttribute("dir");
+      setRtl(dir === "rtl");
+    };
+    read();
+    const obs = new MutationObserver(read);
+    obs.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["dir"],
+    });
+    return () => obs.disconnect();
+  }, []);
+
   const offsets = Array.from({ length: half * 2 + 1 }, (_, i) => i - half);
 
   const {
@@ -131,8 +170,12 @@ export function VirtualTrack({
 
   const containerWidth = ref.current?.offsetWidth ?? 0;
   const frac = position - Math.round(position);
+  // RTL row-reverses the strip (next on the left), so the centring shift during
+  // a drag runs the opposite way — negate the fractional term.
   const stripOffset =
-    containerWidth / 2 - (half + frac) * itemWidth - itemWidth / 2;
+    containerWidth / 2 -
+    (half + (rtl ? -frac : frac)) * itemWidth -
+    itemWidth / 2;
 
   const round = Math.round(position);
   const activeIndex = circular
@@ -186,6 +229,7 @@ export function VirtualTrack({
       {renderOverlay?.({ activeIndex })}
       <div
         className={styles.strip}
+        data-rtl={rtl ? "" : undefined}
         style={{ transform: `translateX(${stripOffset}px)` }}
       >
         {offsets.map((o) => {
@@ -204,7 +248,7 @@ export function VirtualTrack({
                 itemClassName,
                 isActive ? styles.active : undefined,
               )}
-              style={getTrackItemStyle(signedDistance)}
+              style={getTrackItemStyle(signedDistance, rtl)}
               aria-hidden={!isActive}
               onClick={!isActive ? () => scrollTo(round + o) : undefined}
             >

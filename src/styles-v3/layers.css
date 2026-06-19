@@ -115,6 +115,15 @@
     cursor: default;
   }
 
+  /* RTL: mirror direction-bearing glyphs (the horizontal prev/next/pager
+     chevrons, marked `data-flip-rtl`). `dir="rtl"` may sit on <html>, the root,
+     or a portalled popup's ancestor — the descendant selector catches all,
+     including pickers mounted on document.body. Other icons (clock, home, check)
+     are direction-neutral and stay put. */
+  [dir="rtl"] [data-flip-rtl] {
+    transform: scaleX(-1);
+  }
+
   /* Themed focus ring everywhere by default (UA outline is not themable).
      Lives in cal-base, so any module rule in cal-modules can override it. */
   [data-dateforge-root] :focus-visible,

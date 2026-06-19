@@ -179,6 +179,23 @@ describe("Toolbar primitives", () => {
     ).toBeTruthy();
   });
 
+  it("prev/next chevrons carry data-flip-rtl (mirrored under dir=rtl)", () => {
+    const { getByLabelText } = setup(
+      <>
+        <CalendarToolbarPrev />
+        <CalendarToolbarNext />
+      </>,
+    );
+    // Direction-bearing glyphs opt into the cal-base RTL mirror; the home/clock/
+    // check icons (direction-neutral) do not.
+    expect(
+      getByLabelText("Previous month").querySelector("svg[data-flip-rtl]"),
+    ).toBeTruthy();
+    expect(
+      getByLabelText("Next month").querySelector("svg[data-flip-rtl]"),
+    ).toBeTruthy();
+  });
+
   it("cols: number → equal tracks; string → raw grid-template (data-cols)", () => {
     const { getByRole, rerender } = setup(
       <CalendarToolbar cols={3}>
