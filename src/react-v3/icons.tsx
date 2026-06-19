@@ -7,7 +7,17 @@ import type { ReactNode } from "react";
  * `aria-hidden`, never focusable; the OWNING control carries the aria-label.
  */
 
-function Icon({ children, size = 14 }: { children: ReactNode; size?: number }) {
+function Icon({
+  children,
+  size = 14,
+  flipRtl = false,
+}: {
+  children: ReactNode;
+  size?: number;
+  /** Mirror horizontally under `dir="rtl"` — for direction-bearing glyphs
+      (the horizontal chevrons), handled by a cal-base rule in layers.css. */
+  flipRtl?: boolean;
+}) {
   return (
     <svg
       width={size}
@@ -20,6 +30,7 @@ function Icon({ children, size = 14 }: { children: ReactNode; size?: number }) {
       strokeLinejoin="round"
       aria-hidden="true"
       focusable="false"
+      data-flip-rtl={flipRtl ? "" : undefined}
     >
       {children}
     </svg>
@@ -28,7 +39,7 @@ function Icon({ children, size = 14 }: { children: ReactNode; size?: number }) {
 
 export function ChevronLeftIcon({ size }: { size?: number }) {
   return (
-    <Icon size={size}>
+    <Icon size={size} flipRtl>
       <path d="m15 18-6-6 6-6" />
     </Icon>
   );
@@ -36,7 +47,7 @@ export function ChevronLeftIcon({ size }: { size?: number }) {
 
 export function ChevronRightIcon({ size }: { size?: number }) {
   return (
-    <Icon size={size}>
+    <Icon size={size} flipRtl>
       <path d="m9 18 6-6-6-6" />
     </Icon>
   );

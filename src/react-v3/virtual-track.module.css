@@ -80,6 +80,11 @@
     transform-style: preserve-3d;
   }
 
+  /* RTL: the inherited `direction: rtl` already reverses the flex row (months
+     run right-to-left) for free — do NOT add `row-reverse`, it would cancel
+     that back to LTR. The strip's `translateX` is physical, so the JS handles
+     the drag-centring shift (negated frac); only the spatial order is native. */
+
   .item {
     position: relative;
     z-index: 1;

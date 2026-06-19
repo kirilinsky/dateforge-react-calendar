@@ -33,6 +33,21 @@ function useStoryBackground(mode: string) {
   }, [mode]);
 }
 
+// Drives text direction from the toolbar. Set on <html> (not just the story
+// wrapper) so portalled popups — month/year/time pickers mount on document.body
+// — inherit it too. v3 is RTL-ready via CSS logical props + computed-direction
+// reads; this flips the whole document so those paths get exercised.
+function useStoryDirection(dir: string) {
+  useLayoutEffect(() => {
+    const prev = document.documentElement.getAttribute("dir");
+    document.documentElement.setAttribute("dir", dir === "rtl" ? "rtl" : "ltr");
+    return () => {
+      if (prev === null) document.documentElement.removeAttribute("dir");
+      else document.documentElement.setAttribute("dir", prev);
+    };
+  }, [dir]);
+}
+
 const themeNames = ["default", ...Object.keys(themes)];
 // `default` keeps the story's own (v3 default) look; the rest are the v3
 // appearances (zenith + the ported v2 set).
@@ -89,6 +104,19 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    direction: {
+      description: "Text direction",
+      defaultValue: "ltr",
+      toolbar: {
+        title: "Direction",
+        icon: "transfer",
+        items: [
+          { value: "ltr", title: "dir: LTR" },
+          { value: "rtl", title: "dir: RTL" },
+        ],
+        dynamicTitle: true,
+      },
+    },
     gradient: {
       description: "Calendar gradient",
       defaultValue: "off",
@@ -104,6 +132,8 @@ const preview: Preview = {
     (Story, ctx) => {
       const themeMode = (ctx.globals.themeMode as string) ?? "light";
       useStoryBackground(themeMode);
+      const direction = (ctx.globals.direction as string) ?? "ltr";
+      useStoryDirection(direction);
       const viewportActive = Boolean(
         (ctx.globals.viewport as { value?: string } | undefined)?.value,
       );
@@ -119,10 +149,11 @@ const preview: Preview = {
       return (
         <div
           style={style}
+          dir={direction === "rtl" ? "rtl" : "ltr"}
           data-appearance={appearance !== "default" ? appearance : undefined}
         >
           <Story
-            key={`${ctx.globals.theme}-${ctx.globals.themeMode}-${ctx.globals.appearance}-${ctx.globals.locale}-${ctx.globals.gradient}`}
+            key={`${ctx.globals.theme}-${ctx.globals.themeMode}-${ctx.globals.appearance}-${ctx.globals.locale}-${ctx.globals.gradient}-${ctx.globals.direction}`}
           />
         </div>
       );
