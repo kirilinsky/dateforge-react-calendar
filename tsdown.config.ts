@@ -15,150 +15,68 @@ const sharedBase = {
   target: "es2022" as const,
 };
 
-const externalizeContextsPlugin = {
-  name: "externalize-contexts",
-  resolveId(id: string) {
-    if (id.startsWith("@/context/")) {
-      return { id: "@dateforge/react-calendar/context", external: true };
-    }
-  },
+// ── v3 entry map ──────────────────────────────────────────────────────────────
+// Root + context + every module + the theme/appearance palettes. All entries
+// build in ONE pass per format, so rolldown auto-extracts the shared shell/core
+// (store, hooks, UI primitives) into common chunks that the tiny per-module
+// entries import — no manual externalization plugin (the v2 approach). Modules
+// stay their own subpath bundles; a consumer pulls only what it imports.
+const M = "src/modules-v3";
+const entry = {
+  index: "src/react-v3/index.ts",
+  context: "src/react-v3/context.ts",
+  "modules/index": `${M}/index.ts`,
+  "modules/days": `${M}/days/CalendarDays.tsx`,
+  "modules/days-track": `${M}/days-track/CalendarDaysTrack.tsx`,
+  "modules/info": `${M}/info/CalendarInfo.tsx`,
+  "modules/lunar": `${M}/lunar/CalendarLunar.tsx`,
+  "modules/manual-input": `${M}/manual-input/CalendarManualInput.tsx`,
+  "modules/months-grid": `${M}/months-grid/CalendarMonthsGrid.tsx`,
+  "modules/months-track": `${M}/months-track/CalendarMonthsTrack.tsx`,
+  "modules/months-wheel": `${M}/months-wheel/CalendarMonthsWheel.tsx`,
+  "modules/presets": `${M}/presets/CalendarPresets.tsx`,
+  "modules/selected-dates": `${M}/selected-dates/CalendarSelectedDates.tsx`,
+  "modules/time": `${M}/time/CalendarTimeWheel.tsx`,
+  "modules/toolbar": `${M}/toolbar/CalendarToolbar.tsx`,
+  "modules/years-grid": `${M}/years-grid/CalendarYearsGrid.tsx`,
+  "modules/years-track": `${M}/years-track/CalendarYearsTrack.tsx`,
+  "modules/years-wheel": `${M}/years-wheel/CalendarYearsWheel.tsx`,
+  themes: "src/styles-v3/themes.ts",
+  appearances: "src/styles-v3/appearances.ts",
 };
 
 const codecovToken = process.env.CODECOV_TOKEN;
-const codecovBase = codecovRollupPlugin({
-  enableBundleAnalysis: !!codecovToken,
-  bundleName: "dateforge-core",
-  uploadToken: codecovToken,
-  gitService: "github",
-});
-const codecovModules = codecovRollupPlugin({
-  enableBundleAnalysis: !!codecovToken,
-  bundleName: "dateforge-modules",
-  uploadToken: codecovToken,
-  gitService: "github",
-});
+const codecov = (bundleName: string) =>
+  codecovRollupPlugin({
+    enableBundleAnalysis: !!codecovToken,
+    bundleName,
+    uploadToken: codecovToken,
+    gitService: "github",
+  });
 
 export default defineConfig([
-  // ── Main + context: ESM (with CSS inject) ────────────────────────────────
+  // ── ESM (CSS injected into the JS at import time) ──────────────────────────
   {
     ...sharedBase,
-    entry: { index: "src/index.ts", context: "src/context/index.ts" },
+    entry,
     outDir: "dist",
     clean: true,
     format: ["esm"],
     outExtensions: () => ({ dts: ".d.ts" }),
     dts: true,
     css: { inject: true, minify: true },
-    plugins: [codecovBase],
+    plugins: [codecov("dateforge-v3")],
     deps: sharedDeps,
   },
-  // ── Main + context: CJS (no CSS inject — avoids ESM syntax in .cjs) ──────
+  // ── CJS (no CSS inject — keeps ESM syntax out of the .cjs files) ────────────
   {
     ...sharedBase,
-    entry: { index: "src/index.ts", context: "src/context/index.ts" },
+    entry,
     outDir: "dist",
     format: ["cjs"],
     outExtensions: () => ({ dts: ".d.cts" }),
     dts: true,
     css: { inject: false, minify: true },
     deps: sharedDeps,
-  },
-  // ── Modules: ESM ─────────────────────────────────────────────────────────
-  {
-    ...sharedBase,
-    entry: {
-      index: "src/modules/index.ts",
-      info: "src/modules/info/index.tsx",
-      days: "src/modules/days/index.tsx",
-      toolbar: "src/modules/toolbar/index.tsx",
-      "toolbar/apply": "src/modules/toolbar/apply/index.tsx",
-      "toolbar/clear": "src/modules/toolbar/clear/index.tsx",
-      "toolbar/clock": "src/modules/toolbar/clock/index.tsx",
-      "toolbar/day-label": "src/modules/toolbar/day-label/index.tsx",
-      "toolbar/home": "src/modules/toolbar/home/index.tsx",
-      "toolbar/label": "src/modules/toolbar/label/index.tsx",
-      "toolbar/month-label": "src/modules/toolbar/month-label/index.tsx",
-      "toolbar/month-trigger": "src/modules/toolbar/month-trigger/index.tsx",
-      "toolbar/next": "src/modules/toolbar/next/index.tsx",
-      "toolbar/prev": "src/modules/toolbar/prev/index.tsx",
-      "toolbar/theme-toggle": "src/modules/toolbar/theme-toggle/index.tsx",
-      "toolbar/time": "src/modules/toolbar/time/index.tsx",
-      "toolbar/year-label": "src/modules/toolbar/year-label/index.tsx",
-      "toolbar/year-trigger": "src/modules/toolbar/year-trigger/index.tsx",
-      "months-grid": "src/modules/months-grid/index.tsx",
-      time: "src/modules/time/index.tsx",
-      presets: "src/modules/presets/index.tsx",
-      "selected-dates": "src/modules/selected-dates/index.tsx",
-      "manual-input": "src/modules/manual-input/index.tsx",
-      lunar: "src/modules/lunar/index.tsx",
-      "years-track": "src/modules/years-track/index.tsx",
-      "months-track": "src/modules/months-track/index.tsx",
-      "days-track": "src/modules/days-track/index.tsx",
-      "years-grid": "src/modules/years-grid/index.tsx",
-      "months-wheel": "src/modules/months-wheel/index.tsx",
-      "years-wheel": "src/modules/years-wheel/index.tsx",
-    },
-    outDir: "dist/modules",
-    format: ["esm"],
-    outExtensions: () => ({ dts: ".d.ts" }),
-    dts: true,
-    css: { inject: true, minify: true },
-    plugins: [externalizeContextsPlugin, codecovModules],
-    deps: {
-      neverBundle: [
-        ...sharedDeps.neverBundle,
-        "@dateforge/react-calendar",
-        "@dateforge/react-calendar/context",
-      ],
-    },
-  },
-  // ── Modules: CJS ─────────────────────────────────────────────────────────
-  {
-    ...sharedBase,
-    entry: {
-      index: "src/modules/index.ts",
-      info: "src/modules/info/index.tsx",
-      days: "src/modules/days/index.tsx",
-      toolbar: "src/modules/toolbar/index.tsx",
-      "toolbar/apply": "src/modules/toolbar/apply/index.tsx",
-      "toolbar/clear": "src/modules/toolbar/clear/index.tsx",
-      "toolbar/clock": "src/modules/toolbar/clock/index.tsx",
-      "toolbar/day-label": "src/modules/toolbar/day-label/index.tsx",
-      "toolbar/home": "src/modules/toolbar/home/index.tsx",
-      "toolbar/label": "src/modules/toolbar/label/index.tsx",
-      "toolbar/month-label": "src/modules/toolbar/month-label/index.tsx",
-      "toolbar/month-trigger": "src/modules/toolbar/month-trigger/index.tsx",
-      "toolbar/next": "src/modules/toolbar/next/index.tsx",
-      "toolbar/prev": "src/modules/toolbar/prev/index.tsx",
-      "toolbar/theme-toggle": "src/modules/toolbar/theme-toggle/index.tsx",
-      "toolbar/time": "src/modules/toolbar/time/index.tsx",
-      "toolbar/year-label": "src/modules/toolbar/year-label/index.tsx",
-      "toolbar/year-trigger": "src/modules/toolbar/year-trigger/index.tsx",
-      "months-grid": "src/modules/months-grid/index.tsx",
-      time: "src/modules/time/index.tsx",
-      presets: "src/modules/presets/index.tsx",
-      "selected-dates": "src/modules/selected-dates/index.tsx",
-      "manual-input": "src/modules/manual-input/index.tsx",
-      lunar: "src/modules/lunar/index.tsx",
-      "years-track": "src/modules/years-track/index.tsx",
-      "months-track": "src/modules/months-track/index.tsx",
-      "days-track": "src/modules/days-track/index.tsx",
-      "years-grid": "src/modules/years-grid/index.tsx",
-      "months-wheel": "src/modules/months-wheel/index.tsx",
-      "years-wheel": "src/modules/years-wheel/index.tsx",
-    },
-    outDir: "dist/modules",
-    format: ["cjs"],
-    outExtensions: () => ({ dts: ".d.cts" }),
-    dts: true,
-    css: { inject: false, minify: true },
-    plugins: [externalizeContextsPlugin],
-    deps: {
-      neverBundle: [
-        ...sharedDeps.neverBundle,
-        "@dateforge/react-calendar",
-        "@dateforge/react-calendar/context",
-      ],
-    },
   },
 ]);

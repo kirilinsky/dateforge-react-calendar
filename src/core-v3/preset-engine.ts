@@ -1,5 +1,7 @@
 import {
   addDays,
+  addMonths,
+  addYears,
   type CalendarDate,
   calendarDate,
   compareDate,
@@ -216,10 +218,138 @@ export const presetThisMonth: Preset = {
   },
 };
 
-/** Convenience bundle of the common presets, in display order. */
+// ── Relative single-date quick-picks (the v2 `basicPresets` set) ──────────────
+// Each jumps the selection to a date relative to today. Labels are plain
+// English here (matching the other presets); a locale-aware label rides the
+// label registry later, like the rest of the module strings.
+
+export const presetYesterday: Preset = {
+  id: "yesterday",
+  label: "Yesterday",
+  resolve: (ctx) => ({ kind: "date", date: addDays(ctx.today, -1) }),
+};
+export const presetTomorrow: Preset = {
+  id: "tomorrow",
+  label: "Tomorrow",
+  resolve: (ctx) => ({ kind: "date", date: addDays(ctx.today, 1) }),
+};
+export const presetLastWeek: Preset = {
+  id: "last-week",
+  label: "Last week",
+  resolve: (ctx) => ({ kind: "date", date: addDays(ctx.today, -7) }),
+};
+export const presetNextWeek: Preset = {
+  id: "next-week",
+  label: "Next week",
+  resolve: (ctx) => ({ kind: "date", date: addDays(ctx.today, 7) }),
+};
+export const presetLastMonth: Preset = {
+  id: "last-month",
+  label: "Last month",
+  resolve: (ctx) => ({ kind: "date", date: addMonths(ctx.today, -1) }),
+};
+export const presetNextMonth: Preset = {
+  id: "next-month",
+  label: "Next month",
+  resolve: (ctx) => ({ kind: "date", date: addMonths(ctx.today, 1) }),
+};
+export const presetLastYear: Preset = {
+  id: "last-year",
+  label: "Last year",
+  resolve: (ctx) => ({ kind: "date", date: addYears(ctx.today, -1) }),
+};
+export const presetNextYear: Preset = {
+  id: "next-year",
+  label: "Next year",
+  resolve: (ctx) => ({ kind: "date", date: addYears(ctx.today, 1) }),
+};
+
+/** Convenience bundle of the common (range-ish) presets, in display order. */
 export const commonPresets: Preset[] = [
   presetToday,
   presetThisWeek,
   presetLast7Days,
   presetThisMonth,
 ];
+
+/**
+ * Relative single-date quick-picks, past → future (the v2 `basicPresets` pack):
+ * last year / month / week, yesterday, today, tomorrow, next week / month / year.
+ */
+export const relativePresets: Preset[] = [
+  presetLastYear,
+  presetLastMonth,
+  presetLastWeek,
+  presetYesterday,
+  presetToday,
+  presetTomorrow,
+  presetNextWeek,
+  presetNextMonth,
+  presetNextYear,
+];
+
+// ── definePreset — the declarative authoring form (v2 SimplePresetDef parity) ──
+// Lets a consumer write the common cases without a resolver:
+//   { label: "Today",       value: 0 }                    // day offset from today
+//   { label: "In 3 days",   value: 3 }
+//   { label: "Last 7 days", value: -6, range: 6 }         // span: 7 days ending today
+//   { label: "New Year",    value: new Date(2026, 0, 1) } // fixed wall-clock date
+//   { label: "Start of mo", getValue: ({ now }) => … }    // full function form
+// `value`/`getValue` speak JS `Date` (the public boundary); `definePreset`
+// compiles them into a v3 `Preset` resolver (CalendarDate-based).
+
+/** Declarative preset spec — compiled to a {@link Preset} by {@link definePreset}. */
+export type PresetInput = {
+  id?: string;
+  label: string;
+  group?: string;
+  modes?: SelectionMode[];
+  /** Day offset from today (number, ± = future/past) OR a fixed wall-clock Date. */
+  value?: number | Date;
+  /** Span length in days after `value` — turns the pick into a range. */
+  range?: number;
+  /** Full form: return a `Date`, a `{ from, to }` span, or `null` to hide. */
+  getValue?: (ctx: { now: Date }) => Date | { from: Date; to: Date } | null;
+};
+
+const jsToCalendarDate = (d: Date): CalendarDate =>
+  calendarDate(d.getFullYear(), d.getMonth() + 1, d.getDate());
+
+/** Compile a declarative {@link PresetInput} into a {@link Preset}. */
+export function definePreset(input: PresetInput): Preset {
+  const { id, label, group, modes, value, range, getValue } = input;
+  return {
+    id: id ?? label.toLowerCase().replace(/\s+/g, "-"),
+    label,
+    group,
+    modes,
+    resolve: (ctx): PresetResult | null => {
+      if (getValue) {
+        const now = new Date(
+          ctx.today.year,
+          ctx.today.month - 1,
+          ctx.today.day,
+        );
+        const out = getValue({ now });
+        if (out == null) return null;
+        return out instanceof Date
+          ? { kind: "date", date: jsToCalendarDate(out) }
+          : {
+              kind: "range",
+              range: orderRange(
+                jsToCalendarDate(out.from),
+                jsToCalendarDate(out.to),
+              ),
+            };
+      }
+      if (value == null) return null;
+      const base =
+        value instanceof Date
+          ? jsToCalendarDate(value)
+          : addDays(ctx.today, value);
+      return range != null
+        ? { kind: "range", range: orderRange(base, addDays(base, range)) }
+        : { kind: "date", date: base };
+    },
+  };
+}

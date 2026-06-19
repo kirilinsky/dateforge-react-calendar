@@ -99,6 +99,62 @@ writeFileSync("./src/styles-v3/themes.css", lines.join("\n"));
 
 console.log(`✓ ${names.length} theme families → src/styles-v3/themes.css`);
 
+// ── Named theme OBJECTS (themes.ts) ──────────────────────────────────────────
+// Same remapped tokens as the CSS, but as importable `ThemeFamily` objects so a
+// consumer can `import { dracula } from "…/themes"` and tree-shake a single
+// theme (v2 parity; consistent with the appearance objects). Raw per-side vars;
+// `themeFamilyToVars` merges them to the identical light-dark() set at apply.
+
+/** Build the per-side `vars` record from a family's remapped tokens. */
+function sideVars(side: Partial<V3ThemeTokens>): Record<string, string> {
+  const vars: Record<string, string> = {};
+  for (const key of V3_KEYS) {
+    const v = side[key];
+    if (v != null) vars[`${TOKEN_TO_VAR[key]}`] = v;
+  }
+  return vars;
+}
+
+const tsLines: string[] = [
+  "/*",
+  " * GENERATED — do not edit by hand. Run: npx tsx scripts/generate-theme-v3.ts",
+  " * Source: themes/themes.ts (THEME_FAMILIES_DATA).",
+  " *",
+  " * Named ThemeFamily objects (the same palettes as themes.css). Pass one as",
+  " * `<Calendar theme={dracula} />` to tree-shake a single theme, or use the",
+  ' * string form `theme="dracula"` to ride the generated stylesheet instead.',
+  " */",
+  'import { type ThemeFamily, THEME_BRAND } from "./theme-tokens";',
+  "",
+];
+
+for (const name of names) {
+  const family = THEME_FAMILIES_DATA[name];
+  const light = sideVars(remap(family.light));
+  const dark = sideVars(remap(family.dark));
+  const varsLiteral = (vars: Record<string, string>) =>
+    `{ ${Object.entries(vars)
+      .map(([k, v]) => `"${k}": "${v}"`)
+      .join(", ")} }`;
+  tsLines.push(`export const ${name}: ThemeFamily = {`);
+  tsLines.push(`  kind: "family",`);
+  tsLines.push(
+    `  light: { [THEME_BRAND]: true, vars: ${varsLiteral(light)} },`,
+  );
+  tsLines.push(`  dark: { [THEME_BRAND]: true, vars: ${varsLiteral(dark)} },`);
+  tsLines.push("};");
+}
+
+tsLines.push("");
+tsLines.push("/** All built-in theme families, keyed by name. */");
+tsLines.push(
+  `export const THEMES: Record<string, ThemeFamily> = { ${names.join(", ")} };`,
+);
+tsLines.push("");
+
+writeFileSync("./src/styles-v3/themes.ts", tsLines.join("\n"));
+console.log(`✓ ${names.length} theme families → src/styles-v3/themes.ts`);
+
 // ── Contrast audit (report-only) ─────────────────────────────────────────────
 // Guards the WCAG quality bar without rewriting palettes: any pair below its
 // target is listed so a regression in themes/themes.ts is visible at build

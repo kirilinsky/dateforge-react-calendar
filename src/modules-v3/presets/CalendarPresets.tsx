@@ -2,8 +2,10 @@ import { useMemo, useRef } from "react";
 import { dateKey } from "../../core-v3/calendar-date";
 import {
   compilePresets,
+  definePreset,
   type EvaluatedPreset,
   type Preset,
+  type PresetInput,
   type PresetResult,
 } from "../../core-v3/preset-engine";
 import type { SelectionState } from "../../core-v3/state";
@@ -44,7 +46,13 @@ function isPresetActive(
 }
 
 export type CalendarPresetsProps = {
-  presets?: Preset[];
+  /**
+   * Presets to render. Accepts the declarative form ({@link PresetInput}:
+   * `{ label, value, range }` / `{ label, getValue }`) and/or compiled
+   * {@link Preset} resolvers — mix freely with the built-in packs
+   * (`relativePresets`, `commonPresets`).
+   */
+  presets?: (Preset | PresetInput)[];
   col?: number | string;
   className?: string;
   /** Per-module theme override (`data-theme` on the module container). */
@@ -66,7 +74,15 @@ export function CalendarPresets({
 
   const selection = useStoreSelector(store, (s) => s.selection);
 
-  const engine = useMemo(() => compilePresets(presetsProp), [presetsProp]);
+  // Declarative inputs (no `resolve`) are compiled to real presets first, so a
+  // consumer can pass `{ label, value }` shorthands and compiled presets mixed.
+  const engine = useMemo(
+    () =>
+      compilePresets(
+        presetsProp.map((p) => ("resolve" in p ? p : definePreset(p))),
+      ),
+    [presetsProp],
+  );
 
   const todayRef = useRef(today(config.timeZone));
   const ctx = useMemo(
