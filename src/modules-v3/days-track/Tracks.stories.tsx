@@ -96,3 +96,38 @@ export const BoundRange: Story = {
     </div>
   ),
 };
+
+/**
+ * Multiselect: in `mode="multiple"` the days track only MOVES the cursor —
+ * scroll to a day and tap the round confirm chip to toggle it into the set
+ * (check = add, red clear = remove an already-picked day). Auto-committing each
+ * landed day would carpet the month. The grid below mirrors the live set; two
+ * days are pre-selected.
+ */
+export const Multiselect: Story = {
+  render: (_, ctx) => (
+    <div style={{ width: 320, display: "grid", gap: 6 }}>
+      <Calendar
+        {...storyThemeProps(ctx.globals)}
+        config={buildConfig({ ...storyLocale(ctx.globals), mode: "multiple" })}
+        initialView={D(2026, 6, 15)}
+        defaultSelection={{
+          shape: "point",
+          dates: [
+            {
+              date: D(2026, 6, 8),
+              time: { hour: 0, minute: 0, second: 0, ms: 0 },
+            },
+            {
+              date: D(2026, 6, 21),
+              time: { hour: 0, minute: 0, second: 0, ms: 0 },
+            },
+          ],
+        }}
+      >
+        <CalendarDaysTrack showMonthLabel />
+        <CalendarDays />
+      </Calendar>
+    </div>
+  ),
+};

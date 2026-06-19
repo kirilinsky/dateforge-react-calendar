@@ -139,6 +139,50 @@
     opacity: 0.8;
   }
 
+  /* Multiselect confirm overlay: a round button on the trailing edge of the
+     centred day. Check = add the landed day; struck/red Clear = remove it (the
+     day is already selected). `z-index: 4` floats above the strip + highlight;
+     the module stops `pointerdown` so a tap here doesn't start a track drag. */
+  .confirm {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-end: 0.5em;
+    transform: translateY(-50%);
+    inline-size: 2.2em;
+    block-size: 2.2em;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    appearance: none;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 4;
+    background: var(--c-accent, #1a73e8);
+    color: var(--c-activeText, #fff);
+    box-shadow: var(--cal-shadow-md, 0 0.2em 0.6em var(--c-shadow, #0002));
+    transition:
+      background var(--cal-paint-transition, var(--cal-transition, 0.2s))
+        var(--cal-paint-easing, linear),
+      transform 80ms ease;
+  }
+  .confirm svg {
+    inline-size: 1.1em;
+    block-size: 1.1em;
+  }
+  .confirm:active:not(:disabled) {
+    transform: translateY(-50%) scale(var(--cal-press-scale, 0.94));
+  }
+  /* Already-selected day → remove affordance. */
+  .confirm[data-selected] {
+    background: var(--c-error, #d23f31);
+  }
+  .confirm:disabled {
+    cursor: not-allowed;
+    opacity: var(--cal-opacity-disabled, 0.55);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .item {
       opacity: 1;
