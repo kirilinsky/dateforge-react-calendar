@@ -4,13 +4,107 @@ import { compileDateRules } from "@/core-v3/date-rule-engine";
 import {
   commonPresets,
   compilePresets,
+  definePreset,
   type Preset,
   presetThisMonth,
   presetToday,
+  relativePresets,
 } from "@/core-v3/preset-engine";
 
 const D = (y: number, m: number, d: number) => calendarDate(y, m, d);
 const ctx = { today: D(2026, 6, 5), firstDayOfWeek: 1 };
+
+describe("definePreset (declarative authoring, v2 SimplePresetDef parity)", () => {
+  const resolve = (p: ReturnType<typeof definePreset>) => p.resolve(ctx);
+
+  it("value: number = a day offset from today", () => {
+    expect(resolve(definePreset({ label: "Today", value: 0 }))).toEqual({
+      kind: "date",
+      date: D(2026, 6, 5),
+    });
+    expect(resolve(definePreset({ label: "In 3 days", value: 3 }))).toEqual({
+      kind: "date",
+      date: D(2026, 6, 8),
+    });
+  });
+
+  it("value: Date = a fixed wall-clock date", () => {
+    expect(
+      resolve(definePreset({ label: "New Year", value: new Date(2026, 0, 1) })),
+    ).toEqual({ kind: "date", date: D(2026, 1, 1) });
+  });
+
+  it("value + range = a span ending/starting at the offset", () => {
+    // -6 + range 6 = the 7 days ending today (the v2 "Last 7 days").
+    const r = resolve(definePreset({ label: "Last 7", value: -6, range: 6 }));
+    expect(r?.kind).toBe("range");
+    if (r?.kind === "range") {
+      expect(dateKey(r.range.start)).toBe(dateKey(D(2026, 5, 30)));
+      expect(dateKey(r.range.end)).toBe(dateKey(D(2026, 6, 5)));
+    }
+  });
+
+  it("getValue form: Date, {from,to}, or null", () => {
+    const startOfMonth = definePreset({
+      label: "Start of month",
+      getValue: ({ now }) => new Date(now.getFullYear(), now.getMonth(), 1),
+    });
+    expect(resolve(startOfMonth)).toEqual({
+      kind: "date",
+      date: D(2026, 6, 1),
+    });
+
+    const span = definePreset({
+      label: "Span",
+      getValue: ({ now }) => ({
+        from: now,
+        to: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 2),
+      }),
+    });
+    const r = resolve(span);
+    expect(r?.kind).toBe("range");
+
+    const hidden = definePreset({ label: "Hidden", getValue: () => null });
+    expect(resolve(hidden)).toBeNull();
+  });
+
+  it("derives an id from the label when omitted", () => {
+    expect(definePreset({ label: "Last 7 days", value: -6 }).id).toBe(
+      "last-7-days",
+    );
+  });
+});
+
+describe("relativePresets (v2 basicPresets parity)", () => {
+  it("offers the 9 relative single-date quick-picks, past → future", () => {
+    expect(relativePresets.map((p) => p.id)).toEqual([
+      "last-year",
+      "last-month",
+      "last-week",
+      "yesterday",
+      "today",
+      "tomorrow",
+      "next-week",
+      "next-month",
+      "next-year",
+    ]);
+  });
+
+  it("each resolves to the right date relative to today (2026-06-05)", () => {
+    const at = (id: string) => {
+      const r = relativePresets.find((p) => p.id === id)?.resolve(ctx);
+      return r?.kind === "date" ? dateKey(r.date) : null;
+    };
+    expect(at("yesterday")).toBe(dateKey(D(2026, 6, 4)));
+    expect(at("tomorrow")).toBe(dateKey(D(2026, 6, 6)));
+    expect(at("last-week")).toBe(dateKey(D(2026, 5, 29)));
+    expect(at("next-week")).toBe(dateKey(D(2026, 6, 12)));
+    expect(at("last-month")).toBe(dateKey(D(2026, 5, 5)));
+    expect(at("next-month")).toBe(dateKey(D(2026, 7, 5)));
+    expect(at("last-year")).toBe(dateKey(D(2025, 6, 5)));
+    expect(at("next-year")).toBe(dateKey(D(2027, 6, 5)));
+  });
+});
 
 describe("compilePresets", () => {
   it("dedupes by id (first wins) and preserves order", () => {

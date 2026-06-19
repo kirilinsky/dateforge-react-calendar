@@ -1,0 +1,19 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "src/react-v3/index.ts",
+    "src/react-v3/context.ts",
+    "src/modules-v3/index.ts",
+    "src/modules-v3/*/Calendar*.tsx",
+    "src/styles-v3/themes.ts",
+    "src/styles-v3/appearances.ts",
+    "src/index.ts",
+    "src/context/index.ts",
+    "src/modules/index.ts",
+    "scripts/**/*.{ts,mts,mjs}",
+    "**/*.stories.tsx",
+    ".storybook/{main,preview}.{ts,tsx}"
+  ],
+  "project": ["src/**/*.{ts,tsx}", "scripts/**/*.{ts,mts,mjs}"],
+  "ignore": ["dist/**", "dist-v3probe/**"]
+}
