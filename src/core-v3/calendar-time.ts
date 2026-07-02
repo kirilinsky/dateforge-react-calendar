@@ -21,7 +21,7 @@ export const MIDNIGHT: CalendarTime = { hour: 0, minute: 0, second: 0, ms: 0 };
 const MS_PER_SECOND = 1000;
 const MS_PER_MINUTE = 60 * MS_PER_SECOND;
 const MS_PER_HOUR = 60 * MS_PER_MINUTE;
-/** Milliseconds in a 24-hour civil day (ignores DST; that lives at the boundary). */
+/** Milliseconds in a 24-hour civil day (ignores DST; that lives at the boundary). @internal */
 export const MS_PER_DAY = 24 * MS_PER_HOUR;
 
 /** Construct a CalendarTime. `second`/`ms` default to 0. Does not validate. */

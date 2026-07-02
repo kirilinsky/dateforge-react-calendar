@@ -8,8 +8,10 @@ import { type CalendarDate, calendarDate } from "../../core-v3/calendar-date";
  * All math is wall-clock on the mask string; no JS Date, no timezone.
  */
 
+/** @internal */
 export type SegmentKind = "day" | "month" | "year";
 
+/** @internal */
 export type Segment = {
   kind: SegmentKind;
   /** Char range in the format/mask string: [start, end). */
@@ -23,6 +25,7 @@ const TOKEN_TO_KIND: Record<string, SegmentKind> = {
   YYYY: "year",
 };
 
+/** @internal */
 export function formatSegments(format: string): Segment[] {
   const out: Segment[] = [];
   for (const token of ["DD", "MM", "YYYY"]) {
@@ -38,7 +41,7 @@ export function formatSegments(format: string): Segment[] {
   return out.sort((a, b) => a.start - b.start);
 }
 
-/** The segment containing (or immediately left of) the caret. */
+/** The segment containing (or immediately left of) the caret. @internal */
 export function segmentAt(format: string, pos: number): Segment | null {
   const segments = formatSegments(format);
   for (const seg of segments) {

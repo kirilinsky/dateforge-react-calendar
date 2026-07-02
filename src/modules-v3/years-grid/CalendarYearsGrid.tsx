@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { calendarDate, daysInMonth } from "../../core-v3/calendar-date";
 import { rangesOverlap } from "../../core-v3/calendar-range";
 import type { DateRuleEngine } from "../../core-v3/date-rule-engine";
@@ -24,6 +24,8 @@ export type OutOfRangeBehavior = "disable" | "hide" | "show";
 
 export type CalendarYearsGridProps = {
   yearsPerPage?: number;
+  /** First year of the initially shown page (v2 parity). Paging/navigation take over after. */
+  startYear?: number;
   showControls?: boolean;
   /** Out-of-range / fully-disabled year presentation. Default `"disable"`. */
   outOfRangeBehavior?: OutOfRangeBehavior;
@@ -60,6 +62,7 @@ function isYearFullyDisabled(year: number, engine: DateRuleEngine): boolean {
 
 export function CalendarYearsGrid({
   yearsPerPage = 12,
+  startYear,
   showControls = true,
   outOfRangeBehavior = "disable",
   col,
@@ -82,14 +85,22 @@ export function CalendarYearsGrid({
   );
 
   // Page anchor. `null` = follow the view's natural page; a number pins the page
-  // after the user pages with the arrows.
-  const [pinnedBase, setPinnedBase] = useState<number | null>(null);
+  // after the user pages with the arrows. `startYear` seeds the pin so the
+  // first page starts there regardless of the view.
+  const [pinnedBase, setPinnedBase] = useState<number | null>(
+    startYear ?? null,
+  );
   const viewBase = pageStart(viewDate.year, perPage);
   const baseYear = pinnedBase ?? viewBase;
 
-  // If the view jumps to a year outside the pinned page, release the pin so the
-  // grid follows the view again (no post-navigation drift).
+  // If the view NAVIGATES to a year outside the pinned page, release the pin so
+  // the grid follows the view again (no post-navigation drift). Only on a real
+  // view change — never on mount, or a `startYear` far from the view would be
+  // released before it is ever seen.
+  const lastViewYear = useRef(viewDate.year);
   useEffect(() => {
+    if (lastViewYear.current === viewDate.year) return;
+    lastViewYear.current = viewDate.year;
     setPinnedBase((prev) =>
       prev !== null && (viewDate.year < prev || viewDate.year >= prev + perPage)
         ? null

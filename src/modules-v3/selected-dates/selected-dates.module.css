@@ -1,3 +1,8 @@
+/* Layer ORDER must ride in every layered file: bundlers concatenate
+   chunk CSS in graph order, and the first statement seen pins the order —
+   without this a chunk that lands first would re-rank the layers. */
+@layer cal-base, cal-themes, cal-appearances, cal-modules, cal-user;
+
 @layer cal-modules {
   .container {
     display: flex;
@@ -83,7 +88,22 @@
   }
 
   /* Layout only — the button itself is the shared UIButton (ghost/sm). */
+  /* Clear-all: a pill in the same language as the chips (radius/metrics), with
+     a muted resting look; hover shifts to the error tint — a destructive action
+     should read as one before it is pressed. Overrides the UIButton ghost
+     resting styles deliberately (cal-modules > cal-base). */
   .clearBtn {
     margin-inline-start: auto;
+    border: 1px solid var(--c-stroke, #ddd);
+    border-radius: 999px;
+    padding: 0.3em 0.8em;
+    gap: 0.3em;
+    color: var(--c-mutedText, #888);
+  }
+
+  .clearBtn:hover:not(:disabled) {
+    color: var(--c-error, #d23f31);
+    border-color: color-mix(in srgb, var(--c-error, #d23f31) 45%, transparent);
+    background: color-mix(in srgb, var(--c-error, #d23f31) 10%, transparent);
   }
 }

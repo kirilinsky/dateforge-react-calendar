@@ -9,6 +9,7 @@
 export type V3StoryThemeProps = {
   theme?: string;
   appearance?: string;
+  gradient?: boolean;
   scheme: "light" | "dark";
 };
 
@@ -26,6 +27,7 @@ export function storyThemeProps(
   return {
     theme,
     appearance,
+    gradient: globals.gradient === "on" || undefined,
     scheme: globals.themeMode === "dark" ? "dark" : "light",
   };
 }

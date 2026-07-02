@@ -1,3 +1,8 @@
+/* Layer ORDER must ride in every layered file: bundlers concatenate
+   chunk CSS in graph order, and the first statement seen pins the order —
+   without this a chunk that lands first would re-rank the layers. */
+@layer cal-base, cal-themes, cal-appearances, cal-modules, cal-user;
+
 @layer cal-modules {
   /* Field layout: label ABOVE the input (react-aria / shadcn field pattern).
      Keeps sibling from/to bound inputs the same width regardless of label
@@ -61,14 +66,17 @@
     padding-inline-end: 1.7em;
   }
 
+  /* Read-only is NOT disabled: the input stays in the a11y tree and focusable,
+     so its ink (and placeholder) must keep AA contrast — mutedText, never
+     disabledText. The tinted background alone signals the state. */
   .input[readonly] {
     background: color-mix(in srgb, var(--c-backdrop, #fff) 70%, var(--c-tone, #aaa));
-    color: var(--c-disabledText, #999);
+    color: var(--c-mutedText, #767c85);
     cursor: default;
   }
 
   .input::placeholder {
-    color: var(--c-mutedText, #aaa);
-    opacity: 0.8;
+    color: var(--c-mutedText, #767c85);
+    opacity: 1;
   }
 }

@@ -78,7 +78,7 @@ export function createWarner(sink: WarningSink = defaultSink): Warner {
 
 const shared = createWarner();
 
-/** Shared library warner — warns once per distinct message, dev-only. */
+/** Shared library warner — warns once per distinct message, dev-only. @internal */
 export const warnOnce = shared.warnOnce;
-/** Reset the shared warner's dedupe state (mainly for tests). */
+/** Reset the shared warner's dedupe state (mainly for tests). @internal */
 export const resetWarnings = shared.reset;

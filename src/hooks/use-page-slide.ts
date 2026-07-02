@@ -55,7 +55,7 @@ function keyframesFor(
           ? `translateY(${-distance}px)`
           : `translateY(${distance}px)`; // "up"
   return [
-    { opacity: .2, transform: from },
+    { opacity: 0.2, transform: from },
     { opacity: 1, transform: "translate(0, 0)" },
   ];
 }

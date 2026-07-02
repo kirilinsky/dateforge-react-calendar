@@ -50,6 +50,11 @@ export type CalendarMonthsWheelProps = {
    * clamping). No effect on point selections or before a range exists.
    */
   bound?: "from" | "to";
+  /**
+   * Bound mode: show a localized date header for the edited bound above the
+   * drum (v2 parity). Hidden while the range is empty. Default `true`.
+   */
+  showBoundDate?: boolean;
   /** Per-module theme override (`data-theme` on the module container). */
   theme?: string;
   /** Per-module scheme override (`data-scheme` on the module container). */
@@ -69,6 +74,7 @@ export function CalendarMonthsWheel({
   monthsLabel,
   monthPickerLabel,
   bound,
+  showBoundDate = true,
   theme,
   scheme,
   col,
@@ -145,6 +151,17 @@ export function CalendarMonthsWheel({
 
   const gridSlot = getGridSlotStyle(col);
 
+  // Bound-date header: the wall-clock date of the edited boundary (v2 parity;
+  // same recipe as the TimeWheel).
+  const headerText =
+    showBoundDate && boundDate
+      ? new Intl.DateTimeFormat(locale, {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }).format(new Date(boundDate.year, boundDate.month - 1, boundDate.day))
+      : null;
+
   return (
     <div
       data-dateforge-months-wheel=""
@@ -154,6 +171,11 @@ export function CalendarMonthsWheel({
       className={[styles.container, className].filter(Boolean).join(" ")}
       style={gridSlot}
     >
+      {headerText && (
+        <div className={styles.boundedDate} data-bound={bound}>
+          {headerText}
+        </div>
+      )}
       <div
         className={styles.root}
         role="group"

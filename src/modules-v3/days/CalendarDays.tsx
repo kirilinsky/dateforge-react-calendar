@@ -4,6 +4,7 @@ import type { CalendarDate } from "../../core-v3/calendar-date";
 import {
   addMonths,
   calendarDate,
+  compareDate,
   dateKey,
   datesEqual,
 } from "../../core-v3/calendar-date";
@@ -100,6 +101,12 @@ export type CalendarDaysProps = {
   todayDot?: boolean;
   /** Subtle inset outline on today (50% accent). Default true. */
   highlightToday?: boolean;
+  /**
+   * Render days outside the `min`/`max` window as blank cells instead of
+   * disabled ones (v2 parity). Rule-`disabled` days are NOT hidden — only the
+   * hard window. Default `false`.
+   */
+  hideOutOfRange?: boolean;
   /**
    * Custom day-cell content. The button shell, data attributes, keyboard and
    * aria stay owned by the library. Pass a stable reference (module-level fn
@@ -222,6 +229,7 @@ export function CalendarDays({
   boldWeekends = false,
   todayDot,
   highlightToday = false,
+  hideOutOfRange = false,
   renderDay,
   theme,
   scheme,
@@ -456,7 +464,10 @@ export function CalendarDays({
             </span>
           )}
           {week.map((cell) =>
-            !cell.inMonth && !showOutsideDays ? (
+            (!cell.inMonth && !showOutsideDays) ||
+            (hideOutOfRange &&
+              ((config.min && compareDate(cell.date, config.min) < 0) ||
+                (config.max && compareDate(cell.date, config.max) > 0))) ? (
               <span
                 key={dateKey(cell.date)}
                 role="gridcell"

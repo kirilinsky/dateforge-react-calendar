@@ -1,8 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { CalendarDate } from "../../core-v3/calendar-date";
 import { dateKey } from "../../core-v3/calendar-date";
 
 import { fromCalendarDateTime } from "../../core-v3/timezone-boundary";
+import { ClearIcon } from "../../react-v3/icons";
 import { useLabels } from "../../react-v3/labels-context";
 import { useCalendarActions, useCalendarStore } from "../../react-v3/provider";
 import { UIButton } from "../../react-v3/ui/button";
@@ -15,6 +16,15 @@ export type CalendarSelectedDatesProps = {
   allowClearPerChip?: boolean;
   allowNavigate?: boolean;
   showTime?: boolean;
+  /**
+   * Collapse the chip list after N chips; the rest hide behind a "+{count}"
+   * chip that expands on click (v2 parity). Omit for no collapsing.
+   */
+  maxVisibleChips?: number;
+  /** Visible text of the overflow chip; `{count}` interpolates. Default `"+{count}"`. */
+  overflowLabel?: string;
+  /** Chip row alignment. Default `"left"`. */
+  align?: "left" | "center" | "right";
   col?: number | string;
   className?: string;
   /** Per-module theme override (`data-theme` on the module container). */
@@ -107,6 +117,9 @@ export function CalendarSelectedDates({
   allowClearPerChip = false,
   allowNavigate = true,
   showTime = false,
+  maxVisibleChips,
+  overflowLabel = "+{count}",
+  align = "left",
   col,
   className,
   theme,
@@ -128,7 +141,22 @@ export function CalendarSelectedDates({
   const isCurrentMonth = (d: CalendarDate) =>
     d.year === viewDate.year && d.month === viewDate.month;
 
-  const gridSlot = getGridSlotStyle(col);
+  const alignStyle = {
+    justifyContent:
+      align === "right"
+        ? "flex-end"
+        : align === "center"
+          ? "center"
+          : "flex-start",
+  } as const;
+  const gridSlot = { ...getGridSlotStyle(col), ...alignStyle };
+
+  // Chip overflow: cap the visible chips, park the rest behind a "+N" expander.
+  const [expanded, setExpanded] = useState(false);
+  const cap =
+    maxVisibleChips === undefined || !Number.isFinite(maxVisibleChips)
+      ? Number.POSITIVE_INFINITY
+      : Math.max(0, Math.floor(maxVisibleChips));
 
   if (selection.shape === "point") {
     if (selection.dates.length === 0) return null;
@@ -142,24 +170,41 @@ export function CalendarSelectedDates({
         className={[styles.container, className].filter(Boolean).join(" ")}
         style={gridSlot}
       >
-        {selection.dates.map((dt) => {
-          const r = fromCalendarDateTime(dt, config.timeZone);
-          if (!r.ok) return null;
-          const active = isCurrentMonth(dt.date);
-          return (
-            <Chip
-              key={dateKey(dt.date)}
-              label={fmt(r.date)}
-              active={active}
-              disabled={config.readOnly}
-              onClick={allowNavigate ? () => navigateTo(dt.date) : undefined}
-              onRemove={
-                allowClearPerChip ? () => removeDate(dt.date) : undefined
-              }
-              removeLabel={t("removeSelectedDate")}
-            />
-          );
-        })}
+        {(expanded ? selection.dates : selection.dates.slice(0, cap)).map(
+          (dt) => {
+            const r = fromCalendarDateTime(dt, config.timeZone);
+            if (!r.ok) return null;
+            const active = isCurrentMonth(dt.date);
+            return (
+              <Chip
+                key={dateKey(dt.date)}
+                label={fmt(r.date)}
+                active={active}
+                disabled={config.readOnly}
+                onClick={allowNavigate ? () => navigateTo(dt.date) : undefined}
+                onRemove={
+                  allowClearPerChip ? () => removeDate(dt.date) : undefined
+                }
+                removeLabel={t("removeSelectedDate")}
+              />
+            );
+          },
+        )}
+        {!expanded && selection.dates.length > cap && (
+          <UIButton
+            size="sm"
+            data-overflow-chip=""
+            aria-label={t("showMoreSelectedDates", {
+              count: selection.dates.length - cap,
+            })}
+            onClick={() => setExpanded(true)}
+          >
+            {overflowLabel.replaceAll(
+              "{count}",
+              String(selection.dates.length - cap),
+            )}
+          </UIButton>
+        )}
         {allowClear && (
           <UIButton
             variant="ghost"
@@ -169,6 +214,7 @@ export function CalendarSelectedDates({
             onClick={() => clear()}
             disabled={config.readOnly}
           >
+            <ClearIcon />
             {t("clear")}
           </UIButton>
         )}
@@ -245,6 +291,7 @@ export function CalendarSelectedDates({
           onClick={() => clear()}
           disabled={config.readOnly}
         >
+          <ClearIcon />
           {t("clear")}
         </UIButton>
       )}

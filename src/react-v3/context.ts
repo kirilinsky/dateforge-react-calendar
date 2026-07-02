@@ -6,6 +6,20 @@
  * and the aria-label registry.
  */
 
+// State/action shapes — what `useStoreSelector` selectors receive and what the
+// store dispatches; custom modules type against these.
+export type {
+  CalendarAction,
+  CalendarActionType,
+} from "../core-v3/actions";
+export type {
+  CalendarState,
+  InteractionState,
+  PointSelection,
+  SelectionState,
+  SpanSelection,
+  ViewState,
+} from "../core-v3/state";
 export { useLabels } from "./labels-context";
 export {
   type CalendarActions,

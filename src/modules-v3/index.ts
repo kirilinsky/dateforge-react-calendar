@@ -14,8 +14,17 @@ export {
   CalendarDaysTrack,
   type CalendarDaysTrackProps,
 } from "./days-track/CalendarDaysTrack";
-export { CalendarInfo, type CalendarInfoProps } from "./info/CalendarInfo";
-export { CalendarLunar, type CalendarLunarProps } from "./lunar/CalendarLunar";
+export {
+  CalendarInfo,
+  type CalendarInfoFormatter,
+  type CalendarInfoProps,
+} from "./info/CalendarInfo";
+export {
+  CalendarLunar,
+  type CalendarLunarProps,
+  type LunarPhaseIndex,
+  type LunarPhaseKey,
+} from "./lunar/CalendarLunar";
 export {
   CalendarManualInput,
   type CalendarManualInputProps,

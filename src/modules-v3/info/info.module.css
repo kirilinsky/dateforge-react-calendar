@@ -1,3 +1,8 @@
+/* Layer ORDER must ride in every layered file: bundlers concatenate
+   chunk CSS in graph order, and the first statement seen pins the order —
+   without this a chunk that lands first would re-rank the layers. */
+@layer cal-base, cal-themes, cal-appearances, cal-modules, cal-user;
+
 @layer cal-modules {
   /* Height animation transitions to the MEASURED content height (v2 parity:
      ResizeObserver + a CSS var) — covers show/hide AND content reflow (a
@@ -17,23 +22,8 @@
     padding: 0.5em 0.75em;
   }
 
-  .animated .inner {
-    overflow: hidden;
-    height: var(--cal-info-h, auto);
-    transition: height
-      var(--cal-info-transition, 0.25s)
-      var(--cal-info-easing, cubic-bezier(0.4, 0, 0.2, 1));
-  }
 
-  .animated[data-collapsed] .inner {
-    padding-block: 0;
-  }
 
-  @media (prefers-reduced-motion: reduce) {
-    .animated .inner {
-      transition: none;
-    }
-  }
 
   /* Text block: summary line + optional relative line, wrapping as a row. */
   .contentGroup {

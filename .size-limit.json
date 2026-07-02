@@ -5,10 +5,7 @@
       "./dist/index.mjs": "{ Calendar }"
     },
     "limit": "16.5 KB",
-    "ignore": [
-      "react",
-      "react-dom"
-    ]
+    "ignore": ["react", "react-dom"]
   },
   {
     "name": "Calendar + Days only (minimal viable)",
@@ -17,10 +14,7 @@
       "./dist/modules/days.mjs": "{ CalendarDays }"
     },
     "limit": "19.5 KB",
-    "ignore": [
-      "react",
-      "react-dom"
-    ]
+    "ignore": ["react", "react-dom"]
   },
   {
     "name": "Calendar + Toolbar + Days",
@@ -30,10 +24,7 @@
       "./dist/modules/days.mjs": "{ CalendarDays }"
     },
     "limit": "24.5 KB",
-    "ignore": [
-      "react",
-      "react-dom"
-    ]
+    "ignore": ["react", "react-dom"]
   },
   {
     "name": "Calendar + Days + Dracula theme + Compact appearance",
@@ -44,9 +35,14 @@
       "./dist/appearances.mjs": "{ compact }"
     },
     "limit": "23.5 KB",
-    "ignore": [
-      "react",
-      "react-dom"
-    ]
+    "ignore": ["react", "react-dom"]
+  },
+  {
+    "name": "Prebuilt SimpleCalendar (one import)",
+    "import": {
+      "./dist/prebuilt.mjs": "{ SimpleCalendar }"
+    },
+    "limit": "27 KB",
+    "ignore": ["react", "react-dom"]
   }
 ]

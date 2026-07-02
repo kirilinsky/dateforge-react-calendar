@@ -1,3 +1,8 @@
+/* Layer ORDER must ride in every layered file: bundlers concatenate
+   chunk CSS in graph order, and the first statement seen pins the order —
+   without this a chunk that lands first would re-rank the layers. */
+@layer cal-base, cal-themes, cal-appearances, cal-modules, cal-user;
+
 @layer cal-base {
   /*
    * VirtualTrack — shared physics-track shell. cal-base so module rules

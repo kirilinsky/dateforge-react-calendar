@@ -48,6 +48,12 @@ export type CalendarProps = CalendarProviderProps & {
    * `col` — same mental model as CSS Grid.
    */
   cols?: number | string;
+  /**
+   * Decorative gradient mode (v2 parity): soft accent glows in the shell's
+   * corners and a gradient fill on selected cells. Pure CSS, token-driven —
+   * follows the active theme and scheme. Default `false`.
+   */
+  gradient?: boolean;
   /** Light/dark choice. `"auto"` (default) follows the OS via `color-scheme`. */
   scheme?: SchemeMode;
   /**
@@ -59,6 +65,10 @@ export type CalendarProps = CalendarProviderProps & {
   onSchemeChange?: (scheme: "light" | "dark") => void;
   /** Extra class on the root shell (user escape hatch). */
   className?: string;
+  /** `id` on the root shell (label targets, anchors). */
+  id?: string;
+  /** Inline style on the root shell — merged over theme/appearance vars. */
+  style?: React.CSSProperties;
   /** Test handle on the root. Default `"dateforge-calendar"`. */
   "data-testid"?: string;
   /** Root-level aria label overrides (module → root → English default). */
@@ -69,9 +79,12 @@ export function Calendar({
   theme = "noir",
   appearance,
   cols,
+  gradient = false,
   scheme = "auto",
   onSchemeChange,
   className,
+  id,
+  style,
   "data-testid": testId = "dateforge-calendar",
   labels,
   children,
@@ -130,8 +143,9 @@ export function Calendar({
       ...themeStyle,
       ...appearanceStyle,
       ...(gridTemplateColumns ? { gridTemplateColumns } : undefined),
+      ...style,
     }),
-    [themeStyle, appearanceStyle, gridTemplateColumns],
+    [themeStyle, appearanceStyle, gridTemplateColumns, style],
   );
 
   // First focus (Focus Manager): resolve once, perform from the root after the
@@ -150,10 +164,12 @@ export function Calendar({
           <UIProvider scheme={activeScheme} toggleScheme={toggleScheme}>
             <div
               ref={rootRef}
+              id={id}
               data-dateforge-root=""
               data-theme={dataTheme}
               data-appearance={dataAppearance}
               data-scheme={activeScheme}
+              data-gradient={gradient ? "" : undefined}
               data-readonly={readOnly ? "" : undefined}
               data-testid={testId}
               className={className}

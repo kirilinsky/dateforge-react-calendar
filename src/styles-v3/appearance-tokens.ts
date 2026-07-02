@@ -90,6 +90,7 @@ export const APPEARANCE_TOKEN_TO_VAR: Record<keyof AppearanceTokens, string> = {
   letterSpacing: "--cal-letter-spacing",
 };
 
+/** @internal */
 export const CUSTOM_APPEARANCE_BRAND = Symbol.for(
   "dateforge.appearance.custom",
 );

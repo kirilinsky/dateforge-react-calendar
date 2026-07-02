@@ -3,17 +3,28 @@
   "entry": [
     "src/react-v3/index.ts",
     "src/react-v3/context.ts",
+    "src/react-v3/prebuilt.tsx",
     "src/modules-v3/index.ts",
     "src/modules-v3/*/Calendar*.tsx",
     "src/styles-v3/themes.ts",
     "src/styles-v3/appearances.ts",
-    "src/index.ts",
-    "src/context/index.ts",
-    "src/modules/index.ts",
     "scripts/**/*.{ts,mts,mjs}",
-    "**/*.stories.tsx",
+    "src/**/*.stories.tsx",
     ".storybook/{main,preview}.{ts,tsx}"
   ],
   "project": ["src/**/*.{ts,tsx}", "scripts/**/*.{ts,mts,mjs}"],
-  "ignore": ["dist/**", "dist-v3probe/**"]
+  "ignore": [
+    "src/components/**",
+    "src/context/**",
+    "src/global/**",
+    "src/modules/**",
+    "src/stories/**",
+    "src/styles/**",
+    "src/types/**",
+    "src/utils/**",
+    "src/index.ts",
+    "themes/**",
+    "appearances/**"
+  ],
+  "tags": ["-internal"]
 }

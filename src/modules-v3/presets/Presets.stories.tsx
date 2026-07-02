@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { buildConfig, D } from "../../__tests__/v3/fixtures/builders";
 import {

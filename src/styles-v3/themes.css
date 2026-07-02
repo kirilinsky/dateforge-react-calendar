@@ -7,6 +7,8 @@
  * are registered as typed <color> properties in tokens.css, which makes
  * theme and scheme switches crossfade via the paint transitions.
  */
+@layer cal-base, cal-themes, cal-appearances, cal-modules, cal-user;
+
 @layer cal-themes {
   [data-theme="abyss"] {
     --c-accent: #d400f0;

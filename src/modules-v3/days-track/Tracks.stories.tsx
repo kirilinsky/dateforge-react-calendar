@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { buildConfig, D, span } from "../../__tests__/v3/fixtures/builders";
 import { CalendarDays } from "../../modules-v3/days/CalendarDays";
 import { Calendar } from "../../react-v3/calendar";

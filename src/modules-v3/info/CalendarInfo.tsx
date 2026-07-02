@@ -1,5 +1,5 @@
-import type { CSSProperties, KeyboardEvent, ReactNode } from "react";
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import type { KeyboardEvent, ReactNode } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 import { differenceInDays } from "../../core-v3/calendar-date";
 import {
   type AnyCalendarValue,
@@ -38,8 +38,6 @@ export type CalendarInfoProps = {
   rangeStyle?: CalendarInfoRangeStyle;
   /** Toggle the built-in summary text (actions stay). Default true. */
   showSummary?: boolean;
-  /** Animate height when content appears/disappears. Default true. */
-  animated?: boolean;
   /** Horizontal alignment of the text block. Default "left". */
   align?: CalendarInfoAlign;
   /** Node rendered before the summary text (icon, label). */
@@ -118,7 +116,6 @@ export function CalendarInfo({
   showRelative = false,
   rangeStyle = "days",
   showSummary = true,
-  animated = true,
   align = "left",
   prefix,
   clearLabel,
@@ -232,33 +229,6 @@ export function CalendarInfo({
   const hasActionGroup = showHome || hasClearBtn;
   const hasContent = hasTextContent || hasActionGroup;
 
-  // ── Animated height (v2 parity) ────────────────────────────────────────────
-  // Transition to the MEASURED content height, so the bar animates not only on
-  // show/hide but also when the content reflows (e.g. the relative line wraps
-  // to a second row in a narrow container) — pure 0fr/1fr can't cover that.
-  const innerRef = useRef<HTMLDivElement>(null);
-  const [innerHeight, setInnerHeight] = useState<number | null>(null);
-
-  useLayoutEffect(() => {
-    if (!animated) {
-      setInnerHeight(null);
-      return;
-    }
-    if (!hasContent) {
-      setInnerHeight(0);
-      return;
-    }
-    const inner = innerRef.current;
-    if (!inner) return;
-    // scrollHeight = content + padding; with border-box that's the target height.
-    const measure = () => setInnerHeight(inner.scrollHeight);
-    measure();
-    if (typeof ResizeObserver === "undefined") return;
-    const ro = new ResizeObserver(measure);
-    for (const child of inner.children) ro.observe(child);
-    return () => ro.disconnect();
-  }, [animated, hasContent, summary, relativeSummary, hasClearBtn, showHome]);
-
   // ── Action group: roving arrows/Home/End + focus restore (v2 parity) ──────
   const homeBtnRef = useRef<HTMLButtonElement>(null);
   const clearBtnRef = useRef<HTMLButtonElement>(null);
@@ -306,7 +276,7 @@ export function CalendarInfo({
     clear();
   };
 
-  if (!animated && !hasContent) return null;
+  if (!hasContent) return null;
 
   return (
     <div
@@ -314,21 +284,10 @@ export function CalendarInfo({
       data-area="calendar-info"
       data-theme={theme}
       data-scheme={scheme}
-      data-collapsed={animated && !hasContent ? "" : undefined}
-      className={[styles.container, animated && styles.animated, className]
-        .filter(Boolean)
-        .join(" ")}
+      className={[styles.container, className].filter(Boolean).join(" ")}
       style={getGridSlotStyle(col)}
     >
-      <div
-        ref={innerRef}
-        className={styles.inner}
-        style={
-          animated && innerHeight !== null
-            ? ({ "--cal-info-h": `${innerHeight}px` } as CSSProperties)
-            : undefined
-        }
-      >
+      <div className={styles.inner}>
         <div
           className={styles.contentGroup}
           role={hasTextContent ? "status" : undefined}
