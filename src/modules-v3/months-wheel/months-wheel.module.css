@@ -1,3 +1,8 @@
+/* Layer ORDER must ride in every layered file: bundlers concatenate
+   chunk CSS in graph order, and the first statement seen pins the order —
+   without this a chunk that lands first would re-rank the layers. */
+@layer cal-base, cal-themes, cal-appearances, cal-modules, cal-user;
+
 @layer cal-modules {
   .container {
     display: flex;
@@ -44,5 +49,15 @@
   .resetBtn {
     align-self: center;
     margin: 0.35em 0 0.15em;
+  }
+
+  /* Bound-date header (bound mode): the wall-clock date this wheel edits. */
+  .boundedDate {
+    text-align: center;
+    font-size: 0.78em;
+    font-weight: 600;
+    color: var(--c-mutedText, #888);
+    padding: 0.35em 0 0.15em;
+    user-select: none;
   }
 }

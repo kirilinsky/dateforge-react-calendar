@@ -27,6 +27,8 @@ const lines: string[] = [
   " * One block per appearance; the cal-base bridge feeds these --cal-* vars into",
   ' * the vars the modules read. "No appearance" = the v3 default look.',
   " */",
+  "@layer cal-base, cal-themes, cal-appearances, cal-modules, cal-user;",
+  "",
   "@layer cal-appearances {",
 ];
 

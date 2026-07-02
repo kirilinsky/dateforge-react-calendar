@@ -76,6 +76,7 @@ export const extDate = (
   min = 0,
 ): Date => new Date(y, m - 1, d, h, min);
 
+/** @internal */
 export const extRange = (
   start: [number, number, number],
   end: [number, number, number],

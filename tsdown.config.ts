@@ -25,6 +25,7 @@ const M = "src/modules-v3";
 const entry = {
   index: "src/react-v3/index.ts",
   context: "src/react-v3/context.ts",
+  prebuilt: "src/react-v3/prebuilt.tsx",
   "modules/index": `${M}/index.ts`,
   "modules/days": `${M}/days/CalendarDays.tsx`,
   "modules/days-track": `${M}/days-track/CalendarDaysTrack.tsx`,

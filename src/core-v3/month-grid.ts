@@ -12,6 +12,7 @@ import {
  * state is layered on later by the adapter from the selection store — the pure
  * grid stays state-free so it can be memoized by `(year, month, options)`.
  */
+/** @internal */
 export type MonthGridCell = {
   readonly date: CalendarDate;
   /** False for leading/trailing days borrowed from the adjacent months. */

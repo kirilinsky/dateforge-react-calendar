@@ -20,7 +20,8 @@
     --c-range: #1a73e8;
     --c-activeText: #ffffff;
     --c-text: #1f2024;
-    --c-mutedText: #8a8f98;
+    /* AA on white for small text (weekday headers are 12px): ≥4.5:1. */
+    --c-mutedText: #5c6470;
     --c-disabledText: #c4c7cc;
     --c-backdrop: #ffffff;
     --c-tone: #eef1f7;
@@ -29,7 +30,8 @@
     --c-disabled: #a0a0a2;
     --c-weekend: #c62828;
     --c-error: #dc2626;
-    --c-outOfMonth: #b9bdc4;
+    /* Out-of-month days are real (clickable, labelled) content — AA too. */
+    --c-outOfMonth: #6e7683;
     --c-todayDot: #b06000;
     --c-focusRing: #1a73e8;
 
@@ -113,6 +115,35 @@
 
   [data-dateforge-root][data-readonly] {
     cursor: default;
+  }
+
+  /* Gradient mode (v2 parity, token-driven): soft accent glows in two corners
+     of the shell, and selected cells swap their flat accent fill for a light
+     accent gradient via the `--cal-selected-*` indirection (consumed by the
+     days cells and UITile). The ink flips to `--c-text` — the fill is a 38→14%
+     accent-over-backdrop mix, too light for `--c-activeText`. All color-mix on
+     theme tokens, so it follows every theme and both schemes. */
+  [data-dateforge-root][data-gradient] {
+    background:
+      radial-gradient(
+        ellipse 50% 45% at 5% 5%,
+        color-mix(in srgb, var(--c-backdrop) 89%, var(--c-accent)) 0%,
+        transparent 100%
+      ),
+      radial-gradient(
+        ellipse 40% 38% at 95% 95%,
+        color-mix(in srgb, var(--c-backdrop) 90%, var(--c-accent)) 0%,
+        transparent 100%
+      ),
+      var(--c-backdrop);
+    --cal-selected-bg: linear-gradient(
+      155deg,
+      color-mix(in srgb, var(--c-accent) 38%, var(--c-backdrop)) 0%,
+      color-mix(in srgb, var(--c-accent) 14%, var(--c-backdrop)) 100%
+    );
+    --cal-selected-ink: var(--c-text);
+    --cal-selected-ring: inset 0 0 0 1px
+      color-mix(in srgb, var(--c-accent) 22%, transparent);
   }
 
   /* RTL: mirror direction-bearing glyphs (the horizontal prev/next/pager

@@ -28,15 +28,8 @@ const day = (key: string) =>
   document.querySelector(`[data-date="${key}"]`) as HTMLElement;
 
 describe("CalendarInfo", () => {
-  it("stays mounted but collapsed when empty (animated default)", () => {
-    const { container } = setup();
-    const info = container.querySelector("[data-dateforge-info]");
-    expect(info).toBeTruthy();
-    expect(info?.hasAttribute("data-collapsed")).toBe(true);
-  });
-
-  it("animated=false unmounts entirely when empty", () => {
-    const { container } = setup("single", { animated: false });
+  it("unmounts entirely when empty", () => {
+    const { container } = setup("single", {});
     expect(container.querySelector("[data-dateforge-info]")).toBeNull();
   });
 

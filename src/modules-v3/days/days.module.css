@@ -1,3 +1,8 @@
+/* Layer ORDER must ride in every layered file: bundlers concatenate
+   chunk CSS in graph order, and the first statement seen pins the order —
+   without this a chunk that lands first would re-rank the layers. */
+@layer cal-base, cal-themes, cal-appearances, cal-modules, cal-user;
+
 @layer cal-modules {
   /*
    * Days module. State comes from the `data-*` attributes the module emits
@@ -235,8 +240,11 @@
   .cell[data-range-start],
   .cell[data-range-end],
   .cell[data-selected] {
-    background: var(--c-accent, #1a73e8);
-    color: var(--c-activeText, #fff);
+    /* `--cal-selected-*`: gradient-mode indirection (set on the root by
+       `data-gradient`); the fallbacks are the standard flat accent fill. */
+    background: var(--cal-selected-bg, var(--c-accent, #1a73e8));
+    color: var(--cal-selected-ink, var(--c-activeText, #fff));
+    box-shadow: var(--cal-selected-ring, none);
   }
 
   /* Today marker, two independent layers (v2 parity):

@@ -52,6 +52,11 @@ export type CalendarYearsWheelProps = {
    * Commits via `setBoundDate` (core owns ordering/clamping).
    */
   bound?: "from" | "to";
+  /**
+   * Bound mode: show a localized date header for the edited bound above the
+   * drum (v2 parity). Hidden while the range is empty. Default `true`.
+   */
+  showBoundDate?: boolean;
   /** Per-module theme override (`data-theme` on the module container). */
   theme?: string;
   /** Per-module scheme override (`data-scheme` on the module container). */
@@ -70,6 +75,7 @@ export function CalendarYearsWheel({
   yearsLabel,
   yearPickerLabel,
   bound,
+  showBoundDate = true,
   theme,
   scheme,
   col,
@@ -141,6 +147,16 @@ export function CalendarYearsWheel({
 
   const gridSlot = getGridSlotStyle(col);
 
+  // Bound-date header (v2 parity; same recipe as the TimeWheel).
+  const headerText =
+    showBoundDate && boundDate
+      ? new Intl.DateTimeFormat(locale, {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }).format(new Date(boundDate.year, boundDate.month - 1, boundDate.day))
+      : null;
+
   return (
     <div
       data-dateforge-years-wheel=""
@@ -150,6 +166,11 @@ export function CalendarYearsWheel({
       className={[styles.container, className].filter(Boolean).join(" ")}
       style={gridSlot}
     >
+      {headerText && (
+        <div className={styles.boundedDate} data-bound={bound}>
+          {headerText}
+        </div>
+      )}
       <div
         className={styles.root}
         role="group"

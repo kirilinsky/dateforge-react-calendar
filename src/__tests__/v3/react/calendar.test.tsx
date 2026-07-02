@@ -118,6 +118,25 @@ describe("Calendar root", () => {
     expect(placed?.style.gridColumn).toBe("1 / 3");
   });
 
+  it("gradient prop marks the root (off by default)", () => {
+    const { getByTestId, rerender } = render(
+      <Calendar config={config()} initialView={D(2026, 6, 1)} gradient>
+        <CalendarDays />
+      </Calendar>,
+    );
+    expect(
+      getByTestId("dateforge-calendar").getAttribute("data-gradient"),
+    ).toBe("");
+    rerender(
+      <Calendar config={config()} initialView={D(2026, 6, 1)}>
+        <CalendarDays />
+      </Calendar>,
+    );
+    expect(
+      getByTestId("dateforge-calendar").getAttribute("data-gradient"),
+    ).toBeNull();
+  });
+
   it("marks data-readonly for a read-only config", () => {
     const { getByTestId } = render(
       <Calendar

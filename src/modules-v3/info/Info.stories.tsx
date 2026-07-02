@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { buildConfig, D } from "../../__tests__/v3/fixtures/builders";
 import { Calendar } from "../../react-v3/calendar";
 import { storyLocale, storyThemeProps } from "../_lab/story-globals";
@@ -101,9 +101,9 @@ export const CustomFormatter: Story = {
   ),
 };
 
-/** Height animation: select/clear to watch the bar collapse and expand.
- *  CSS-only (grid-template-rows 0fr→1fr), reduced-motion disables. */
-export const AnimatedCollapse: Story = {
+/** Empty ⇄ filled: the bar mounts only while there is content — select a day
+ *  to show it, Clear to drop it (no height animation; the module unmounts). */
+export const EmptyUnmounts: Story = {
   render: (_, ctx) => (
     <Calendar
       {...storyThemeProps(ctx.globals)}

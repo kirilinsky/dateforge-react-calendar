@@ -1,3 +1,8 @@
+/* Layer ORDER must ride in every layered file: bundlers concatenate
+   chunk CSS in graph order, and the first statement seen pins the order —
+   without this a chunk that lands first would re-rank the layers. */
+@layer cal-base, cal-themes, cal-appearances, cal-modules, cal-user;
+
 @layer cal-base {
   /*
    * UITile — the shared roving-grid cell primitive. cal-base layer: module
@@ -32,10 +37,12 @@
     transform: scale(var(--cal-press-scale, 1));
   }
 
-  /* Committed pick. */
+  /* Committed pick. `--cal-selected-*` = gradient-mode indirection (root
+     `data-gradient`); fallbacks are the flat accent fill. */
   .tile[data-selected] {
-    background: var(--c-accent, #1a73e8);
-    color: var(--c-activeText, #fff);
+    background: var(--cal-selected-bg, var(--c-accent, #1a73e8));
+    color: var(--cal-selected-ink, var(--c-activeText, #fff));
+    box-shadow: var(--cal-selected-ring, none);
   }
 
   /* Hover on a SELECTED tile: keep the accent fill + inverted ink, just darken
@@ -44,7 +51,7 @@
      while the inverted `--c-activeText` text stays — unreadable, especially in
      dark themes. */
   .tile[data-selected]:hover:not(:disabled):not([aria-disabled="true"]) {
-    background: var(--c-accent, #1a73e8);
+    background: var(--cal-selected-bg, var(--c-accent, #1a73e8));
     filter: brightness(0.93);
   }
 

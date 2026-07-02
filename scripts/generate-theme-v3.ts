@@ -12,6 +12,7 @@
  *
  * Run: npx tsx scripts/generate-theme-v3.ts  (wired into `npm run build`).
  */
+import { execSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 import {
   TOKEN_TO_VAR,
@@ -69,6 +70,8 @@ const lines: string[] = [
   " * are registered as typed <color> properties in tokens.css, which makes",
   " * theme and scheme switches crossfade via the paint transitions.",
   " */",
+  "@layer cal-base, cal-themes, cal-appearances, cal-modules, cal-user;",
+  "",
   "@layer cal-themes {",
 ];
 
@@ -124,7 +127,7 @@ const tsLines: string[] = [
   " * `<Calendar theme={dracula} />` to tree-shake a single theme, or use the",
   ' * string form `theme="dracula"` to ride the generated stylesheet instead.',
   " */",
-  'import { type ThemeFamily, THEME_BRAND } from "./theme-tokens";',
+  'import { THEME_BRAND, type ThemeFamily } from "./theme-tokens";',
   "",
 ];
 
@@ -153,6 +156,12 @@ tsLines.push(
 tsLines.push("");
 
 writeFileSync("./src/styles-v3/themes.ts", tsLines.join("\n"));
+// Keep the generated file biome-clean, or every `build` would fail the next
+// `check` (verify runs check before build, so a stale unformatted output trips
+// the following run).
+execSync("npx biome format --write ./src/styles-v3/themes.ts", {
+  stdio: "ignore",
+});
 console.log(`✓ ${names.length} theme families → src/styles-v3/themes.ts`);
 
 // ── Contrast audit (report-only) ─────────────────────────────────────────────

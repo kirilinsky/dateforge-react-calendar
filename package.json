@@ -32,6 +32,16 @@
         "default": "./dist/context.cjs"
       }
     },
+    "./prebuilt": {
+      "import": {
+        "types": "./dist/prebuilt.d.ts",
+        "default": "./dist/prebuilt.mjs"
+      },
+      "require": {
+        "types": "./dist/prebuilt.d.cts",
+        "default": "./dist/prebuilt.cjs"
+      }
+    },
     "./modules": {
       "import": {
         "types": "./dist/modules/index.d.ts",

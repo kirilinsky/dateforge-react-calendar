@@ -109,7 +109,7 @@ export function unitSnap(
   }
 }
 
-/** Span length measured in the active unit (closed-form, no day iteration). */
+/** Span length measured in the active unit (closed-form, no day iteration). @internal */
 export function spanUnitLength(
   range: CalendarRange,
   config: CalendarConfig,

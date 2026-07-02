@@ -23,6 +23,7 @@ export type EffectSink = (
   state: CalendarState,
   action: CalendarAction,
 ) => void;
+/** @internal */
 export type StoreListener = () => void;
 
 export type CalendarStore = {

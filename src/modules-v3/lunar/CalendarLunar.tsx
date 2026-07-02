@@ -12,6 +12,20 @@ import {
 } from "./helpers";
 import styles from "./lunar.module.css";
 
+// Public lunar math (v2 exported these types/helpers): rides the lunar bundle.
+export {
+  buildLunarWindow,
+  getLunarFraction,
+  getLunarIllumination,
+  getLunarPhaseIndex,
+  getLunarPhaseKey,
+  LUNAR_PHASE_ABBR,
+  LUNAR_PHASE_KEYS,
+  LUNAR_PHASE_LONG,
+  type LunarPhaseIndex,
+  type LunarPhaseKey,
+} from "./helpers";
+
 export type CalendarLunarProps = {
   /** aria-label for the strip wrapper (registry key `lunar`). */
   lunarLabel?: string;

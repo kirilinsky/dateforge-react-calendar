@@ -1,3 +1,8 @@
+/* Layer ORDER must ride in every layered file: bundlers concatenate
+   chunk CSS in graph order, and the first statement seen pins the order —
+   without this a chunk that lands first would re-rank the layers. */
+@layer cal-base, cal-themes, cal-appearances, cal-modules, cal-user;
+
 @layer cal-modules {
   .container {
     container-type: inline-size;
@@ -11,19 +16,36 @@
     flex: 1;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.45em;
-    padding: 0.65em 0.55em;
+    gap: 0.4em;
+    padding: 0.5em 0.45em;
   }
 
   /* Tiles are the shared UITile primitive. Module extras: a tinted resting
      surface (presets read as offered actions, not bare cells) and roomier
      metrics for two-line labels. Selected/disabled come from the primitive. */
+  /* Same control scale as the months/years grid tiles (0.875em / 2.6em) — the
+     presets used to tower over every other button in the calendar. */
   .item {
-    min-height: 3.35em;
+    font-size: 0.875em;
+    min-height: 2.6em;
     max-width: 100%;
-    overflow-wrap: anywhere;
-    padding: 0.45em 0.6em;
+  }
+
+  /* Tinted RESTING surface only — the module rule lives in cal-modules, which
+     outranks cal-base, so an unguarded background here would paint over the
+     UITile selected fill (accent) and leave activeText ink on a light tint. */
+  .item:not([data-selected]) {
     background: color-mix(in srgb, var(--c-backdrop, #fff) 78%, var(--c-tone, #888));
+  }
+
+  .item {
+    /* Wrap between WORDS; break inside a word only when it alone overflows the
+       tile (`anywhere` chopped labels mid-word at any character). `balance`
+       evens out the two lines ("Last 7 days" → "Last 7" / "days", not
+       "Last 7 day" / "s"). */
+    overflow-wrap: break-word;
+    text-wrap: balance;
+    padding: 0.35em 0.55em;
   }
 
   .item:hover:not([disabled]):not([data-selected]) {
@@ -50,6 +72,15 @@
     .grid[data-count="9"] { grid-template-columns: repeat(9, minmax(0, 1fr)); }
     .grid[data-count="10"] { grid-template-columns: repeat(10, minmax(0, 1fr)); }
     .grid[data-count="12"] { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  }
+
+  /* Mid-width containers (a typical 300px picker): many-column layouts get
+     too cramped for word-wrapped labels — cap the columns so tiles keep
+     readable line lengths. */
+  @container cal-presets (max-width: 26em) {
+    .grid[data-count="4"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid[data-count="5"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid[data-count="10"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   }
 
   @container cal-presets (max-width: 16em) {

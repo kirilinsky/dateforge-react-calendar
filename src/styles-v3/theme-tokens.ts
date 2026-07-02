@@ -236,6 +236,7 @@ function deriveSeedTokens(
   return derived;
 }
 
+/** @internal */
 export function tokensToVars(
   tokens: Partial<ThemeTokens> | undefined,
 ): Record<string, string> {
