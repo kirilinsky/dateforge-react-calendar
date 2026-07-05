@@ -62,6 +62,8 @@ type PrebuiltShared = {
 type SingleDateProps = PrebuiltShared & {
   /** Controlled value. Omit for uncontrolled. */
   value?: Date | null;
+  /** Uncontrolled initial date. */
+  defaultValue?: Date | null;
   onChange?: (date: Date | null) => void;
 };
 
@@ -95,13 +97,22 @@ const single = (onChange?: (d: Date | null) => void) =>
  * selection. `<SimpleCalendar onChange={setDate} />` and done.
  */
 export function SimpleCalendar(props: SingleDateProps) {
-  const { value, onChange, theme, appearance, gradient, scheme, className } =
-    props;
+  const {
+    value,
+    defaultValue,
+    onChange,
+    theme,
+    appearance,
+    gradient,
+    scheme,
+    className,
+  } = props;
   const config = useSingleConfig(props);
   return (
     <Calendar
       config={config}
       value={value}
+      defaultValue={defaultValue}
       onChange={single(onChange)}
       theme={theme}
       appearance={appearance}
@@ -128,13 +139,22 @@ export function SimpleCalendar(props: SingleDateProps) {
  * keyboard-first single-date entry with the grid as fallback.
  */
 export function DatePicker(props: SingleDateProps) {
-  const { value, onChange, theme, appearance, gradient, scheme, className } =
-    props;
+  const {
+    value,
+    defaultValue,
+    onChange,
+    theme,
+    appearance,
+    gradient,
+    scheme,
+    className,
+  } = props;
   const config = useSingleConfig(props);
   return (
     <Calendar
       config={config}
       value={value}
+      defaultValue={defaultValue}
       onChange={single(onChange)}
       theme={theme}
       appearance={appearance}
@@ -163,6 +183,8 @@ export function DatePicker(props: SingleDateProps) {
 type MonthPickerProps = PrebuiltShared & {
   /** Controlled month (any day inside it). Omit for uncontrolled. */
   value?: Date | null;
+  /** Uncontrolled initial month (any day inside it). */
+  defaultValue?: Date | null;
   /** First day of the picked month (or `null` when cleared). */
   onChange?: (month: Date | null) => void;
 };
@@ -180,25 +202,36 @@ function MonthSelect() {
 const isRange = (v: AnyCalendarValue): v is PublicRange =>
   typeof v === "object" && v !== null && "start" in v;
 
+/** A month `Date` widened to the whole-month span the `unit:"month"` config expects. */
+const monthSpan = (d: Date | null | undefined) =>
+  d == null
+    ? d
+    : {
+        start: new Date(d.getFullYear(), d.getMonth(), 1),
+        end: new Date(d.getFullYear(), d.getMonth() + 1, 0),
+      };
+
 /**
  * A month picker: year-stepping header + 12-month grid; picking a month
  * selects the whole month (`unit: "month"`), reported as its first day.
  */
 export function MonthPicker(props: MonthPickerProps) {
-  const { value, onChange, theme, appearance, gradient, scheme, className } =
-    props;
+  const {
+    value,
+    defaultValue,
+    onChange,
+    theme,
+    appearance,
+    gradient,
+    scheme,
+    className,
+  } = props;
   const config = useSingleConfig(props, { unit: "month" });
   return (
     <Calendar
       config={config}
-      value={
-        value == null
-          ? value
-          : {
-              start: new Date(value.getFullYear(), value.getMonth(), 1),
-              end: new Date(value.getFullYear(), value.getMonth() + 1, 0),
-            }
-      }
+      value={monthSpan(value)}
+      defaultValue={monthSpan(defaultValue) ?? undefined}
       onChange={
         onChange
           ? (v: AnyCalendarValue) => onChange(isRange(v) ? v.start : null)
@@ -237,6 +270,8 @@ type MultiMonthProps = PrebuiltShared & {
   navigation?: boolean;
   /** Controlled value / uncontrolled seed / change — the root's own contract. */
   value?: AnyCalendarValue;
+  /** Uncontrolled initial selection, public `Date`-based shape. */
+  defaultValue?: AnyCalendarValue;
   defaultSelection?: SelectionState;
   onChange?: (value: AnyCalendarValue, details: CalendarChangeDetails) => void;
 };
@@ -256,6 +291,7 @@ export function MultiMonthCalendar(props: MultiMonthProps) {
     startMonth,
     navigation = true,
     value,
+    defaultValue,
     defaultSelection,
     onChange,
     theme,
@@ -279,6 +315,7 @@ export function MultiMonthCalendar(props: MultiMonthProps) {
     <Calendar
       config={config}
       value={value}
+      defaultValue={defaultValue}
       defaultSelection={defaultSelection}
       onChange={onChange}
       initialView={

@@ -41,6 +41,8 @@ export const DayFlag = {
   Today: 1 << 9,
   OutOfMonth: 1 << 10,
   Weekend: 1 << 11,
+  /** `maxDates` is hit and this (unselected) day would be rejected on click. */
+  MaxReached: 1 << 12,
 } as const;
 
 /**
@@ -124,6 +126,14 @@ export function dayFlags(
 
   if (lookup.shape === "point") {
     if (lookup.pointKeys.has(dateKey(date))) f |= DayFlag.Selected;
+    // Pre-click affordance (v2 parity): when the multiple-mode cap is full,
+    // every OTHER day would reject — surface it before the click.
+    else if (
+      config.maxDates !== undefined &&
+      lookup.pointKeys.size >= config.maxDates
+    ) {
+      f |= DayFlag.MaxReached;
+    }
   } else {
     const idx = rangeIndexOf(lookup.ranges, date);
     if (idx !== -1) {

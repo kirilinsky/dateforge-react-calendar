@@ -27,6 +27,14 @@ export const WARNINGS = {
     `The selected span is empty after exclude rules removed every day; nothing was committed.`,
   maxRangesReached: (max: number) =>
     `maxRanges (${max}) reached. Ignoring the new range — raise maxRanges or remove one first.`,
+  invalidValue: (detail: string) =>
+    `Dropped an invalid \`value\`/\`defaultValue\` entry (${detail}). Pass valid Date objects in the shape of the configured unit × mode.`,
+  invalidMinMax: () =>
+    `\`min\` is after \`max\` — no day is selectable. Swap or fix the bounds.`,
+  invalidPreset: (detail: string) =>
+    `Skipped an invalid preset (${detail}). Each preset needs a \`label\` (or \`id\`) and a resolvable value.`,
+  presetResolveError: (id: string, error: string) =>
+    `Preset "${id}" threw while resolving (${error}). It is treated as empty — make its getValue/resolve never throw.`,
 } as const;
 
 export type WarningId = keyof typeof WARNINGS;

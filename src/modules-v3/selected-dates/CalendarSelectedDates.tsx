@@ -25,6 +25,14 @@ export type CalendarSelectedDatesProps = {
   overflowLabel?: string;
   /** Chip row alignment. Default `"left"`. */
   align?: "left" | "center" | "right";
+  /** Per-module override for the Clear button label. */
+  clearLabel?: string;
+  /** Per-module override for a chip's remove-button aria label. */
+  removeDateLabel?: string;
+  /** Per-module override for the range-start remove aria label. */
+  removeRangeStartLabel?: string;
+  /** Per-module override for the range-end remove aria label. */
+  removeRangeEndLabel?: string;
   col?: number | string;
   className?: string;
   /** Per-module theme override (`data-theme` on the module container). */
@@ -120,6 +128,10 @@ export function CalendarSelectedDates({
   maxVisibleChips,
   overflowLabel = "+{count}",
   align = "left",
+  clearLabel,
+  removeDateLabel,
+  removeRangeStartLabel,
+  removeRangeEndLabel,
   col,
   className,
   theme,
@@ -185,7 +197,11 @@ export function CalendarSelectedDates({
                 onRemove={
                   allowClearPerChip ? () => removeDate(dt.date) : undefined
                 }
-                removeLabel={t("removeSelectedDate")}
+                removeLabel={t(
+                  "removeSelectedDate",
+                  undefined,
+                  removeDateLabel,
+                )}
               />
             );
           },
@@ -210,12 +226,12 @@ export function CalendarSelectedDates({
             variant="ghost"
             size="sm"
             className={styles.clearBtn}
-            aria-label={t("clear")}
+            aria-label={t("clear", undefined, clearLabel)}
             onClick={() => clear()}
             disabled={config.readOnly}
           >
             <ClearIcon />
-            {t("clear")}
+            {t("clear", undefined, clearLabel)}
           </UIButton>
         )}
       </div>
@@ -264,7 +280,11 @@ export function CalendarSelectedDates({
                   ? () => removeRange(index)
                   : undefined
               }
-              removeLabel={t("removeRangeStart")}
+              removeLabel={t(
+                "removeRangeStart",
+                undefined,
+                removeRangeStartLabel,
+              )}
             />
             <span className={styles.sep} aria-hidden>
               –
@@ -277,7 +297,7 @@ export function CalendarSelectedDates({
               onRemove={
                 allowClearPerChip ? () => removeRange(index) : undefined
               }
-              removeLabel={t("removeRangeEnd")}
+              removeLabel={t("removeRangeEnd", undefined, removeRangeEndLabel)}
             />
           </span>
         );
@@ -287,12 +307,12 @@ export function CalendarSelectedDates({
           variant="ghost"
           size="sm"
           className={styles.clearBtn}
-          aria-label={t("clear")}
+          aria-label={t("clear", undefined, clearLabel)}
           onClick={() => clear()}
           disabled={config.readOnly}
         >
           <ClearIcon />
-          {t("clear")}
+          {t("clear", undefined, clearLabel)}
         </UIButton>
       )}
     </div>

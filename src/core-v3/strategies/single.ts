@@ -49,11 +49,22 @@ function selectDay(ctx: SelectionContext, date: CalendarDate): ReduceResult {
 
 function setTime(ctx: SelectionContext, time: CalendarTime): ReduceResult {
   const sel = ctx.state.selection;
-  if (!ctx.config.withTime || sel.shape !== "point" || !sel.dates[0]) {
+  if (!ctx.config.withTime || sel.shape !== "point") {
     return noChange(ctx.state);
   }
   const timeInvalid = validateTime(time, ctx.config);
   if (timeInvalid) return rejected(ctx.state, timeInvalid);
+
+  // Time-only flow (v2 parity): editing time with NO selection auto-creates
+  // one on the view anchor — a bare `<CalendarTimeWheel/>` works as a time
+  // picker. The anchor day still passes the same day invariants as a click.
+  if (!sel.dates[0]) {
+    const anchor = ctx.state.view.viewDate;
+    const rejection = validateDay(anchor, ctx.config);
+    if (rejection) return rejected(ctx.state, rejection);
+    return commitPoint(ctx.state, [calendarDateTime(anchor, time)]);
+  }
+
   return commitPoint(ctx.state, [withTime(sel.dates[0], time)]);
 }
 

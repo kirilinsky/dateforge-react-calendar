@@ -45,7 +45,12 @@ export type CalendarProviderProps = {
    * host's intent. Omit (`undefined`) for uncontrolled use with `defaultSelection`.
    */
   value?: AnyCalendarValue;
-  /** Seeded selection for uncontrolled use (defaultValue). */
+  /**
+   * Uncontrolled initial selection in the public `Date`-based shape (same
+   * shape as `value`). The ergonomic seed for uncontrolled use.
+   */
+  defaultValue?: AnyCalendarValue;
+  /** Uncontrolled seed as a raw internal `SelectionState`. @internal */
   defaultSelection?: SelectionState;
   /** Initial view anchor. Defaults to today in the configured zone. */
   initialView?: CalendarDate;
@@ -95,6 +100,7 @@ type Callbacks = Pick<
 export function CalendarProvider({
   config,
   value,
+  defaultValue,
   defaultSelection,
   initialView,
   initialFocus,
@@ -117,10 +123,14 @@ export function CalendarProvider({
       config,
       createInitialState(config, {
         view,
-        // Controlled mount seeds from `value`; otherwise from `defaultSelection`.
+        // Controlled mount seeds from `value`; uncontrolled from the public
+        // `defaultValue` (or the internal `defaultSelection` escape hatch).
         selection: controlled
           ? fromPublicValue(value, config)
-          : defaultSelection,
+          : (defaultSelection ??
+            (defaultValue !== undefined
+              ? fromPublicValue(defaultValue, config)
+              : undefined)),
         // First focus is resolved once at mount (Focus Manager). Default: none.
         focus: resolveInitialFocus(initialFocus, view),
       }),

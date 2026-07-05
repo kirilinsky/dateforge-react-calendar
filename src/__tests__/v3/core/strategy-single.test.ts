@@ -183,11 +183,14 @@ describe("time", () => {
     );
   });
 
-  it("setTime is a no-op without a selection", () => {
+  it("setTime without a selection auto-creates one on the view anchor (time-only flow)", () => {
     const cfg = config({ withTime: true });
     const s = start(cfg);
     const r = reduce(s, { type: "setTime", time: calendarTime(10, 0) }, cfg);
-    expect(r.state).toBe(s);
+    expect(r.state.selection).toEqual({
+      shape: "point",
+      dates: [{ date: r.state.view.viewDate, time: calendarTime(10, 0) }],
+    });
   });
 
   it("rejects malformed time edits", () => {

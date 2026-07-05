@@ -10,6 +10,7 @@ import {
   resolveAppearance,
 } from "../styles-v3/appearance-tokens";
 import type { ThemeFamily } from "../styles-v3/theme-tokens";
+import { CalendarAnnouncer } from "./announcer";
 import { resolveInitialFocus, useFirstFocus } from "./focus-manager";
 import { LabelsProvider } from "./labels-context";
 import { CalendarProvider, type CalendarProviderProps } from "./provider";
@@ -176,6 +177,7 @@ export function Calendar({
               style={rootStyle}
             >
               {children}
+              <CalendarAnnouncer />
             </div>
           </UIProvider>
         </LabelsProvider>

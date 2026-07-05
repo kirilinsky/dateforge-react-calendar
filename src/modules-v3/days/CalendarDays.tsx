@@ -376,6 +376,7 @@ export function CalendarDays({
       e.key,
       effectiveFocus,
       config.firstDayOfWeek,
+      e.shiftKey,
     );
     if (!result) return;
     e.preventDefault();

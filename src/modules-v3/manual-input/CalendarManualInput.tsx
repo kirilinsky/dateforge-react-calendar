@@ -102,11 +102,21 @@ export function CalendarManualInput({
   const pendingCursor = useRef<number | null>(null);
   const pendingRange = useRef<[number, number] | null>(null);
 
+  // Multiple mode: the input is an ADD box (v2 parity) — it never mirrors a
+  // picked date, each complete entry appends and the field resets for the
+  // next one. Pair with `<CalendarSelectedDates allowClearPerChip>` for the
+  // chip list; at `maxDates` the box disables instead of rejecting on commit.
+  const isMultiple = config.mode === "multiple" && selection.shape === "point";
+  const capReached =
+    isMultiple &&
+    config.maxDates !== undefined &&
+    selection.dates.length >= config.maxDates;
+
   // The date this input mirrors: the single point, or the chosen span bound.
   // Pure CalendarDate fields — wall-clock, no Date/timezone roundtrip.
   const controlled: CalendarDate | null =
     selection.shape === "point"
-      ? selection.dates.length === 1
+      ? !isMultiple && selection.dates.length === 1
         ? selection.dates[0].date
         : null
       : selection.ranges.length > 0
@@ -164,6 +174,22 @@ export function CalendarManualInput({
       const committed =
         bound === "to" ? after.ranges[0].end : after.ranges[0].start;
       return compareDate(committed, d) === 0;
+    }
+    if (isMultiple) {
+      // Add-box: re-typing an already-picked date would toggle it OFF via
+      // selectDay — treat it as "already there" instead.
+      const key = `${d.year}-${d.month}-${d.day}`;
+      const dup = selection.dates.some(
+        (dt) => `${dt.date.year}-${dt.date.month}-${dt.date.day}` === key,
+      );
+      if (!dup) selectDay(d);
+      // Reset for the next entry (async: let the commit render first).
+      pendingCursor.current = 0;
+      setTimeout(() => {
+        setText("");
+        setInvalid(false);
+      }, 0);
+      return true;
     }
     selectDay(d);
     return true;
@@ -283,6 +309,7 @@ export function CalendarManualInput({
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           readOnly={config.readOnly}
+          disabled={capReached}
           aria-invalid={invalid || undefined}
           aria-label={ariaLabel}
         />
