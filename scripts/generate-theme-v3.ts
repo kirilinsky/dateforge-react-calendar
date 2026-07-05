@@ -211,6 +211,10 @@ const PAIRS: Pair[] = [
   ["mutedText", "backdrop", 3],
   ["error", "backdrop", 3],
   ["weekend", "backdrop", 3],
+  // Out-of-month day numbers and disabled ink render directly on the backdrop;
+  // 3:1 = AA for large/UI text (they are de-emphasized by design, never body).
+  ["outOfMonth", "backdrop", 3],
+  ["disabledText", "backdrop", 3],
 ];
 
 const violations: string[] = [];
