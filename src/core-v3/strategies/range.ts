@@ -70,6 +70,12 @@ function applyPreset(
   preset: PresetResult,
 ): ReduceResult {
   if (preset.kind !== "range") return noChange(ctx.state);
+  // A preset commits through the SAME invariants as a manual pick (the
+  // preset-engine contract): endpoint validity first, then span rules.
+  const startRejection = validateDay(preset.range.start, ctx.config);
+  if (startRejection) return rejected(ctx.state, startRejection);
+  const endRejection = validateDay(preset.range.end, ctx.config);
+  if (endRejection) return rejected(ctx.state, endRejection);
   const lengthRejection = validateSpanLength(preset.range, ctx.config);
   if (lengthRejection) return rejected(ctx.state, lengthRejection);
   const crossing = validateRangeCrossing(preset.range, ctx.config);

@@ -12,6 +12,7 @@ import {
   spanSetTime,
   unitSnap,
   validateDay,
+  validateSpanLength,
 } from "./shared";
 
 /**
@@ -52,8 +53,16 @@ function applyPreset(
   preset: PresetResult,
 ): ReduceResult {
   if (preset.kind === "date") return selectDay(ctx, preset.date);
-  if (preset.kind === "range")
+  if (preset.kind === "range") {
+    // Same invariants as a manual pick (the preset-engine contract).
+    const startRejection = validateDay(preset.range.start, ctx.config);
+    if (startRejection) return rejected(ctx.state, startRejection);
+    const endRejection = validateDay(preset.range.end, ctx.config);
+    if (endRejection) return rejected(ctx.state, endRejection);
+    const lengthRejection = validateSpanLength(preset.range, ctx.config);
+    if (lengthRejection) return rejected(ctx.state, lengthRejection);
     return commitSpan(ctx.state, [preset.range], timesFor(ctx), ctx.config);
+  }
   return noChange(ctx.state);
 }
 
