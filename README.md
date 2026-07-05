@@ -23,44 +23,20 @@
 # @dateforge/react-calendar
 
 <div align="center">
-  <img src="https://i.ibb.co/pj9WVkSR/image.png" alt="Compact DateForge calendar" width="360" />
-</div>
-
-<div align="center">
 
 ### [🚀 Live Demo](https://calendar-demo-pi.vercel.app/) &nbsp;·&nbsp; [📖 Docs](https://calendar-demo-pi.vercel.app/docs) &nbsp;·&nbsp; [📚 Storybook](https://kirilinsky.github.io/dateforge-react-calendar/)
 
 </div>
 
-**A modular calendar toolkit that starts tiny and grows with your product.**
+**A modular React calendar toolkit that starts tiny and grows with your product.**
 
-Monolithic pickers ship the grid, toolbar, time picker, presets, layout opinions, and weight. DateForge ships only what you use.
+Monolithic pickers ship the grid, the toolbar, the time picker, the presets, the layout opinions — and all the weight. DateForge ships only what you use: every module is its own bundle on its own subpath, sharing one calendar core.
 
-Start with a toolbar and a grid. Add range selection, multi-select, time, presets, manual input, chips, tracks, custom layouts, themes, and tokens.
-
-DateForge is not one picker with a long prop list. It is a set of focused modules that share one calendar brain.
-
-<div align="center">
-  <img src="https://i.ibb.co/hxRcVz03/dateforge-modular-architecture.png" alt="DateForge modular architecture" width="720" />
-</div>
-
-**Modular · Composable · Tokenized**  
-**Start minimal. Scale infinitely. Add only the modules you need.**
-
-The module mix, selection modes, tokens, and focused props unlock **~2.0 trillion built-in calendar configurations** without forcing one prebuilt UI.
-
-Use built-in themes and appearances, or create your own. Shape selection with presets, disabled rules, min/max bounds, timezones, and modes:
-`single`, `multiple`, or `range`.
-
-Build a classic picker, date track, 12-month board, month-only selector, time-only control, or custom booking flow from the same parts.
-
-<div align="center">
-   <br />
-  <br />
-  <img src="https://i.ibb.co/7Jhq7s0Y/image.png" alt="DateForge date and time calendar flow" width="380" />
-</div>
-
----
+- **Zero runtime dependencies.** React 18/19 peer, nothing else.
+- **SSR-safe.** No hydration mismatches — server render tested in CI.
+- **Accessible.** Keyboard-first, roving focus, axe-audited, WCAG-checked contrast in every built-in theme.
+- **Themeable.** 28 light/dark theme families, 8 appearances, gradient mode, or bring your own tokens.
+- **Pay per module.** A minimal calendar stays around 20 KB min+gzip; size budgets are enforced in CI.
 
 ## Install
 
@@ -68,121 +44,176 @@ Build a classic picker, date track, 12-month board, month-only selector, time-on
 npm i @dateforge/react-calendar
 ```
 
-No global CSS import is required — styles are bundled into the modules and apply automatically.
+No global CSS import required — styles ship inside the modules and apply automatically.
 
-## Quick start
+## 10-second start
+
+One import, zero composition:
 
 ```tsx
 import { useState } from "react";
-import { Calendar } from "@dateforge/react-calendar";
+import { SimpleCalendar } from "@dateforge/react-calendar/prebuilt";
+
+export function Example() {
+  const [date, setDate] = useState<Date | null>(null);
+  return <SimpleCalendar value={date} onChange={setDate} />;
+}
+```
+
+### Prebuilt gallery
+
+Every prebuilt is a ready recipe over the same primitives, with plain-`Date` props (`value`, `defaultValue`, `onChange`, `locale`, `min`/`max`, `disabled`, `theme`, `appearance`, `gradient`, `scheme`):
+
+```tsx
 import {
-  CalendarDays,
+  DatePicker,
+  MonthPicker,
+  MultiMonthCalendar,
+  SimpleCalendar,
+} from "@dateforge/react-calendar/prebuilt";
+
+<SimpleCalendar onChange={setDate} />                      // header + day grid
+<DatePicker allowClear onChange={setDate} />               // typed input + grid + Today
+<MonthPicker onChange={setMonth} />                        // year stepper + 12-month grid
+<MultiMonthCalendar months={6} cols={3} mode="range" />    // 6-month range board
+```
+
+## Compose your own
+
+When a prebuilt stops fitting, drop one level down: `Calendar` takes a compiled `config` (from `createCalendarConfig`) and any mix of modules as children. The root is a CSS grid — `cols` on the root declares columns, `col` on a module places it.
+
+```tsx
+import {
+  Calendar,
+  commonPresets,
+  createCalendarConfig,
+} from "@dateforge/react-calendar";
+import { CalendarDays } from "@dateforge/react-calendar/modules/days";
+import { CalendarPresets } from "@dateforge/react-calendar/modules/presets";
+import {
   CalendarToolbar,
   CalendarToolbarMonthTrigger,
   CalendarToolbarNext,
   CalendarToolbarPrev,
   CalendarToolbarYearTrigger,
-} from "@dateforge/react-calendar/modules";
+} from "@dateforge/react-calendar/modules/toolbar";
 
-export function Example() {
-  const [date, setDate] = useState<Date | null>(null);
+const config = createCalendarConfig({
+  mode: "range",
+  locale: "de-DE",
+  disabled: { weekends: true },
+});
 
+export function BookingCalendar() {
   return (
-    <Calendar mode="single" value={date} onChange={setDate}>
+    <Calendar
+      config={config}
+      cols={3}
+      onChange={(range) => console.log(range)} // { start: Date, end: Date } | null
+    >
       <CalendarToolbar>
         <CalendarToolbarPrev />
         <CalendarToolbarMonthTrigger />
-        <CalendarToolbarYearTrigger compact />
+        <CalendarToolbarYearTrigger />
         <CalendarToolbarNext />
       </CalendarToolbar>
-      <CalendarDays />
+      <CalendarPresets col={1} presets={commonPresets} />
+      <CalendarDays col={2} />
     </Calendar>
   );
 }
 ```
 
-## Why DateForge?
+Remove a line, remove a feature. Add a module, add a workflow. Order in JSX is visual flow — no `order` props, no slots.
 
-Most date pickers ask you to accept their shape. DateForge lets you forge yours.
-
-- **Ship less by default** — import `CalendarDays` and the toolbar pieces you need, then stop. No unused time picker, presets, or hidden panel.
-- **Compose real workflows** — add modules for range previews, multi-month layouts, inline time, shortcuts, manual input, summaries, or tracks.
-- **Keep one shared state model** — every module plugs into the same provider, so custom layouts feel native instead of stitched together.
-- **Style it like your system** — themes, appearances, gradients, CSS-grid placement, and tokens help it feel built-in.
-- **Grow without rewriting** — the same API covers a tiny picker, booking range calendar, scheduler, or dense operations tool.
-- **Built for serious apps** — a11y, SSR-safe defaults, timezones, React 18/19, zero runtime dependencies, and tree-shakeable modules.
-
-```tsx
-<Calendar mode="range" value={range} onChange={setRange}>
-  <CalendarToolbar>
-    <CalendarToolbarPrev />
-    <CalendarToolbarMonthTrigger />
-    <CalendarToolbarYearTrigger compact />
-    <CalendarToolbarNext />
-  </CalendarToolbar>
-  <CalendarDays />
-  <CalendarPresets presets={presets} />
-  <CalendarSelectedDates />
-</Calendar>
-```
-
-Remove a line, remove a feature. Add a module, add a workflow. That is the core idea.
-
-## Themes
-
-Themes are light/dark families. Omit `theme` for the default auto palette, pass `light` or `dark` for an explicit initial mode, or import a family:
-
-```tsx
-import { Calendar, createTheme } from "@dateforge/react-calendar";
-import { nebula } from "@dateforge/react-calendar/themes/nebula";
-
-<Calendar theme={nebula} dark />;
-
-const brand = createTheme({
-  highlight: "#2563eb",
-  range: "#22c55e",
-  weekend: "#ef4444",
-  light: { backdrop: "#f8fafc" },
-  dark: { backdrop: "#0f172a", text: "#f8fafc" },
-});
-
-<Calendar theme={brand} />;
-```
+The `onChange` value shape is derived from `unit` × `mode` alone: `day`+`single` → `Date | null`, `day`+`multiple` → `Date[]`, any single span (`range`, or `week`/`month` single) → `{ start, end } | null`, any multi span → `{ start, end }[]`.
 
 ## Modules
 
-| Module                  | Use it for                                                  |
-| ----------------------- | ----------------------------------------------------------- |
-| `CalendarToolbar`       | Composable header row for navigation, labels, popups, time  |
-| `CalendarDays`          | Classic month grid for single, multiple, and range          |
-| `CalendarSelectedDates` | Selected-date chips, overflow, per-chip clear               |
-| `CalendarInfo`          | Selection metrics, relative hints, empty text, home / clear |
-| `CalendarManualInput`   | Typed dates, keyboard-first editing, per-date remove        |
-| `CalendarPresets`       | Shortcuts like Today, Last 7 days, custom ranges            |
-| `CalendarMonthsGrid`    | Month-only picking or fast month jumps                      |
-| `CalendarYearsGrid`     | Year-only picking or fast year jumps                        |
-| `CalendarDaysTrack`     | Scrollable day track for compact/mobile layouts             |
-| `CalendarMonthsTrack`   | Scrollable month track                                      |
-| `CalendarYearsTrack`    | Scrollable year track                                       |
-| `CalendarTimeWheel`     | Drum-style hour/minute/second picker (range bound aware)    |
-| `CalendarMonthsWheel`   | Drum-style month picker (range bound aware)                 |
-| `CalendarYearsWheel`    | Drum-style year picker (range bound aware)                  |
-| `CalendarLunar`         | Information-only lunar phase strip around the selected date |
+Import from `@dateforge/react-calendar/modules`, or per subpath (`…/modules/days`, `…/modules/toolbar`, …) for the smallest possible bundle.
 
-### Module groups
+| Module | Use it for |
+| --- | --- |
+| `CalendarToolbar` + primitives | Composable header: prev/next (unit-aware), month/year triggers and labels, Home, Apply, clock |
+| `CalendarDays` | Classic month grid — single, multiple, range, multi-range; `offset` for multi-month boards |
+| `CalendarMonthsGrid` / `CalendarYearsGrid` | Month/year picking or fast jumps |
+| `CalendarDaysTrack` / `CalendarMonthsTrack` / `CalendarYearsTrack` | Physics-based scrollable strips for compact and mobile layouts |
+| `CalendarTimeWheel` / `CalendarMonthsWheel` / `CalendarYearsWheel` | iOS-style drum pickers, range-bound aware (`bound="from" \| "to"`) |
+| `CalendarManualInput` | Typed, segment-based date entry with keyboard stepping |
+| `CalendarPresets` | Shortcuts — `commonPresets`, `relativePresets`, or `definePreset` your own |
+| `CalendarSelectedDates` | Selected-date chips with overflow and per-chip clear |
+| `CalendarInfo` | Selection metrics, relative hints, empty text |
+| `CalendarLunar` | Information-only lunar phase strip |
 
-- **Grids** — `Days`, `MonthsGrid`, `YearsGrid`. Tabular picking.
-- **Tracks** — `DaysTrack`, `MonthsTrack`, `YearsTrack`. Horizontal scrollable strips (compact / mobile).
-- **Wheels** — `TimeWheel`, `MonthsWheel`, `YearsWheel`. iOS-style drum pickers with physics, optional `bound` for range, optional `showReset` for "current".
-- **Inputs** — `ManualInput`. Typed dates with mask + format.
-- **Helpers** — `Toolbar`, `Presets`.
-- **Information** — `Info`, `SelectedDates`, `Lunar`. Read-only / display-focused; minor interactive bits (clear, per-chip remove) are escape hatches, not the primary purpose.
+## Features
 
----
+- **Selection axes** — `mode`: `single` / `multiple` / `range` / `multi-range` × `unit`: `day` / `week` / `month`. Plus `minSpan`/`maxSpan`, `maxDates`, `maxRanges`.
+- **Disabled vs excluded** — `disabled` days can't be picked; `exclude` days are cut out of emitted spans (business-day flows), with segments reported in change details.
+- **28 theme families** — each with light + dark: `abyss`, `aurora`, `bauhaus`, `chalk`, `crimson`, `cyber`, `dracula`, `eclipse`, `espresso`, `fjord`, `graphite`, `industrial`, `meadow`, `mint`, `monsoon`, `nebula`, `neon`, `noir`, `pearl`, `prism`, `riso`, `sandstone`, `slate`, `snow`, `solar`, `split`, `temporal`, `velvet`.
+- **8 appearances** (shape/spacing, independent of color): `zenith`, `airy`, `bubble`, `compact`, `loft`, `press`, `soft`, `square`.
+- **Gradient mode** — `gradient` on the root adds corner glows and gradient selected fills, pure CSS, theme-driven.
+- **Scheme control** — `scheme="auto" | "light" | "dark"`, controllable via `onSchemeChange`; no dark-mode flash on SSR.
+- **Locales via `Intl`** — month/weekday names, digits, and week start derive from any BCP-47 `locale`; no locale files to import.
+- **RTL** — logical properties throughout; the calendar follows the inherited `dir`.
+- **Time** — `withTime`, 12/24-hour, `ampmLabels`, `defaultTime`, and a `minTime`/`maxTime` window enforced by the core.
+- **Time zones & DST** — IANA `timeZone` for "today" resolution, with explicit ambiguous/nonexistent-time policies.
+- **Presets** — built-in packs plus `definePreset` with validation context (disabled/min/max aware).
+- **Accessibility** — full keyboard navigation, focus management, live announcements, axe test suite in CI.
+- **Validation hooks** — `onValidationReject` tells you what was refused and why; `onViewChange` tracks navigation.
+
+### Theming in one minute
+
+```tsx
+import { Calendar, createTheme } from "@dateforge/react-calendar";
+import { nebula } from "@dateforge/react-calendar/themes";
+import { compact } from "@dateforge/react-calendar/appearances";
+
+// Built-in: by name (generated stylesheet) or by object (tree-shaken)
+<Calendar config={config} theme="dracula" />
+<Calendar config={config} theme={nebula} appearance={compact} scheme="dark" />
+
+// Custom: common tokens + per-mode overrides → a light/dark family
+const brand = createTheme({
+  accent: "#2563eb",
+  range: "#22c55e",
+  light: { backdrop: "#f8fafc" },
+  dark: { backdrop: "#0f172a", text: "#f8fafc" },
+});
+<Calendar config={config} theme={brand} />
+```
+
+## Bundle size
+
+Budgets from [`.size-limit.json`](./.size-limit.json), min+gzip, enforced on every commit (React excluded):
+
+| Import | Budget |
+| --- | --- |
+| `Calendar` only | < 18 KB |
+| `Calendar` + `CalendarDays` | < 21.5 KB |
+| `Calendar` + `CalendarDays` + theme + appearance | < 25.5 KB |
+| `Calendar` + Toolbar + `CalendarDays` | < 26 KB |
+| `SimpleCalendar` (prebuilt, one import) | < 27 KB |
+
+Dual ESM/CJS, `sideEffects` limited to CSS, subpath exports per module — bundlers drop everything you don't touch.
+
+## Migrating from v2
+
+v3 is a clean rebuild. The three headline breaking changes:
+
+- **Config object instead of flat props.** `<Calendar mode locale min …>` became `createCalendarConfig({ mode, locale, min, … })` passed as one `config` prop — compiled once, shared by every module.
+- **Value shapes by `unit` × `mode`.** `onChange` shapes are fully determined by the config's unit and mode (see above); segments and reasons arrive in a second `details` argument.
+- **Themes are families only.** Every theme is a `{ light, dark }` pair; the v1 single-variant palettes are gone, `createTheme` always returns a family.
+
+Prefer not to migrate composition code by hand? The [prebuilt components](#prebuilt-gallery) cover the common v2 setups with one import. Full details in [DOCUMENTATION.md](./DOCUMENTATION.md).
 
 ## Links
 
 - 📚 [Repo Documentation](https://github.com/kirilinsky/dateforge-react-calendar/blob/main/DOCUMENTATION.md)
 - 🏛 [Architecture](https://github.com/kirilinsky/dateforge-react-calendar/blob/main/ARCHITECTURE.md)
 - 📝 [Changelog](https://github.com/kirilinsky/dateforge-react-calendar/blob/main/CHANGELOG.md)
+- 📚 [Storybook](https://kirilinsky.github.io/dateforge-react-calendar/)
 - 🐛 [Issues](https://github.com/kirilinsky/dateforge-react-calendar/issues)
+
+## License
+
+[MIT](./LICENSE) © [Kirilinsky](https://github.com/kirilinsky)

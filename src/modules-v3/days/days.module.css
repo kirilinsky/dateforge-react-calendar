@@ -284,10 +284,10 @@
     text-decoration: line-through;
   }
 
-  /* Disabled days: blocked, de-emphasized. */
+  /* Disabled days: blocked, de-emphasized (theme disabled-surface tint). */
   .cell[data-disabled] {
     color: var(--c-disabledText, #ccc);
-    background: transparent;
+    background: color-mix(in srgb, var(--c-disabled, #aaa) 10%, transparent);
     cursor: not-allowed;
     opacity: 0.55;
   }

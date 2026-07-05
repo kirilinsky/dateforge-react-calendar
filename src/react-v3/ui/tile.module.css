@@ -67,6 +67,7 @@
     color: var(--c-disabledText, #ccc);
     cursor: not-allowed;
     opacity: var(--cal-opacity-disabled, 0.55);
-    background: transparent;
+    /* Theme-tuned disabled SURFACE token as a soft tint (v2 parity). */
+    background: color-mix(in srgb, var(--c-disabled, #aaa) 10%, transparent);
   }
 }
