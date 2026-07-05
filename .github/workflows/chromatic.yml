@@ -31,7 +31,14 @@ jobs:
   chromatic:
     # Skip auto-generated changeset release PRs and dependabot PRs — they
     # don't touch stories and just re-run the snapshot for no visual delta.
-    if: github.head_ref != 'changeset-release/main' && !startsWith(github.head_ref, 'dependabot/')
+    # Same for the main-push builds those merges produce (dep bumps and
+    # version-packages commits land as "chore(deps…"/"chore: version…").
+    if: >-
+      github.head_ref != 'changeset-release/main' &&
+      !startsWith(github.head_ref, 'dependabot/') &&
+      (github.event_name != 'push' ||
+        (!startsWith(github.event.head_commit.message, 'chore(deps') &&
+         !startsWith(github.event.head_commit.message, 'chore: version packages')))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
