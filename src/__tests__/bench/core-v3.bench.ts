@@ -1,11 +1,11 @@
 import { bench, describe } from "vitest";
-import { calendarDate } from "@/core-v3/calendar-date";
-import { compileDateRules } from "@/core-v3/date-rule-engine";
-import { buildDayLookup, dayFlags } from "@/core-v3/day-flags";
-import { buildMonthGrid } from "@/core-v3/month-grid";
-import { reduce } from "@/core-v3/reducer";
-import { createInitialState } from "@/core-v3/state";
-import { buildConfig, D } from "../v3/fixtures/builders";
+import { calendarDate } from "@/core/calendar-date";
+import { compileDateRules } from "@/core/date-rule-engine";
+import { buildDayLookup, dayFlags } from "@/core/day-flags";
+import { buildMonthGrid } from "@/core/month-grid";
+import { reduce } from "@/core/reducer";
+import { createInitialState } from "@/core/state";
+import { buildConfig, D } from "../fixtures/builders";
 
 /**
  * CodSpeed benchmarks over the v3 hot paths: the reducer commit cycle, the
@@ -19,7 +19,7 @@ const rangeConfig = buildConfig({
   disabled: compileDateRules({ weekends: true }),
 });
 
-describe("core-v3", () => {
+describe("core", () => {
   bench("reduce: 60 selectDay commits (single)", () => {
     let state = createInitialState(config, { view: D(2026, 6, 1) });
     for (let i = 0; i < 60; i++) {

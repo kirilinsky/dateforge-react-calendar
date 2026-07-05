@@ -18,18 +18,18 @@ never imports from the layers above it.
 
 ```
 ┌────────────────────────────────────────────────────────────────────┐
-│  styles-v3/          CSS layer cascade, theme/appearance tokens,   │
+│  styles/          CSS layer cascade, theme/appearance tokens,   │
 │                      generated palettes (consumed by all UI)       │
 ├────────────────────────────────────────────────────────────────────┤
-│  modules-v3/         Visual modules: Days, Toolbar, Grids, Tracks, │
+│  modules/         Visual modules: Days, Toolbar, Grids, Tracks, │
 │                      Wheels, Presets, Info, ManualInput, Lunar …   │
 │                      read via selectors, write via actions         │
 ├────────────────────────────────────────────────────────────────────┤
-│  react-v3/           React adapter: store + provider, effect       │
+│  react/           React adapter: store + provider, effect       │
 │                      interpreter, <Calendar> shell, popup, focus   │
 │                      manager, announcer, labels, UI primitives     │
 ├────────────────────────────────────────────────────────────────────┤
-│  core-v3/            Pure core: calendar structs, reducer,         │
+│  core/            Pure core: calendar structs, reducer,         │
 │                      strategies, engines, validation, effects.     │
 │                      NO React. NO DOM. NO JS Date (one exception). │
 └────────────────────────────────────────────────────────────────────┘
@@ -37,7 +37,7 @@ never imports from the layers above it.
 
 Three rules make the layering real, not aspirational:
 
-1. **The core is pure.** `src/core-v3/` contains no React import, no DOM
+1. **The core is pure.** `src/core/` contains no React import, no DOM
    access, no user callbacks, and no `console` calls on the state path. The
    one sanctioned exception to "no JS `Date`" is the timezone boundary
    (§3.2). Everything in the core is a plain function over plain data:
@@ -61,7 +61,7 @@ effects — is recorded in `.notes/rfc-v3.md` and `.notes/plans/v3.md`.
 
 ```
 src/
-  core-v3/              pure core (this is the library's brain)
+  core/              pure core (this is the library's brain)
     calendar-date.ts        CalendarDate struct + proleptic-Gregorian math
     calendar-time.ts        CalendarTime struct, clamping, window checks
     calendar-date-time.ts   CalendarDateTime = date + time
@@ -85,7 +85,7 @@ src/
     bound.ts                read a span bound for display
     labels.ts               label registry (aria strings, interpolation)
     warnings.ts             dev warning registry (never-throw policy)
-  react-v3/             React adapter + shell
+  react/             React adapter + shell
     store.ts                framework-agnostic store around the reducer
     provider.tsx            CalendarProvider: store creation, effect sink,
                             controlled sync, useCalendarActions
@@ -105,22 +105,22 @@ src/
                             MultiMonthCalendar
     config.ts               createCalendarConfig (options -> compiled config)
     VirtualTrack.tsx        shared physics-track shell (tracks)
-  modules-v3/           visual modules, one folder = one subpath bundle
+  modules/           visual modules, one folder = one subpath bundle
     days/ toolbar/ months-grid/ years-grid/ presets/ selected-dates/ info/
     manual-input/ days-track/ months-track/ years-track/ time/ months-wheel/
     years-wheel/ lunar/  (+ _lab/ story helpers)
-  styles-v3/            cascade + tokens + generated palettes
+  styles/            cascade + tokens + generated palettes
     layers.css tokens.css themes.css appearances.css
     theme-tokens.ts theme-source.ts appearance-tokens.ts themes.ts appearances.ts
   hooks/                shared React hooks (track physics, SSR values, roving)
   __tests__/            unit (v3/core, v3/react), fixtures, fuzz, bench
-scripts/                generate-theme-v3.ts, generate-appearance-v3.ts,
+scripts/                generate-theme.ts, generate-appearance.ts,
                         check-css-important.mjs
 ```
 
 ---
 
-## 3. The pure core (`src/core-v3/`)
+## 3. The pure core (`src/core/`)
 
 ### 3.1 Calendar primitives
 
@@ -178,7 +178,7 @@ the selection axes (`unit`, `mode`), locale/week data (`locale`,
 engines**: `disabled` and `exclude` (§3.11).
 
 Consumers build it with `createCalendarConfig(options)`
-(`react-v3/config.ts`): plain-`Date` bounds, plain rule objects, and locale
+(`react/config.ts`): plain-`Date` bounds, plain rule objects, and locale
 defaults (`firstDayOfWeek` derived from `Intl.Locale.getWeekInfo`, falling
 back to Monday) are compiled into the struct once. An inverted `min > max`
 window is kept as passed (nothing becomes selectable) but warns once in dev.
@@ -369,7 +369,7 @@ compiler never throws. The engine also exposes `limits` (bounds implied by
 `before`/`after`) for view clamping.
 
 `createDisabled` on the public surface is literally an alias of
-`compileDateRules` (`react-v3/index.ts`).
+`compileDateRules` (`react/index.ts`).
 
 ### 3.12 Exclusion and segments
 
@@ -430,7 +430,7 @@ The pipeline has three stages with distinct cost profiles:
    its containing span's endpoints (committed ranges are canonical), never by
    probing neighbor days.
 
-The bits are opaque inside the core. `react-v3/day-attrs.ts` maps them to
+The bits are opaque inside the core. `react/day-attrs.ts` maps them to
 readable `data-*` attributes exactly once, at the DOM edge:
 `data-selected`, `data-in-range`, `data-range-start/end`,
 `data-preview(-start/-end)`, `data-disabled`, `data-excluded`, `data-today`,
@@ -573,7 +573,7 @@ between renders never rebuilds the store or re-subscribes anything.
 
 ---
 
-## 6. React adapter (`src/react-v3/`)
+## 6. React adapter (`src/react/`)
 
 ### 6.1 Store
 
@@ -720,7 +720,7 @@ committed text, so the region never chatters; the mount value is seeded as
 
 ### 6.9 UI primitives
 
-`react-v3/ui/` holds the two internal building blocks every module composes
+`react/ui/` holds the two internal building blocks every module composes
 (styled in `cal-base` so module CSS can override without `!important`):
 
 - `UIButton` — the one action-button primitive (toolbar nav, resets, clear,
@@ -747,7 +747,7 @@ compositions for the common cases — `SimpleCalendar`, `DatePicker`,
 
 ---
 
-## 7. Module layer (`src/modules-v3/`)
+## 7. Module layer (`src/modules/`)
 
 ### 7.1 The composition promise
 
@@ -806,21 +806,21 @@ Days as the canonical example (`days/CalendarDays.tsx`):
 ### 7.4 Building a third-party module
 
 Everything a custom module needs is the public `/context` surface
-(`react-v3/context.ts`); no internal imports, no context spelunking:
+(`react/context.ts`); no internal imports, no context spelunking:
 
 - `useCalendarStore()` + `useStoreSelector(store, selector)` — read;
 - `useCalendarActions()` — write;
 - `useUI()` — popup state; `useLabels()` — label resolution;
 - exported types: `CalendarState`, `SelectionState`, `CalendarAction`, …
 
-`src/react-v3/Recipes.stories.tsx` is the reference recipe (an RC-gate
+`src/react/Recipes.stories.tsx` is the reference recipe (an RC-gate
 item): a custom footer that subscribes to the picked-day count and the first
 date, and writes back with `navigateTo`/`clear` — a dozen lines, re-rendering
 only when its own selections change.
 
 ---
 
-## 8. Styling (`src/styles-v3/`)
+## 8. Styling (`src/styles/`)
 
 ### 8.1 Layer cascade
 
@@ -872,14 +872,14 @@ transitions crossfade smoothly instead of snapping.
 ### 8.3 Theme pipeline (generator)
 
 ```
-styles-v3/theme-source.ts        28 hand-tuned families (light + dark),
+styles/theme-source.ts        28 hand-tuned families (light + dark),
         │                        v2 token vocabulary
         ▼
-scripts/generate-theme-v3.ts     remaps keys (highlight→accent, accent→focusRing),
+scripts/generate-theme.ts     remaps keys (highlight→accent, accent→focusRing),
         │                        runs a WCAG contrast audit per family
-        ├──► styles-v3/themes.css    one [data-theme="<name>"] block per family,
+        ├──► styles/themes.css    one [data-theme="<name>"] block per family,
         │                            every token as light-dark(light, dark)
-        └──► styles-v3/themes.ts     named ThemeFamily objects (importable,
+        └──► styles/themes.ts     named ThemeFamily objects (importable,
                                      tree-shakeable via /themes)
 ```
 
@@ -910,7 +910,7 @@ backdrop, which is where the dot actually lives).
 height, control/tile padding, `pressScale`, opacities, letter-spacing)
 mapped to `--cal-*` vars. Same dual pattern as themes: a built-in name rides
 on `data-appearance` (generated `appearances.css` via
-`scripts/generate-appearance-v3.ts`), a `createAppearance(tokens)` object
+`scripts/generate-appearance.ts`), a `createAppearance(tokens)` object
 becomes inline vars.
 
 A small **bridge in `cal-base`** aliases the vars modules actually consume
@@ -969,7 +969,7 @@ A11y is layered into the architecture rather than sprinkled per component:
   text.
 - **Reduced motion** — transition/press tokens collapse under
   `prefers-reduced-motion`, and `usePageSlide` no-ops.
-- **Gate** — `src/__tests__/v3/react/a11y.test.tsx` runs axe over
+- **Gate** — `src/__tests__/react/a11y.test.tsx` runs axe over
   representative compositions; violations fail CI. New modules must land
   with axe cases.
 
@@ -1033,7 +1033,7 @@ The recurring theme: **pay on commit (rare), not on hover/render (hot)**.
   float; shared by `VirtualTrack` (tracks, axis "x") and StepDrum (wheels,
   axis "y").
 - **Budget enforcement** — the size-limit multi-bundle gate (§13) and
-  `vitest bench` benches over the core (`__tests__/bench/core-v3.bench.ts`).
+  `vitest bench` benches over the core (`__tests__/bench/core.bench.ts`).
 
 ---
 

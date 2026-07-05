@@ -1,10 +1,10 @@
 import type { Preview } from "@storybook/react-vite";
 import { useLayoutEffect } from "react";
-import { STORY_LOCALES } from "../src/modules-v3/_lab/story-globals";
+import { STORY_LOCALES } from "../src/modules/_lab/story-globals";
 // v3 registries drive the dropdowns: THEMES (28 generated families) and
 // APPEARANCES (zenith + the ported v2 set).
-import { APPEARANCES } from "../src/styles-v3/appearances";
-import { THEMES } from "../src/styles-v3/themes";
+import { APPEARANCES } from "../src/styles/appearances";
+import { THEMES } from "../src/styles/themes";
 import "../dist/style.css";
 
 const STORY_BG = { light: "#ffffff", dark: "#1a1a1c" } as const;
@@ -220,14 +220,7 @@ const preview: Preview = {
     options: {
       storySort: {
         method: "alphabetical",
-        order: [
-          "Compositions",
-          "Modes",
-          "Modules",
-          "Patterns",
-          "Timezone",
-          "Theming",
-        ],
+        order: ["Prebuilt", "Recipes", "Days", "Toolbar"],
         locales: "en-US",
       },
     },

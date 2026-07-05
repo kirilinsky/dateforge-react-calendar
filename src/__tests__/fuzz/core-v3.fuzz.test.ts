@@ -1,16 +1,12 @@
 import { describe, expect, it } from "vitest";
-import type { CalendarAction } from "@/core-v3/actions";
-import {
-  calendarDate,
-  compareDate,
-  isValidDate,
-} from "@/core-v3/calendar-date";
-import { calendarTime } from "@/core-v3/calendar-time";
-import { compileDateRules } from "@/core-v3/date-rule-engine";
-import { reduce } from "@/core-v3/reducer";
-import type { CalendarState } from "@/core-v3/state";
-import { createInitialState } from "@/core-v3/state";
-import { buildConfig, D } from "../v3/fixtures/builders";
+import type { CalendarAction } from "@/core/actions";
+import { calendarDate, compareDate, isValidDate } from "@/core/calendar-date";
+import { calendarTime } from "@/core/calendar-time";
+import { compileDateRules } from "@/core/date-rule-engine";
+import { reduce } from "@/core/reducer";
+import type { CalendarState } from "@/core/state";
+import { createInitialState } from "@/core/state";
+import { buildConfig, D } from "../fixtures/builders";
 
 /**
  * Property fuzz over the v3 reducer: hammer random action sequences through

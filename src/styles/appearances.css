@@ -1,0 +1,214 @@
+/*
+ * GENERATED — do not edit by hand.
+ * Run: npx tsx scripts/generate-appearance.ts
+ * Source: src/styles/appearances.ts (APPEARANCES).
+ *
+ * One block per appearance; the cal-base bridge feeds these --cal-* vars into
+ * the vars the modules read. "No appearance" = the v3 default look.
+ */
+@layer cal-base, cal-themes, cal-appearances, cal-modules, cal-user;
+
+@layer cal-appearances {
+  [data-appearance="airy"] {
+    --cal-radius: 0.4em;
+    --cal-container-radius: 0.6em;
+    --cal-border: 1px;
+    --cal-spacing: 1em;
+    --cal-shadow-sm: none;
+    --cal-shadow-md: none;
+    --cal-shadow-lg: none;
+    --cal-transition: 0.2s;
+    --cal-font-size: clamp(13px, 3.2cqw, 20px);
+    --cal-text-day: clamp(0.9em, 5.2cqi, 1.4em);
+    --cal-day-weight: 300;
+    --cal-day-height: 3.2em;
+    --cal-days-gap: 0.5em;
+    --cal-days-padding: 1.2em;
+    --cal-popup-padding: 1em;
+    --cal-size-chip: 2em;
+    --cal-control-padding: 0.5em 1em;
+    --cal-control-border: 0px;
+    --cal-control-weight: 300;
+    --cal-press-scale: 0.98;
+    --cal-tile-padding: 0.6em 0.85em;
+    --cal-opacity-disabled: 0.3;
+    --cal-opacity-muted: 0.4;
+    --cal-opacity-hover: 0.75;
+    --cal-letter-spacing: 0.1em;
+  }
+
+  [data-appearance="bubble"] {
+    --cal-radius: 1.5em;
+    --cal-container-radius: 2.2em;
+    --cal-border: 1px;
+    --cal-spacing: 0.7em;
+    --cal-shadow-sm: 0 0.15em 0.5em var(--c-shadow);
+    --cal-shadow-md: 0 0.25em 0.9em var(--c-shadow);
+    --cal-shadow-lg: 0 0.35em 1.4em var(--c-shadow);
+    --cal-transition: 0.28s;
+    --cal-font-size: clamp(12px, 2.9cqw, 19px);
+    --cal-text-day: clamp(0.78em, 4.6cqi, 1.22em);
+    --cal-day-height: 3em;
+    --cal-days-gap: 0.4em;
+    --cal-days-padding: 1em;
+    --cal-popup-padding: 0.9em;
+    --cal-size-chip: 2.4em;
+    --cal-control-padding: 0.5em 1.1em;
+    --cal-control-border: 0px;
+    --cal-control-weight: 500;
+    --cal-press-scale: 0.93;
+    --cal-tile-padding: 0.55em 0.85em;
+    --cal-opacity-disabled: 0.45;
+    --cal-opacity-muted: 0.65;
+    --cal-opacity-hover: 0.82;
+  }
+
+  [data-appearance="compact"] {
+    --cal-radius: 0.3em;
+    --cal-border: 1px;
+    --cal-spacing: 0.35em;
+    --cal-shadow-sm: 0 0.05em 0.15em var(--c-shadow);
+    --cal-shadow-md: 0 0.1em 0.3em var(--c-shadow);
+    --cal-shadow-lg: 0 0.1em 0.4em var(--c-shadow);
+    --cal-transition: 0.15s;
+    --cal-font-size: clamp(11px, 2.3cqw, 15px);
+    --cal-text-day: clamp(0.68em, 4.2cqi, 1em);
+    --cal-day-height: 2em;
+    --cal-days-gap: 1px;
+    --cal-days-padding: 0.45em;
+    --cal-popup-padding: 0.5em;
+    --cal-size-chip: 1.9em;
+    --cal-control-padding: 0.2em 0.45em;
+    --cal-control-border: 1px;
+    --cal-control-weight: 500;
+    --cal-press-scale: 0.96;
+    --cal-tile-padding: 0.25em 0.4em;
+    --cal-opacity-disabled: 0.4;
+    --cal-opacity-muted: 0.55;
+    --cal-opacity-hover: 0.75;
+  }
+
+  [data-appearance="loft"] {
+    --cal-radius: 1em;
+    --cal-container-radius: 2.5em;
+    --cal-border: 0px;
+    --cal-spacing: 1em;
+    --cal-shadow-sm: 0 0.3em 0.9em var(--c-shadow);
+    --cal-shadow-md: 0 0.8em 2em var(--c-shadow);
+    --cal-shadow-lg: 0 1.5em 3.5em var(--c-shadow);
+    --cal-transition: 0.35s;
+    --cal-font-size: clamp(14px, 3.5cqw, 22px);
+    --cal-text-day: clamp(0.82em, 4.8cqi, 1.28em);
+    --cal-day-weight: 500;
+    --cal-day-height: 3em;
+    --cal-days-gap: 0.4em;
+    --cal-days-padding: 1.8em;
+    --cal-popup-padding: 1em;
+    --cal-size-chip: 2.5em;
+    --cal-control-padding: 0.5em 0.95em;
+    --cal-control-border: 0px;
+    --cal-control-weight: 600;
+    --cal-press-scale: 0.97;
+    --cal-tile-padding: 0.5em 0.75em;
+    --cal-opacity-disabled: 0.35;
+    --cal-opacity-muted: 0.6;
+    --cal-opacity-hover: 0.82;
+  }
+
+  [data-appearance="press"] {
+    --cal-radius: 0.05em;
+    --cal-container-radius: 0.1em;
+    --cal-border: 1px;
+    --cal-spacing: 0.35em;
+    --cal-shadow-sm: none;
+    --cal-shadow-md: none;
+    --cal-shadow-lg: none;
+    --cal-transition: 0.18s;
+    --cal-font: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+    --cal-font-size: clamp(14px, 3.4cqw, 22px);
+    --cal-text-day: clamp(1em, 5.2cqi, 1.54em);
+    --cal-day-height: 2.8em;
+    --cal-days-gap: 2px;
+    --cal-days-padding: 1.2em;
+    --cal-popup-padding: 0.9em;
+    --cal-size-chip: 2.2em;
+    --cal-control-padding: 0.3em 0.65em;
+    --cal-control-border: 1px;
+    --cal-control-weight: 400;
+    --cal-press-scale: 0.92;
+    --cal-tile-padding: 0.35em 0.55em;
+    --cal-opacity-disabled: 0.25;
+    --cal-opacity-muted: 0.55;
+    --cal-opacity-hover: 0.78;
+    --cal-letter-spacing: 0.18em;
+  }
+
+  [data-appearance="soft"] {
+    --cal-radius: 0.75em;
+    --cal-border: 1px;
+    --cal-spacing: 0.7em;
+    --cal-shadow-sm: 0 0.15em 0.5em var(--c-shadow);
+    --cal-shadow-md: 0 0.25em 0.8em var(--c-shadow);
+    --cal-shadow-lg: 0 0.3em 1.2em var(--c-shadow);
+    --cal-transition: 0.25s;
+    --cal-text-day: clamp(0.74em, 4.4cqi, 1.16em);
+    --cal-day-height: 2.8em;
+    --cal-days-gap: 0.3em;
+    --cal-days-padding: 0.95em;
+    --cal-popup-padding: 0.85em;
+    --cal-size-chip: 2.2em;
+    --cal-control-padding: 0.4em 0.85em;
+    --cal-control-border: 0px;
+    --cal-control-weight: 500;
+    --cal-press-scale: 0.96;
+    --cal-tile-padding: 0.45em 0.7em;
+    --cal-opacity-disabled: 0.45;
+    --cal-opacity-muted: 0.65;
+    --cal-opacity-hover: 0.82;
+  }
+
+  [data-appearance="square"] {
+    --cal-radius: 0;
+    --cal-border: 1px;
+    --cal-spacing: 0.5em;
+    --cal-transition: 0.12s;
+    --cal-text-day: clamp(0.72em, 4.4cqi, 1.12em);
+    --cal-day-height: 2.6em;
+    --cal-days-gap: 0;
+    --cal-popup-padding: 0.7em;
+    --cal-size-chip: 2em;
+    --cal-control-padding: 0.3em 0.6em;
+    --cal-control-border: 1px;
+    --cal-control-weight: 500;
+    --cal-press-scale: 1;
+    --cal-tile-padding: 0.3em 0.5em;
+    --cal-opacity-disabled: 0.3;
+    --cal-opacity-muted: 0.5;
+    --cal-opacity-hover: 0.72;
+    --cal-letter-spacing: 0.04em;
+  }
+
+  [data-appearance="zenith"] {
+    --cal-radius: 0.5em;
+    --cal-container-radius: 0.8em;
+    --cal-border: 1px;
+    --cal-container-gap: 1px;
+    --cal-spacing: 0.6em;
+    --cal-shadow-sm: 0 0.1em 0.3em var(--c-shadow);
+    --cal-shadow-md: 0 0.2em 0.6em var(--c-shadow);
+    --cal-shadow-lg: 0 0.2em 0.8em var(--c-shadow);
+    --cal-transition: 0.2s;
+    --cal-font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --cal-day-height: 2.4em;
+    --cal-days-gap: 0.15em;
+    --cal-control-padding: 0.3em 0.7em;
+    --cal-control-border: 0px;
+    --cal-control-weight: 500;
+    --cal-press-scale: 0.95;
+    --cal-tile-padding: 0.4em 0.6em;
+    --cal-opacity-disabled: 0.4;
+    --cal-opacity-muted: 0.6;
+    --cal-opacity-hover: 0.8;
+    --cal-letter-spacing: 0.01em;
+  }
+}

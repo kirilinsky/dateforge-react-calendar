@@ -1,0 +1,187 @@
+import "../styles/tokens.css";
+import "../styles/layers.css";
+import "../styles/themes.css";
+import "../styles/appearances.css";
+import { useCallback, useMemo, useRef, useState } from "react";
+import type { LabelOverrides } from "../core/labels";
+import { today } from "../core/timezone-boundary";
+import {
+  type CalendarAppearance,
+  resolveAppearance,
+} from "../styles/appearance-tokens";
+import type { ThemeFamily } from "../styles/theme-tokens";
+import { CalendarAnnouncer } from "./announcer";
+import { resolveInitialFocus, useFirstFocus } from "./focus-manager";
+import { LabelsProvider } from "./labels-context";
+import { CalendarProvider, type CalendarProviderProps } from "./provider";
+import { resolveThemeScope, ThemeScopeProvider } from "./theme-scope";
+import { type SchemeMode, UIProvider } from "./ui-context";
+
+/**
+ * The v3 root: the visual shell plus the store provider. It renders the single
+ * grid container every module places itself into (`@container cal-root`), tags
+ * it with `data-theme` / `data-readonly` / `data-testid`, and wraps the children
+ * in a `CalendarProvider`. The provider sits OUTSIDE the DOM node so the store
+ * is available to the shell's descendants.
+ *
+ * Styling is data-attribute + token driven (see styles/layers.css): the shell
+ * carries neutral `--c-*` defaults that a theme overrides in the `cal-themes`
+ * layer.
+ */
+export type CalendarProps = CalendarProviderProps & {
+  /**
+   * Theme: built-in family name (e.g. `"noir"`, rendered as `data-theme`) or
+   * a `createTheme` token object (applied as inline light-dark() CSS vars).
+   */
+  theme?: string | ThemeFamily;
+  /**
+   * Appearance — the non-color visual axis (shape, spacing, motion). A built-in
+   * name (e.g. `"zenith"`, rendered as `data-appearance`) or a
+   * `createAppearance` token object (inline `--cal-*` vars). Omit for the v3
+   * default look. Independent of `theme` (colors).
+   */
+  appearance?: CalendarAppearance;
+  /**
+   * Root grid columns. A number → that many equal `minmax(0, 1fr)` tracks; a
+   * string → a raw `grid-template-columns` value. Modules place themselves with
+   * their `col` prop (`col={2}` spans 2, `col="1 / 3"` raw). Omit for the
+   * default single column (modules stack). Parent declares `cols`, children get
+   * `col` — same mental model as CSS Grid.
+   */
+  cols?: number | string;
+  /**
+   * Decorative gradient mode (v2 parity): soft accent glows in the shell's
+   * corners and a gradient fill on selected cells. Pure CSS, token-driven —
+   * follows the active theme and scheme. Default `false`.
+   */
+  gradient?: boolean;
+  /** Light/dark choice. `"auto"` (default) follows the OS via `color-scheme`. */
+  scheme?: SchemeMode;
+  /**
+   * Controlled scheme. Provide together with `scheme` to own the light/dark
+   * choice: the toolbar theme toggle calls this with the next resolved scheme
+   * instead of flipping internal state. Omit for uncontrolled (the toggle owns
+   * the flip, seeded from `scheme`).
+   */
+  onSchemeChange?: (scheme: "light" | "dark") => void;
+  /** Extra class on the root shell (user escape hatch). */
+  className?: string;
+  /** `id` on the root shell (label targets, anchors). */
+  id?: string;
+  /** Inline style on the root shell — merged over theme/appearance vars. */
+  style?: React.CSSProperties;
+  /** Test handle on the root. Default `"dateforge-calendar"`. */
+  "data-testid"?: string;
+  /** Root-level aria label overrides (module → root → English default). */
+  labels?: LabelOverrides;
+};
+
+export function Calendar({
+  theme = "noir",
+  appearance,
+  cols,
+  gradient = false,
+  scheme = "auto",
+  onSchemeChange,
+  className,
+  id,
+  style,
+  "data-testid": testId = "dateforge-calendar",
+  labels,
+  children,
+  ...providerProps
+}: CalendarProps) {
+  const { config, initialView, initialFocus } = providerProps;
+  const readOnly = config.readOnly;
+
+  // Runtime light/dark. Controlled when `onSchemeChange` is given (the host owns
+  // `scheme`); otherwise uncontrolled, seeded from the prop and flipped here.
+  // `"auto"` keeps the CSS-native first paint — only an explicit toggle pins a
+  // concrete value, so dark systems never flash light.
+  const controlled = onSchemeChange !== undefined;
+  const [internalScheme, setInternalScheme] = useState<SchemeMode>(scheme);
+  const activeScheme = controlled ? scheme : internalScheme;
+  const toggleScheme = useCallback(() => {
+    const resolved =
+      activeScheme === "auto"
+        ? typeof window !== "undefined" &&
+          window.matchMedia?.("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light"
+        : activeScheme;
+    const next = resolved === "dark" ? "light" : "dark";
+    if (onSchemeChange) onSchemeChange(next);
+    else setInternalScheme(next);
+  }, [activeScheme, onSchemeChange]);
+
+  // The dynamic scheme + appearance ride on ThemeScope too, so portalled popups
+  // re-declaring `data-scheme`/`data-appearance` follow the root instead of
+  // pinning the mount-time value.
+  const themeScope = useMemo(
+    () => ({ theme, scheme: activeScheme, appearance }),
+    [theme, activeScheme, appearance],
+  );
+  const { dataTheme, style: themeStyle } = useMemo(
+    () => resolveThemeScope(theme),
+    [theme],
+  );
+  const { dataAppearance, style: appearanceStyle } = useMemo(
+    () => resolveAppearance(appearance),
+    [appearance],
+  );
+  // `cols`: a number → N equal `minmax(0, 1fr)` tracks (the `0` floor lets cells
+  // shrink so wide content can't blow the grid past the container); a string is
+  // a raw `grid-template-columns`. Omitted → the root keeps its single implicit
+  // column (modules stack vertically). Mirrors the toolbar's own `cols`.
+  const gridTemplateColumns =
+    cols === undefined
+      ? undefined
+      : typeof cols === "number"
+        ? `repeat(${cols}, minmax(0, 1fr))`
+        : cols;
+  const rootStyle = useMemo(
+    () => ({
+      ...themeStyle,
+      ...appearanceStyle,
+      ...(gridTemplateColumns ? { gridTemplateColumns } : undefined),
+      ...style,
+    }),
+    [themeStyle, appearanceStyle, gridTemplateColumns, style],
+  );
+
+  // First focus (Focus Manager): resolve once, perform from the root after the
+  // grid has mounted. The root div is the query scope for the target day cell.
+  const rootRef = useRef<HTMLDivElement>(null);
+  const focusTarget = resolveInitialFocus(
+    initialFocus,
+    initialView ?? today(config.timeZone),
+  );
+  useFirstFocus(rootRef, focusTarget);
+
+  return (
+    <CalendarProvider {...providerProps}>
+      <ThemeScopeProvider value={themeScope}>
+        <LabelsProvider labels={labels}>
+          <UIProvider scheme={activeScheme} toggleScheme={toggleScheme}>
+            <div
+              ref={rootRef}
+              id={id}
+              data-dateforge-root=""
+              data-theme={dataTheme}
+              data-appearance={dataAppearance}
+              data-scheme={activeScheme}
+              data-gradient={gradient ? "" : undefined}
+              data-readonly={readOnly ? "" : undefined}
+              data-testid={testId}
+              className={className}
+              style={rootStyle}
+            >
+              {children}
+              <CalendarAnnouncer />
+            </div>
+          </UIProvider>
+        </LabelsProvider>
+      </ThemeScopeProvider>
+    </CalendarProvider>
+  );
+}

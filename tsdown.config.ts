@@ -21,11 +21,11 @@ const sharedBase = {
 // (store, hooks, UI primitives) into common chunks that the tiny per-module
 // entries import — no manual externalization plugin (the v2 approach). Modules
 // stay their own subpath bundles; a consumer pulls only what it imports.
-const M = "src/modules-v3";
+const M = "src/modules";
 const entry = {
-  index: "src/react-v3/index.ts",
-  context: "src/react-v3/context.ts",
-  prebuilt: "src/react-v3/prebuilt.tsx",
+  index: "src/react/index.ts",
+  context: "src/react/context.ts",
+  prebuilt: "src/react/prebuilt.tsx",
   "modules/index": `${M}/index.ts`,
   "modules/days": `${M}/days/CalendarDays.tsx`,
   "modules/days-track": `${M}/days-track/CalendarDaysTrack.tsx`,
@@ -42,8 +42,8 @@ const entry = {
   "modules/years-grid": `${M}/years-grid/CalendarYearsGrid.tsx`,
   "modules/years-track": `${M}/years-track/CalendarYearsTrack.tsx`,
   "modules/years-wheel": `${M}/years-wheel/CalendarYearsWheel.tsx`,
-  themes: "src/styles-v3/themes.ts",
-  appearances: "src/styles-v3/appearances.ts",
+  themes: "src/styles/themes.ts",
+  appearances: "src/styles/appearances.ts",
 };
 
 const codecovToken = process.env.CODECOV_TOKEN;
