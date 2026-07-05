@@ -55,7 +55,7 @@ jobs:
       - run: npm run build
 
       - name: Publish to Chromatic
-        uses: chromaui/action@8ad69a40dea06755a3c6db290f300a39e011433b # latest
+        uses: chromaui/action@94713c544284a14195de3b50ef24301579f1877e # latest
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           exitZeroOnChanges: true
