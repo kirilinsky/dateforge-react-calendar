@@ -278,6 +278,41 @@ describe("clear", () => {
   });
 });
 
+describe("preset invariants (same as a manual pick)", () => {
+  const preset = (s: ReturnType<typeof D>, e: ReturnType<typeof D>) =>
+    ({
+      type: "applyPreset",
+      result: { kind: "range", range: { start: s, end: e } },
+    }) as const;
+
+  it("range mode: rejects a preset whose endpoint is disabled or out of window", () => {
+    const cfg = config("day", "range", {
+      min: D(2026, 6, 1),
+      max: D(2026, 6, 30),
+      disabled: compileDateRules({ dates: [D(2026, 6, 10)] }),
+    });
+    const s0 = start(cfg);
+    // End past max.
+    const past = reduce(s0, preset(D(2026, 6, 20), D(2026, 7, 5)), cfg);
+    expect(past.state).toBe(s0);
+    // Start on a disabled day.
+    const dis = reduce(s0, preset(D(2026, 6, 10), D(2026, 6, 12)), cfg);
+    expect(dis.state).toBe(s0);
+    // Clean preset commits.
+    const ok = reduce(s0, preset(D(2026, 6, 3), D(2026, 6, 6)), cfg);
+    expect(spans(ok.state)).toEqual([
+      [dateKey(D(2026, 6, 3)), dateKey(D(2026, 6, 6))],
+    ]);
+  });
+
+  it("single-span (week): rejects a preset outside min/max", () => {
+    const cfg = config("week", "single", { max: D(2026, 6, 14) });
+    const s0 = start(cfg);
+    const bad = reduce(s0, preset(D(2026, 6, 15), D(2026, 6, 21)), cfg);
+    expect(bad.state).toBe(s0);
+  });
+});
+
 describe("range time", () => {
   it("rejects malformed time edits", () => {
     const cfg = config("day", "range", { withTime: true });
