@@ -204,22 +204,22 @@
     },
     "./themes": {
       "import": {
-        "types": "./dist/themes/index.d.ts",
-        "default": "./dist/themes/index.mjs"
+        "types": "./dist/themes.d.ts",
+        "default": "./dist/themes.mjs"
       },
       "require": {
-        "types": "./dist/themes/index.d.cts",
-        "default": "./dist/themes/index.cjs"
+        "types": "./dist/themes.d.cts",
+        "default": "./dist/themes.cjs"
       }
     },
     "./appearances": {
       "import": {
-        "types": "./dist/appearances/index.d.ts",
-        "default": "./dist/appearances/index.mjs"
+        "types": "./dist/appearances.d.ts",
+        "default": "./dist/appearances.mjs"
       },
       "require": {
-        "types": "./dist/appearances/index.d.cts",
-        "default": "./dist/appearances/index.cjs"
+        "types": "./dist/appearances.d.cts",
+        "default": "./dist/appearances.cjs"
       }
     }
   },
@@ -247,17 +247,17 @@
     "check:exports": "publint && attw --pack . --profile node16",
     "size": "size-limit",
     "size:why": "size-limit --why",
-    "build": "tsdown --dts && npx tsx scripts/generate-theme.ts && npx tsx scripts/generate-appearance.ts && npx tsx scripts/generate-theme-v3.ts && npx tsx scripts/generate-appearance-v3.ts",
+    "build": "tsdown --dts && npx tsx scripts/generate-theme-v3.ts && npx tsx scripts/generate-appearance-v3.ts",
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:ssr": "vitest run src/__tests__/integration/ssr.test.tsx",
+    "test:ssr": "vitest run src/__tests__/v3/react/ssr.test.tsx",
     "test:storybook": "vitest run --project=storybook --passWithNoTests",
     "bench": "vitest bench --config vitest.bench.config.ts",
-    "fuzz": "FUZZ_RUNS=1000 vitest run src/__tests__/fuzz --reporter=verbose --reporter=./src/__tests__/fuzz/md-reporter",
-    "fuzz:ci": "FUZZ_RUNS=100 vitest run src/__tests__/fuzz --reporter=./src/__tests__/fuzz/md-reporter",
+    "fuzz": "FUZZ_RUNS=1000 vitest run src/__tests__/fuzz --reporter=verbose",
+    "fuzz:ci": "FUZZ_RUNS=200 vitest run src/__tests__/fuzz",
     "verify": "npm run typecheck && npm run check && npm run check:css && npm run knip && npm run build && npm run check:exports && npm run size && npm run test",
     "storybook": "storybook dev -p 6006 --no-open",
     "build-storybook": "storybook build",
@@ -294,7 +294,6 @@
     "@vitest/browser-playwright": "^4.1.6",
     "@vitest/coverage-v8": "^4.1.6",
     "chromatic": "^16.10.1",
-    "fast-check": "^4.8.0",
     "happy-dom": "^20.9.0",
     "jest-axe": "^10.0.0",
     "knip": "^6.14.1",

@@ -1,11 +1,10 @@
 import type { Preview } from "@storybook/react-vite";
 import { useLayoutEffect } from "react";
-import { STORY_LOCALES } from "../src/stories/_helpers/resolve-globals";
-// v3 appearance registry — the dropdown lists exactly the v3 appearances
-// (zenith + the ported v2 set), the same way `themes/index` drives the theme
-// dropdown. Names overlap v2's, so legacy stories keep working too.
+import { STORY_LOCALES } from "../src/modules-v3/_lab/story-globals";
+// v3 registries drive the dropdowns: THEMES (28 generated families) and
+// APPEARANCES (zenith + the ported v2 set).
 import { APPEARANCES } from "../src/styles-v3/appearances";
-import * as themes from "../themes/index";
+import { THEMES } from "../src/styles-v3/themes";
 import "../dist/style.css";
 
 const STORY_BG = { light: "#ffffff", dark: "#1a1a1c" } as const;
@@ -48,7 +47,7 @@ function useStoryDirection(dir: string) {
   }, [dir]);
 }
 
-const themeNames = ["default", ...Object.keys(themes)];
+const themeNames = ["default", ...Object.keys(THEMES)];
 // `default` keeps the story's own (v3 default) look; the rest are the v3
 // appearances (zenith + the ported v2 set).
 const appearanceNames = ["default", ...Object.keys(APPEARANCES)];

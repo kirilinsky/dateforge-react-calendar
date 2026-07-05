@@ -1,6 +1,6 @@
 /*
  * GENERATED — do not edit by hand. Run: npx tsx scripts/generate-theme-v3.ts
- * Source: themes/themes.ts (THEME_FAMILIES_DATA).
+ * Source: src/styles-v3/theme-source.ts (THEME_FAMILIES_DATA).
  *
  * Named ThemeFamily objects (the same palettes as themes.css). Pass one as
  * `<Calendar theme={dracula} />` to tree-shake a single theme, or use the

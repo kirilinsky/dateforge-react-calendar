@@ -13,18 +13,6 @@
     ".storybook/{main,preview}.{ts,tsx}"
   ],
   "project": ["src/**/*.{ts,tsx}", "scripts/**/*.{ts,mts,mjs}"],
-  "ignore": [
-    "src/components/**",
-    "src/context/**",
-    "src/global/**",
-    "src/modules/**",
-    "src/stories/**",
-    "src/styles/**",
-    "src/types/**",
-    "src/utils/**",
-    "src/index.ts",
-    "themes/**",
-    "appearances/**"
-  ],
+  "ignore": [],
   "tags": ["-internal"]
 }

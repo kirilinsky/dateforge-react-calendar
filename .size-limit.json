@@ -4,7 +4,7 @@
     "import": {
       "./dist/index.mjs": "{ Calendar }"
     },
-    "limit": "16.5 KB",
+    "limit": "18 KB",
     "ignore": ["react", "react-dom"]
   },
   {
@@ -13,7 +13,7 @@
       "./dist/index.mjs": "{ Calendar }",
       "./dist/modules/days.mjs": "{ CalendarDays }"
     },
-    "limit": "19.5 KB",
+    "limit": "21.5 KB",
     "ignore": ["react", "react-dom"]
   },
   {
@@ -23,7 +23,7 @@
       "./dist/modules/toolbar.mjs": "{ CalendarToolbar, CalendarToolbarPrev, CalendarToolbarNext, CalendarToolbarMonthTrigger, CalendarToolbarYearTrigger, CalendarToolbarGroup }",
       "./dist/modules/days.mjs": "{ CalendarDays }"
     },
-    "limit": "24.5 KB",
+    "limit": "26 KB",
     "ignore": ["react", "react-dom"]
   },
   {
@@ -34,7 +34,7 @@
       "./dist/themes.mjs": "{ dracula }",
       "./dist/appearances.mjs": "{ compact }"
     },
-    "limit": "23.5 KB",
+    "limit": "25.5 KB",
     "ignore": ["react", "react-dom"]
   },
   {

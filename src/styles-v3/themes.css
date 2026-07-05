@@ -1,6 +1,6 @@
 /*
  * GENERATED — do not edit by hand. Run: npx tsx scripts/generate-theme-v3.ts
- * Source: themes/themes.ts (THEME_FAMILIES_DATA).
+ * Source: src/styles-v3/theme-source.ts (THEME_FAMILIES_DATA).
  *
  * One block per family; tokens use light-dark() so the active side follows
  * the root color-scheme (scheme prop: light/dark force, auto = OS). Tokens

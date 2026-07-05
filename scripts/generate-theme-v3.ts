@@ -1,6 +1,6 @@
 /**
  * Generates `src/styles-v3/themes.css` from the v2 theme source of truth
- * (`themes/themes.ts`, 28 families with WCAG-checked light/dark companions).
+ * (`src/styles-v3/theme-source.ts`, 28 families with WCAG-checked light/dark companions).
  *
  * Each family becomes one `[data-theme="<name>"]` block in the `cal-themes`
  * layer, with every token emitted as `light-dark(light, dark)` — the active
@@ -15,11 +15,13 @@
 import { execSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 import {
+  THEME_FAMILIES_DATA,
+  type ThemeTokens as V2ThemeTokens,
+} from "../src/styles-v3/theme-source";
+import {
   TOKEN_TO_VAR,
   type ThemeTokens as V3ThemeTokens,
 } from "../src/styles-v3/theme-tokens";
-import type { ThemeTokens as V2ThemeTokens } from "../src/types/theme-tokens";
-import { THEME_FAMILIES_DATA } from "../themes/themes";
 
 const V2_TO_V3_KEY: Record<keyof V2ThemeTokens, keyof V3ThemeTokens> = {
   accent: "focusRing",
@@ -63,7 +65,7 @@ function remap(v2: V2ThemeTokens): Partial<V3ThemeTokens> {
 const lines: string[] = [
   "/*",
   " * GENERATED — do not edit by hand. Run: npx tsx scripts/generate-theme-v3.ts",
-  " * Source: themes/themes.ts (THEME_FAMILIES_DATA).",
+  " * Source: src/styles-v3/theme-source.ts (THEME_FAMILIES_DATA).",
   " *",
   " * One block per family; tokens use light-dark() so the active side follows",
   " * the root color-scheme (scheme prop: light/dark force, auto = OS). Tokens",
@@ -121,7 +123,7 @@ function sideVars(side: Partial<V3ThemeTokens>): Record<string, string> {
 const tsLines: string[] = [
   "/*",
   " * GENERATED — do not edit by hand. Run: npx tsx scripts/generate-theme-v3.ts",
-  " * Source: themes/themes.ts (THEME_FAMILIES_DATA).",
+  " * Source: src/styles-v3/theme-source.ts (THEME_FAMILIES_DATA).",
   " *",
   " * Named ThemeFamily objects (the same palettes as themes.css). Pass one as",
   " * `<Calendar theme={dracula} />` to tree-shake a single theme, or use the",
@@ -166,7 +168,7 @@ console.log(`✓ ${names.length} theme families → src/styles-v3/themes.ts`);
 
 // ── Contrast audit (report-only) ─────────────────────────────────────────────
 // Guards the WCAG quality bar without rewriting palettes: any pair below its
-// target is listed so a regression in themes/themes.ts is visible at build
+// target is listed so a regression in theme-source.ts is visible at build
 // time. Targets: 4.5:1 for primary ink pairs (AA normal text), 3:1 for
 // secondary/muted ink (AA large text / UI).
 
