@@ -3,9 +3,32 @@
  * defined in .storybook/preview.tsx) to v3 `<Calendar>` props.
  *
  * The dropdown lists v2 family names, but v2 and v3 themes are generated from
- * the same `themes/themes.ts` data, so the names match the v3 `data-theme`
+ * the same `styles-v3/theme-source.ts` data, so the names match the v3 `data-theme`
  * families 1:1. `"default"` keeps the story's own theme (v3 default `noir`).
  */
+/** Locales offered by the Storybook toolbar Locale dropdown. */
+export const STORY_LOCALES = [
+  "default",
+  "en-US",
+  "en-GB",
+  "de-DE",
+  "fr-FR",
+  "es-ES",
+  "it-IT",
+  "pt-BR",
+  "ru-RU",
+  "pl-PL",
+  "tr-TR",
+  "ar-EG",
+  "he-IL",
+  "fa-IR",
+  "ja-JP",
+  "ko-KR",
+  "zh-CN",
+  "hi-IN",
+  "th-TH",
+] as const;
+
 export type V3StoryThemeProps = {
   theme?: string;
   appearance?: string;

@@ -51,26 +51,7 @@ const getSpec = (format: string): FormatSpec => {
   return spec;
 };
 
-export const dateToMask = (
-  d: Date | null,
-  format: string = DEFAULT_DATE_FORMAT,
-): string => {
-  if (!d) return "";
-  const spec = getSpec(format);
-  const parts: Record<DateToken, string> = {
-    DD: String(d.getDate()).padStart(2, "0"),
-    MM: String(d.getMonth() + 1).padStart(2, "0"),
-    YYYY: String(d.getFullYear()).padStart(4, "0"),
-  };
-  let out = "";
-  for (let i = 0; i < spec.tokens.length; i++) {
-    if (i > 0) out += spec.separators[i - 1];
-    out += parts[spec.tokens[i]];
-  }
-  return out;
-};
-
-export const maskToDate = (
+const maskToDate = (
   raw: string,
   format: string = DEFAULT_DATE_FORMAT,
 ): Date | null => {

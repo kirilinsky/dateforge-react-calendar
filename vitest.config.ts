@@ -21,18 +21,9 @@ export default defineConfig({
       reporter: ["text", "lcov", "html"],
       include: ["src/**/*.{ts,tsx}"],
       exclude: [
-        "src/stories/**",
         "src/**/*.stories.*",
-        "src/styles/**",
-        "src/global/**",
         "src/**/*.module.css",
-        "src/index.ts",
-        "src/Icons/**",
-        "src/types/**",
         "src/__tests__/**",
-        "src/utils/date-utils.ts",
-        "src/modules/index.ts",
-        "src/context/index.ts",
       ],
       thresholds: {
         lines: 80,
