@@ -113,14 +113,15 @@ export function CalendarTimeWheel({
   // Range bounds are finite (non-circular); a point wheel spins freely.
   const isBound = selection.shape === "span" && bound !== undefined;
 
-  // The strategy can only commit a time onto an existing selection (a picked
-  // day, or a drawn range). Without one, `setTime` is a no-op — so the wheel
-  // would look alive but do nothing. Mark it read-only in that case so it reads
-  // as inactive until a date/range exists.
+  // Span strategies can only commit a time onto an existing drawn range —
+  // without one, `setTime` is a no-op, so the wheel would look alive but do
+  // nothing; mark it read-only until a range exists. Point (single) mode has
+  // no such gate: editing time with no selection auto-creates one on the view
+  // anchor (the time-only picker flow, v2 parity).
   const hasTarget =
     selection.shape === "span"
       ? selection.ranges.length > 0
-      : selection.dates.length > 0;
+      : selection.dates.length > 0 || config.mode === "single";
   // Staged: the draft IS the target, so the wheel is live (only readOnly gates).
   const readOnly = draft ? config.readOnly : config.readOnly || !hasTarget;
 

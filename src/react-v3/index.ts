@@ -18,6 +18,8 @@ export {
   compileDateRules,
   compileDateRules as createDisabled,
   type DateRuleConfig,
+  type DateRuleDayInput,
+  type DateRuleRangeInput,
 } from "../core-v3/date-rule-engine";
 export type {
   EvaluatedPreset,
@@ -32,6 +34,7 @@ export {
   type Preset,
   type PresetContext,
   type PresetInput,
+  type PresetLabel,
   type PresetResult,
   presetLast7Days,
   presetLastMonth,
@@ -46,6 +49,7 @@ export {
   presetTomorrow,
   presetYesterday,
   relativePresets,
+  resolvePresetLabel,
 } from "../core-v3/preset-engine";
 export type {
   AnyCalendarValue,

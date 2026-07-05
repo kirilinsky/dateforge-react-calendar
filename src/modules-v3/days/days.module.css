@@ -133,7 +133,7 @@
   /* Hover on an empty cell: subtle highlight. */
   .cell:hover:not([data-disabled]):not([data-in-range]):not([data-selected]):not(
       [data-preview]
-    ) {
+    ):not([data-max-reached]) {
     background: var(--c-tone, #eef1f7);
   }
 
@@ -290,5 +290,15 @@
     background: transparent;
     cursor: not-allowed;
     opacity: 0.55;
+  }
+
+  /* maxDates hit: every further pick would reject — say so before the click
+     (soft error tint on hover + a not-allowed cursor, v2 parity). */
+  .cell[data-max-reached] {
+    cursor: not-allowed;
+  }
+  .cell[data-max-reached]:hover:not([data-selected]) {
+    background: color-mix(in srgb, var(--c-error, #dc2626) 14%, transparent);
+    color: var(--c-mutedText, #777);
   }
 }

@@ -86,9 +86,15 @@ describe("CalendarTimeWheel", () => {
     expect(hourDrum?.getAttribute("aria-disabled")).toBe("true");
   });
 
-  it("is inert (data-readonly) until a date is selected", async () => {
-    const user = userEvent.setup();
+  it("single mode: live with no selection (time-only flow auto-creates)", () => {
     const { container } = setup();
+    const root = container.querySelector("[data-dateforge-time]");
+    expect(root?.getAttribute("data-readonly")).toBeNull();
+  });
+
+  it("multiple mode: inert until a date is selected", async () => {
+    const user = userEvent.setup();
+    const { container } = setup({}, { mode: "multiple" });
     const root = container.querySelector("[data-dateforge-time]");
     expect(root?.getAttribute("data-readonly")).toBe("true");
     await user.click(
@@ -114,18 +120,21 @@ describe("CalendarTimeWheel", () => {
   it("onTimeSelect fires only on a committed change", async () => {
     const onTimeSelect = vi.fn();
     const user = userEvent.setup();
+    // readOnly: nothing can commit → no callback.
+    const first = setup({ onTimeSelect }, { readOnly: true });
+    const roDrum = first.container.querySelector(
+      "[data-dateforge-time] [role=spinbutton]",
+    ) as HTMLElement;
+    roDrum.focus();
+    await user.keyboard("{ArrowDown}");
+    expect(onTimeSelect).not.toHaveBeenCalled();
+    first.unmount();
+    // Live single wheel: the keyboard edit commits (auto-creating the
+    // selection on the view anchor — time-only flow) → callback fires.
     const { container } = setup({ onTimeSelect });
-    // No selection yet → wheel is inert, keyboard does nothing.
     const hourDrum = container.querySelector(
       "[data-dateforge-time] [role=spinbutton]",
     ) as HTMLElement;
-    hourDrum.focus();
-    await user.keyboard("{ArrowDown}");
-    expect(onTimeSelect).not.toHaveBeenCalled();
-    // Select a day → commit lands → callback fires.
-    await user.click(
-      document.querySelector('[data-date="20260610"]') as HTMLElement,
-    );
     hourDrum.focus();
     await user.keyboard("{ArrowDown}");
     expect(onTimeSelect).toHaveBeenCalledTimes(1);

@@ -9,6 +9,8 @@
  */
 
 export const LABEL_DEFAULTS = {
+  announceCleared: "Selection cleared",
+  announceSelected: "Selected: {value}",
   apply: "Apply",
   calendarNavigation: "Calendar navigation",
   changeMonth: "Change month, currently {month}",

@@ -144,7 +144,9 @@ describe("CalendarInfo", () => {
     const user = userEvent.setup();
     setup("single", { showSummary: false, allowClear: true });
     await user.click(day("20260615"));
-    expect(document.querySelector("[role=status]")).toBeNull();
+    expect(
+      document.querySelector("[data-dateforge-info] [role=status]"),
+    ).toBeNull();
     expect(screen.getByLabelText("Clear")).toBeTruthy();
   });
 
@@ -234,9 +236,13 @@ describe("CalendarInfo", () => {
   it("status region has aria-live=polite only when text exists", async () => {
     const user = userEvent.setup();
     setup("single", { showHome: true });
-    expect(document.querySelector("[role=status]")).toBeNull();
+    expect(
+      document.querySelector("[data-dateforge-info] [role=status]"),
+    ).toBeNull();
     await user.click(day("20260615"));
-    const status = document.querySelector("[role=status]");
+    const status = document.querySelector(
+      "[data-dateforge-info] [role=status]",
+    );
     expect(status?.getAttribute("aria-live")).toBe("polite");
   });
 });

@@ -7,6 +7,7 @@ import {
   type Preset,
   type PresetInput,
   type PresetResult,
+  resolvePresetLabel,
 } from "../../core-v3/preset-engine";
 import type { SelectionState } from "../../core-v3/state";
 import { today } from "../../core-v3/timezone-boundary";
@@ -76,10 +77,16 @@ export function CalendarPresets({
 
   // Declarative inputs (no `resolve`) are compiled to real presets first, so a
   // consumer can pass `{ label, value }` shorthands and compiled presets mixed.
+  // `definePreset`/`compilePresets` absorb malformed entries (null, missing
+  // label, throwing getValue) — user preset lists never crash the render.
   const engine = useMemo(
     () =>
       compilePresets(
-        presetsProp.map((p) => ("resolve" in p ? p : definePreset(p))),
+        presetsProp.map((p) =>
+          p !== null && typeof p === "object" && "resolve" in p
+            ? p
+            : definePreset(p as PresetInput),
+        ),
       ),
     [presetsProp],
   );
@@ -157,7 +164,7 @@ export function CalendarPresets({
                 }
               }}
             >
-              {ep.preset.label ?? ep.preset.id}
+              {resolvePresetLabel(ep.preset, config.locale)}
             </UITile>
           );
         })}

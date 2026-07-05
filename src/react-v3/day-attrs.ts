@@ -28,5 +28,6 @@ export function dayDataAttrs(flags: number): DayDataAttrs {
     "data-today": on(DayFlag.Today),
     "data-outside": on(DayFlag.OutOfMonth),
     "data-weekend": on(DayFlag.Weekend),
+    "data-max-reached": on(DayFlag.MaxReached),
   };
 }

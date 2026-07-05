@@ -10,6 +10,7 @@ import {
 import { type CalendarRange, orderRange, weekRange } from "./calendar-range";
 import type { DateRuleEngine } from "./date-rule-engine";
 import type { SelectionMode } from "./selection-types";
+import { warnOnce } from "./warnings";
 
 /**
  * Preset engine — turns named shortcuts ("Today", "Last 7 days", "This month")
@@ -34,11 +35,17 @@ export type PresetResult =
   | { kind: "dates"; dates: CalendarDate[] }
   | { kind: "range"; range: CalendarRange };
 
+/**
+ * A display label: a plain string, or a locale-aware function (v2 parity) —
+ * resolve with {@link resolvePresetLabel} at render time.
+ */
+export type PresetLabel = string | ((locale: string) => string);
+
 export type Preset = {
   /** Stable identity — used as React key and for telemetry; never the label. */
   id: string;
-  /** Optional display label (a label-registry key is wired in later). */
-  label?: string;
+  /** Optional display label — plain string or `(locale) => string`. */
+  label?: PresetLabel;
   /** Optional grouping for sectioned preset lists. */
   group?: string;
   /** Pure resolver. Returns `null` when the preset does not apply in context. */
@@ -129,12 +136,41 @@ function isBlocked(
   }
 }
 
-/** Compile presets into a queryable engine. Duplicate ids are dropped (first wins). */
+/**
+ * Presets never throw (v2 invariant): a user resolver that crashes is treated
+ * as "empty" with one dev warning, never a render crash.
+ */
+function safeResolve(preset: Preset, ctx: PresetContext): PresetResult | null {
+  try {
+    return preset.resolve(ctx);
+  } catch (error) {
+    warnOnce("presetResolveError", preset.id, String(error));
+    return null;
+  }
+}
+
+/**
+ * Compile presets into a queryable engine. Defensive by contract: `null`/
+ * malformed entries are skipped and duplicate ids dropped (first wins), each
+ * with a dev warning — user-supplied preset lists never crash the render.
+ */
 export function compilePresets(input: readonly Preset[] = []): PresetEngine {
   const presets: Preset[] = [];
   const seen = new Set<string>();
   for (const p of input) {
-    if (seen.has(p.id)) continue;
+    if (
+      p === null ||
+      typeof p !== "object" ||
+      typeof p.id !== "string" ||
+      typeof p.resolve !== "function"
+    ) {
+      warnOnce("invalidPreset", `entry is ${p === null ? "null" : typeof p}`);
+      continue;
+    }
+    if (seen.has(p.id)) {
+      warnOnce("duplicatePresetId", p.id);
+      continue;
+    }
     seen.add(p.id);
     presets.push(p);
   }
@@ -144,11 +180,12 @@ export function compilePresets(input: readonly Preset[] = []): PresetEngine {
   return {
     presets,
     resolve(id, ctx) {
-      return byId.get(id)?.resolve(ctx) ?? null;
+      const preset = byId.get(id);
+      return preset ? safeResolve(preset, ctx) : null;
     },
     evaluate(ctx, vctx) {
       return presets.map((preset) => {
-        const result = preset.resolve(ctx);
+        const result = safeResolve(preset, ctx);
         let status: PresetStatus;
         if (!result) status = "empty";
         else if (!isCompatible(result, preset, vctx.mode))
@@ -177,11 +214,48 @@ export function compilePresets(input: readonly Preset[] = []): PresetEngine {
   };
 }
 
+// --- label resolution + localized relative labels (v2 parity) ---
+
+/** Resolve a {@link PresetLabel} for display; falls back to the preset id. */
+export function resolvePresetLabel(preset: Preset, locale?: string): string {
+  const { label } = preset;
+  if (typeof label === "function") {
+    try {
+      return label(locale ?? "en-US");
+    } catch (error) {
+      warnOnce("presetResolveError", preset.id, String(error));
+      return preset.id;
+    }
+  }
+  return label ?? preset.id;
+}
+
+const rtfCache = new Map<string, Intl.RelativeTimeFormat>();
+
+/**
+ * Localized relative label via `Intl.RelativeTimeFormat` ("Yesterday",
+ * "Вчера", "Nächsten Monat"…), sentence-cased. The built-in packs use this so
+ * their buttons follow the calendar locale (v2 `basicPresets` behavior).
+ */
+function relativeLabel(
+  locale: string,
+  amount: number,
+  unit: Intl.RelativeTimeFormatUnit,
+): string {
+  let rtf = rtfCache.get(locale);
+  if (!rtf) {
+    rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+    rtfCache.set(locale, rtf);
+  }
+  const s = rtf.format(amount, unit);
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 // --- a small set of common presets (tree-shakeable, opt-in) ---
 
 export const presetToday: Preset = {
   id: "today",
-  label: "Today",
+  label: (l) => relativeLabel(l, 0, "day"),
   resolve: (ctx) => ({ kind: "date", date: ctx.today }),
 };
 
@@ -196,7 +270,7 @@ export const presetLast7Days: Preset = {
 
 export const presetThisWeek: Preset = {
   id: "this-week",
-  label: "This week",
+  label: (l) => relativeLabel(l, 0, "week"),
   resolve: (ctx) => ({
     kind: "range",
     range: weekRange(ctx.today, ctx.firstDayOfWeek),
@@ -205,7 +279,7 @@ export const presetThisWeek: Preset = {
 
 export const presetThisMonth: Preset = {
   id: "this-month",
-  label: "This month",
+  label: (l) => relativeLabel(l, 0, "month"),
   resolve: (ctx) => {
     const { year, month } = ctx.today;
     return {
@@ -225,42 +299,42 @@ export const presetThisMonth: Preset = {
 
 export const presetYesterday: Preset = {
   id: "yesterday",
-  label: "Yesterday",
+  label: (l) => relativeLabel(l, -1, "day"),
   resolve: (ctx) => ({ kind: "date", date: addDays(ctx.today, -1) }),
 };
 export const presetTomorrow: Preset = {
   id: "tomorrow",
-  label: "Tomorrow",
+  label: (l) => relativeLabel(l, 1, "day"),
   resolve: (ctx) => ({ kind: "date", date: addDays(ctx.today, 1) }),
 };
 export const presetLastWeek: Preset = {
   id: "last-week",
-  label: "Last week",
+  label: (l) => relativeLabel(l, -1, "week"),
   resolve: (ctx) => ({ kind: "date", date: addDays(ctx.today, -7) }),
 };
 export const presetNextWeek: Preset = {
   id: "next-week",
-  label: "Next week",
+  label: (l) => relativeLabel(l, 1, "week"),
   resolve: (ctx) => ({ kind: "date", date: addDays(ctx.today, 7) }),
 };
 export const presetLastMonth: Preset = {
   id: "last-month",
-  label: "Last month",
+  label: (l) => relativeLabel(l, -1, "month"),
   resolve: (ctx) => ({ kind: "date", date: addMonths(ctx.today, -1) }),
 };
 export const presetNextMonth: Preset = {
   id: "next-month",
-  label: "Next month",
+  label: (l) => relativeLabel(l, 1, "month"),
   resolve: (ctx) => ({ kind: "date", date: addMonths(ctx.today, 1) }),
 };
 export const presetLastYear: Preset = {
   id: "last-year",
-  label: "Last year",
+  label: (l) => relativeLabel(l, -1, "year"),
   resolve: (ctx) => ({ kind: "date", date: addYears(ctx.today, -1) }),
 };
 export const presetNextYear: Preset = {
   id: "next-year",
-  label: "Next year",
+  label: (l) => relativeLabel(l, 1, "year"),
   resolve: (ctx) => ({ kind: "date", date: addYears(ctx.today, 1) }),
 };
 
@@ -301,7 +375,8 @@ export const relativePresets: Preset[] = [
 /** Declarative preset spec — compiled to a {@link Preset} by {@link definePreset}. */
 export type PresetInput = {
   id?: string;
-  label: string;
+  /** Display label — plain string or `(locale) => string` (v2 parity). */
+  label: PresetLabel;
   group?: string;
   modes?: SelectionMode[];
   /** Day offset from today (number, ± = future/past) OR a fixed wall-clock Date. */
@@ -312,14 +387,35 @@ export type PresetInput = {
   getValue?: (ctx: { now: Date }) => Date | { from: Date; to: Date } | null;
 };
 
+const isUsableDate = (d: unknown): d is Date =>
+  d instanceof Date && !Number.isNaN(d.getTime());
+
 const jsToCalendarDate = (d: Date): CalendarDate =>
   calendarDate(d.getFullYear(), d.getMonth() + 1, d.getDate());
 
-/** Compile a declarative {@link PresetInput} into a {@link Preset}. */
+/** A preset that never applies — the safe stand-in for malformed input. */
+const emptyPreset = (id: string): Preset => ({ id, resolve: () => null });
+
+/**
+ * Compile a declarative {@link PresetInput} into a {@link Preset}. Defensive:
+ * malformed entries degrade to an inert preset with a dev warning, and NaN
+ * dates from `value`/`getValue` resolve to `null` — presets never throw.
+ */
 export function definePreset(input: PresetInput): Preset {
+  if (input === null || typeof input !== "object") {
+    warnOnce(
+      "invalidPreset",
+      `entry is ${input === null ? "null" : typeof input}`,
+    );
+    return emptyPreset("invalid-preset");
+  }
   const { id, label, group, modes, value, range, getValue } = input;
+  if (id == null && typeof label !== "string") {
+    warnOnce("invalidPreset", "no `id` and no string `label` to derive one");
+    return emptyPreset("invalid-preset");
+  }
   return {
-    id: id ?? label.toLowerCase().replace(/\s+/g, "-"),
+    id: id ?? (label as string).toLowerCase().replace(/\s+/g, "-"),
     label,
     group,
     modes,
@@ -332,17 +428,22 @@ export function definePreset(input: PresetInput): Preset {
         );
         const out = getValue({ now });
         if (out == null) return null;
-        return out instanceof Date
-          ? { kind: "date", date: jsToCalendarDate(out) }
-          : {
-              kind: "range",
-              range: orderRange(
-                jsToCalendarDate(out.from),
-                jsToCalendarDate(out.to),
-              ),
-            };
+        if (out instanceof Date) {
+          return isUsableDate(out)
+            ? { kind: "date", date: jsToCalendarDate(out) }
+            : null;
+        }
+        if (!isUsableDate(out.from) || !isUsableDate(out.to)) return null;
+        return {
+          kind: "range",
+          range: orderRange(
+            jsToCalendarDate(out.from),
+            jsToCalendarDate(out.to),
+          ),
+        };
       }
       if (value == null) return null;
+      if (value instanceof Date && !isUsableDate(value)) return null;
       const base =
         value instanceof Date
           ? jsToCalendarDate(value)

@@ -6,6 +6,7 @@ import type { SelectionMode, SelectionUnit } from "./selection-types";
 import type { CalendarConfig, SelectionState, SpanSelection } from "./state";
 import { selectionShape } from "./state";
 import { fromCalendarDateTime, toCalendarDateTime } from "./timezone-boundary";
+import { warnOnce } from "./warnings";
 
 /**
  * The public boundary value — what `onChange` emits and `value` accepts.
@@ -224,12 +225,65 @@ export function valueKey(
   return rangeKey(value, config);
 }
 
-/** Normalize the runtime span shapes (lone range or array) into ranges. */
+/** A real, non-NaN `Date` — the only thing allowed through the boundary. */
+function isValidDate(d: unknown): d is Date {
+  return d instanceof Date && !Number.isNaN(d.getTime());
+}
+
+function isValidRange(r: unknown): r is PublicRange {
+  return (
+    typeof r === "object" &&
+    r !== null &&
+    isValidDate((r as PublicRange).start) &&
+    isValidDate((r as PublicRange).end)
+  );
+}
+
+function describeBad(item: unknown): string {
+  if (item instanceof Date) return "Invalid Date";
+  if (Array.isArray(item)) return "nested array";
+  return typeof item;
+}
+
+/**
+ * Normalize + validate the point-shape input: `Invalid Date` and non-Date
+ * entries are dropped with a dev warning, a lone `Date` in multiple mode is
+ * wrapped, and an array in single mode collapses to its first valid entry —
+ * the v2 "never throws on bad input" contract.
+ */
+function pointValueToDates(value: AnyCalendarValue, multiple: boolean): Date[] {
+  if (value == null) return [];
+  const items = Array.isArray(value) ? value : [value];
+  const dates: Date[] = [];
+  for (const item of items) {
+    if (isValidDate(item)) {
+      dates.push(item);
+      if (!multiple) break; // single: first valid entry wins
+    } else {
+      warnOnce("invalidValue", describeBad(item));
+    }
+  }
+  if (!multiple && Array.isArray(value) && value.length > 1) {
+    warnOnce("invalidValue", "array in single mode; using the first entry");
+  }
+  return dates;
+}
+
+/**
+ * Normalize the runtime span shapes (lone range or array) into ranges. Invalid
+ * entries (NaN bounds, non-objects) are dropped with a dev warning; a lone
+ * valid `Date` degrades to a one-day span (shape-mismatch normalization).
+ */
 function spanValueToRanges(value: AnyCalendarValue): readonly PublicRange[] {
-  if (value === null) return [];
-  if (Array.isArray(value)) return value as PublicRange[];
-  // A lone PublicRange (range, or week/month single cardinality).
-  return [value as PublicRange];
+  if (value === null || value === undefined) return [];
+  const items = Array.isArray(value) ? value : [value];
+  const ranges: PublicRange[] = [];
+  for (const item of items) {
+    if (isValidRange(item)) ranges.push(item);
+    else if (isValidDate(item)) ranges.push({ start: item, end: item });
+    else warnOnce("invalidValue", describeBad(item));
+  }
+  return ranges;
 }
 
 /**
@@ -249,12 +303,7 @@ export function fromPublicValue(
   const shape = selectionShape(config.unit, config.mode);
 
   if (shape === "point") {
-    const dates =
-      config.mode === "multiple"
-        ? ((value as Date[] | null) ?? [])
-        : value
-          ? [value as Date]
-          : [];
+    const dates = pointValueToDates(value, config.mode === "multiple");
     return {
       shape: "point",
       dates: dates.map((d) => toCalendarDateTime(d, timeZone)),

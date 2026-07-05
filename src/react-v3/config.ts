@@ -1,4 +1,8 @@
-import { type CalendarDate, calendarDate } from "../core-v3/calendar-date";
+import {
+  type CalendarDate,
+  calendarDate,
+  compareDate,
+} from "../core-v3/calendar-date";
 import { type CalendarTime, MIDNIGHT } from "../core-v3/calendar-time";
 import {
   compileDateRules,
@@ -7,6 +11,7 @@ import {
 } from "../core-v3/date-rule-engine";
 import type { SelectionMode, SelectionUnit } from "../core-v3/selection-types";
 import type { CalendarConfig } from "../core-v3/state";
+import { warnOnce } from "../core-v3/warnings";
 
 /**
  * User-friendly options for {@link createCalendarConfig} — the ergonomic layer
@@ -135,13 +140,20 @@ export function createCalendarConfig(
     maxRanges,
     timeZone,
   } = options;
+  const minDay = min ? toCalDate(min) : undefined;
+  const maxDay = max ? toCalDate(max) : undefined;
+  if (minDay && maxDay && compareDate(minDay, maxDay) > 0) {
+    // Kept as passed (the engine simply makes nothing selectable) — but the
+    // author almost certainly swapped the bounds, so say so once in dev.
+    warnOnce("invalidMinMax");
+  }
   return {
     mode,
     unit,
     locale,
     firstDayOfWeek: firstDayOfWeek ?? localeFirstDay(locale),
-    min: min ? toCalDate(min) : undefined,
-    max: max ? toCalDate(max) : undefined,
+    min: minDay,
+    max: maxDay,
     disabled: toEngine(disabled),
     exclude: toEngine(exclude),
     excludedEndpointPolicy,

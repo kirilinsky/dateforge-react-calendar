@@ -1,6 +1,7 @@
 import { type CalendarDate, calendarDate } from "./calendar-date";
 import { type CalendarDateTime, calendarDateTime } from "./calendar-date-time";
 import { calendarTime } from "./calendar-time";
+import { warnOnce } from "./warnings";
 
 /**
  * The one boundary where JS `Date` is allowed.
@@ -43,6 +44,24 @@ export type ConversionResult =
 
 // --- formatter cache (perf): constructing Intl formatters is expensive ---
 
+const UTC_OFFSET_RE = /^utc([+-])(\d{1,2})$/i;
+
+/**
+ * Accept the human-friendly `"UTC±N"` shorthand (v2 parity) by mapping it to
+ * the equivalent IANA `Etc/GMT∓N` zone — note the deliberate SIGN FLIP: POSIX
+ * `Etc/GMT` zones are inverted, so `UTC+3` (east) is `Etc/GMT-3`. Anything
+ * else passes through untouched.
+ */
+export function normalizeTimeZone(timeZone?: string): string | undefined {
+  if (!timeZone) return timeZone;
+  const m = UTC_OFFSET_RE.exec(timeZone.trim());
+  if (!m) return timeZone;
+  const hours = Number.parseInt(m[2], 10);
+  if (hours === 0) return "UTC";
+  if (hours > 14) return timeZone; // no real zone that far out; let Intl reject
+  return `Etc/GMT${m[1] === "+" ? "-" : "+"}${hours}`;
+}
+
 const partsCache = new Map<string, Intl.DateTimeFormat>();
 
 function partsFormatter(timeZone?: string): Intl.DateTimeFormat {
@@ -51,7 +70,7 @@ function partsFormatter(timeZone?: string): Intl.DateTimeFormat {
   if (!f) {
     try {
       f = new Intl.DateTimeFormat("en-US", {
-        timeZone,
+        timeZone: normalizeTimeZone(timeZone),
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
@@ -62,6 +81,9 @@ function partsFormatter(timeZone?: string): Intl.DateTimeFormat {
       });
     } catch (error) {
       if (timeZone !== undefined && error instanceof RangeError) {
+        // Unknown zone: degrade to the system zone with a dev warning (the
+        // "malformed input never throws" contract).
+        warnOnce("invalidTimeZone", timeZone);
         return partsFormatter(undefined);
       }
       throw error;

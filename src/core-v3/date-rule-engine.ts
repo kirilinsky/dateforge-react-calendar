@@ -1,16 +1,13 @@
 import {
   type CalendarDate,
+  calendarDate,
   compareDate,
   dateKey,
   isValidDate,
   weekdayOf,
 } from "./calendar-date";
-import {
-  type CalendarRange,
-  mergeRanges,
-  orderRange,
-  rangesContain,
-} from "./calendar-range";
+import { mergeRanges, orderRange, rangesContain } from "./calendar-range";
+import { warnOnce } from "./warnings";
 
 /**
  * Shared rule engine behind both the `disabled` and `exclude` props — they have
@@ -24,6 +21,14 @@ import {
  * mask → exact-date Set → min/max compare → range binary search → predicates
  * last). Reasons are computed lazily and only when a UI asks (tooltip / aria).
  */
+/** A day in rule config: a `CalendarDate` struct or a plain JS `Date`. */
+export type DateRuleDayInput = CalendarDate | Date;
+
+/** A span in rule config: `{start,end}` (v3) or `{from,to}` (v2 alias). */
+export type DateRuleRangeInput =
+  | { start: DateRuleDayInput; end: DateRuleDayInput }
+  | { from: DateRuleDayInput; to: DateRuleDayInput };
+
 export type DateRuleConfig = {
   /** Match every day. */
   all?: boolean;
@@ -32,13 +37,13 @@ export type DateRuleConfig = {
   /** Match these weekdays (0 = Sun .. 6 = Sat). */
   weekdays?: number[];
   /** Match days strictly before this date. Also sets the inferred lower limit. */
-  before?: CalendarDate;
+  before?: DateRuleDayInput;
   /** Match days strictly after this date. Also sets the inferred upper limit. */
-  after?: CalendarDate;
+  after?: DateRuleDayInput;
   /** Match these exact days. */
-  dates?: CalendarDate[];
+  dates?: DateRuleDayInput[];
   /** Match days inside any of these spans. */
-  ranges?: CalendarRange[];
+  ranges?: DateRuleRangeInput[];
   /** Arbitrary match — evaluated last, never indexed or cached. */
   predicate?: (date: CalendarDate) => boolean;
 };
@@ -98,9 +103,41 @@ function weekdayFor(date: CalendarDate, weekday?: number): number {
 }
 
 /**
+ * Coerce a rule-config day (JS `Date` or `CalendarDate`) to a valid
+ * `CalendarDate`, or `undefined` (with a dev warning) when malformed — the
+ * boundary that lets `createDisabled` speak plain `Date` like v2.
+ */
+function coerceRuleDay(
+  d: DateRuleDayInput | undefined,
+  field: string,
+): CalendarDate | undefined {
+  if (d == null) return undefined;
+  if (d instanceof Date) {
+    if (Number.isNaN(d.getTime())) {
+      warnOnce("malformedDateRule", `${field}: Invalid Date`);
+      return undefined;
+    }
+    return calendarDate(d.getFullYear(), d.getMonth() + 1, d.getDate());
+  }
+  if (!isValidDate(d)) {
+    warnOnce("malformedDateRule", `${field}: not a valid calendar date`);
+    return undefined;
+  }
+  return d;
+}
+
+/** Read a range input's bounds, accepting both `{start,end}` and `{from,to}`. */
+function ruleRangeBounds(
+  r: DateRuleRangeInput,
+): [DateRuleDayInput | undefined, DateRuleDayInput | undefined] {
+  if ("start" in r) return [r.start, r.end];
+  return [r.from, r.to];
+}
+
+/**
  * Compile a rule config once into a queryable engine. Malformed entries are
- * skipped defensively (never throws); a future warning registry can report
- * them. Both `disabled` and `exclude` call this.
+ * skipped defensively with a dev warning (never throws). Both `disabled` and
+ * `exclude` call this; day inputs accept plain JS `Date` (v2 parity).
  */
 export function compileDateRules(config?: DateRuleConfig): DateRuleEngine {
   if (!config) return EMPTY_ENGINE;
@@ -111,22 +148,25 @@ export function compileDateRules(config?: DateRuleConfig): DateRuleEngine {
   const exactKeys = new Set<number>();
   if (config.dates) {
     for (const d of config.dates) {
-      if (isValidDate(d)) exactKeys.add(dateKey(d));
+      const day = coerceRuleDay(d, "dates");
+      if (day) exactKeys.add(dateKey(day));
     }
   }
 
-  const before =
-    config.before && isValidDate(config.before) ? config.before : undefined;
-  const after =
-    config.after && isValidDate(config.after) ? config.after : undefined;
+  const before = coerceRuleDay(config.before, "before");
+  const after = coerceRuleDay(config.after, "after");
 
-  const ranges = config.ranges
-    ? mergeRanges(
-        config.ranges
-          .filter((r) => isValidDate(r.start) && isValidDate(r.end))
-          .map((r) => orderRange(r.start, r.end)),
-      )
-    : [];
+  const rangeBounds: { start: CalendarDate; end: CalendarDate }[] = [];
+  if (config.ranges) {
+    for (const r of config.ranges) {
+      const [rawStart, rawEnd] = ruleRangeBounds(r);
+      const start = coerceRuleDay(rawStart, "ranges.start");
+      const end = coerceRuleDay(rawEnd, "ranges.end");
+      if (start && end) rangeBounds.push(orderRange(start, end));
+      else warnOnce("malformedDateRule", "ranges: missing/invalid bound");
+    }
+  }
+  const ranges = mergeRanges(rangeBounds);
 
   const predicate = config.predicate;
 
