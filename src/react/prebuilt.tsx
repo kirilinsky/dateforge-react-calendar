@@ -134,15 +134,21 @@ export function SimpleCalendar(props: SingleDateProps) {
   );
 }
 
+type DatePickerProps = SingleDateProps & {
+  /** Clear button inside the manual input. Default `true`. */
+  allowClear?: boolean;
+};
+
 /**
  * A date picker: typed manual input above the calendar, plus a Today jump —
  * keyboard-first single-date entry with the grid as fallback.
  */
-export function DatePicker(props: SingleDateProps) {
+export function DatePicker(props: DatePickerProps) {
   const {
     value,
     defaultValue,
     onChange,
+    allowClear = true,
     theme,
     appearance,
     gradient,
@@ -163,7 +169,7 @@ export function DatePicker(props: SingleDateProps) {
       className={className}
       data-testid={props["data-testid"] ?? "dateforge-date-picker"}
     >
-      <CalendarManualInput allowClear />
+      <CalendarManualInput allowClear={allowClear} />
       <CalendarToolbar cols="auto minmax(0, 1fr) auto">
         <CalendarToolbarGroup>
           <CalendarToolbarPrev />

@@ -39,7 +39,7 @@ export const TodayMarkers: Story = {
         {...storyThemeProps(ctx.globals)}
         config={buildConfig({ ...storyLocale(ctx.globals), mode: "single" })}
       >
-        <CalendarDays todayDot={false} />
+        <CalendarDays todayDot={false} highlightToday />
       </Calendar>
     </div>
   ),

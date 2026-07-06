@@ -12,7 +12,7 @@
 &nbsp;&nbsp;
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/kirilinsky/dateforge-react-calendar/badge)](https://securityscorecards.dev/viewer/?uri=github.com/kirilinsky/dateforge-react-calendar)
 &nbsp;&nbsp;
-[![Socket](https://badge.socket.dev/npm/package/@dateforge/react-calendar/1.0.0)](https://badge.socket.dev/npm/package/@dateforge/react-calendar/1.0.0)
+[![Socket](https://badge.socket.dev/npm/package/@dateforge/react-calendar)](https://badge.socket.dev/npm/package/@dateforge/react-calendar)
 &nbsp;&nbsp;
 [![Visual regression](https://img.shields.io/badge/visual%20regression-Chromatic-ff4785?style=flat-square&logo=chromatic)](https://www.chromatic.com/library?appId=69edcfe5e2f1e060b1cce900)
 &nbsp;&nbsp;

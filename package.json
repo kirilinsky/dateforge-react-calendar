@@ -248,7 +248,7 @@
     "check:exports": "publint && attw --pack . --profile node16 --exclude-entrypoints ./style.css && node scripts/check-entrypoints.mjs",
     "size": "size-limit",
     "size:why": "size-limit --why",
-    "build": "tsdown --dts && node scripts/fix-cjs-css.mjs && npx tsx scripts/generate-theme.ts && npx tsx scripts/generate-appearance.ts",
+    "build": "tsdown --dts && node scripts/fix-cjs-css.mjs && node scripts/fix-dts-type-exports.mjs && npx tsx scripts/generate-theme.ts && npx tsx scripts/generate-appearance.ts",
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",

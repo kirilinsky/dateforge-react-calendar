@@ -84,7 +84,7 @@ Shared props on all four (`PrebuiltShared`):
 | `config` | `CalendarConfigOptions` | Escape hatch: extra `createCalendarConfig` options, spread last |
 | `className`, `data-testid` | `string` | Root overrides |
 
-`SimpleCalendar` / `DatePicker` add `value?: Date | null`, `defaultValue?: Date | null`, `onChange?: (date: Date | null) => void`. `MonthPicker` uses the same shapes but reports the first day of the picked month. `MultiMonthCalendar` adds:
+`SimpleCalendar` / `DatePicker` add `value?: Date | null`, `defaultValue?: Date | null`, `onChange?: (date: Date | null) => void`; `DatePicker` also takes `allowClear?: boolean` (default `true`) for the clear button inside its input. `MonthPicker` uses the same shapes but reports the first day of the picked month. `MultiMonthCalendar` adds:
 
 | Prop | Type | Default | Description |
 |---|---|---|---|

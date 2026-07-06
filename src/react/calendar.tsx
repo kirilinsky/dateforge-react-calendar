@@ -5,6 +5,7 @@ import "../styles/appearances.css";
 import { useCallback, useMemo, useRef, useState } from "react";
 import type { LabelOverrides } from "../core/labels";
 import { today } from "../core/timezone-boundary";
+import { warnOnce } from "../core/warnings";
 import {
   type CalendarAppearance,
   resolveAppearance,
@@ -101,6 +102,13 @@ export function Calendar({
   const controlled = onSchemeChange !== undefined;
   const [internalScheme, setInternalScheme] = useState<SchemeMode>(scheme);
   const activeScheme = controlled ? scheme : internalScheme;
+  // Uncontrolled `scheme` is a SEED: a later prop change is silently ignored,
+  // which reads as a bug from the host's side — say so once in dev.
+  const seedScheme = useRef(scheme);
+  if (!controlled && seedScheme.current !== scheme) {
+    seedScheme.current = scheme;
+    warnOnce("schemeChangeIgnored");
+  }
   const toggleScheme = useCallback(() => {
     const resolved =
       activeScheme === "auto"
