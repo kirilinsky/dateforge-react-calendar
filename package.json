@@ -294,7 +294,7 @@
     "@vitest/browser": "^4.1.6",
     "@vitest/browser-playwright": "^4.1.6",
     "@vitest/coverage-v8": "^4.1.6",
-    "chromatic": "^16.10.1",
+    "chromatic": "^18.0.1",
     "happy-dom": "^20.9.0",
     "jest-axe": "^10.0.0",
     "knip": "^6.14.1",
