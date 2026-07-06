@@ -69,7 +69,16 @@ export default defineConfig([
     plugins: [codecov("dateforge-v3")],
     deps: sharedDeps,
   },
-  // ── CJS (no CSS inject — keeps ESM syntax out of the .cjs files) ────────────
+  // ── CJS. THE CSS CONTRACT (documented in README/DOCUMENTATION): CJS output
+  // carries NO css references — a CJS consumer imports the stylesheet once,
+  // manually: `@dateforge/react-calendar/style.css` (exported subpath). There
+  // is no runtime injector in tsdown: `inject: true` only preserves ESM
+  // `import "./style.css"` statements, which are a SyntaxError under
+  // require(). So: inject stays off here, @tsdown/css still leaves a phantom
+  // `require("./layers-*.cjs")` (broken through 0.22.3 — the 3.0.0
+  // MODULE_NOT_FOUND bug), and `scripts/fix-cjs-css.mjs` strips it after the
+  // build. `scripts/check-entrypoints.mjs` smoke-requires every subpath in
+  // CI so a dead entry can't ship again. ─────────────────────────────────────
   {
     ...sharedBase,
     entry,

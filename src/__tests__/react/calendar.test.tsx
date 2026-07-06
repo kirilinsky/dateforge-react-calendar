@@ -92,7 +92,11 @@ describe("Calendar root", () => {
       </Calendar>,
     );
     const root = getByTestId("dateforge-calendar");
-    expect(root.style.gridTemplateColumns).toBe("repeat(3, minmax(0, 1fr))");
+    // Smart cols: auto-fit capped at N by the fair-share min, collapsing on
+    // narrow containers via the --cal-cols-min floor.
+    expect(root.style.gridTemplateColumns).toContain("repeat(auto-fit,");
+    expect(root.style.gridTemplateColumns).toContain("/ 3");
+    expect(root.style.gridTemplateColumns).toContain("--cal-cols-min");
     rerender(
       <Calendar config={config()} initialView={D(2026, 6, 1)}>
         <CalendarDays />

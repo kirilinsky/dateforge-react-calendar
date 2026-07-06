@@ -649,9 +649,12 @@ Root props of architectural note:
   light). Uncontrolled: the toolbar theme toggle flips internal state,
   resolving `"auto"` against `matchMedia` at flip time. Controlled: provide
   `onSchemeChange` and own the value.
-- `cols` — root grid columns: a number becomes
-  `repeat(N, minmax(0, 1fr))` (the `0` floor lets cells shrink so wide
-  content cannot blow the grid), a string is a raw `grid-template-columns`.
+- `cols` — root grid columns: a number becomes a SMART auto-fit template —
+  up to N equal tracks while each stays ≥ `--cal-cols-min` (default `14em`),
+  collapsing N → … → 1 on narrow containers (side-by-side months stack on
+  phones); implicit tracks are pinned to `0px` so a stray span can't blow
+  the grid. `--cal-cols-min: 0px` restores fixed-share tracks; a string is a
+  raw `grid-template-columns`.
 - `gradient` — decorative corner glows + gradient selected-cell fill, pure
   token-driven CSS (`--cal-selected-*` indirection), follows every theme and
   scheme.
@@ -662,10 +665,12 @@ Root props of architectural note:
 The root is one CSS grid; modules occupy cells. The contract (unchanged in
 spirit from v2, verified in `calendar.tsx` + `utils/get-grid-slot-style.ts`):
 
-- `<Calendar cols={N}>` — N equal tracks; omit for a single column (modules
+- `<Calendar cols={N}>` — up to N equal tracks (smart collapse below the
+  `--cal-cols-min` per-column floor); omit for a single column (modules
   stack vertically).
 - `<Module col={3}>` → `grid-column: span 3`; `col="2 / 4"` → raw placement;
-  `col` omitted → the module takes the full row.
+  `col` omitted → auto-placement; `col="full"` (→ `1 / -1`) is the
+  collapse-safe full-row form.
 - **JSX order = visual flow.** Auto-placement fills row by row; there is no
   `order` prop and no dense packing (dense reorders visually vs DOM — an
   a11y smell).
@@ -1078,10 +1083,22 @@ sink, not console spies (§3.16).
 **Bundler** — tsdown (rolldown-based), `tsdown.config.ts`, two passes over
 one entry map:
 
-- **ESM** — `.mjs` + `.d.ts`, CSS **injected** into the JS at import time
-  (importing a module auto-applies its styles);
-- **CJS** — `.cjs` + `.d.cts`, CSS inject disabled (keeps ESM syntax out of
-  CJS output).
+- **ESM** — `.mjs` + `.d.ts`; each chunk carries an `import "./style.css"`
+  statement that bundlers resolve (one shared stylesheet — base + themes +
+  appearances + modules). Bare Node can't evaluate the css import; ESM
+  consumers are bundler/framework environments.
+- **CJS** — `.cjs` + `.d.cts`, no CSS references at all: the documented
+  contract is ONE manual import of `@dateforge/react-calendar/style.css`.
+
+Two post-build repair passes run right after tsdown (`scripts/fix-cjs-css.mjs`,
+`scripts/fix-dts-type-exports.mjs`): the CSS pipeline in @tsdown/css (broken
+through 0.22.3) leaves a phantom `require("./layers-*.cjs")` chunk reference
+and untagged type-only exports in bundled d.ts; the fixers strip/tag those,
+re-pin the `@layer` order statement on `dist/style.css`, and FAIL the build
+if any local reference stays unresolved. `scripts/check-entrypoints.mjs`
+(wired into `check:exports`) then `require()`s + `import()`s every exports
+subpath and cross-checks each `d.cts` value export against the real
+require() namespace.
 
 The entry map lists the root (`index`), `context`, `prebuilt`,
 `modules/index` plus **every module as its own entry**, and the

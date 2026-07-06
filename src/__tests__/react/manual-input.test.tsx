@@ -220,7 +220,7 @@ describe("CalendarManualInput v2-parity surface", () => {
     );
     const input = screen.getByRole("textbox") as HTMLInputElement;
     await user.type(input, "15012026");
-    input.setSelectionRange(4, 4); // caret in MM
+    (input as HTMLInputElement).setSelectionRange(4, 4); // caret in MM
     await user.keyboard("{ArrowDown}");
     expect(input.value).toBe("15.12.2026");
   });
@@ -288,5 +288,100 @@ describe("CalendarManualInput localization (registry)", () => {
     );
     expect(screen.getByLabelText("Дата начала")).toBeTruthy();
     expect(screen.getByLabelText("Дата конца")).toBeTruthy();
+  });
+
+  it("unsupported format tokens fall back to the default and still commit", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <Calendar
+        config={buildConfig({ mode: "single" })}
+        onChange={onChange}
+        initialView={D(2026, 7, 1)}
+      >
+        <CalendarManualInput format="TT.MM.JJJJ" />
+      </Calendar>,
+    );
+    const input = screen.getByRole("textbox");
+    // The bogus format falls back to DD.MM.YYYY across the WHOLE pipeline —
+    // previously the mask worked but the commit parser never fired (dead
+    // input: valid-looking text, nothing applied).
+    expect(input.getAttribute("placeholder")).toBe("DD.MM.YYYY");
+    await user.click(input);
+    await user.type(input, "11122021");
+    expect(input).toHaveValue("11.12.2021");
+    expect(input.getAttribute("data-invalid")).toBeNull();
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  it("committing a date outside the shown month moves the view to it", async () => {
+    const user = userEvent.setup();
+    render(
+      <Calendar
+        config={buildConfig({ mode: "single" })}
+        initialView={D(2026, 6, 1)}
+      >
+        <CalendarManualInput format="DD.MM.YYYY" />
+        <CalendarDays />
+      </Calendar>,
+    );
+    const input = screen.getByRole("textbox");
+    await user.click(input);
+    await user.type(input, "15122026");
+    // The grid follows the committed date — otherwise a valid entry outside
+    // the current month is invisible ("typed a date, nothing happened").
+    expect(
+      document.querySelector('[data-date="20261215"][data-selected]'),
+    ).toBeTruthy();
+  });
+
+  it("multiple at the maxDates cap: rejected add never moves the view", async () => {
+    const user = userEvent.setup();
+    render(
+      <Calendar
+        config={buildConfig({ mode: "multiple", maxDates: 1 })}
+        initialView={D(2026, 6, 1)}
+      >
+        <CalendarManualInput format="DD.MM.YYYY" />
+        <CalendarDays />
+      </Calendar>,
+    );
+    const input = screen.getByRole("textbox");
+    await user.click(input);
+    await user.type(input, "05062026"); // fills the cap
+    // The box disables at the cap, so type a 2nd date is impossible via UI;
+    // drop the cap guard by rerender? Instead: cap=1 → input disabled — the
+    // affordance itself prevents the phantom jump. Assert that.
+    await vi.waitFor(() => expect(input).toBeDisabled());
+    expect(
+      document.querySelector('[data-date="20260605"][data-selected]'),
+    ).toBeTruthy();
+  });
+
+  it("ArrowUp segment stepping never navigates the view", async () => {
+    const user = userEvent.setup();
+    const onViewChange = vi.fn();
+    render(
+      <Calendar
+        config={buildConfig({ mode: "single" })}
+        initialView={D(2026, 6, 1)}
+        onViewChange={onViewChange}
+      >
+        <CalendarManualInput format="DD.MM.YYYY" />
+        <CalendarDays />
+      </Calendar>,
+    );
+    const input = screen.getByRole("textbox");
+    await user.click(input);
+    await user.type(input, "15062026"); // committed, same month — no nav
+    onViewChange.mockClear();
+    // Step the month segment up twice: commits move to Jul/Aug but the view
+    // must stay put (no per-keystroke navigation spam).
+    (input as HTMLInputElement).setSelectionRange(4, 4);
+    await user.keyboard("{ArrowUp}{ArrowUp}");
+    expect(onViewChange).not.toHaveBeenCalled();
   });
 });

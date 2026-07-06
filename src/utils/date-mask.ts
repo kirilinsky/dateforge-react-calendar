@@ -1,3 +1,4 @@
+import { warnOnce } from "../core/warnings";
 export const DEFAULT_DATE_FORMAT = "DD.MM.YYYY" as const;
 
 type DateToken = "DD" | "MM" | "YYYY";
@@ -43,12 +44,31 @@ const isValidSpec = (spec: FormatSpec): boolean =>
   spec.tokens.includes("MM") &&
   spec.tokens.includes("YYYY");
 
+const specCache = new Map<string, FormatSpec>();
+
 const getSpec = (format: string): FormatSpec => {
-  const spec = parseFormat(format);
-  if (!isValidSpec(spec)) {
-    return parseFormat(DEFAULT_DATE_FORMAT);
+  let spec = specCache.get(format);
+  if (!spec) {
+    spec = parseFormat(format);
+    if (!isValidSpec(spec)) spec = parseFormat(DEFAULT_DATE_FORMAT);
+    specCache.set(format, spec);
   }
   return spec;
+};
+
+/**
+ * Normalize a user-supplied format to one the whole input pipeline supports:
+ * an unsupported string (e.g. localized tokens like "TT.MM.JJJJ") falls back
+ * to {@link DEFAULT_DATE_FORMAT} with a dev warning. The component resolves
+ * ONCE and feeds the result everywhere (mask, validation, segment stepping,
+ * placeholder) — a half-fallback previously left the mask working while the
+ * commit path silently never parsed, i.e. a dead input.
+ */
+export const resolveDateFormat = (format: string | undefined): string => {
+  if (format === undefined) return DEFAULT_DATE_FORMAT;
+  if (isValidSpec(parseFormat(format))) return format;
+  warnOnce("invalidDateFormat", format);
+  return DEFAULT_DATE_FORMAT;
 };
 
 const maskToDate = (

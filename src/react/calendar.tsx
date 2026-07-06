@@ -2,9 +2,10 @@ import "../styles/tokens.css";
 import "../styles/layers.css";
 import "../styles/themes.css";
 import "../styles/appearances.css";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { LabelOverrides } from "../core/labels";
 import { today } from "../core/timezone-boundary";
+import { warnOnce } from "../core/warnings";
 import {
   type CalendarAppearance,
   resolveAppearance,
@@ -101,6 +102,16 @@ export function Calendar({
   const controlled = onSchemeChange !== undefined;
   const [internalScheme, setInternalScheme] = useState<SchemeMode>(scheme);
   const activeScheme = controlled ? scheme : internalScheme;
+  // Uncontrolled `scheme` is a SEED: a later prop change is silently ignored,
+  // which reads as a bug from the host's side — say so once in dev. In an
+  // effect, not render: concurrent React may replay/discard renders.
+  const seedScheme = useRef(scheme);
+  useEffect(() => {
+    if (!controlled && seedScheme.current !== scheme) {
+      seedScheme.current = scheme;
+      warnOnce("schemeChangeIgnored");
+    }
+  }, [controlled, scheme]);
   const toggleScheme = useCallback(() => {
     const resolved =
       activeScheme === "auto"
@@ -129,21 +140,36 @@ export function Calendar({
     () => resolveAppearance(appearance),
     [appearance],
   );
-  // `cols`: a number → N equal `minmax(0, 1fr)` tracks (the `0` floor lets cells
-  // shrink so wide content can't blow the grid past the container); a string is
-  // a raw `grid-template-columns`. Omitted → the root keeps its single implicit
-  // column (modules stack vertically). Mirrors the toolbar's own `cols`.
+  // `cols`: a number → a SMART grid: up to N equal tracks on wide containers,
+  // collapsing N → … → 1 when a track would drop below the per-column floor
+  // (`--cal-cols-min`, default 14em ≈ a comfortable month) — side-by-side
+  // months stack into a column on phones instead of squeezing. `auto-fit` +
+  // a min of max(floor, fair-share) keeps EXACTLY N columns whenever they
+  // genuinely fit (the fair share stops an N+1th track from sneaking in).
+  // Set `--cal-cols-min: 0px` on the root to opt back into fixed N tracks.
+  // A string stays a raw `grid-template-columns`. Omitted → single implicit
+  // column (modules stack). Mirrors the toolbar's own `cols`.
+  const colCount =
+    typeof cols === "number" ? Math.max(1, Math.floor(cols)) : undefined;
   const gridTemplateColumns =
     cols === undefined
       ? undefined
-      : typeof cols === "number"
-        ? `repeat(${cols}, minmax(0, 1fr))`
+      : colCount !== undefined
+        ? `repeat(auto-fit, minmax(min(100%, max(var(--cal-cols-min, 14em), calc((100% - ${
+            colCount - 1
+          } * var(--c-gap, 8px)) / ${colCount}))), 1fr))`
         : cols;
   const rootStyle = useMemo(
     () => ({
       ...themeStyle,
       ...appearanceStyle,
       ...(gridTemplateColumns ? { gridTemplateColumns } : undefined),
+      // Smart numeric cols only: a child spanning more tracks than currently
+      // fit would otherwise manufacture auto-sized implicit tracks and blow
+      // the grid past the container on the very phones the collapse serves.
+      // Zero-width implicit tracks neutralize stray spans (col="full" is the
+      // recommended full-row form).
+      ...(colCount !== undefined ? { gridAutoColumns: "0px" } : undefined),
       ...style,
     }),
     [themeStyle, appearanceStyle, gridTemplateColumns, style],

@@ -1,4 +1,4 @@
-import { Fragment, useMemo } from "react";
+import { useMemo } from "react";
 import { calendarDate } from "../core/calendar-date";
 import type { DateRuleConfig } from "../core/date-rule-engine";
 import type {
@@ -134,15 +134,21 @@ export function SimpleCalendar(props: SingleDateProps) {
   );
 }
 
+type DatePickerProps = SingleDateProps & {
+  /** Clear button inside the manual input. Default `true`. */
+  allowClear?: boolean;
+};
+
 /**
  * A date picker: typed manual input above the calendar, plus a Today jump —
  * keyboard-first single-date entry with the grid as fallback.
  */
-export function DatePicker(props: SingleDateProps) {
+export function DatePicker(props: DatePickerProps) {
   const {
     value,
     defaultValue,
     onChange,
+    allowClear = true,
     theme,
     appearance,
     gradient,
@@ -163,7 +169,7 @@ export function DatePicker(props: SingleDateProps) {
       className={className}
       data-testid={props["data-testid"] ?? "dateforge-date-picker"}
     >
-      <CalendarManualInput allowClear />
+      <CalendarManualInput allowClear={allowClear} />
       <CalendarToolbar cols="auto minmax(0, 1fr) auto">
         <CalendarToolbarGroup>
           <CalendarToolbarPrev />
@@ -303,14 +309,16 @@ export function MultiMonthCalendar(props: MultiMonthProps) {
   const config = useSingleConfig(props, { mode });
   const count = Math.max(1, Math.floor(months));
   const perRow = Math.max(1, Math.min(Math.floor(cols), count));
-  // Chunk the offsets into rows: [0..perRow), [perRow..2*perRow), …
-  const rows: number[][] = [];
-  for (let o = 0; o < count; o += perRow) {
-    rows.push(
-      Array.from({ length: Math.min(perRow, count - o) }, (_, i) => o + i),
-    );
-  }
   const last = count - 1;
+  // One CELL per month (its header + its grid stacked together): the root's
+  // smart `cols` grid can then collapse 3 → 2 → 1 columns on narrow screens
+  // without ever separating a toolbar from its month.
+  const monthCell: React.CSSProperties = {
+    display: "grid",
+    gap: "var(--c-gap, 8px)",
+    alignContent: "start",
+    minWidth: 0,
+  };
   return (
     <Calendar
       config={config}
@@ -331,27 +339,18 @@ export function MultiMonthCalendar(props: MultiMonthProps) {
       className={className}
       data-testid={props["data-testid"] ?? "dateforge-multi-month"}
     >
-      {rows.map((row) => (
-        <Fragment key={row[0]}>
-          {row.map((offset) => (
-            <CalendarToolbar
-              key={offset}
-              col={1}
-              offset={offset}
-              justify="center"
-            >
-              {navigation && offset === 0 && <CalendarToolbarPrev />}
-              <CalendarToolbarGroup>
-                <CalendarToolbarMonthLabel />
-                <CalendarToolbarYearLabel />
-              </CalendarToolbarGroup>
-              {navigation && offset === last && <CalendarToolbarNext />}
-            </CalendarToolbar>
-          ))}
-          {row.map((offset) => (
-            <CalendarDays key={offset} offset={offset} col={1} />
-          ))}
-        </Fragment>
+      {Array.from({ length: count }, (_, offset) => (
+        <div key={offset} style={monthCell}>
+          <CalendarToolbar offset={offset} justify="center">
+            {navigation && offset === 0 && <CalendarToolbarPrev />}
+            <CalendarToolbarGroup>
+              <CalendarToolbarMonthLabel />
+              <CalendarToolbarYearLabel />
+            </CalendarToolbarGroup>
+            {navigation && offset === last && <CalendarToolbarNext />}
+          </CalendarToolbar>
+          <CalendarDays offset={offset} />
+        </div>
       ))}
     </Calendar>
   );

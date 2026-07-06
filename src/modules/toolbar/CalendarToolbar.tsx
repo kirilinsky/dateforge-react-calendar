@@ -239,13 +239,30 @@ export function CalendarToolbar({
 /** Visual grouping of toolbar parts. */
 export function CalendarToolbarGroup({
   grow,
+  push,
   col,
   className,
   children,
-}: WithClass & { grow?: boolean; col?: number | string }) {
+}: WithClass & {
+  grow?: boolean;
+  /**
+   * Pin the group to a toolbar edge (smart flex layout): `"end"` rides the
+   * inline end ("actions right"), `"start"` the inline start — regardless of
+   * what else shares the row. In `cols` grid mode the auto margin applies
+   * WITHIN the group's own cell (prefer `col` placement there).
+   */
+  push?: "start" | "end";
+  col?: number | string;
+}) {
   return (
     <div
-      className={cx(styles.group, grow ? styles.grow : undefined, className)}
+      className={cx(
+        styles.group,
+        grow ? styles.grow : undefined,
+        push === "end" ? styles.pushEnd : undefined,
+        push === "start" ? styles.pushStart : undefined,
+        className,
+      )}
       style={getGridSlotStyle(col)}
     >
       {children}

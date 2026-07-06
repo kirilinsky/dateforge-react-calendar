@@ -161,7 +161,13 @@
   .grid[data-weekend-tint]::after {
     content: "";
     position: absolute;
-    inset-block: 0;
+    /* The strips position against the PADDING box (abs-positioning rules), so
+       the appearance inset (`--cal-days-padding`, always a single length)
+       must be kept out of the band: block-wise the strip starts/ends at the
+       content edge, inline-wise the column math below subtracts it — without
+       this the strip is wider than a real column and sits shifted, so the
+       day numbers read off-center inside it. */
+    inset-block: var(--cal-days-padding, 0px);
     z-index: 0;
     background: var(
       --c-weekendSurface,
@@ -169,26 +175,30 @@
     );
     border-radius: var(--c-day-radius, 8px);
     pointer-events: none;
+    /* One column of the row grid: (content width − week-number lead) / 7. */
+    --wknd-col: calc(
+      (
+          100% - var(--cal-days-padding, 0px) - var(--cal-days-padding, 0px) -
+            var(--cal-grid-lead, 0px)
+        ) /
+        7
+    );
   }
   /* Strip A: the first contiguous weekend run (spans 1 or 2 columns). */
   .grid[data-weekend-tint]::before {
-    width: calc(
-      var(--wknd-a-span, 2) * (100% - var(--cal-grid-lead, 0px)) / 7
-    );
+    width: calc(var(--wknd-a-span, 2) * var(--wknd-col));
     inset-inline-start: calc(
-      var(--cal-grid-lead, 0px) + var(--wknd-a-start, 5) *
-        (100% - var(--cal-grid-lead, 0px)) / 7
+      var(--cal-days-padding, 0px) + var(--cal-grid-lead, 0px) +
+        var(--wknd-a-start, 5) * var(--wknd-col)
     );
   }
   /* Strip B: a second run only when the weekend is split (Sunday-start);
      `--wknd-b-span: 0` collapses it to nothing otherwise. */
   .grid[data-weekend-tint]::after {
-    width: calc(
-      var(--wknd-b-span, 0) * (100% - var(--cal-grid-lead, 0px)) / 7
-    );
+    width: calc(var(--wknd-b-span, 0) * var(--wknd-col));
     inset-inline-start: calc(
-      var(--cal-grid-lead, 0px) + var(--wknd-b-start, 0) *
-        (100% - var(--cal-grid-lead, 0px)) / 7
+      var(--cal-days-padding, 0px) + var(--cal-grid-lead, 0px) +
+        var(--wknd-b-start, 0) * var(--wknd-col)
     );
   }
 

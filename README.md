@@ -12,7 +12,7 @@
 &nbsp;&nbsp;
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/kirilinsky/dateforge-react-calendar/badge)](https://securityscorecards.dev/viewer/?uri=github.com/kirilinsky/dateforge-react-calendar)
 &nbsp;&nbsp;
-[![Socket](https://badge.socket.dev/npm/package/@dateforge/react-calendar/1.0.0)](https://badge.socket.dev/npm/package/@dateforge/react-calendar/1.0.0)
+[![Socket](https://badge.socket.dev/npm/package/@dateforge/react-calendar)](https://badge.socket.dev/npm/package/@dateforge/react-calendar)
 &nbsp;&nbsp;
 [![Visual regression](https://img.shields.io/badge/visual%20regression-Chromatic-ff4785?style=flat-square&logo=chromatic)](https://www.chromatic.com/library?appId=69edcfe5e2f1e060b1cce900)
 &nbsp;&nbsp;
@@ -44,7 +44,7 @@ Monolithic pickers ship the grid, the toolbar, the time picker, the presets, the
 npm i @dateforge/react-calendar
 ```
 
-No global CSS import required — styles ship inside the modules and apply automatically.
+Styles ship with the components: with ESM (any bundler) the CSS is picked up automatically via the modules' own stylesheet imports. **CJS consumers import the stylesheet once:** `import '@dateforge/react-calendar/style.css'`.
 
 ## 10-second start
 

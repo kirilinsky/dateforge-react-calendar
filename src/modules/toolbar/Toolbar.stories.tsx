@@ -217,6 +217,10 @@ export const DayStepper: Story = {
  * actions stay disabled until something is selected.
  */
 export const FooterClockAndApply: Story = {
+  // The clock renders the CURRENT time — every Chromatic snapshot would
+  // differ. Skip snapshotting; the story still runs in the vitest browser
+  // project (a11y/interaction stay covered).
+  parameters: { chromatic: { disableSnapshot: true } },
   render: (_, ctx) => (
     <Frame
       {...storyThemeProps(ctx.globals)}

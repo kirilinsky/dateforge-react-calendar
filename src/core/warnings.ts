@@ -35,6 +35,12 @@ export const WARNINGS = {
     `Skipped an invalid preset (${detail}). Each preset needs a \`label\` (or \`id\`) and a resolvable value.`,
   presetResolveError: (id: string, error: string) =>
     `Preset "${id}" threw while resolving (${error}). It is treated as empty — make its getValue/resolve never throw.`,
+  invalidDaysPadding: (value: string) =>
+    `\`daysPadding\` must be a single length ("${value}" given) — the weekend column strips derive per-column math from it and a multi-value shorthand breaks their calc(). Using it as-is for padding, but the strips may misrender.`,
+  invalidDateFormat: (format: string) =>
+    `Unsupported date format "${format}". Expected DD, MM and YYYY tokens with single-char separators (e.g. "DD.MM.YYYY"). Falling back to the default.`,
+  schemeChangeIgnored: () =>
+    `The \`scheme\` prop changed but the calendar is uncontrolled, so the change was ignored (\`scheme\` only seeds the initial value). Pass \`onSchemeChange\` to control the scheme.`,
 } as const;
 
 export type WarningId = keyof typeof WARNINGS;
