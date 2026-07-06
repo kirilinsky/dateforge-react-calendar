@@ -1,6 +1,6 @@
 {
   "name": "@dateforge/react-calendar",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Modular React calendar toolkit. Compose single, multiple, range, time, presets, tracks, themes, appearances, and custom flows with zero dependencies.",
   "publishConfig": {
     "access": "public",
