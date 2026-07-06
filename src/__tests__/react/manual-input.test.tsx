@@ -289,4 +289,31 @@ describe("CalendarManualInput localization (registry)", () => {
     expect(screen.getByLabelText("Дата начала")).toBeTruthy();
     expect(screen.getByLabelText("Дата конца")).toBeTruthy();
   });
+
+  it("unsupported format tokens fall back to the default and still commit", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <Calendar
+        config={buildConfig({ mode: "single" })}
+        onChange={onChange}
+        initialView={D(2026, 7, 1)}
+      >
+        <CalendarManualInput format="TT.MM.JJJJ" />
+      </Calendar>,
+    );
+    const input = screen.getByRole("textbox");
+    // The bogus format falls back to DD.MM.YYYY across the WHOLE pipeline —
+    // previously the mask worked but the commit parser never fired (dead
+    // input: valid-looking text, nothing applied).
+    expect(input.getAttribute("placeholder")).toBe("DD.MM.YYYY");
+    await user.click(input);
+    await user.type(input, "11122021");
+    expect(input).toHaveValue("11.12.2021");
+    expect(input.getAttribute("data-invalid")).toBeNull();
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
+  });
 });

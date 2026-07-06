@@ -1,5 +1,12 @@
 import type { ReactNode } from "react";
-import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { CalendarDate } from "../../core/calendar-date";
 import { compareDate } from "../../core/calendar-date";
 import { today as getToday } from "../../core/timezone-boundary";
@@ -11,6 +18,7 @@ import { useStoreSelector } from "../../react/use-store-selector";
 import {
   applyMask,
   DEFAULT_DATE_FORMAT,
+  resolveDateFormat,
   validatePartialMask,
 } from "../../utils/date-mask";
 import { getGridSlotStyle } from "../../utils/get-grid-slot-style";
@@ -77,7 +85,7 @@ const dateToMaskText = (d: CalendarDate | null, format: string): string => {
 };
 
 export function CalendarManualInput({
-  format = DEFAULT_DATE_FORMAT,
+  format: formatProp = DEFAULT_DATE_FORMAT,
   placeholder,
   bound = "from",
   label,
@@ -96,6 +104,13 @@ export function CalendarManualInput({
   const { selectDay, setBoundDate, clear } = useCalendarActions();
 
   const selection = useStoreSelector(store, (s) => s.selection);
+
+  // One resolved format for the WHOLE pipeline (mask, validation, segment
+  // stepping, placeholder). An unsupported format string falls back to the
+  // default with a dev warning — previously date-mask fell back while the
+  // segments parser didn't, leaving a working-looking input that never
+  // committed (the "valid text, nothing applies" bug).
+  const format = useMemo(() => resolveDateFormat(formatProp), [formatProp]);
 
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);

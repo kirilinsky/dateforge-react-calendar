@@ -1,3 +1,4 @@
+import { warnOnce } from "../core/warnings";
 export const DEFAULT_DATE_FORMAT = "DD.MM.YYYY" as const;
 
 type DateToken = "DD" | "MM" | "YYYY";
@@ -49,6 +50,21 @@ const getSpec = (format: string): FormatSpec => {
     return parseFormat(DEFAULT_DATE_FORMAT);
   }
   return spec;
+};
+
+/**
+ * Normalize a user-supplied format to one the whole input pipeline supports:
+ * an unsupported string (e.g. localized tokens like "TT.MM.JJJJ") falls back
+ * to {@link DEFAULT_DATE_FORMAT} with a dev warning. The component resolves
+ * ONCE and feeds the result everywhere (mask, validation, segment stepping,
+ * placeholder) — a half-fallback previously left the mask working while the
+ * commit path silently never parsed, i.e. a dead input.
+ */
+export const resolveDateFormat = (format: string | undefined): string => {
+  if (format === undefined) return DEFAULT_DATE_FORMAT;
+  if (isValidSpec(parseFormat(format))) return format;
+  warnOnce("invalidDateFormat", format);
+  return DEFAULT_DATE_FORMAT;
 };
 
 const maskToDate = (
