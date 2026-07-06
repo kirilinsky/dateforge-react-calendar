@@ -8,31 +8,37 @@
    * Toolbar primitives. Tokens from --c-* with fallbacks; no !important
    * (enforced by scripts/check-css-important.mjs).
    */
-  /* The toolbar is a GRID of content-sized cells: each primitive occupies one
-     auto column sized to its content (`max-content`), so nothing ever collapses
-     or truncates — the old flexbox shrank icon buttons to slivers and clipped
-     month names under pressure. Cells are spread by `justify-content` (default
-     space-between; the `justify` prop overrides). For a precise or MIXED layout
-     — e.g. a flexible label that should truncate, or equal halves — set `cols`
-     and place children with `col` (explicit `minmax(0, 1fr)` tracks). The
-     container name lets parts adapt via @container queries (short months below). */
+  /* SMART default layout: a wrapping flex row. Every primitive keeps its
+     natural width (`flex-shrink: 0` below — the old v2 flexbox shrank icon
+     buttons to slivers, we never shrink), and when the row genuinely doesn't
+     fit, items WRAP to the next line instead of pushing the toolbar past its
+     container. Distribution is space-between per row (the `justify` prop
+     overrides); a group can pin itself to an edge with `push`. For a precise
+     or MIXED layout — e.g. a flexible label that should truncate, or equal
+     halves — set `cols` and place children with `col` (explicit
+     `minmax(0, 1fr)` grid tracks). The container name lets parts adapt via
+     @container queries (short months below). */
   .toolbar {
     container-type: inline-size;
     container-name: cal-toolbar;
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: max-content;
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 0.4em var(--c-gap, 8px);
     min-inline-size: 0;
   }
 
-  /* `cols` set: explicit column tracks (template via inline style). Children
-     place themselves with `col`; auto-flow returns to rows so they fill the
-     declared columns left-to-right, and the tracks already span the full width
-     (no space-between distribution to apply). */
+  /* Natural width, no collapse: overflow wraps instead of shrinking. */
+  .toolbar > * {
+    flex-shrink: 0;
+  }
+
+  /* `cols` set: explicit grid column tracks (template via inline style).
+     Children place themselves with `col`; the declared tracks span the full
+     width (no space-between distribution to apply). */
   .toolbar[data-cols] {
+    display: grid;
     grid-auto-flow: row;
     justify-content: normal;
   }
@@ -41,12 +47,23 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    min-inline-size: 0;
   }
 
-  /* A group that claims slack. The default content-sized grid has no spare
-     track to grow into, so this just stretches within its own cell; for a truly
-     filling region use `cols` with a `1fr` `col`. */
+  /* Edge pins (smart layout): an auto margin eats the row's slack on one
+     side, so a group rides the opposite edge regardless of what else shares
+     the row — "everything left, actions right" without a `cols` template. */
+  .pushEnd {
+    margin-inline-start: auto;
+  }
+  .pushStart {
+    margin-inline-end: auto;
+  }
+
+  /* A group that claims the row's slack (flex mode) or stretches in its own
+     `cols` cell (grid mode). */
   .grow {
+    flex: 1 1 auto;
     justify-self: stretch;
     min-inline-size: 0;
   }

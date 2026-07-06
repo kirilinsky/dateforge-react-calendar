@@ -445,6 +445,8 @@ The pager clamps to the `min`/`max` window; if the view navigates outside the pi
 
 Exports: `CalendarToolbar`, `CalendarToolbarGroup`, `CalendarToolbarPrev`, `CalendarToolbarNext`, `CalendarToolbarHome`, `CalendarToolbarLabel`, `CalendarToolbarMonthLabel`, `CalendarToolbarYearLabel`, `CalendarToolbarDayLabel`, `CalendarToolbarMonthTrigger`, `CalendarToolbarYearTrigger`, `CalendarToolbarClear`, `CalendarToolbarApply`, `CalendarToolbarClock`, `CalendarToolbarTime`, `CalendarToolbarThemeToggle`.
 
+**Smart layout (default):** the toolbar is a wrapping flex row — parts keep their natural width (icons never shrink to slivers) and overflow WRAPS to the next line instead of pushing past the container. Each row distributes space-between (`justify` overrides); pin a group to an edge with `push` (`<CalendarToolbarGroup push="end">` = "actions right"). For precise tracks (a truncating middle label, equal halves) switch to the explicit grid with `cols` + `col`.
+
 Conventions shared by every part:
 
 - `col` places the part in the toolbar's own grid (when the toolbar has `cols`).
@@ -463,7 +465,7 @@ Conventions shared by every part:
 | `bound` | `"from" \| "to"` | — | Span mode: every part inside displays and **edits** this range edge instead of the view (labels title the bound date; prev/next/home/triggers commit via `setBoundDate`). Per-part `bound` overrides (replaces, never combines) |
 | `theme`, `scheme`, `className` | shared | — | |
 
-`CalendarToolbarGroup` — visual grouping: `{ grow?: boolean; col?; className? }`.
+`CalendarToolbarGroup` — visual grouping: `{ grow?: boolean; push?: "start" | "end"; col?; className? }`. `grow` claims the row's slack; `push` pins the group to a toolbar edge in the smart flex layout.
 
 #### Prev / Next (`StepProps`)
 
