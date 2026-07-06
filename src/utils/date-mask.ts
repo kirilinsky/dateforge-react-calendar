@@ -44,10 +44,14 @@ const isValidSpec = (spec: FormatSpec): boolean =>
   spec.tokens.includes("MM") &&
   spec.tokens.includes("YYYY");
 
+const specCache = new Map<string, FormatSpec>();
+
 const getSpec = (format: string): FormatSpec => {
-  const spec = parseFormat(format);
-  if (!isValidSpec(spec)) {
-    return parseFormat(DEFAULT_DATE_FORMAT);
+  let spec = specCache.get(format);
+  if (!spec) {
+    spec = parseFormat(format);
+    if (!isValidSpec(spec)) spec = parseFormat(DEFAULT_DATE_FORMAT);
+    specCache.set(format, spec);
   }
   return spec;
 };

@@ -248,7 +248,8 @@ export function CalendarToolbarGroup({
   /**
    * Pin the group to a toolbar edge (smart flex layout): `"end"` rides the
    * inline end ("actions right"), `"start"` the inline start — regardless of
-   * what else shares the row. No-op in `cols` grid mode (place with `col`).
+   * what else shares the row. In `cols` grid mode the auto margin applies
+   * WITHIN the group's own cell (prefer `col` placement there).
    */
   push?: "start" | "end";
   col?: number | string;

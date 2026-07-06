@@ -144,14 +144,14 @@ export const BookingRange: Story = {
           <CalendarDays offset={1} />
         </div>
         <CalendarPresets
-          col={2}
+          col="full"
           presets={[
             definePreset({ label: "Next 7 days", value: 0, range: 6 }),
             definePreset({ label: "Next 30 days", value: 0, range: 29 }),
             ...commonPresets,
           ]}
         />
-        <CalendarInfo col={2} showRelative allowClear />
+        <CalendarInfo col="full" showRelative allowClear />
       </Calendar>
     </div>
   ),

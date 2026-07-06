@@ -185,7 +185,7 @@ export function CalendarManualInput({
   // Commit a complete typed date: point shapes select; span shapes with an
   // existing range move THIS input's bound (core validates ordering/crossing);
   // an empty span starts from the anchor like a grid click would.
-  const commitDate = (d: CalendarDate): boolean => {
+  const commitDate = (d: CalendarDate, followView: boolean): boolean => {
     // Same date as the mirrored value: no-op (re-dispatching selectDay would
     // TOGGLE the point selection off in single mode).
     if (controlled && compareDate(controlled, d) === 0) return true;
@@ -196,7 +196,7 @@ export function CalendarManualInput({
       const committed =
         bound === "to" ? after.ranges[0].end : after.ranges[0].start;
       if (compareDate(committed, d) !== 0) return false;
-      syncViewTo(d);
+      if (followView) syncViewTo(d);
       return true;
     }
     if (isMultiple) {
@@ -206,8 +206,16 @@ export function CalendarManualInput({
       const dup = selection.dates.some(
         (dt) => `${dt.date.year}-${dt.date.month}-${dt.date.day}` === key,
       );
-      if (!dup) selectDay(d);
-      syncViewTo(d);
+      if (!dup) {
+        selectDay(d);
+        // Follow only when the add actually landed — the maxDates cap lives
+        // in the strategy, so a rejected pick must not teleport the view.
+        const after = store.getState().selection;
+        const landed =
+          after.shape === "point" &&
+          after.dates.some((dt) => compareDate(dt.date, d) === 0);
+        if (landed && followView) syncViewTo(d);
+      }
       // Reset for the next entry (async: let the commit render first).
       pendingCursor.current = 0;
       setTimeout(() => {
@@ -220,6 +228,7 @@ export function CalendarManualInput({
     // Only follow when the pick actually landed (core may reject).
     const after = store.getState().selection;
     if (
+      followView &&
       after.shape === "point" &&
       after.dates.some((dt) => compareDate(dt.date, d) === 0)
     ) {
@@ -228,12 +237,12 @@ export function CalendarManualInput({
     return true;
   };
 
-  const processMask = (masked: string) => {
+  const processMask = (masked: string, followView = true) => {
     setText(masked);
     let nextInvalid = validatePartialMask(masked, format);
     const date = maskToCalendarDate(masked, format);
     if (date) {
-      nextInvalid = !(isDateAllowed(date) && commitDate(date));
+      nextInvalid = !(isDateAllowed(date) && commitDate(date, followView));
     }
     setInvalid(nextInvalid);
   };
@@ -275,7 +284,8 @@ export function CalendarManualInput({
       );
       if (!step) return;
       pendingRange.current = [step.selStart, step.selEnd];
-      processMask(step.text);
+      // Segment stepping commits but never drags the view along per press.
+      processMask(step.text, false);
       return;
     }
     const target = e.currentTarget;

@@ -34,6 +34,15 @@
     flex-shrink: 0;
   }
 
+  /* Exception: a lone LABEL wider than the whole container has nowhere to
+     wrap to — let it shrink and ellipsize through its slot instead of
+     escaping the container. */
+  .toolbar > .label {
+    flex-shrink: 1;
+    min-inline-size: 0;
+    overflow: hidden;
+  }
+
   /* `cols` set: explicit grid column tracks (template via inline style).
      Children place themselves with `col`; the declared tracks span the full
      width (no space-between distribution to apply). */

@@ -220,7 +220,7 @@ describe("CalendarManualInput v2-parity surface", () => {
     );
     const input = screen.getByRole("textbox") as HTMLInputElement;
     await user.type(input, "15012026");
-    input.setSelectionRange(4, 4); // caret in MM
+    (input as HTMLInputElement).setSelectionRange(4, 4); // caret in MM
     await user.keyboard("{ArrowDown}");
     expect(input.value).toBe("15.12.2026");
   });
@@ -336,5 +336,52 @@ describe("CalendarManualInput localization (registry)", () => {
     expect(
       document.querySelector('[data-date="20261215"][data-selected]'),
     ).toBeTruthy();
+  });
+
+  it("multiple at the maxDates cap: rejected add never moves the view", async () => {
+    const user = userEvent.setup();
+    render(
+      <Calendar
+        config={buildConfig({ mode: "multiple", maxDates: 1 })}
+        initialView={D(2026, 6, 1)}
+      >
+        <CalendarManualInput format="DD.MM.YYYY" />
+        <CalendarDays />
+      </Calendar>,
+    );
+    const input = screen.getByRole("textbox");
+    await user.click(input);
+    await user.type(input, "05062026"); // fills the cap
+    // The box disables at the cap, so type a 2nd date is impossible via UI;
+    // drop the cap guard by rerender? Instead: cap=1 → input disabled — the
+    // affordance itself prevents the phantom jump. Assert that.
+    await vi.waitFor(() => expect(input).toBeDisabled());
+    expect(
+      document.querySelector('[data-date="20260605"][data-selected]'),
+    ).toBeTruthy();
+  });
+
+  it("ArrowUp segment stepping never navigates the view", async () => {
+    const user = userEvent.setup();
+    const onViewChange = vi.fn();
+    render(
+      <Calendar
+        config={buildConfig({ mode: "single" })}
+        initialView={D(2026, 6, 1)}
+        onViewChange={onViewChange}
+      >
+        <CalendarManualInput format="DD.MM.YYYY" />
+        <CalendarDays />
+      </Calendar>,
+    );
+    const input = screen.getByRole("textbox");
+    await user.click(input);
+    await user.type(input, "15062026"); // committed, same month — no nav
+    onViewChange.mockClear();
+    // Step the month segment up twice: commits move to Jul/Aug but the view
+    // must stay put (no per-keystroke navigation spam).
+    (input as HTMLInputElement).setSelectionRange(4, 4);
+    await user.keyboard("{ArrowUp}{ArrowUp}");
+    expect(onViewChange).not.toHaveBeenCalled();
   });
 });

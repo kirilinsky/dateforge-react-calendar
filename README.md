@@ -44,7 +44,7 @@ Monolithic pickers ship the grid, the toolbar, the time picker, the presets, the
 npm i @dateforge/react-calendar
 ```
 
-No global CSS import required — styles ship inside the modules and apply automatically.
+Styles ship with the components: with ESM (any bundler) the CSS is picked up automatically via the modules' own stylesheet imports. **CJS consumers import the stylesheet once:** `import '@dateforge/react-calendar/style.css'`.
 
 ## 10-second start
 

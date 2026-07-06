@@ -1,3 +1,4 @@
+import { warnOnce } from "../core/warnings";
 /*
  * Appearances — the v3 take on v2's appearance system. An APPEARANCE is the set
  * of NON-COLOR visual tokens: shape (radius), spacing, motion, typography,
@@ -131,6 +132,10 @@ export function createAppearance(
     const value = tokens[key as keyof AppearanceTokens];
     if (cssVar && value != null) vars[cssVar] = value;
   }
+  // The weekend strips compute per-column geometry from daysPadding — a
+  // multi-value shorthand silently invalidates their calc() (strips vanish).
+  const daysPadding = tokens.daysPadding?.trim();
+  if (daysPadding?.includes(" ")) warnOnce("invalidDaysPadding", daysPadding);
   return { [CUSTOM_APPEARANCE_BRAND]: true, vars };
 }
 

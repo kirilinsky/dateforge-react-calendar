@@ -50,7 +50,7 @@ Modular React calendar / date-picker library. Zero runtime dependencies, SSR-saf
 npm i @dateforge/react-calendar
 ```
 
-No global CSS import is required — styles ship with the components and land in a predictable [`@layer` cascade](#the-layer-cascade). Zero runtime dependencies.
+Styles land in a predictable [`@layer` cascade](#the-layer-cascade) and ship with the components: **ESM** consumers (any bundler) get them automatically via the modules' own CSS imports; **CJS** consumers import the stylesheet once — `require('@dateforge/react-calendar/style.css')` (or the equivalent bundler import). Zero runtime dependencies.
 
 ### Prebuilt calendars
 
@@ -89,7 +89,7 @@ Shared props on all four (`PrebuiltShared`):
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `months` | `number` | `3` | How many consecutive months to render |
-| `cols` | `number` | `3` | Months per row |
+| `cols` | `number` | `3` | Months per row (a maximum — the smart grid collapses toward one column on narrow screens) |
 | `mode` | `"single" \| "multiple" \| "range" \| "multi-range"` | `"range"` | Selection mode for the whole board |
 | `startMonth` | `Date` | current month | First shown month (any day inside it) |
 | `navigation` | `boolean` | `true` | Prev/next arrows on the first/last header, stepping the whole board |
@@ -163,7 +163,7 @@ The calendar root is one CSS grid. Modules occupy grid cells.
 - **`<Module col={value}>`** — per-module `grid-column`:
   - `col={3}` (number) → `grid-column: span 3`;
   - `col="2 / 4"` (string) → raw CSS `grid-column` placement;
-  - omitted → the module takes a full row (spans all columns).
+  - omitted → auto-placement (one cell). Use `col="full"` for a guaranteed full row — it maps to `1 / -1`, which stays a full row when the smart grid collapses (a numeric span would force phantom columns there).
 - **Order in JSX = visual flow.** No `order` prop; the grid auto-places row by row.
 
 The naming is intentional: the parent declares `cols` (plural, like `grid-template-columns`), children get `col` (singular, like `grid-column`).
@@ -1206,13 +1206,14 @@ The package is pay-for-what-you-import: dual ESM/CJS, every module its own bundl
 | `…/modules/days`, `…/modules/toolbar`, `…/modules/months-grid`, `…/modules/years-grid`, `…/modules/time`, `…/modules/months-wheel`, `…/modules/years-wheel`, `…/modules/days-track`, `…/modules/months-track`, `…/modules/years-track`, `…/modules/presets`, `…/modules/selected-dates`, `…/modules/info`, `…/modules/manual-input`, `…/modules/lunar` | one module each |
 | `…/themes` | 28 named `ThemeFamily` objects + `THEMES` |
 | `…/appearances` | 8 named appearance objects + token records |
+| `…/style.css` | the shared stylesheet (base + themes + appearances + modules) — import it once in CJS setups; ESM gets it automatically |
 
 Guidelines:
 
 - **Prefer module subpaths** over the `/modules` barrel in production — the barrel imports everything.
 - The **object forms** of themes/appearances tree-shake to exactly what you use; the **string forms** ride generated stylesheets that cover all of them.
 - Heavy physics (drum wheels, tracks) is only bundled when you import those modules — the toolbar triggers' default pickers are plain grids, and a wheel enters a trigger only through *your* `picker` import.
-- CSS is marked `sideEffects` and ships with the components — no manual style imports, and unused modules bring no CSS.
+- CSS is marked `sideEffects` and ships with the components. The styles are ONE shared stylesheet (~11 KB gzip: base + themes + appearances + all modules): ESM entries import it automatically (bundler-resolved), CJS consumers import `@dateforge/react-calendar/style.css` once. JS stays pay-per-module; the stylesheet does not split per module.
 
 ---
 
