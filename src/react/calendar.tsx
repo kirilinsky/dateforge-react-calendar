@@ -137,15 +137,22 @@ export function Calendar({
     () => resolveAppearance(appearance),
     [appearance],
   );
-  // `cols`: a number → N equal `minmax(0, 1fr)` tracks (the `0` floor lets cells
-  // shrink so wide content can't blow the grid past the container); a string is
-  // a raw `grid-template-columns`. Omitted → the root keeps its single implicit
-  // column (modules stack vertically). Mirrors the toolbar's own `cols`.
+  // `cols`: a number → a SMART grid: up to N equal tracks on wide containers,
+  // collapsing N → … → 1 when a track would drop below the per-column floor
+  // (`--cal-cols-min`, default 14em ≈ a comfortable month) — side-by-side
+  // months stack into a column on phones instead of squeezing. `auto-fit` +
+  // a min of max(floor, fair-share) keeps EXACTLY N columns whenever they
+  // genuinely fit (the fair share stops an N+1th track from sneaking in).
+  // Set `--cal-cols-min: 0px` on the root to opt back into fixed N tracks.
+  // A string stays a raw `grid-template-columns`. Omitted → single implicit
+  // column (modules stack). Mirrors the toolbar's own `cols`.
   const gridTemplateColumns =
     cols === undefined
       ? undefined
       : typeof cols === "number"
-        ? `repeat(${cols}, minmax(0, 1fr))`
+        ? `repeat(auto-fit, minmax(min(100%, max(var(--cal-cols-min, 14em), calc((100% - ${
+            Math.max(1, Math.floor(cols)) - 1
+          } * var(--c-gap, 8px)) / ${Math.max(1, Math.floor(cols))}))), 1fr))`
         : cols;
   const rootStyle = useMemo(
     () => ({

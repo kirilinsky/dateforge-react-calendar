@@ -159,7 +159,7 @@ There is no module registry and no required module: `<Calendar config={config}><
 
 The calendar root is one CSS grid. Modules occupy grid cells.
 
-- **`<Calendar cols={N}>`** — number of equal `minmax(0, 1fr)` columns on the root, or a raw `grid-template-columns` string. Omit for the default single column (modules stack vertically).
+- **`<Calendar cols={N}>`** — a SMART grid: up to N equal columns on wide containers, automatically collapsing N → … → 1 when a column would drop below the per-column floor (`--cal-cols-min`, default `14em`) — side-by-side months stack into a single column on phones. Set `--cal-cols-min: 0px` on the root for fixed N tracks, or pass a raw `grid-template-columns` string for full control. Omit for the default single column (modules stack vertically).
 - **`<Module col={value}>`** — per-module `grid-column`:
   - `col={3}` (number) → `grid-column: span 3`;
   - `col="2 / 4"` (string) → raw CSS `grid-column` placement;
