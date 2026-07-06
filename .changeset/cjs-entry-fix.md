@@ -2,11 +2,13 @@
 "@dateforge/react-calendar": patch
 ---
 
-Fix the broken CJS build: `require('@dateforge/react-calendar')` (and `/prebuilt`, `/modules`) failed with `MODULE_NOT_FOUND` for a phantom `layers-*.cjs` chunk the bundler referenced but never emitted; one chunk also carried a literal ESM `import "./style.css"` statement. A post-build repair step now strips both, the stylesheet is exported as `@dateforge/react-calendar/style.css` for CJS consumers, and CI smoke-loads (`require` + `import`) every exports subpath so a dead entry can't ship again.
+Fixes:
 
-Also in this patch:
-
-- Subpath `.d.ts`/`.d.cts` files now mark type-only exports with the `type` modifier (`export { CalendarDays, type CalendarDaysProps }`) — fixes broken re-exports and phantom runtime imports under `verbatimModuleSyntax`/`isolatedModules`.
-- `DatePicker` gained the documented `allowClear` prop (default `true`) — it was previously hard-coded on.
-- Dev warning when the `scheme` prop changes on an uncontrolled calendar (it only seeds the initial value; pass `onSchemeChange` to control it).
-- The "outline only" TodayMarkers story actually passes `highlightToday` now.
+- **CJS build repaired** — `require()` of the root, `/prebuilt` and `/modules` entries failed with `MODULE_NOT_FOUND` (phantom `layers-*.cjs` chunk). The stylesheet is now also exported as `./style.css`, and CI smoke-loads every exports subpath.
+- Subpath `.d.ts` files mark type-only exports with the `type` modifier (fixes `verbatimModuleSyntax`/`isolatedModules` consumers).
+- Manual input: an unsupported `format` (e.g. `TT.MM.JJJJ`) silently never committed — it now falls back to the default with a dev warning; committing a date outside the shown month now moves the view to it.
+- Selected-dates: the active chip kept readable text on hover (state-guarded hover styles).
+- Days: weekend column strips align with the real columns under appearance padding.
+- Smart toolbar: overflow wraps to the next line instead of escaping the container; `CalendarToolbarGroup` gained `push="start" | "end"`.
+- Smart root `cols`: side-by-side months collapse to a single column on narrow screens (`--cal-cols-min`, default `14em`; set `0px` for fixed tracks). `MultiMonthCalendar` months are self-contained cells, so the collapse never separates a header from its grid.
+- `DatePicker` gained the documented `allowClear` prop; dev warning when `scheme` changes on an uncontrolled calendar.
