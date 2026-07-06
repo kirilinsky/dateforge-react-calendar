@@ -221,7 +221,8 @@
         "types": "./dist/appearances.d.cts",
         "default": "./dist/appearances.cjs"
       }
-    }
+    },
+    "./style.css": "./dist/style.css"
   },
   "repository": {
     "type": "git",
@@ -244,10 +245,10 @@
     "check": "biome check .",
     "check:css": "node scripts/check-css-important.mjs",
     "check:fix": "biome check --write .",
-    "check:exports": "publint && attw --pack . --profile node16",
+    "check:exports": "publint && attw --pack . --profile node16 --exclude-entrypoints ./style.css && node scripts/check-entrypoints.mjs",
     "size": "size-limit",
     "size:why": "size-limit --why",
-    "build": "tsdown --dts && npx tsx scripts/generate-theme.ts && npx tsx scripts/generate-appearance.ts",
+    "build": "tsdown --dts && node scripts/fix-cjs-css.mjs && npx tsx scripts/generate-theme.ts && npx tsx scripts/generate-appearance.ts",
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
@@ -285,7 +286,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
-    "@tsdown/css": "^0.21.4",
+    "@tsdown/css": "^0.22.3",
     "@types/jest-axe": "^3.5.9",
     "@types/node": "^25.9.0",
     "@types/react": "^19.2.14",
@@ -303,7 +304,7 @@
     "react-dom": "^19",
     "size-limit": "12.1.0",
     "storybook": "^10.4.0",
-    "tsdown": "^0.21.4",
+    "tsdown": "^0.22.3",
     "tsx": "^4.22.2",
     "typescript": "^5.9.3",
     "vitest": "^4.1.6"

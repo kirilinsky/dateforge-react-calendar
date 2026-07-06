@@ -69,7 +69,12 @@ export default defineConfig([
     plugins: [codecov("dateforge-v3")],
     deps: sharedDeps,
   },
-  // ── CJS (no CSS inject — keeps ESM syntax out of the .cjs files) ────────────
+  // ── CJS (CSS injected too — the SAME contract as ESM: styles ship with the
+  // components, no manual import. `inject: false` shipped a broken 3.0.0: the
+  // css was written to a style.css asset (not even in the exports map) while
+  // the chunks kept a dangling `require("./layers-*.cjs")` → MODULE_NOT_FOUND
+  // on the root/prebuilt/modules entries. The injector output is plain CJS —
+  // `scripts/check-entrypoints.mjs` smoke-requires every subpath in CI.) ──────
   {
     ...sharedBase,
     entry,
@@ -77,7 +82,7 @@ export default defineConfig([
     format: ["cjs"],
     outExtensions: () => ({ dts: ".d.cts" }),
     dts: true,
-    css: { inject: false, minify: true },
+    css: { inject: true, minify: true },
     deps: sharedDeps,
   },
 ]);
