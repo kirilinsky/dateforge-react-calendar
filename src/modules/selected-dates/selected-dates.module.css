@@ -27,7 +27,10 @@
     transition: background var(--cal-paint-transition, var(--cal-transition, 0.2s)) var(--cal-paint-easing, linear);
   }
 
-  .chip:hover:not([disabled]) {
+  /* State guard (:not([data-active])): this hover has higher specificity
+     than the [data-active] rule below — without the guard it swaps the
+     accent fill for tone while activeText ink stays → unreadable chip. */
+  .chip:hover:not([disabled]):not([data-active]) {
     background: var(--c-tone, #eef1f7);
   }
 
@@ -35,6 +38,11 @@
     background: var(--c-accent, #1a73e8);
     color: var(--c-activeText, #fff);
     border-color: var(--c-accent, #1a73e8);
+  }
+
+  /* Hover on the active chip keeps the accent fill, darkens a touch. */
+  .chip[data-active]:hover:not([disabled]) {
+    filter: brightness(0.93);
   }
 
   /* Chip with inline remove button */
