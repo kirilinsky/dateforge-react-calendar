@@ -69,12 +69,16 @@ export default defineConfig([
     plugins: [codecov("dateforge-v3")],
     deps: sharedDeps,
   },
-  // ── CJS (CSS injected too — the SAME contract as ESM: styles ship with the
-  // components, no manual import. `inject: false` shipped a broken 3.0.0: the
-  // css was written to a style.css asset (not even in the exports map) while
-  // the chunks kept a dangling `require("./layers-*.cjs")` → MODULE_NOT_FOUND
-  // on the root/prebuilt/modules entries. The injector output is plain CJS —
-  // `scripts/check-entrypoints.mjs` smoke-requires every subpath in CI.) ──────
+  // ── CJS. THE CSS CONTRACT (documented in README/DOCUMENTATION): CJS output
+  // carries NO css references — a CJS consumer imports the stylesheet once,
+  // manually: `@dateforge/react-calendar/style.css` (exported subpath). There
+  // is no runtime injector in tsdown: `inject: true` only preserves ESM
+  // `import "./style.css"` statements, which are a SyntaxError under
+  // require(). So: inject stays off here, @tsdown/css still leaves a phantom
+  // `require("./layers-*.cjs")` (broken through 0.22.3 — the 3.0.0
+  // MODULE_NOT_FOUND bug), and `scripts/fix-cjs-css.mjs` strips it after the
+  // build. `scripts/check-entrypoints.mjs` smoke-requires every subpath in
+  // CI so a dead entry can't ship again. ─────────────────────────────────────
   {
     ...sharedBase,
     entry,
@@ -82,7 +86,7 @@ export default defineConfig([
     format: ["cjs"],
     outExtensions: () => ({ dts: ".d.cts" }),
     dts: true,
-    css: { inject: true, minify: true },
+    css: { inject: false, minify: true },
     deps: sharedDeps,
   },
 ]);
