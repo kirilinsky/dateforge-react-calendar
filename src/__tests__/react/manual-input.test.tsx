@@ -316,4 +316,25 @@ describe("CalendarManualInput localization (registry)", () => {
     expect(warn).toHaveBeenCalled();
     warn.mockRestore();
   });
+
+  it("committing a date outside the shown month moves the view to it", async () => {
+    const user = userEvent.setup();
+    render(
+      <Calendar
+        config={buildConfig({ mode: "single" })}
+        initialView={D(2026, 6, 1)}
+      >
+        <CalendarManualInput format="DD.MM.YYYY" />
+        <CalendarDays />
+      </Calendar>,
+    );
+    const input = screen.getByRole("textbox");
+    await user.click(input);
+    await user.type(input, "15122026");
+    // The grid follows the committed date — otherwise a valid entry outside
+    // the current month is invisible ("typed a date, nothing happened").
+    expect(
+      document.querySelector('[data-date="20261215"][data-selected]'),
+    ).toBeTruthy();
+  });
 });

@@ -101,7 +101,7 @@ export function CalendarManualInput({
   const store = useCalendarStore();
   const config = store.getConfig();
   const t = useLabels();
-  const { selectDay, setBoundDate, clear } = useCalendarActions();
+  const { selectDay, setBoundDate, clear, navigateTo } = useCalendarActions();
 
   const selection = useStoreSelector(store, (s) => s.selection);
 
@@ -175,6 +175,13 @@ export function CalendarManualInput({
     return true;
   };
 
+  // A committed date outside the shown month is otherwise invisible ("typed a
+  // valid date, nothing happened") — follow it with the view, like a preset.
+  const syncViewTo = (d: CalendarDate) => {
+    const view = store.getState().view.viewDate;
+    if (view.year !== d.year || view.month !== d.month) navigateTo(d);
+  };
+
   // Commit a complete typed date: point shapes select; span shapes with an
   // existing range move THIS input's bound (core validates ordering/crossing);
   // an empty span starts from the anchor like a grid click would.
@@ -188,7 +195,9 @@ export function CalendarManualInput({
       if (after.shape !== "span" || after.ranges.length === 0) return false;
       const committed =
         bound === "to" ? after.ranges[0].end : after.ranges[0].start;
-      return compareDate(committed, d) === 0;
+      if (compareDate(committed, d) !== 0) return false;
+      syncViewTo(d);
+      return true;
     }
     if (isMultiple) {
       // Add-box: re-typing an already-picked date would toggle it OFF via
@@ -198,6 +207,7 @@ export function CalendarManualInput({
         (dt) => `${dt.date.year}-${dt.date.month}-${dt.date.day}` === key,
       );
       if (!dup) selectDay(d);
+      syncViewTo(d);
       // Reset for the next entry (async: let the commit render first).
       pendingCursor.current = 0;
       setTimeout(() => {
@@ -207,6 +217,14 @@ export function CalendarManualInput({
       return true;
     }
     selectDay(d);
+    // Only follow when the pick actually landed (core may reject).
+    const after = store.getState().selection;
+    if (
+      after.shape === "point" &&
+      after.dates.some((dt) => compareDate(dt.date, d) === 0)
+    ) {
+      syncViewTo(d);
+    }
     return true;
   };
 
