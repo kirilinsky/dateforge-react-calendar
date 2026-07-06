@@ -307,6 +307,7 @@
     "tsdown": "^0.22.3",
     "tsx": "^4.22.2",
     "typescript": "^5.9.3",
+    "unrun": "^0.3.1",
     "vitest": "^4.1.6"
   },
   "keywords": [
