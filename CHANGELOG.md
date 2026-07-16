@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.1.1
+
+### Patch Changes
+
+- [#134](https://github.com/kirilinsky/dateforge-react-calendar/pull/134) [`3f40e30`](https://github.com/kirilinsky/dateforge-react-calendar/commit/3f40e30089cbd3592f25b2f682e2d5aee4177dd7) Thanks [@kirilinsky](https://github.com/kirilinsky)! - Update dev tooling (Storybook 10.5, Vitest 4.1.10, Biome 2.5.3, Chromatic 18) and CI action pins. Fix Storybook browser tests under Storybook 10.5 by prebundling testing-library CJS deps in the Vitest config. No runtime changes.
+
 ## 3.1.0
 
 ### Minor Changes
