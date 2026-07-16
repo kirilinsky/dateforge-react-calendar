@@ -288,7 +288,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@tsdown/css": "^0.22.3",
     "@types/jest-axe": "^3.5.9",
-    "@types/node": "26.1.0",
+    "@types/node": "26.1.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitest/browser": "^4.1.6",
