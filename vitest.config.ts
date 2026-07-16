@@ -52,6 +52,19 @@ export default defineConfig({
             configDir: path.join(dirname, ".storybook"),
           }),
         ],
+        // storybook 10.5's addon-vitest setup file pulls @testing-library/dom's
+        // CJS deps with named imports; vite must prebundle them or browser mode
+        // throws "does not provide an export named ..." on import.
+        optimizeDeps: {
+          include: [
+            "aria-query",
+            "lz-string",
+            "dom-accessibility-api",
+            "pretty-format",
+            "@testing-library/dom",
+            "@testing-library/user-event",
+          ],
+        },
         test: {
           name: "storybook",
           retry: 2,
