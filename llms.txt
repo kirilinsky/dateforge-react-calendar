@@ -1,0 +1,135 @@
+# @dateforge/react-calendar
+
+> Modular React date picker and calendar: single date, multiple dates, date range, multi-range, week/month selection, month picker, and time picker. Zero runtime dependencies, SSR-safe, accessible (keyboard + axe-audited), RTL-ready, 28 light/dark themes. React 18/19 peer, TypeScript types included. Each module ships on its own subpath, so bundles include only what you import.
+
+Install: `npm i @dateforge/react-calendar`. Styles ship with the components (ESM picks them up automatically; CJS consumers import `@dateforge/react-calendar/style.css` once).
+
+Key facts for code generation:
+
+- The public API speaks plain JS `Date`. The `value` / `onChange` shape depends ONLY on `unit` × `mode` (see Value shapes below).
+- `<Calendar>` takes a compiled `config` from `createCalendarConfig(...)`, not loose props. Build it once (module scope or `useMemo`).
+- Modules are children of `<Calendar>`; JSX order is visual order. `<Calendar config={config}><CalendarDays /></Calendar>` is a complete calendar.
+- Only the root `onChange` owns the value; per-module `on*Select` callbacks are observational.
+- The pickers render inline. There is no built-in input-with-popover wrapper; put `<Calendar>` / a prebuilt inside your own popover if you need one (`CalendarToolbarApply` gives a confirm button).
+- Month numbers in `calendarDate(y, m, d)` are 1-based. `Date` inputs follow normal JS (0-based months).
+
+## Quick start (prebuilt, one import)
+
+```tsx
+import { useState } from "react";
+import { SimpleCalendar } from "@dateforge/react-calendar/prebuilt";
+
+export function Example() {
+  const [date, setDate] = useState<Date | null>(null);
+  return <SimpleCalendar value={date} onChange={setDate} />;
+}
+```
+
+Prebuilts on `@dateforge/react-calendar/prebuilt`:
+
+- `SimpleCalendar`: month/year header + day grid, single date. `value: Date | null`.
+- `DatePicker`: typed date input above the grid + Today button, `allowClear`. `value: Date | null`.
+- `MonthPicker`: year stepper + 12-month grid. Emits the first day of the picked month.
+- `MultiMonthCalendar`: `months` consecutive months, `cols` per row, `mode` (default `"range"`), `startMonth`, `navigation`. Uses the root value contract.
+- Shared props: `locale`, `min`, `max`, `disabled`, `readOnly`, `theme`, `appearance`, `gradient`, `scheme`, `config` (extra `createCalendarConfig` options), `className`.
+
+## Composed calendar
+
+```tsx
+import { Calendar, createCalendarConfig } from "@dateforge/react-calendar";
+import { CalendarDays } from "@dateforge/react-calendar/modules/days";
+import {
+  CalendarToolbar,
+  CalendarToolbarGroup,
+  CalendarToolbarMonthTrigger,
+  CalendarToolbarNext,
+  CalendarToolbarPrev,
+  CalendarToolbarYearTrigger,
+} from "@dateforge/react-calendar/modules/toolbar";
+
+const config = createCalendarConfig({
+  mode: "range",
+  locale: "de-DE",
+  min: new Date(2026, 0, 1),
+  disabled: { weekends: true },
+});
+
+export function RangePicker() {
+  return (
+    <Calendar config={config} onChange={(value, details) => console.log(value, details.reason)}>
+      <CalendarToolbar cols="auto minmax(0, 1fr) auto">
+        <CalendarToolbarPrev />
+        <CalendarToolbarGroup>
+          <CalendarToolbarMonthTrigger />
+          <CalendarToolbarYearTrigger />
+        </CalendarToolbarGroup>
+        <CalendarToolbarNext />
+      </CalendarToolbar>
+      <CalendarDays />
+    </Calendar>
+  );
+}
+```
+
+## Value shapes (`unit` × `mode`)
+
+| unit | mode | value |
+|---|---|---|
+| `day` | `single` | `Date \| null` |
+| `day` | `multiple` | `Date[]` |
+| `day` | `range` | `{ start: Date; end: Date } \| null` |
+| `day` | `multi-range` | `{ start: Date; end: Date }[]` |
+| `week` / `month` | `single` / `range` | `{ start: Date; end: Date } \| null` |
+| `week` / `month` | `multiple` / `multi-range` | `{ start: Date; end: Date }[]` |
+
+`onChange(value, details)`: `details.reason` is `"select" | "clear" | "preset" | "time" | "remove" | "external-sync"`. With `exclude`/`disabled` rules on a span, `details.segments` lists the business-day pieces. Range modes emit only complete spans. Controlled mode: pass `value` (`null` = empty); identity is compared by calendar day, so fresh-but-equal objects never loop.
+
+## `createCalendarConfig` options
+
+`mode` (`single | multiple | range | multi-range`), `unit` (`day | week | month`), `locale`, `firstDayOfWeek`, `min`, `max`, `disabled`, `exclude`, `excludedEndpointPolicy`, `readOnly`, `deselectOnReclick`, `withTime`, `hour12`, `ampmLabels`, `defaultTime`, `minTime`, `maxTime`, `weekendDays`, `minSpan`, `maxSpan`, `maxDates`, `maxRanges`, `timeZone` (IANA name).
+
+Date rules (`disabled` / `exclude`, or precompiled via `createDisabled`): `{ all, weekends, weekdays: number[], before, after, dates: Date[], ranges: ({ start, end } | { from, to })[], predicate }`.
+
+## `<Calendar>` props
+
+`config` (required), `value`, `defaultValue`, `onChange`, `onViewChange`, `onValidationReject`, `initialView`, `initialFocus`, `theme`, `appearance`, `scheme` (`light | dark | auto`), `onSchemeChange`, `cols` (smart grid columns; children take `col`), `gradient`, `labels` (aria/UI string overrides), `className`, `id`, `style`.
+
+## Modules (`@dateforge/react-calendar/modules/<name>`)
+
+- `days`: `CalendarDays`, the month day grid.
+- `toolbar`: `CalendarToolbar` + `CalendarToolbarPrev`, `Next`, `MonthTrigger`, `YearTrigger`, `MonthLabel`, `YearLabel`, `DayLabel`, `Label`, `Group`, `Home`, `Clear`, `Apply`, `Clock` (time popup), `ThemeToggle`.
+- `months-grid`, `years-grid`: `CalendarMonthsGrid`, `CalendarYearsGrid`.
+- `time`: `CalendarTimeWheel` (drum time picker; `bound="from" | "to"` for ranges).
+- `months-wheel`, `years-wheel`: `CalendarMonthsWheel`, `CalendarYearsWheel`.
+- `days-track`, `months-track`, `years-track`: swipeable horizontal strips (`CalendarDaysTrack`, …), mobile-friendly.
+- `manual-input`: `CalendarManualInput`, typed segment-based date entry.
+- `presets`: `CalendarPresets`, quick picks (`commonPresets`, `relativePresets`, `definePreset`).
+- `selected-dates`: `CalendarSelectedDates`, chips for the current selection.
+- `info`: `CalendarInfo`, formatted summary of the selection.
+- `lunar`: `CalendarLunar`, moon-phase surface.
+
+## Theming
+
+- `theme`: one of 28 built-in families (`noir` default, `abyss`, `aurora`, `bauhaus`, `chalk`, `crimson`, `cyber`, `dracula`, `eclipse`, `espresso`, `fjord`, `graphite`, `industrial`, `meadow`, `mint`, `monsoon`, `nebula`, `neon`, `pearl`, `prism`, `riso`, `sandstone`, `slate`, `snow`, `solar`, `split`, `temporal`, `velvet`) or a `createTheme({ accent, light: {...}, dark: {...} })` object.
+- `appearance`: `loft`, `compact`, `square`, `soft`, `bubble`, `airy`, `press`, `zenith`, or `createAppearance(...)`.
+- `scheme="auto"` follows the OS with no flash. Styles live in `@layer cal-base, cal-themes, cal-appearances, cal-modules, cal-user`; override in `cal-user` or unlayered CSS. Day cells expose `data-*` attributes (`data-selected`, `data-today`, `data-disabled`, `data-weekend`, `data-in-range`, …).
+
+## Other
+
+- Localization via `Intl` (`locale`); UI/aria strings via the `labels` registry. RTL is inherited from `dir` on any ancestor.
+- SSR: no hydration mismatch (tested in CI); `useToday()` for client-stable "today".
+- Custom modules: `@dateforge/react-calendar/context` exports `useCalendarStore`, `useStoreSelector`, `useCalendarActions`, `useUI`, `useLabels`.
+- Malformed input never throws; it degrades with a dev warning.
+
+## Docs
+
+- [Full API reference](https://github.com/kirilinsky/dateforge-react-calendar/blob/main/DOCUMENTATION.md): also shipped in the package as `DOCUMENTATION.md`
+- [Docs site](https://calendar-demo-pi.vercel.app/docs)
+- [Live demo](https://calendar-demo-pi.vercel.app/)
+- [Storybook](https://kirilinsky.github.io/dateforge-react-calendar/)
+- [Architecture](https://github.com/kirilinsky/dateforge-react-calendar/blob/main/ARCHITECTURE.md)
+
+## Optional
+
+- [Changelog](https://github.com/kirilinsky/dateforge-react-calendar/blob/main/CHANGELOG.md)
+- [README](https://github.com/kirilinsky/dateforge-react-calendar/blob/main/README.md)
