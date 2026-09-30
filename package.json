@@ -1,6 +1,6 @@
 {
   "name": "@dateforge/react-calendar",
-  "version": "3.2.2",
+  "version": "3.2.3",
   "description": "React date picker and calendar: single date, date range, multiple dates, month and time picker. Modular (pay per module), zero dependencies, SSR-safe, accessible, RTL, 28 light/dark themes. React 18/19, TypeScript.",
   "publishConfig": {
     "access": "public",

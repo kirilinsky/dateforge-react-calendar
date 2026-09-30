@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.2.3
+
+### Patch Changes
+
+- [#174](https://github.com/kirilinsky/dateforge-react-calendar/pull/174) [`c0749cd`](https://github.com/kirilinsky/dateforge-react-calendar/commit/c0749cd8dd4c1e61d036ee164b9711de8fa38328) Thanks [@kirilinsky](https://github.com/kirilinsky)! - Page-slide animation no longer leaks an unhandled `AbortError` rejection when a slide is cancelled in DOM shims (happy-dom ≥20.14) that do not mark the `finished` promise as handled.
+
 ## 3.2.2
 
 ### Patch Changes
