@@ -86,6 +86,9 @@ export function usePageSlide(
       duration,
       easing,
     });
+    // cancel() rejects `finished` with AbortError. Browsers mark it handled per
+    // spec; some DOM shims (happy-dom ≥20.14) don't → unhandled rejection.
+    animation.current.finished?.catch(() => {});
   }, [ordinal, ref, distance, duration, easing]);
 
   return {

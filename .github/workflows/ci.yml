@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [20, 22]
+        node: [22, 24]
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
@@ -58,8 +58,8 @@ jobs:
 
       - run: npm run check:exports
 
-      - name: Run tests (Node 20)
-        if: matrix.node == 20
+      - name: Run tests (Node 24)
+        if: matrix.node == 24
         run: npm test
 
       - name: Run tests with coverage (Node 22)

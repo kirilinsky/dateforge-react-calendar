@@ -1,0 +1,26 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "DateForge React Calendar",
+  "description": "Modular React date picker and calendar: single date, date range, multiple dates, month and time picker. Zero dependencies, SSR-safe, accessible, RTL, 28 light/dark themes.",
+  "branch": "main",
+  "excludeFolders": [".github", ".changeset", ".storybook", "scripts", "src"],
+  "excludeFiles": [
+    "CHANGELOG.md",
+    "ARCHITECTURE.md",
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
+    "SECURITY.md"
+  ],
+  "rules": [
+    "Install with `npm i @dateforge/react-calendar`. Peer deps: react and react-dom 18 or 19. No other runtime dependencies.",
+    "For a quick single-date picker use the prebuilts from `@dateforge/react-calendar/prebuilt`: `SimpleCalendar`, `DatePicker`, `MonthPicker`, `MultiMonthCalendar`. They take plain `Date` props.",
+    "`<Calendar>` requires a compiled `config` from `createCalendarConfig(...)`. Build it once at module scope or in `useMemo`, not on every render.",
+    "The `value`/`onChange` shape depends only on `unit` x `mode`: day+single is `Date | null`, day+multiple is `Date[]`, range is `{ start: Date; end: Date } | null`, multi-range is `{ start: Date; end: Date }[]`.",
+    "Import each module from its own subpath (e.g. `@dateforge/react-calendar/modules/days`) instead of the `/modules` barrel to keep bundles small.",
+    "Only the root `onChange` owns the selected value; per-module `on*Select` callbacks are observational.",
+    "Pickers render inline; there is no built-in input-with-popover. Wrap the calendar in your own popover if needed.",
+    "`calendarDate(year, month, day)` uses 1-based months; JS `Date` inputs keep normal 0-based months.",
+    "Use `useToday()` instead of `new Date()` for SSR-safe \"today\" values.",
+    "Styles are included automatically with ESM. CJS consumers import `@dateforge/react-calendar/style.css` once. Override styles in the `cal-user` cascade layer or unlayered CSS."
+  ]
+}
