@@ -272,7 +272,7 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "0.18.5",
-    "@biomejs/biome": "2.5.14",
+    "@biomejs/biome": "2.5.15",
     "@changesets/changelog-github": "1.0.1",
     "@changesets/cli": "3.0.3",
     "@chromatic-com/storybook": "^5.3.1",
@@ -291,7 +291,7 @@
     "@testing-library/user-event": "^14.6.7",
     "@tsdown/css": "^0.23.0",
     "@types/jest-axe": "^3.5.9",
-    "@types/node": "26.6.3",
+    "@types/node": "26.6.4",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitest/browser": "^4.1.11",
