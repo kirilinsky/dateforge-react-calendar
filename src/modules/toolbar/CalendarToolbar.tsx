@@ -907,7 +907,9 @@ export function CalendarToolbarMonthTrigger({
         aria-expanded={fixed ? undefined : open}
         aria-label={t(
           "changeMonth",
-          { month: longNames[date.month - 1] },
+          // Forced `short` shows only the short name, so the accessible name
+          // must carry it too (WCAG 2.5.3 Label in Name).
+          { month: short ? shortText : longText },
           label,
         )}
         data-toolbar-month-trigger=""

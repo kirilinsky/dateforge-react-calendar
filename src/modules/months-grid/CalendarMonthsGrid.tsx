@@ -89,11 +89,6 @@ export function CalendarMonthsGrid({
     [config.locale, short],
   );
 
-  const longNames = useMemo(
-    () => getMonthNames(config.locale, false),
-    [config.locale],
-  );
-
   const selectedMonths = useMemo((): ReadonlySet<number> => {
     const set = new Set<number>();
     if (selection.shape === "point") {
@@ -169,14 +164,17 @@ export function CalendarMonthsGrid({
           const isHidden = isBlocked && outOfRangeBehavior === "hide";
           const disabled =
             config.readOnly || (isBlocked && outOfRangeBehavior === "disable");
-          const longName = longNames[month - 1];
+          // Accessible name = the VISIBLE label (WCAG 2.5.3 Label in Name):
+          // a voice-control user says "click Jan", so "January" must not
+          // replace a short "Jan" tile's name.
+          const name = monthNames[month - 1];
           return (
             <UITile
               key={month}
               {...getItemProps(month - 1)}
               className={styles.item}
               aria-label={
-                isSelected ? t("monthSelected", { month: longName }) : longName
+                isSelected ? t("monthSelected", { month: name }) : name
               }
               aria-current={isCurrent ? "true" : undefined}
               aria-disabled={disabled || undefined}
@@ -190,7 +188,7 @@ export function CalendarMonthsGrid({
                 onMonthSelect?.(year, month);
               }}
             >
-              {monthNames[month - 1]}
+              {name}
             </UITile>
           );
         })}

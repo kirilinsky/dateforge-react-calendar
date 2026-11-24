@@ -405,7 +405,8 @@ describe("Toolbar month/year triggers", () => {
 
   it("short prop forces the short month name (data-short)", () => {
     const { getByLabelText } = setup(<CalendarToolbarMonthTrigger short />);
-    const btn = getByLabelText("Change month, currently June");
+    // Accessible name follows the visible short name (WCAG 2.5.3).
+    const btn = getByLabelText("Change month, currently Jun");
     expect(btn.getAttribute("data-short")).toBe("");
     expect(btn.textContent).toContain("Jun");
   });

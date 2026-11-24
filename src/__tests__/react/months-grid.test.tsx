@@ -33,16 +33,16 @@ describe("CalendarMonthsGrid", () => {
     setup();
     const current = document.querySelector("[aria-current='true']");
     expect(current).toBeTruthy();
-    // June is month 6 (index 5 = "Jun")
-    expect(current?.getAttribute("aria-label")).toMatch(/june/i);
+    // Accessible name = the visible short label (WCAG 2.5.3 Label in Name).
+    expect(current?.getAttribute("aria-label")).toBe("Jun");
   });
 
   it("clicking a month navigates view and calls onMonthSelect", async () => {
     const onMonthSelect = vi.fn();
     const user = userEvent.setup();
     setup({ onMonthSelect });
-    // Click March (3rd button, label aria = "March")
-    const marchBtn = screen.getByLabelText(/march/i);
+    // Click March (3rd button, aria-label = visible "Mar")
+    const marchBtn = screen.getByLabelText("Mar");
     await user.click(marchBtn);
     expect(onMonthSelect).toHaveBeenCalledWith(2026, 3);
   });
@@ -50,7 +50,7 @@ describe("CalendarMonthsGrid", () => {
   it("disabled months have aria-disabled", () => {
     // min = July 2026 → months Jan-Jun of 2026 out of range
     setup({}, { min: D(2026, 7, 1) });
-    const janBtn = screen.getByLabelText(/january/i);
+    const janBtn = screen.getByLabelText("Jan");
     expect(janBtn.getAttribute("aria-disabled")).toBe("true");
   });
 
@@ -78,16 +78,16 @@ describe("CalendarMonthsGrid", () => {
         }),
       },
     );
-    const march = screen.getByLabelText(/march/i);
+    const march = screen.getByLabelText("Mar");
     expect(march.getAttribute("aria-disabled")).toBe("true");
     // A non-disabled month stays enabled.
-    const april = screen.getByLabelText(/april/i);
+    const april = screen.getByLabelText("Apr");
     expect(april.getAttribute("aria-disabled")).toBeNull();
   });
 
   it("outOfRangeBehavior='hide' hides out-of-range months from a11y tree", () => {
     setup({ outOfRangeBehavior: "hide" }, { min: D(2026, 7, 1) });
-    const jan = screen.getByLabelText(/january/i);
+    const jan = screen.getByLabelText("Jan");
     expect(jan.getAttribute("aria-hidden")).toBe("true");
     expect(jan).toHaveStyle({ visibility: "hidden" });
   });
@@ -99,7 +99,7 @@ describe("CalendarMonthsGrid", () => {
       { outOfRangeBehavior: "show", onMonthSelect },
       { min: D(2026, 7, 1) },
     );
-    const jan = screen.getByLabelText(/january/i);
+    const jan = screen.getByLabelText("Jan");
     expect(jan.getAttribute("aria-disabled")).toBeNull();
     await user.click(jan);
     expect(onMonthSelect).toHaveBeenCalledWith(2026, 1);
@@ -107,7 +107,7 @@ describe("CalendarMonthsGrid", () => {
 
   it("announces a month holding a selected date", () => {
     setup({}, {}, point({ d: D(2026, 3, 15) }));
-    expect(screen.getByLabelText(/march, selected/i)).toBeTruthy();
+    expect(screen.getByLabelText("Mar, selected")).toBeTruthy();
   });
 
   it("applies a per-module theme override on the container", () => {
