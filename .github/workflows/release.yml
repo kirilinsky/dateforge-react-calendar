@@ -43,13 +43,16 @@ jobs:
       - name: Verify package tarball (npm pack)
         run: npm pack --dry-run
 
+      # changesets/action v2 is required for @changesets/cli v3: v1 detected
+      # published packages by parsing CLI stdout, which v3 changed, so v1
+      # published to npm but silently skipped git tags + GitHub releases
+      # (3.2.3 and 3.2.4 shipped without either).
       - name: Create Release Pull Request or Publish
-        uses: changesets/action@63a615b9cd06ba9a3e6d13796c7fbcb080a60a0b # v1
+        uses: changesets/action@ae32849d5ba541f9ae29e40e22a623bc13562f51 # v2.1.2
         with:
-          publish: npx changeset publish
-          version: npx changeset version
-          commit: "chore: version packages"
-          title: "chore: version packages"
-          createGithubReleases: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.CHANGESETS_TOKEN || secrets.GITHUB_TOKEN }}
+          publish-script: npx changeset publish
+          version-script: npx changeset version
+          commit-message: "chore: version packages"
+          pr-title: "chore: version packages"
+          create-github-releases: true
+          github-token: ${{ secrets.CHANGESETS_TOKEN || secrets.GITHUB_TOKEN }}
