@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.2.4
+
+### Patch Changes
+
+- [#197](https://github.com/kirilinsky/dateforge-react-calendar/pull/197) [`dc93b12`](https://github.com/kirilinsky/dateforge-react-calendar/commit/dc93b1229db3aab40faedbe17ed789d987e3c405) Thanks [@kirilinsky](https://github.com/kirilinsky)! - a11y: month accessible names now match the visible label (WCAG 2.5.3 Label in Name). `CalendarMonthsGrid` tiles with short labels are named "Jan" (or "Jan, selected") instead of "January", and `CalendarToolbarMonthTrigger` with `short` reads "Change month, currently Jun". Voice-control users can now activate them by what they see. If your tests query month tiles by full name (e.g. `getByLabelText("January")`) with short labels, update them to the short label.
+
 ## 3.2.3
 
 ### Patch Changes
